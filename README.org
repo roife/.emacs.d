@@ -1,5 +1,5 @@
 * Description
-My emacs confiduration.
+My emacs configurations.
 * TODO
 ** TODO linux support
 ** TODO move to macport
