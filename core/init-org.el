@@ -136,10 +136,12 @@
    '(org-block-begin-line ((t (:foreground "#55595F" :background "#292F39"))))
    '(org-block-end-line ((t (:foreground "#55595F" :background "#292F39")))))
   )
-(use-package olivetti
-  :hook ((org-mode . olivetti-mode))
-  :config
-  (setq olivetti-body-width 100))
+
+;; Attention: olivetti makes org-mode quite slow
+;; (use-package olivetti
+;;   :hook ((org-mode . olivetti-mode))
+;;   :config
+;;   (setq olivetti-body-width 100))
 
 (use-package org-bullets
   :if (char-displayable-p ?◉)
