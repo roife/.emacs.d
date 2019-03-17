@@ -1,0 +1,21 @@
+/*
+!init.el
+!early-init.el
+!.gitignore
+!README.org
+# core
+!/core
+/core/*
+!/core/init-*.el
+# site-lisp
+!/site-lisp
+/site-lisp/*
+!/site-lisp/*.el
+# template
+!/template
+/template/*
+# !/template/*.template.*
+# site-lisp
+!/site-lisp
+/site-lisp/*
+!/site-lisp/-*.el

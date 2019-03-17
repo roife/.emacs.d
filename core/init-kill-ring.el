@@ -1,0 +1,69 @@
+;;; init-kill-ring.el --- Initialize kill-ring configurations.  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2019  roife
+
+;; Author: roife <roife@outlook.com>
+;; Keywords: lisp
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Initialize kill-ring configurations.
+
+;;; Code:
+(eval-when-compile (require 'init-define))
+
+;;;; defaults
+(setq kill-ring-max 200)
+
+;; Save clipboard contents into kill-ring before replace them
+(setq save-interprogram-paste-before-kill t)
+
+;;;; Kill & Mark things easily: [easy-kill-extras]
+(use-package easy-kill-extras
+  :bind (([remap kill-ring-save] . easy-kill)
+         ([remap mark-sexp] . easy-mark-sexp)
+         ([remap mark-word] . easy-mark-word)
+
+         ;; Integrate `zap-to-char'
+         ([remap zap-to-char] . easy-mark-to-char)
+         ([remap zap-up-to-char] . easy-mark-up-to-char)
+
+         ;; Integrate `expand-region'
+         :map easy-kill-base-map
+         ("o" . easy-kill-er-expand)
+         ("i" . easy-kill-er-unexpand))
+  :init
+  (setq easy-kill-alist '((?w word           " ")
+                          (?s sexp           "\n")
+                          (?l list           "\n")
+                          (?f filename       "\n")
+                          (?d defun          "\n\n")
+                          (?D defun-name     " ")
+                          (?e line           "\n")
+                          (?b buffer-file-name)
+
+                          (?^ backward-line-edge "")
+                          (?$ forward-line-edge "")
+                          (?h buffer "")
+                          (?< buffer-before-point "")
+                          (?> buffer-after-point "")
+                          (?f string-to-char-forward "")
+                          (?F string-up-to-char-forward "")
+                          (?t string-to-char-backward "")
+                          (?T string-up-to-char-backward ""))))
+
+(provide 'init-kill-ring)
+;;; init-kill-ring.el ends here
