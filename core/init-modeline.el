@@ -32,10 +32,9 @@
   :group 'faces)
 
 ;;;;; winum
-(defface roife/modeline-winum-inactive-face
+(defface roife/modeline-panel-inactive-face
   `((t (:bold t
-              :background ,(face-foreground 'mode-line-inactive)
-              :foreground ,(face-background 'mode-line))))
+              :inherit 'font-lock-function-name-face)))
   "The face for winum on the mode-line of an active window."
   :group 'roife/modeline)
 
@@ -71,7 +70,7 @@
   "Face used for the region in the mode-line."
   :group 'roife/modeline)
 
-(defface roife/modeline-panel-face
+(defface roife/modeline-panel-active-face
   `((t (:background ,(face-foreground 'font-lock-function-name-face)
                     :foreground ,(face-background 'mode-line)
                     :bold t)))
@@ -85,17 +84,37 @@
   "Face used for the major-mode panel in the mode-line."
   :group 'roife/modeline)
 
-;; (defface roife/modeline-onekey-insert-face
-;;   )
+(defface roife/modeline-onekey-insert-face
+  `((t (:background ,(face-foreground 'font-lock-string-face)
+                    :foreground ,(face-background 'mode-line)
+                    :bold t)))
+  "Face used for onekey-insert in the mode-line."
+  :group 'roife/modeline
+  )
 
-;; (defface roife/modeline-onekey-normal-face
-;;   )
+(defface roife/modeline-onekey-normal-face
+  `((t (:background ,(face-foreground 'font-lock-function-name-face)
+                    :foreground ,(face-background 'mode-line)
+                    :bold t)))
+  "Face used for onekey-normal in the mode-line."
+  :group 'roife/modeline
+  )
 
-;; (defface roife/modeline-onekey-select-face
-;;   )
+(defface roife/modeline-onekey-visual-face
+  `((t (:background ,(face-foreground 'font-lock-builtin-face)
+                    :foreground ,(face-background 'mode-line)
+                    :bold t)))
+  "Face used for onekey-visual in the mode-line."
+  :group 'roife/modeline
+  )
 
-;; (defface roife/modeline-onekey-window-face
-;;   )
+(defface roife/modeline-onekey-others-face
+  `((t (:background ,(face-foreground 'font-lock-keyword-face)
+                    :foreground ,(face-background 'mode-line)
+                    :bold t)))
+  "Face used for onekey-others in the mode-line."
+  :group 'roife/modeline
+  )
 
 ;;;; update modeline
 (defun roife/modeline-active-p ()
@@ -178,14 +197,14 @@
                               (abs (- (mark t) (point)))
                               (count-words (region-beginning) (region-end))
                               (count-lines (region-beginning) (region-end)))
-                      'face 'roife/modeline-panel-face))
+                      'face 'roife/modeline-panel-active-face))
   )
 
 (defun roife/modeline-module-macro ()
   "Display current Emacs macro being recorded."
   (when (roife/modeline-active-p)
-    (cond (defining-kbd-macro (propertize "| Def Macro ▶ " 'face 'roife/modeline-panel-face))
-          (executing-kbd-macro (propertize "| Exec Macro ▶ " 'face 'roife/modeline-panel-face))
+    (cond (defining-kbd-macro (propertize "| Def Macro ▶ " 'face 'roife/modeline-panel-active-face))
+          (executing-kbd-macro (propertize "| Exec Macro ▶ " 'face 'roife/modeline-panel-active-face))
           ))
   )
 
@@ -195,15 +214,34 @@
                ((derived-mode-p 'calc-mode) (prin1-to-string calc-angle-mode))
                (t nil))))
     (when info (propertize (concat " " info  " ")
-                           'face 'roife/modeline-major-mode-panel-face)))
+                           'face (roife/modeline-update-face
+                                  'roife/modeline-major-mode-panel-face))))
   )
 
 (defun roife/modeline-module-overwrite-mode-panel ()
   "Overwrite panel for major mode in modeline."
-  (when overwrite-mode (propertize "| Ovr " 'face 'roife/modeline-panel-face)))
+  (when (and overwrite-mode
+             (roife/modeline-active-p)) (propertize "| Ovr "
+             'face 'roife/modeline-panel-active-face))
+  )
 
 (defun roife/modeline-module-onekey ()
   "Indicator for onekey in modeline."
+  (let ((name (pcase roife/onekey-mode
+                ('insert "I")
+                ('normal "N")
+                ('visual "V")
+                (_ (s-capitalized-words (prin1-to-string roife/onekey-mode)))
+                ))
+        (face (pcase roife/onekey-mode
+                ('insert 'roife/modeline-onekey-insert-face)
+                ('normal 'roife/modeline-onekey-normal-face)
+                ('visual 'roife/modeline-onekey-visual-face)
+                (_ 'roife/modeline-onekey-others-face)
+                ))
+        )
+    (when (roife/modeline-active-p)
+      (propertize (concat " " name " ") 'face face)))
   )
 
 ;;; update
@@ -214,8 +252,8 @@
                '(:eval (when (bound-and-true-p winum-mode)
                          (propertize (concat " " (winum-get-number-string) " ")
                                      'face (roife/modeline-update-face
-                                            'roife/modeline-panel-face
-                                            'roife/modeline-winum-inactive-face))))
+                                            'roife/modeline-panel-active-face
+                                            'roife/modeline-panel-inactive-face))))
                ;; recording macro
                '(:eval (roife/modeline-module-macro))
                ;; overwrite
@@ -236,7 +274,8 @@
                '(:eval (if (buffer-file-name) (roife/modeline-module-file)
                          (propertize "%b" 'face '(:weight bold))))
                ;; TODO: A key mode indicator.
-               '(:eval )
+               " "
+               '(:eval (roife/modeline-module-onekey))
                ))
          (rhs (list
                ;; major-mode panel
