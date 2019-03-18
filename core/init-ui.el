@@ -42,7 +42,6 @@
   (setq-default display-line-numbers-width 4))
 
 ;;;; Mouse & Scroll & Move
-(setq-default cursor-type 'bar)
 ;; 滚动时保留10行，防止页面跳动
 (setq scroll-preserve-screen-position t
       scroll-margin 10

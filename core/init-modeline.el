@@ -84,35 +84,43 @@
   "Face used for the major-mode panel in the mode-line."
   :group 'roife/modeline)
 
-(defface roife/modeline-onekey-insert-face
+(defface roife/modeline-rifkey-insert-face
   `((t (:background ,(face-foreground 'font-lock-string-face)
                     :foreground ,(face-background 'mode-line)
                     :bold t)))
-  "Face used for onekey-insert in the mode-line."
+  "Face used for rifkey-insert in the mode-line."
   :group 'roife/modeline
   )
 
-(defface roife/modeline-onekey-normal-face
+(defface roife/modeline-rifkey-normal-face
   `((t (:background ,(face-foreground 'font-lock-function-name-face)
                     :foreground ,(face-background 'mode-line)
                     :bold t)))
-  "Face used for onekey-normal in the mode-line."
+  "Face used for rifkey-normal in the mode-line."
   :group 'roife/modeline
   )
 
-(defface roife/modeline-onekey-visual-face
+(defface roife/modeline-rifkey-visual-face
   `((t (:background ,(face-foreground 'font-lock-builtin-face)
                     :foreground ,(face-background 'mode-line)
                     :bold t)))
-  "Face used for onekey-visual in the mode-line."
+  "Face used for rifkey-visual in the mode-line."
   :group 'roife/modeline
   )
 
-(defface roife/modeline-onekey-others-face
+(defface roife/modeline-rifkey-window-face
+  `((t (:background ,(face-foreground 'font-lock-variable-name-face)
+                    :foreground ,(face-background 'mode-line)
+                    :bold t)))
+  "Face used for rifkey-others in the mode-line."
+  :group 'roife/modeline
+  )
+
+(defface roife/modeline-rifkey-others-face
   `((t (:background ,(face-foreground 'font-lock-keyword-face)
                     :foreground ,(face-background 'mode-line)
                     :bold t)))
-  "Face used for onekey-others in the mode-line."
+  "Face used for rifkey-others in the mode-line."
   :group 'roife/modeline
   )
 
@@ -225,19 +233,21 @@
              'face 'roife/modeline-panel-active-face))
   )
 
-(defun roife/modeline-module-onekey ()
-  "Indicator for onekey in modeline."
-  (let ((name (pcase roife/onekey-mode
+(defun roife/modeline-module-rifkey ()
+  "Indicator for rifkey in modeline."
+  (let ((name (pcase roife/rifkey-mode
                 ('insert "I")
                 ('normal "N")
                 ('visual "V")
-                (_ (s-capitalized-words (prin1-to-string roife/onekey-mode)))
+                ('window "W")
+                (_ (s-capitalized-words (prin1-to-string roife/rifkey-mode)))
                 ))
-        (face (pcase roife/onekey-mode
-                ('insert 'roife/modeline-onekey-insert-face)
-                ('normal 'roife/modeline-onekey-normal-face)
-                ('visual 'roife/modeline-onekey-visual-face)
-                (_ 'roife/modeline-onekey-others-face)
+        (face (pcase roife/rifkey-mode
+                ('insert 'roife/modeline-rifkey-insert-face)
+                ('normal 'roife/modeline-rifkey-normal-face)
+                ('visual 'roife/modeline-rifkey-visual-face)
+                ('window 'roife/modeline-rifkey-window-face)
+                (_ 'roife/modeline-rifkey-others-face)
                 ))
         )
     (when (roife/modeline-active-p)
@@ -275,7 +285,7 @@
                          (propertize "%b" 'face '(:weight bold))))
                ;; TODO: A key mode indicator.
                " "
-               '(:eval (roife/modeline-module-onekey))
+               '(:eval (roife/modeline-module-rifkey))
                ))
          (rhs (list
                ;; major-mode panel

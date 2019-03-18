@@ -1,4 +1,4 @@
-;;; init-hydra.el --- Initialize hydra configurations.  -*- lexical-binding: t; -*-
+;;; init-rifkey.el --- Initialize rifkey configurations.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  roife
 
@@ -25,18 +25,104 @@
 ;;; Code:
 (eval-when-compile (require 'init-define))
 
-(use-package hydra)
+;;normal
+(defhydra roife/hydra-rifkey-normal
+  (:body-pre (progn (setq-default hydra-is-helpful nil
+                                  roife/rifkey-mode 'normal
+                                  cursor-type 'box))
+             :before-exit (progn (setq-default hydra-is-helpful t
+                                               roife/rifkey-mode 'insert
+                                               cursor-type 'bar)) ;; TODO
+             :color amaranth ;; eq to :foreign-keys warn
+             )
+  " "
+  ;; Mode
+  ("SPC" roife/hydra-rifkey-visual/body "Visual" :column "Mode" :color blue)
+  ;; Move
+  ("n" next-line "↓" :column "Move")
+  ("p" previous-line "↑")
+  ("f" forward-char "↓")
+  ("b" backward-char "←")
+  ("v" scroll-up-command "scroll↓")
+  ("V" scroll-down-command "scroll↑")
+  ("a" mwim-beginning-of-code-or-line "bol")
+  ("e" mwim-end-of-code-or-line "eol")
+  ("A" mwim-beginning-of-code-or-line "bol-edit")
+  ("E" mwim-end-of-code-or-line "beol-edit")
+  ("l" recenter-top-bottom "recenter")
+  ;; kill
+  ("kl" (progn (mwim-beginning-of-code-or-line) (paredit-kill)))
+  ;; undo
+  ("u"   undo-tree-undo "undo" :column "Undo")
+  ("U"   undo-tree-redo "redo")
+  ;; search / replace
+  ("s"   swiper :color blue :column "Search")
+  ;; help
+  ("?" (progn (setq hydra-is-helpful (not hydra-is-helpful))) "hint" :column "help")
+  ("i" nil "insert mode")
+  )
+(bind-key "<escape>" 'roife/hydra-rifkey-normal/body)
 
-;;;; navigation
-;; (defhydra
-;;   (:pre ))
+(defhydra roife/hydra-rifkey-visual
+  (:body-pre (progn (setq-default hydra-is-helpful nil
+                                  roife/rifkey-mode 'visual
+                                  cursor-type 'box)
+                    (call-interactively 'set-mark-command))
+             :before-exit (progn (setq-default hydra-is-helpful t
+                                               roife/rifkey-mode 'insert
+                                               cursor-type 'bar)
+                                 (deactivate-mark)) ;; TODO
+             :color amaranth ;; eq to :foreign-keys warn
+             )
+  " "
+  ;; Mode
+  ("<escape>" roife/hydra-rifkey-normal/body "Normal" :column "Mode" :color blue)
+  ;; Move
+  ("n" next-line "↓" :column "Move")
+  ("p" previous-line "↑")
+  ("f" forward-char "↓")
+  ("b" backward-char "←")
+  ("v" scroll-up-command "scroll↓")
+  ("V" scroll-down-command "scroll↑")
+  ("a" mwim-beginning-of-code-or-line "bol")
+  ("e" mwim-end-of-code-or-line "eol")
+  ;; mark
+  ("l" mark-line "line")
+  ;; expand-region
+  ("SPC" er/expand-region "expand" :column "er")
+  ("S-SPC" er/contract-region "contract")
+  ("d" er/mark-defun "func")
+  ("w" er/mark-word "word")
+  ("u" er/mark-url "url")
+  ("e" mark-sexp "s-exp")
+  ("E" er/mark-email "email")
+  ("P" er/mark-text-paragraph "paragraph")
+  ("s" er/mark-symbol "symbol")
+  ("S" er/mark-symbol-with-prefix "pre-symbol")
+  ;; brackets
+  ("q" er/mark-inside-quotes "quotes-in" :column "brackets")
+  ("Q" er/mark-outside-quotes "quotes-out")
+  ("[" er/mark-inside-pairs "pairs-in")
+  ("]" er/mark-outside-pairs "pairs-out")
+  ("t" er/mark-inner-tag "tag-in")
+  ("T" er/mark-outer-tag "tag-out")
+  ("c" er/mark-comment "Comment")
+  ("a" er/mark-html-attribute "HTML attribute")
+  ;; search / replace
+  ;; ("s" (progn (swiper ())) :color blue :column "Search")
+  ;; edit
+  ("k" kill-region "kill" :column "edit" :color blue)
+  ;; help
+  ("?" (progn (setq hydra-is-helpful (not hydra-is-helpful))) "hint" :column "help")
+  ("i" delete-active-region "insert mode" :color blue)
+  )
 
 ;; (defhydra hydra-reading
-;;   (:pre (progn (setq hydra-is-helpful nil) (overwrite-mode -1) (hydra-refresh-mode-line "  [N]  "))
-;;         :before-exit (progn (setq hydra-is-helpful t) (hydra-refresh-mode-line "  [I]  "))
-;;         :foreign-keys run
-;;         :color amaranth
-;;         :hint nil)
+;; (:pre (progn (setq hydra-is-helpful nil) (overwrite-mode -1) (hydra-refresh-mode-line "  [N]  "))
+;;       :before-exit (progn (setq hydra-is-helpful t) (hydra-refresh-mode-line "  [I]  "))
+;;       :foreign-keys run
+;;       :color amaranth
+;;       :hint nil)
 ;;   " "
 ;;   ("!" shell-command)
 ;;   ("-" er/expand-region)
@@ -153,5 +239,5 @@
 ;;       (funcall x))))
 
 ;;;;
-(provide 'init-hydra)
-;;; init-hydra.el ends here
+(provide 'init-rifkey)
+;;; init-rifkey.el ends here

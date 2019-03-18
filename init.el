@@ -102,7 +102,7 @@
 
 (require 'init-highlight)
 
-(require 'init-hydra)
+(require 'init-rifkey)
 
 (require 'init-utils)
 

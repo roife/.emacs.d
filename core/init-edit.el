@@ -292,6 +292,8 @@
 (use-package zoom
   :hook (after-init . zoom-mode))
 
+(use-package hydra)
+
 ;; TODO: anzu(setq isearch-lazy-count t)
 
 (provide 'init-edit)

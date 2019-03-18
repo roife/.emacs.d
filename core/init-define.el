@@ -57,8 +57,8 @@
 (defvar roife/current-window nil)
 (add-hook 'post-command-hook '(lambda () (setq roife/current-window (selected-window))))
 
-;;; onekey
-(defvar roife/onekey-mode 'insert)
+;;; rifkey
+(defvar roife/rifkey-mode 'insert)
 
 (provide 'init-define)
 ;;; init-define.el ends here
