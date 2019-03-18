@@ -37,6 +37,9 @@
 ;;   (advice-add #'persp-load-state-from-file
 ;;               :after #'solaire-mode-restore-persp-mode-buffers))
 
+;;;; cursor
+(setq-default cursor-type 'bar)
+
 ;;;; Mouse
 ;; 支持鼠标中键粘贴
 (setq mouse-yank-at-point t
