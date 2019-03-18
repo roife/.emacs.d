@@ -112,7 +112,15 @@
   `((t (:background ,(face-foreground 'font-lock-variable-name-face)
                     :foreground ,(face-background 'mode-line)
                     :bold t)))
-  "Face used for rifkey-others in the mode-line."
+  "Face used for rifkey-window in the mode-line."
+  :group 'roife/modeline
+  )
+
+(defface roife/modeline-rifkey-op-face
+  `((t (:background ,(face-foreground 'font-lock-keyword-face)
+                    :foreground ,(face-background 'mode-line)
+                    :bold t)))
+  "Face used for rifkey-op in the mode-line."
   :group 'roife/modeline
   )
 
@@ -240,6 +248,7 @@
                 ('normal "N")
                 ('visual "V")
                 ('window "W")
+                ('op "O")
                 (_ (s-capitalized-words (prin1-to-string roife/rifkey-mode)))
                 ))
         (face (pcase roife/rifkey-mode
@@ -247,6 +256,7 @@
                 ('normal 'roife/modeline-rifkey-normal-face)
                 ('visual 'roife/modeline-rifkey-visual-face)
                 ('window 'roife/modeline-rifkey-window-face)
+                ('op 'roife/modeline-rifkey-op-face)
                 (_ 'roife/modeline-rifkey-others-face)
                 ))
         )
