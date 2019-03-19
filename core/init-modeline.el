@@ -171,12 +171,12 @@
                               (propertize
                                (format str num) 'face face))
                             args))
-                   `((,(length (gethash :error diags-by-type)) "•%d " '(:inherit error
-                                                                                 :background ,(face-background 'mode-line-inactive)))
-                     (,(length (gethash :warning diags-by-type)) "•%d " '(:inherit warning
-                                                                                   :background ,(face-background 'mode-line-inactive)))
-                     (,(length (gethash :note diags-by-type)) "•%d" '(:inherit success
-                                                                               :background ,(face-background 'mode-line-inactive))))))))
+                   `((,(length (gethash :error diags-by-type)) "•%d " (:inherit error
+                                                                                :background ,(face-background 'mode-line-inactive)))
+                     (,(length (gethash :warning diags-by-type)) "•%d " (:inherit warning
+                                                                                  :background ,(face-background 'mode-line-inactive)))
+                     (,(length (gethash :note diags-by-type)) "•%d" (:inherit success
+                                                                              :background ,(face-background 'mode-line-inactive))))))))
 
 (defun roife/modeline-module-file ()
   (let* ((prj-p (when (and (bound-and-true-p projectile-mode)
@@ -312,7 +312,7 @@
                ;; vc-mode
                '(vc-mode vc-mode)
                ;; mode
-               "  "
+               " "
                '(:eval (propertize "%m"
                                    'face (roife/modeline-update-face
                                           'roife/modeline-major-mode-active-face)))
