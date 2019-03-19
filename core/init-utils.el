@@ -60,5 +60,10 @@
 ;;;; post image to imgbb: [imgbb]
 (use-package imgbb)
 
+(use-package keyfreq
+  :init
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1))
+
 (provide 'init-utils)
 ;;; init-utils.el ends here

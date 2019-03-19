@@ -28,8 +28,7 @@
 ;;;; counsel
 (use-package counsel
   :defines (projectile-completion-system magit-completing-read-function)
-  :bind (("C-x C-b" . ivy-switch-buffer)
-         ("C-s" . swiper)
+  :bind (("C-s" . swiper)
          ("C-S-s" . swiper-all)
 
          ("C-c v p" . ivy-push-view)
