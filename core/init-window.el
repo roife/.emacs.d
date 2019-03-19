@@ -158,5 +158,9 @@
          ("s-9" . winum-select-window-9))
   :config (setq winum-auto-setup-mode-line nil))
 
+(use-package auto-dim-other-buffers
+  :hook (after-init . auto-dim-other-buffers-mode)
+  :config (set-face-background 'auto-dim-other-buffers-face (face-background 'mode-line-inactive)))
+
 (provide 'init-window)
 ;;; init-window.el ends here
