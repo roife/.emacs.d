@@ -139,12 +139,12 @@
   ;; Be slightly less aggressive in C/C++/C#/Java/Go/Swift
   (add-to-list
    'aggressive-indent-dont-indent-if
-   '(and (or (derived-mode-p 'c-mode)
-             (derived-mode-p 'c++-mode)
-             (derived-mode-p 'csharp-mode)
-             (derived-mode-p 'java-mode)
-             (derived-mode-p 'go-mode)
-             (derived-mode-p 'swift-mode))
+   '(and (derived-mode-p 'c-mode
+                         'c++-mode
+                         'csharp-mode
+                         'java-mode
+                         'go-mode
+                         'swift-mode)
          (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
                              (thing-at-point 'line))))))
 
@@ -154,7 +154,8 @@
 
 ;;;;; [Paredit]
 (use-package paredit
-  :hook (after-init . paredit-mode)
+  :defer 0
+  :hook ((prog-mode . paredit-mode))
   :config
   ;; Don't insert space automatically
   (add-to-list 'paredit-space-for-delimiter-predicates
