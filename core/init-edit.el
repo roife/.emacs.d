@@ -74,6 +74,7 @@
 
 ;;;;; Expand region: [expand-region]
 (use-package expand-region
+  :defer 0
   :bind ("C-=" . er/expand-region))
 
 ;;;; URL
