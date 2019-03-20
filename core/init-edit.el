@@ -153,7 +153,7 @@
 
 ;;;;; [Paredit]
 (use-package paredit
-  :hook (prog-mode . paredit-mode)
+  :hook (after-init . paredit-mode)
   :config
   ;; Don't insert space automatically
   (add-to-list 'paredit-space-for-delimiter-predicates
