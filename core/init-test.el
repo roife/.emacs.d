@@ -32,5 +32,20 @@
     (setenv "PATH" path)
     (setq exec-path (append (parse-colon-path path) (list exec-directory)))))
 
+(use-package pyim
+  :after ivy
+  :config
+
+  (defun eh-ivy-cregexp (str)
+    (let ((a (ivy--regex-plus str))
+          (b (let ((case-fold-search nil))
+               (pyim-cregexp-build str))))
+      (if (and a (stringp a))
+          (concat a "\\|" b)
+        a)))
+
+  (setq ivy-re-builders-alist
+        '((t . eh-ivy-cregexp))))
+
 (provide 'init-test)
 ;;; init-test.el ends here

@@ -25,9 +25,6 @@
 ;;; Code:
 (eval-when-compile (require 'init-define))
 
-;; (use-package atom-one-dark-theme
-;;   :init (load-theme 'atom-one-dark t))
-
 (use-package one-themes
   :init (load-theme 'one-dark t))
 
@@ -39,7 +36,11 @@
   :ensure nil
   :hook ((prog-mode) . display-line-numbers-mode)
   :config
-  (setq-default display-line-numbers-width 4))
+  (setq-default display-line-numbers-width 1
+                display-line-numbers-widen t
+                display-line-numbers-grow-only t)
+  (set-face-foreground 'line-number-current-line "#859393")
+  )
 
 ;;;; Mouse & Scroll & Move
 ;; 滚动时保留10行，防止页面跳动
