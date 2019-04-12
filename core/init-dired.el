@@ -52,9 +52,10 @@
     (setq dired-listing-switches "-alh --group-directories-first")
 
     ;; Quick sort dired buffers via hydra
-    (use-package dired-quick-sort
-      :bind (:map dired-mode-map
-                  ("S" . hydra-dired-quick-sort/body))))
+    ;; (use-package dired-quick-sort
+    ;;   :bind (:map dired-mode-map
+    ;;               ("S" . hydra-dired-quick-sort/body)))
+    )
   )
 
 ;;;; Extra Dired functionality: [dired-aux]
