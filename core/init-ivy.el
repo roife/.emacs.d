@@ -28,8 +28,7 @@
 ;;;; counsel
 (use-package counsel
   :defines (projectile-completion-system magit-completing-read-function)
-  :bind (("C-s" . swiper)
-         ("C-S-s" . swiper-all)
+  :bind (("C-<return>" . swiper-from-isearch)
 
          ("C-c v p" . ivy-push-view)
          ("C-c v o" . ivy-pop-view)
@@ -128,10 +127,10 @@
   :init (ivy-rich-mode 1))
 
 ;;;; Enhance fuzzy matching: [flx]
-        (use-package flx)
+(use-package flx)
 
 ;;;; Enhance M-x: [amx]
-        (use-package amx)
+(use-package amx)
 
-        (provide 'init-ivy)
+(provide 'init-ivy)
 ;;; init-ivy.el ends here
