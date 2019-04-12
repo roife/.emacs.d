@@ -120,16 +120,16 @@
   (setq org-image-actual-width '(600)) ; set inline image size
   (setq org-startup-indented t) ; indent in org
 
-  (custom-set-faces
-   '(org-level-1 ((t (:inherit outline-1 :bold t :height 1.3))))
-   '(org-level-2 ((t (:inherit outline-2 :bold t :height 1.2))))
-   '(org-level-3 ((t (:inherit outline-3 :bold t :height 1.1))))
-   '(org-level-4 ((t (:inherit outline-4 :bold t :height 1.1))))
-   '(org-level-5 ((t (:inherit outline-5 :bold t :height 1.1))))
-   '(org-level-6 ((t (:inherit outline-6 :bold t :height 1.1))))
-   '(org-level-7 ((t (:inherit outline-7 :bold t :height 1.1))))
-   '(org-level-8 ((t (:inherit outline-8 :bold t :height 1.1))))
-   )
+  ;; (custom-set-faces
+  ;;  '(org-level-1 ((t (:inherit outline-1 :bold t :height 1.3))))
+  ;;  '(org-level-2 ((t (:inherit outline-2 :bold t :height 1.2))))
+  ;;  '(org-level-3 ((t (:inherit outline-3 :bold t :height 1.1))))
+  ;;  '(org-level-4 ((t (:inherit outline-4 :bold t :height 1.1))))
+  ;;  '(org-level-5 ((t (:inherit outline-5 :bold t :height 1.1))))
+  ;;  '(org-level-6 ((t (:inherit outline-6 :bold t :height 1.1))))
+  ;;  '(org-level-7 ((t (:inherit outline-7 :bold t :height 1.1))))
+  ;;  '(org-level-8 ((t (:inherit outline-8 :bold t :height 1.1))))
+  ;;  )
 
   (custom-set-faces
    '(org-block ((t (:background "#292F39"))))
