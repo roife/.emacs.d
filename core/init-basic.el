@@ -47,12 +47,6 @@
   :ensure nil
   :hook (after-init . global-auto-revert-mode))
 
-;;;; Advanced help: helpful
-(use-package helpful
-  :bind (("C-h f" . #'helpful-callable)
-         ("C-h v" . #'helpful-variable)
-         ("C-h k" . #'helpful-key)))
-
 ;;;; Misc
 (setq indicate-empty-lines t
       ring-bell-function 'ignore);; use C-y M-y to paste from clipbaord instead of kill-ring
