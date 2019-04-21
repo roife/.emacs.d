@@ -34,8 +34,8 @@
             (lambda ()
               "Restore defalut values after init"
               (setq file-name-handler-alist roife/default-file-name-handler-alist
-                    gc-cons-threshold 530000000
-                    gc-cons-percentage 0.6)
+                    gc-cons-threshold 8000000
+                    gc-cons-percentage 0.7)
               (add-function :after after-focus-change-function
                             (lambda () (unless (frame-focus-state)
                                     (garbage-collect))))

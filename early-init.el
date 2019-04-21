@@ -26,8 +26,8 @@
 ;;; Code:
 
 ;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold 530000000
-      gc-cons-percentage 0.6)
+(setq gc-cons-threshold (* 512 1024 1024)
+      gc-cons-percentage 0.7)
 
 ;; Faster to disable these here (before they've been initialized)
 (unless (and (display-graphic-p) (eq system-type 'darwin))

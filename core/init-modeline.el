@@ -171,12 +171,9 @@
                               (propertize
                                (format str num) 'face face))
                             args))
-                   `((,(length (gethash :error diags-by-type)) "•%d " (:inherit error
-                                                                                :background ,(face-background 'mode-line-inactive)))
-                     (,(length (gethash :warning diags-by-type)) "•%d " (:inherit warning
-                                                                                  :background ,(face-background 'mode-line-inactive)))
-                     (,(length (gethash :note diags-by-type)) "•%d" (:inherit success
-                                                                              :background ,(face-background 'mode-line-inactive))))))))
+                   `((,(length (gethash :error diags-by-type)) "•%d " (:inherit error))
+                     (,(length (gethash :warning diags-by-type)) "•%d " (:inherit warning))
+                     (,(length (gethash :note diags-by-type)) "•%d" (:inherit success)))))))
 
 (defun roife/modeline-module-file ()
   (let* ((prj-p (when (and (bound-and-true-p projectile-mode)
@@ -194,8 +191,7 @@
          (file-name (file-relative-name
                      buffer-file-name
                      (if prj-p prj-p
-                       (abbreviate-file-name default-directory))))
-         )
+                       (abbreviate-file-name default-directory)))))
     (concat (propertize (roife/shorten-path prj-dir)
                         'face `(:foreground ,(face-foreground 'mode-line-inactive)
                                             :weight bold))
@@ -203,8 +199,7 @@
                             "~"
                           prj-name)
                         'face 'roife/modeline-projectile-face)
-            (propertize "/" 'face `(:weight bold :foreground ,(face-foreground 'mode-line)))
-            (propertize file-name 'face `(:weight bold :foreground ,(face-foreground 'mode-line))))
+            (propertize (concat "/" file-name) 'face `(:weight bold)))
     )
   )
 
@@ -302,13 +297,13 @@
                '(:eval (roife/modeline-module-major-mode-panel))
                ;; flymake
                '(:eval (when (bound-and-true-p flymake-mode)
-                         (concat
-                          (propertize " " 'face 'roife/modeline-specific-active-face)
-                          (if (eq roife/current-window (selected-window))
-                              (roife/modeline-module-flymake)
-                            (propertize (roife/modeline-module-flymake) 'face 'roife/modeline-specific-active-face))
-                          (propertize " " 'face 'roife/modeline-specific-active-face)
-                          )))
+                         (let* ((flymake-info (concat " " (roife/modeline-module-flymake) " ")))
+                           (if (roife/modeline-active-p)
+                               (progn (add-face-text-property 0 (length flymake-info)
+                                                              'mode-line-inactive t
+                                                              flymake-info)
+                                      flymake-info)
+                             (propertize flymake-info 'face 'mode-line-inactive)))))
                ;; vc-mode
                '(vc-mode vc-mode)
                ;; mode

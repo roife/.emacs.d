@@ -23,7 +23,7 @@
 
 ;;; Code:
 
-;;;; History: saveplace & recentf & savehist
+;;;; History: `saveplace' `recentf' `savehist''
 (use-package saveplace
   :ensure nil
   :hook (after-init . save-place-mode))
@@ -31,7 +31,7 @@
 (use-package recentf
   :ensure nil
   :hook (after-init . recentf-mode)
-  :init
+  :config
   (setq recentf-max-saved-items 50)
   (setq recentf-exclude '((expand-file-name package-user-dir)
                           ".cache"
@@ -49,7 +49,7 @@
   :ensure nil
   :hook (after-init . savehist-mode)
   :init (setq enable-recursive-minibuffers t ; Allow commands in minibuffers
-              history-length 1000
+              history-length 200
               savehist-additional-variables '(mark-ring
                                               global-mark-ring
                                               search-ring
