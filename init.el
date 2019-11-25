@@ -60,7 +60,7 @@
 
 (update-load-path)
 
-;;;; Load configuration
+;; Load configuration
 ;; Initialize elpa
 (require 'init-elpa)
 ;; basic
@@ -74,7 +74,7 @@
       (require 'init-gui)
       (require (cond (roife/sys-macos-p 'init-macos)
                      ;; ((roife/sys-linux-p) 'init-linux)
-                     ;; ((roife/sys-windows-p) 'init-windows)
+                     (roife/sys-win32-p 'init-win32)
                      ))
       (require 'init-modeline)
       )
@@ -87,7 +87,7 @@
 
 (require 'init-ivy)
 (require 'init-company)
-;; (require 'init-yasnippet)
+(require 'init-yasnippet)
 (require 'init-calendar)
 (require 'init-dired)
 (require 'init-shell)
