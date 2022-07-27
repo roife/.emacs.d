@@ -1,338 +1,244 @@
-;;; init-modeline.el ---  Initialize modeline configurations.  -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019  roife
-
-;; Author: roife <roife@outlook.com>
-;; Keywords: lisp, faces
-
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;;
-
-;;; Code:
-(eval-when-compile (require 'init-define))
 (require 'cl-lib)
 
+;; [hide-mode-line] Hide modeline in certain major modes
+(use-package hide-mode-line
+  :straight t
+  :hook (((
+           ;; completion-list-mode
+           ;; completion-in-region-mode
+           eshell-mode
+           shell-mode
+           term-mode
+           vterm-mode
+           pdf-annot-list-mode
+           flycheck-error-list-mode) . hide-mode-line-mode)))
+
+;; [modeline] Modeline
+
+;;; Get current window
+(defvar +modeline-current-window nil)
+
+(defsubst +modeline-get-current-window-exclude-child-window (&optional frame)
+  "Get the current window but should exclude the child windows.
+If FRAME is nil, it means the current frame."
+  (frame-selected-window (or (frame-parent frame) frame)))
+
+(defun +modeline-set-selected-window (&rest _)
+  "Set `+modeline-current-window' appropriately."
+  (let ((win (+modeline-get-current-window-exclude-child-window)))
+    (setq +modeline-current-window
+          (if (minibuffer-window-active-p win)
+              (minibuffer-selected-window)
+            win))))
+
+(defsubst +modeline-window-active-p ()
+  "Whether is an active window."
+  (eq (+modeline-get-current-window-exclude-child-window) +modeline-current-window))
+
+(add-hook 'pre-redisplay-functions #'+modeline-set-selected-window)
+
+
+;;; Faces for modeline
+
+(defsubst +modeline-update-face (active &optional inactive)
+  "Return ACTIVE if the current window is selected, if not, return INACTIVE."
+  (if (+modeline-window-active-p)
+      active
+    (or inactive 'mode-line-inactive)))
+
+
 ;;;; face
-(defgroup roife/modeline nil
-  "roife/mode-line faces."
+(defgroup +modeline nil
+  "Modeline faces."
   :group 'faces)
 
-;;;;; winum
-(defface roife/modeline-panel-inactive-face
-  `((t (:bold t
-              :inherit 'font-lock-function-name-face)))
-  "The face for winum on the mode-line of an active window."
-  :group 'roife/modeline)
-
-;;;;; position
-(defface roife/modeline-specific-active-face
+(defface +modeline-line-number-active-face
   `((t (:background ,(face-background 'mode-line-inactive))))
   "The face for specific parts on the mode-line of an active window."
-  :group 'roife/modeline)
+  :group '+modeline)
 
-;;;;; major-mode
-(defface roife/modeline-major-mode-active-face
-  '((t (:inherit (mode-line-emphasis bold))))
-  "Face used for the major-mode segment in the mode-line."
-  :group 'roife/modeline)
+(defface +modeline-vc-mode-active-face
+  '((t (:inherit (bold font-lock-constant-face))))
+  "The face for specific parts on the mode-line of an active window."
+  :group '+modeline)
 
-;;;;; modified
-(defface roife/modeline-buffer-modified-face
-  '((t (:inherit (warning bold) :background nil)))
-  "Face used for the 'unsaved' symbol in the mode-line."
-  :group 'roife/modeline)
-
-(defface roife/modeline-projectile-face
-  '((t (:inherit 'font-lock-function-name-face
-                 :background nil
-                 :bold t)))
-  "Face used for the projectile in the mode-line."
-  :group 'roife/modeline)
-
-(defface roife/modeline-region-face
-  '((t (:inherit 'font-lock-function-name-face
-                 :background nil
-                 :bold t)))
-  "Face used for the region in the mode-line."
-  :group 'roife/modeline)
-
-(defface roife/modeline-panel-active-face
+(defface +modeline-meta-active-face
   `((t (:background ,(face-foreground 'font-lock-function-name-face)
-                    :foreground ,(face-background 'mode-line)
-                    :bold t)))
+                    :foreground ,(face-background 'mode-line))))
   "Face used for the panel in the mode-line."
-  :group 'roife/modeline)
+  :group '+modeline)
 
-(defface roife/modeline-major-mode-panel-face
-  `((t (:background ,(face-foreground 'font-lock-keyword-face)
-                    :foreground ,(face-background 'mode-line)
+(defface +modeline-meta-inactive-face
+  '((t (:inherit (bold font-lock-function-name-face))))
+  "The face for winum on the mode-line of an active window."
+  :group '+modeline)
+
+(defface +modeline-modification-active-face
+  '((t (:inherit (bold font-lock-function-name-face))))
+  "The face for winum on the mode-line of an active window."
+  :group '+modeline)
+
+(defface +modeline-buffer-name-active-face
+  '((t (:inherit (bold font-lock-function-name-face))))
+  "The face for winum on the mode-line of an active window."
+  :group '+modeline)
+
+(defface +modeline-buffer-name-inactive-face
+  `((t (:foreground ,(face-foreground 'mode-line)
                     :bold t)))
-  "Face used for the major-mode panel in the mode-line."
-  :group 'roife/modeline)
+  "The face for winum on the mode-line of an active window."
+  :group '+modeline)
 
-(defface roife/modeline-rifkey-insert-face
-  `((t (:background ,(face-foreground 'font-lock-string-face)
-                    :foreground ,(face-background 'mode-line)
-                    :bold t)))
-  "Face used for rifkey-insert in the mode-line."
-  :group 'roife/modeline
-  )
+(defface +modeline-encoding-face
+  '((t (:inherit (italic))))
+  "The face for winum on the mode-line of an active window."
+  :group '+modeline)
 
-(defface roife/modeline-rifkey-normal-face
-  `((t (:background ,(face-foreground 'font-lock-function-name-face)
-                    :foreground ,(face-background 'mode-line)
-                    :bold t)))
-  "Face used for rifkey-normal in the mode-line."
-  :group 'roife/modeline
-  )
-
-(defface roife/modeline-rifkey-visual-face
-  `((t (:background ,(face-foreground 'font-lock-builtin-face)
-                    :foreground ,(face-background 'mode-line)
-                    :bold t)))
-  "Face used for rifkey-visual in the mode-line."
-  :group 'roife/modeline
-  )
-
-(defface roife/modeline-rifkey-window-face
-  `((t (:background ,(face-foreground 'font-lock-variable-name-face)
-                    :foreground ,(face-background 'mode-line)
-                    :bold t)))
-  "Face used for rifkey-window in the mode-line."
-  :group 'roife/modeline
-  )
-
-(defface roife/modeline-rifkey-op-face
-  `((t (:background ,(face-foreground 'font-lock-keyword-face)
-                    :foreground ,(face-background 'mode-line)
-                    :bold t)))
-  "Face used for rifkey-op in the mode-line."
-  :group 'roife/modeline
-  )
-
-(defface roife/modeline-rifkey-others-face
-  `((t (:background ,(face-foreground 'font-lock-keyword-face)
-                    :foreground ,(face-background 'mode-line)
-                    :bold t)))
-  "Face used for rifkey-others in the mode-line."
-  :group 'roife/modeline
-  )
-
-;;;; update modeline
-(defun roife/modeline-active-p ()
-  (eq roife/current-window (selected-window)))
-
-(add-hook 'buffer-list-update-hook '(lambda () (force-mode-line-update)))
-
-(defun roife/modeline-update-face (active &optional inactive)
-  "Return ACTIVE if the current window is selected, if not, return INACTIVE."
-  (unless inactive (setq inactive 'mode-line-inactive))
-  (if (roife/modeline-active-p) active inactive))
-
-;;;; modules
-
-(defun roife/modeline-module-fill (reserve)
-  "Return empty space using FACE and leaving RESERVE space on the right."
-  (unless reserve (setq reserve 20))
-  (when (and window-system (eq 'right (get-scroll-bar-mode)))
-    (setq reserve (- reserve 3)))
-  (propertize " "
-              'display `((space :align-to
-                                (- (+ right right-fringe right-margin) ,reserve)))))
-
-(defun roife/modeline-module-flymake ()
-  (let* ((running (flymake-running-backends))
-         (disabled (flymake-disabled-backends))
-         (diags-by-type (make-hash-table)))
-    (maphash (lambda (_b state)
-               (mapc (lambda (diag)
-                       (push diag
-                             (gethash (flymake--diag-type diag)
-                                      diags-by-type)))
-                     (flymake--backend-state-diags state)))
-             flymake--backend-state)
-    (apply #'concat
-           (mapcar (lambda (args)
-                     (apply (lambda (num str face)
-                              (propertize
-                               (format str num) 'face face))
-                            args))
-                   `((,(length (gethash :error diags-by-type)) "•%d " (:inherit error))
-                     (,(length (gethash :warning diags-by-type)) "•%d " (:inherit warning))
-                     (,(length (gethash :note diags-by-type)) "•%d" (:inherit success)))))))
-
-(defun roife/modeline-module-file ()
-  (let* ((prj-p (when (and (bound-and-true-p projectile-mode)
-                           (projectile-project-p))
-                  (abbreviate-file-name (projectile-project-p))))
-         (prj-dir (file-name-directory ;; get parent
-                   (directory-file-name
-                    (if prj-p prj-p
-                      (abbreviate-file-name default-directory)))))
-         (prj-name (if prj-p
-                       (file-name-nondirectory
-                        (directory-file-name prj-p))
-                     (file-name-nondirectory
-                      (directory-file-name default-directory))))
-         (file-name (file-relative-name
-                     buffer-file-name
-                     (if prj-p prj-p
-                       (abbreviate-file-name default-directory)))))
-    (concat (propertize (roife/shorten-path prj-dir)
-                        'face `(:foreground ,(face-foreground 'mode-line-inactive)
-                                            :weight bold))
-            (propertize (if (eq prj-dir nil)
-                            "~"
-                          prj-name)
-                        'face 'roife/modeline-projectile-face)
-            (propertize (concat "/" file-name) 'face `(:weight bold)))
-    )
-  )
-
-(defun roife/modeline-module-region ()
-  (concat (propertize (format "| C:%d W:%d L:%d "
-                              (abs (- (mark t) (point)))
-                              (count-words (region-beginning) (region-end))
-                              (count-lines (region-beginning) (region-end)))
-                      'face 'roife/modeline-panel-active-face))
-  )
-
-(defun roife/modeline-module-macro ()
+;;; Indicators
+(defsubst +modeline-macro-indicator ()
   "Display current Emacs macro being recorded."
-  (when (roife/modeline-active-p)
-    (cond (defining-kbd-macro (propertize "| Def Macro ▶ " 'face 'roife/modeline-panel-active-face))
-          (executing-kbd-macro (propertize "| Exec Macro ▶ " 'face 'roife/modeline-panel-active-face))
+  (cond (defining-kbd-macro "| Macro ▶ ")
+        (executing-kbd-macro "| Macro ▷ ")))
+
+(defsubst +modeline-anzu-indicator ()
+  "Display the number for anzu."
+  (when (bound-and-true-p anzu--state)
+    (propertize
+     (let ((here anzu--current-position)
+           (total anzu--total-matched))
+       (cond ((eq anzu--state 'replace-query)
+              (format "| %d replace " anzu--cached-count))
+             ((eq anzu--state 'replace)
+              (format "| %d/%d " here total))
+             (anzu--overflow-p
+              (format "| %s+ " total))
+             (t
+              (format "| %s/%d search " here total)))))))
+
+(defsubst +modeline-symbol-overlay-indicator ()
+  "Display the number of matches for symbol overlay."
+  (when (and (bound-and-true-p symbol-overlay-keywords-alist)
+             (not (bound-and-true-p symbol-overlay-temp-symbol)))
+    (let* ((keyword (symbol-overlay-assoc (symbol-overlay-get-symbol t)))
+           (symbol (car keyword))
+           (before (symbol-overlay-get-list -1 symbol))
+           (after (symbol-overlay-get-list 1 symbol))
+           (count (length before)))
+      (if (symbol-overlay-assoc symbol)
+          (format (concat  "| %d/%d sym " (and (cadr keyword) "in scope "))
+                  (+ count 1)
+                  (+ count (length after)))))))
+
+(defsubst +modeline-multiple-cursors-indicator ()
+  "Display the number of multiple cursors."
+  (when (bound-and-true-p multiple-cursors-mode)
+    (format "| %d cursors " (mc/num-cursors))))
+
+(defsubst +modeline-use-region-indicator ()
+  "Display selected region in current buffer."
+  (when (use-region-p)
+    (concat (format "| L%d W%d C%d "
+                    (count-lines (region-beginning) (region-end))
+                    (count-words (region-beginning) (region-end))
+                    (abs (- (mark t) (point)))))))
+
+(defsubst +modeline-modal-indicator ()
+  ""
+  "")
+
+(defsubst +modeline-project-name ()
+  "Get project name for current buffer."
+  (when-let ((project (project-current)))
+    (concat "["
+            (file-name-nondirectory
+             (directory-file-name (project-root project)))
+            "] ")))
+
+(defsubst +modeline-flymake ()
+  "Display flymake info for current buffer."
+  (let* ((err (propertize (cadadr (flymake--mode-line-counter :error t))
+                          'face (+modeline-update-face '(:inherit error))))
+         (warning (propertize (cadadr (flymake--mode-line-counter :warning t))
+                              'face (+modeline-update-face '(:inherit warning))))
+         (note (propertize (cadadr (flymake--mode-line-counter :note t))
+                           'face (+modeline-update-face '(:inherit success))))
+         (str (concat " ["  err ":" warning ":" note "]")))
+    str))
+
+(defsubst +modeline-encoding ()
+  "Get encoding and EOL type of current buffer."
+  (concat (let* ((sys (coding-system-plist buffer-file-coding-system))
+                 (sym (if (memq (plist-get sys :category) '(coding-category-undecided coding-category-utf-8))
+                          'utf-8
+                        (plist-get sys :name))))
+            (upcase (symbol-name sym)))
+          (pcase (coding-system-eol-type buffer-file-coding-system)
+            (0 "/LF")
+            (1 "/CRLF")
+            (2 "/CR")
+            (_ ""))
           ))
-  )
 
-(defun roife/modeline-module-major-mode-panel ()
-  "Panel for major mode in modeline."
-  (let ((info (cond
-               ((derived-mode-p 'calc-mode) (prin1-to-string calc-angle-mode))
-               (t nil))))
-    (when info (propertize (concat " " info  " ")
-                           'face (roife/modeline-update-face
-                                  'roife/modeline-major-mode-panel-face))))
-  )
-
-(defun roife/modeline-module-overwrite-mode-panel ()
-  "Overwrite panel for major mode in modeline."
-  (when (and overwrite-mode
-             (roife/modeline-active-p)) (propertize "| Ovr "
-             'face 'roife/modeline-panel-active-face))
-  )
-
-(defun roife/modeline-module-rifkey ()
-  "Indicator for rifkey in modeline."
-  (let ((name (pcase roife/rifkey-mode
-                ('insert "I")
-                ('normal "N")
-                ('visual "V")
-                ('window "W")
-                ('op "O")
-                (_ (s-capitalized-words (prin1-to-string roife/rifkey-mode)))
+(defsubst +format-mode-line ()
+  "Formatting modeline."
+  (let* ((lhs `(;; ace window
+                (:propertize ,(concat " "
+                                      (window-parameter (selected-window) 'ace-window-path)
+                                      " ")
+                             face ,(+modeline-update-face
+                                    '+modeline-meta-active-face
+                                    '+modeline-meta-inactive-face))
+                ;; indicators
+                (:propertize ,(when (+modeline-window-active-p)
+                                (concat (+modeline-macro-indicator)
+                                        (+modeline-anzu-indicator)
+                                        (+modeline-multiple-cursors-indicator)
+                                        (+modeline-symbol-overlay-indicator)
+                                        (+modeline-use-region-indicator)))
+                             face +modeline-meta-active-face)
+                ;; modified
+                (:propertize " %*" face +modeline-modification-active-face)
+                ;; buffer size
+                " %I"
+                ;; buffer name
+                (:propertize ,(concat  " " (+modeline-project-name) "%b")
+                             face ,(+modeline-update-face
+                                    '+modeline-buffer-name-active-face
+                                    '+modeline-buffer-name-inactive-face))
+                ;; TODO: meow
                 ))
-        (face (pcase roife/rifkey-mode
-                ('insert 'roife/modeline-rifkey-insert-face)
-                ('normal 'roife/modeline-rifkey-normal-face)
-                ('visual 'roife/modeline-rifkey-visual-face)
-                ('window 'roife/modeline-rifkey-window-face)
-                ('op 'roife/modeline-rifkey-op-face)
-                (_ 'roife/modeline-rifkey-others-face)
-                ))
-        )
-    (when (roife/modeline-active-p)
-      (propertize (concat " " name " ") 'face face)))
-  )
-
-;;; update
-(defun roife/modeline-update ()
-  "Update mode-line."
-  (let* ((lhs (list
-               ;; A window number segment for winum
-               '(:eval (when (bound-and-true-p winum-mode)
-                         (propertize (concat " " (winum-get-number-string) " ")
-                                     'face (roife/modeline-update-face
-                                            'roife/modeline-panel-active-face
-                                            'roife/modeline-panel-inactive-face))))
-               ;; recording macro
-               '(:eval (roife/modeline-module-macro))
-               ;; overwrite
-               '(:eval (roife/modeline-module-overwrite-mode-panel))
-               ;; region
-               '(:eval (when (and (use-region-p)
-                                  (roife/modeline-active-p))
-                         (roife/modeline-module-region)))
-               ;; modified
-               " "
-               '(:eval (if (or (buffer-modified-p)
-                               buffer-read-only)
-                           (propertize "%*" 'face (roife/modeline-update-face
-                                                   'roife/modeline-buffer-modified-face))
-                         "-"))
-               ;; size & buffer-name
-               " %I "
-               '(:eval (if (buffer-file-name) (roife/modeline-module-file)
-                         (propertize "%b" 'face '(:weight bold))))
-               ;; TODO: A key mode indicator.
-               " "
-               '(:eval (roife/modeline-module-rifkey))
-               ))
-         (rhs (list
-               ;; major-mode panel
-               '(:eval (roife/modeline-module-major-mode-panel))
-               ;; flymake
-               '(:eval (when (bound-and-true-p flymake-mode)
-                         (let* ((flymake-info (concat " " (roife/modeline-module-flymake) " ")))
-                           (if (roife/modeline-active-p)
-                               (progn (add-face-text-property 0 (length flymake-info)
-                                                              'mode-line-inactive t
-                                                              flymake-info)
-                                      flymake-info)
-                             (propertize flymake-info 'face 'mode-line-inactive)))))
-               ;; vc-mode
-               '(vc-mode vc-mode)
-               ;; mode
-               " "
-               '(:eval (propertize "%m"
-                                   'face (roife/modeline-update-face
-                                          'roife/modeline-major-mode-active-face)))
-               ;; encoding
-               "  "
-               '(:eval (propertize
-                        (let ((buf-coding (format "%s" buffer-file-coding-system)))
-                          (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
-                              (match-string 1 buf-coding)
-                            buf-coding))
-                        ))
-               ;; line & column
-               " "
-               '(:eval (propertize " %l: %C " 'face (roife/modeline-update-face 'roife/modeline-specific-active-face)))
-               " "
-               ;; positon
-               '(-3 "%p")
-               " "
-               ))
-         (fill-space (roife/modeline-module-fill (string-width (format-mode-line rhs))))
-         )
-    (list lhs fill-space rhs)
-    ))
-
-(setq-default mode-line-format '(:eval (roife/modeline-update)))
+         (rhs `(;; major mode
+                (:propertize mode-name
+                             face ,(+modeline-update-face
+                                    '+modeline-buffer-name-active-face
+                                    '+modeline-buffer-name-inactive-face))
+                ;; flymake
+                (:eval (when (bound-and-true-p flymake-mode)
+                         (+modeline-flymake)))
+                ;; vcs
+                (:propertize vc-mode
+                             face ,(+modeline-update-face '+modeline-vc-mode-active-face))
+                ;; encoding
+                " "
+                (:eval (+modeline-encoding))
+                ;; line & col
+                " "
+                (:propertize " %l:%C "
+                             face +modeline-line-number-active-face)
+                ;; position
+                " "
+                (-3 "%p")
+                "%%"))
+         (lhs-str (format-mode-line lhs))
+         (rhs-str (format-mode-line rhs))
+         (rhs-w (string-width rhs-str)))
+    (format "%s%s%s"
+            lhs-str
+            (propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) (+ 1 ,rhs-w)))))
+            rhs-str)))
+(setq-default mode-line-format '((:eval (+format-mode-line))))
+(setq-default header-line-format nil)
 
 (provide 'init-modeline)
-;;; init-modeline.el ends here

@@ -1,56 +1,85 @@
-;;; init-ui.el --- Initialize user interface configurations.   -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019  roife
+;; Optimization
+(setq idle-update-delay 1.0
+      highlight-nonselected-windows nil
+      fast-but-imprecise-scrolling t
+      redisplay-skip-fontification-on-input t)
 
-;; Author: roife <roife@outlook.com>
-;; Keywords: lisp
+;; Suppress GUI features
+(setq use-file-dialog nil
+      use-dialog-box nil
+      inhibit-startup-screen t
+      inhibit-startup-echo-area-message user-login-name
+      inhibit-default-init t
+      initial-scratch-message nil)
+(unless (daemonp)
+  (advice-add #'display-startup-echo-area-message :override #'ignore))
 
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
+;; Smooth Scroll (less "jumpy" than defaults)
+(when (display-graphic-p)
+  (setq mouse-wheel-scroll-amount '(2 ((shift) . hscroll) ((control) . nil))
+        mouse-wheel-scroll-amount-horizontal 1
+        mouse-wheel-progressive-speed nil))
 
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
+;; Better fringe symbol
+(define-fringe-bitmap 'right-curly-arrow
+  [#b00000000
+   #b00000000
+   #b00000000
+   #b00000000
+   #b11110000
+   #b11110000
+   #b00110000
+   #b00110000])
+(define-fringe-bitmap 'left-curly-arrow
+  [#b00001100
+   #b00001100
+   #b00001111
+   #b00001111
+   #b00000000
+   #b00000000
+   #b00000000
+   #b00000000])
 
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; TODO: Font
 
-;;; Commentary:
+(set-face-attribute
+ 'default nil :font "JetBrains Mono 10")
 
-;; Initialize user interface configurations.
-
-;;; Code:
-(eval-when-compile (require 'init-define))
-
+;; Themes
 (use-package one-themes
+  :straight t
   :init (load-theme 'one-dark t))
 
-;;;; line & Column
-(setq-default fill-column 80)
-
-;;;;; Line numbers: display-line-numbers
+;; [display-line-numbers]
 (use-package display-line-numbers
-  :ensure nil
-  :hook ((prog-mode) . display-line-numbers-mode)
+  :hook ((prog-mode conf-mode yaml-mode) . display-line-numbers-mode)
   :config
-  (setq-default display-line-numbers-width 1
-                display-line-numbers-widen t
-                display-line-numbers-grow-only t)
-  (set-face-foreground 'line-number-current-line "#859393")
-  )
+  (setq display-line-numbers 'relative
+        display-line-numbers-width-start t))
 
-;;;; Mouse & Scroll & Move
-;; 滚动时保留10行，防止页面跳动
-(setq scroll-preserve-screen-position t
-      scroll-margin 10
-      scroll-conservatively 101)
-;; 移动时按照屏幕显示而非真实的一行
-(setq line-move-visual nil)
-;; 光标在行尾移动时始终保持在行尾
-(setq track-eol t)
+;; [window-divider] Display window divider
+(use-package window-divider
+  :hook (window-setup . window-divider-mode)
+  :init
+  (setq window-divider-default-places t
+        window-divider-default-bottom-width 1
+        window-divider-default-right-width 1))
+
+;; [iscroll] Smooth scrolling over images
+(use-package iscroll
+  :straight t
+  :hook (image-mode . iscroll-mode))
+
+;; [page-break-lines] Display ^L page breaks as horizontal lines
+(use-package page-break-lines
+  :straight t
+  :hook (after-init . global-page-break-lines-mode))
+
+;; [mixed-pitch] Use monospace in some occasions
+(use-package mixed-pitch
+  :straight t
+  :hook (text-mode . mixed-pitch-mode))
 
 (provide 'init-ui)
-;;; init-ui.el ends here

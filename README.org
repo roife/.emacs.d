@@ -1,7 +1,0 @@
-* Description
-My emacs configurations.
-* TODO
-** TODO linux support
-** TODO move to macport
-** TODO a vi-like mode
-** TODO magit
