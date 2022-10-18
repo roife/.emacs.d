@@ -12,25 +12,21 @@
               persp-kill-foreign-buffer-behaviour 'kill
               persp-auto-resume-time 1.0)
   :config
-  (with-no-warnings
-    ;; Don't save if the state is not loaded
-    (defvar persp-state-loaded nil
-      "Whether the state is loaded.")
+  ;; Don't save if the state is not loaded
+  (defvar persp-state-loaded nil
+    "Whether the state is loaded.")
 
-    (defun my-persp-after-load-state (&rest _)
-      (setq persp-state-loaded t)
-      (aw-update) ;; ISSUE: bug work with ace-window
-      )
-    (advice-add #'persp-load-state-from-file :after #'my-persp-after-load-state)
-    (add-hook 'emacs-startup-hook
-              (lambda ()
-                (add-hook 'find-file-hook #'my-persp-after-load-state)))
+  (defun my-persp-after-load-state (&rest _)
+    (setq persp-state-loaded t))
+  (advice-add #'persp-load-state-from-file :after #'my-persp-after-load-state)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (add-hook 'find-file-hook #'my-persp-after-load-state)))
 
-    (defun my-persp-asave-on-exit (fn &optional interactive-query opt)
-      (if persp-state-loaded
-          (funcall fn interactive-query opt)
-        t))
-    (advice-add #'persp-asave-on-exit :around #'my-persp-asave-on-exit))
+  (defun my-persp-asave-on-exit (fn &optional interactive-query opt)
+    (or (not persp-state-loaded)
+        (funcall fn interactive-query opt)))
+  (advice-add #'persp-asave-on-exit :around #'my-persp-asave-on-exit)
 
   ;; Don't save dead or temporary buffers
   (add-hook 'persp-filter-save-buffers-functions
@@ -51,8 +47,7 @@
                     (string-match-p "\\.bin\\|\\.so\\|\\.dll\\|\\.exe\\'" bname)))))
 
   ;; Don't save persp configs in `recentf'
-  (with-eval-after-load 'recentf
-    (push persp-save-dir recentf-exclude))
+  (push persp-save-dir recentf-exclude)
 
   ;; Eshell integration
   (persp-def-buffer-save/load

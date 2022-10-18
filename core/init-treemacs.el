@@ -3,16 +3,10 @@
 ;; [treemacs] File and project explorer
 (use-package treemacs
   :straight t
-  :commands (treemacs-follow-mode
-             treemacs-filewatch-mode
-             treemacs-fringe-indicator-mode
-             treemacs-git-mode)
   :custom-face
   (cfrs-border-color ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))
-  :bind (([f8]        . treemacs)
-         ("M-0"       . treemacs-select-window)
+  :bind (("M-0"       . treemacs-select-window)
          ("C-x 1"     . treemacs-delete-other-windows)
-         ("C-x t 1"   . treemacs-delete-other-windows)
          ("C-x t t"   . treemacs)
          ("C-x t b"   . treemacs-bookmark)
          ("C-x t C-t" . treemacs-find-file)
@@ -24,10 +18,10 @@
         treemacs-missing-project-action  'remove
         treemacs-sorting                 'alphabetic-asc
         treemacs-follow-after-init       t
-        treemacs-width                   30)
-  :config
-  (treemacs-follow-mode t)
-  (treemacs-filewatch-mode t)
+        treemacs-width                   30
+        treemacs-follow-mode             t
+        treemacs-filewatch-mode          t)
+
   (pcase (cons (not (null (executable-find "git")))
                (not (null (executable-find "python3"))))
     (`(t . t)
@@ -48,7 +42,6 @@
 (use-package treemacs-persp
   :straight t
   :after persp-mode
-  :demand t
   :functions treemacs-set-scope-type
   :config (treemacs-set-scope-type 'Perspectives))
 

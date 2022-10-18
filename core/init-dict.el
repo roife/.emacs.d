@@ -5,6 +5,7 @@
   :straight t
   :bind (("C-, g" . google-this)))
 
+
 ;; [go-translate] Online translation service
 (use-package go-translate
   :straight t
@@ -21,6 +22,7 @@
          ;;(gts-posframe-pop-render :backcolor "#333333" :forecolor "#ffffff")
          (gts-posframe-pop-render)))
   )
+
 
 ;; [osx-dictionary] macOS native dictionary app
 (use-package osx-dictionary

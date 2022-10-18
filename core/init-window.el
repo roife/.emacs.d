@@ -1,57 +1,41 @@
 ;;; -*- lexical-binding: t -*-
 
 ;; [ace-window] switch window in avy style
-(use-package ace-window
+(use-package winum
   :straight t
-  :custom-face
-  (aw-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
-  (aw-minibuffer-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 1.0))))
-  ;; (aw-mode-line-face ((t (:inherit mode-line-emphasis :bold t))))
-  :bind (([remap other-window] . ace-window))
-  :hook ((window-configuration-change . aw-update)) ;; For modeline
-  ;; (add-hook 'after-make-frame-functions #'aw--after-make-frame t)
-  :config
-  ;; Select widnow via `M-1'...`M-9'
-  (defun +aw--select-window (number)
-    "Slecet the specified window."
-    (when (numberp number)
-      (let ((found nil))
-        (dolist (win (aw-window-list))
-          (when (and (window-live-p win)
-                     (eq number
-                         (string-to-number
-                          (window-parameter win 'ace-window-path))))
-            (setq found t)
-            (aw-switch-to-window win)))
-        (unless found
-          (message "No specified window: %d" number)))))
-
-  (dotimes (n 9)
-    (bind-key (format "s-%d" (1+ n))
-              (lambda ()
-                (interactive)
-                (+aw--select-window (1+ n)))))
+  :hook (after-init . winum-mode)
+  :bind (("M-0" . winum-select-window-0)
+         ("M-1" . winum-select-window-1)
+         ("M-2" . winum-select-window-2)
+         ("M-3" . winum-select-window-3)
+         ("M-4" . winum-select-window-4)
+         ("M-5" . winum-select-window-5)
+         ("M-6" . winum-select-window-6)
+         ("M-7" . winum-select-window-7)
+         ("M-8" . winum-select-window-8)
+         ("M-9" . winum-select-window-9))
+  :config (setq winum-auto-setup-mode-line nil)
   )
 
-;; [windmove] Directional window-selection routines
-(use-package windmove
-  :hook (after-init . (lambda () (windmove-default-keybindings 'super))))
 
 ;; [winner] Restore old window configurations
 (use-package winner
   :commands (winner-undo winner-redo)
   :hook (after-init . winner-mode)
-  :init (setq winner-boring-buffers
-              '("*Completions*"
-                "*Compile-Log*"
-                "*inferior-lisp*"
-                "*Fuzzy Completions*"
-                "*Apropos*"
-                "*Help*"
-                "*cvs*"
-                "*Buffer List*"
-                "*Ibuffer*"
-                "*esh command on file*")))
+  :config
+  (setq winner-boring-buffers
+        '("*Completions*"
+          "*Compile-Log*"
+          "*inferior-lisp*"
+          "*Fuzzy Completions*"
+          "*Apropos*"
+          "*Help*"
+          "*cvs*"
+          "*Buffer List*"
+          "*Ibuffer*"
+          "*esh command on file*"))
+  )
+
 
 ;; [popper] Enforce rules for popup windows like *Help*
 (use-package popper
@@ -59,9 +43,8 @@
   :defines popper-echo-dispatch-actions
   :commands popper-group-by-projectile
   :bind (:map popper-mode-map
-              ("C-h z"     . popper-toggle-latest)
               ("C-<tab>"   . popper-cycle)
-              ("C-M-<tab>" . popper-toggle-type))
+              ("C-x `" . popper-toggle-type))
   :hook (emacs-startup . popper-mode)
   :init
   (setq popper-reference-buffers
@@ -87,7 +70,7 @@
           Buffer-menu-mode
 
           gnus-article-mode devdocs-mode
-          grep-mode occur-mode rg-mode deadgrep-mode ag-mode pt-mode
+          grep-mode occur-mode rg-mode ag-mode pt-mode
           youdao-dictionary-mode osx-dictionary-mode fanyi-mode
 
           "^\\*Process List\\*" process-menu-mode
@@ -97,9 +80,8 @@
           "^\\*shell.*\\*.*$"  shell-mode
           "^\\*terminal.*\\*.*$" term-mode
           "^\\*vterm.*\\*.*$"  vterm-mode
+          "^\\*eldoc.*\\*.*$" eldoc-mode
 
-          "\\*DAP Templates\\*$" dap-server-log-mode
-          "\\*ELP Profiling Restuls\\*" profiler-report-mode
           "\\*Flycheck errors\\*$" " \\*Flycheck checker\\*$"
           "\\*Paradox Report\\*$" "\\*package update results\\*$" "\\*Package-Lint\\*$"
           "\\*[Wo]*Man.*\\*$"
@@ -122,27 +104,33 @@
   (setq popper-echo-dispatch-actions t)
 
   :config
+  ;; Enable echo in minibuffer
   (popper-echo-mode 1)
 
-  (with-no-warnings
-    (defun +popper-fit-window-height (win)
-      "Determine the height of popup window WIN by fitting it to the buffer's content."
-      (fit-window-to-buffer
-       win
-       (floor (frame-height) 3)
-       (floor (frame-height) 3)))
-    (setq popper-window-height #'+popper-fit-window-height)
+  ;; Determine the height of popup window WIN by fitting it to the buffer's content.
+  (setq popper-window-height
+        (lambda ()
+          (fit-window-to-buffer
+           win
+           (floor (frame-height) 3)
+           (floor (frame-height) 3))))
 
-    (defun +popper-close-window-hack (&rest _)
-      "Close popper window via `C-g'."
-      ;; `C-g' can deactivate region
-      (when (and (called-interactively-p 'interactive)
-                 (not (region-active-p))
-                 popper-open-popup-alist)
-        (let ((window (caar popper-open-popup-alist)))
-          (when (window-live-p window)
-            (delete-window window)))))
-    (advice-add #'keyboard-quit :before #'+popper-close-window-hack)))
+  (defun +popper-close-window-hack (&rest _)
+    "Close popper window via `C-g'."
+    (when (and (called-interactively-p 'interactive)
+               (not (region-active-p))
+               popper-open-popup-alist)
+      (let ((window (caar popper-open-popup-alist)))
+        (when (window-live-p window)
+          (delete-window window)))))
+  (advice-add #'keyboard-quit :before #'+popper-close-window-hack)
+  )
+
+
+;; [zoom] Managing the window sizes automatically
+(use-package zoom
+  :straight t
+  :hook (after-init . zoom-mode))
 
 
 (provide 'init-window)

@@ -6,6 +6,9 @@
       fast-but-imprecise-scrolling t
       redisplay-skip-fontification-on-input t)
 
+;; disable cursor blinking
+(blink-cursor-mode -1)
+
 ;; Suppress GUI features
 (setq use-file-dialog nil
       use-dialog-box nil
@@ -13,6 +16,7 @@
       inhibit-startup-echo-area-message user-login-name
       inhibit-default-init t
       initial-scratch-message nil)
+
 (unless (daemonp)
   (advice-add #'display-startup-echo-area-message :override #'ignore))
 
@@ -42,22 +46,14 @@
    #b00000000
    #b00000000])
 
-;; TODO: Font
-
-(set-face-attribute
- 'default nil :font "JetBrains Mono 10")
+;; Font
+(push '(font . "JetBrains Mono 11") default-frame-alist)
 
 ;; Themes
-(use-package one-themes
-  :straight t
-  :init (load-theme 'one-dark t))
+;; (use-package one-themes
+;;   :straight t
+;;   :init (load-theme 'one-light t))
 
-;; [display-line-numbers]
-(use-package display-line-numbers
-  :hook ((prog-mode conf-mode yaml-mode) . display-line-numbers-mode)
-  :config
-  (setq display-line-numbers 'relative
-        display-line-numbers-width-start t))
 
 ;; [window-divider] Display window divider
 (use-package window-divider
@@ -71,11 +67,6 @@
 (use-package iscroll
   :straight t
   :hook (image-mode . iscroll-mode))
-
-;; [page-break-lines] Display ^L page breaks as horizontal lines
-(use-package page-break-lines
-  :straight t
-  :hook (after-init . global-page-break-lines-mode))
 
 ;; [mixed-pitch] Use monospace in some occasions
 (use-package mixed-pitch

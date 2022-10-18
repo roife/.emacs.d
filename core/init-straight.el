@@ -1,15 +1,11 @@
 ;;; -*- lexical-binding: t -*-
 
 ;; [straight] Package manager config
-(setq
- ;; skip modification
- straight-check-for-modifications '(check-on-save find-when-checking)
- ;; shadow clone
- straight-vc-git-default-clone-depth 1
- ;; config native comp
- comp-deferred-compilation-deny-list ()
- straight-disable-native-compile (and (fboundp 'native-comp-available-p)
-                                      (not (native-comp-available-p))))
+(setq straight-check-for-modifications nil      ; skip modification
+      straight-vc-git-default-clone-depth 1     ; shadow clone
+      comp-deferred-compilation-deny-list ()    ; config native comp
+      straight-disable-native-compile (and (fboundp 'native-comp-available-p)
+                                           (not (native-comp-available-p))))
 
 ;; [straight] Installation
 (defvar bootstrap-version)
@@ -25,11 +21,11 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+
 ;; [use-package] Config for use-package
 (setq use-package-always-defer t
       use-package-expand-minimally t
-      use-package-enable-imenu-support t
-      use-package-minimum-reported-time 0.01)
+      use-package-enable-imenu-support t)
 
 ;; [use-package] Installation
 (straight-use-package 'use-package)
