@@ -68,9 +68,5 @@
   :straight t
   :hook (image-mode . iscroll-mode))
 
-;; [mixed-pitch] Use monospace in some occasions
-(use-package mixed-pitch
-  :straight t
-  :hook (text-mode . mixed-pitch-mode))
 
 (provide 'init-ui)
