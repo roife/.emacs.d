@@ -52,7 +52,7 @@
 ;; Themes
 (use-package spacemacs-theme
   :straight t
-  :init (load-theme 'spacemacs-dark t))
+  :init (load-theme 'spacemacs-light t))
 
 
 ;; [window-divider] Display window divider

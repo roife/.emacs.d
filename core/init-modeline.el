@@ -354,4 +354,22 @@
 
 (setq-default header-line-format nil)
 
+;; Automatically update face after load-theme
+(defun +update-modeline-faces (&rest _)
+  "Update faces for modeline."
+  (set-face-attribute '+modeline-line-number-active-face nil
+                      :background (face-background 'mode-line-inactive))
+
+  (set-face-attribute '+modeline-meta-active-face nil
+                      :background (face-foreground 'font-lock-function-name-face)
+                      :foreground (face-background 'mode-line))
+
+  (set-face-attribute '+modeline-project-name-inactive-face nil
+                      :foreground (face-foreground 'mode-line))
+
+  (set-face-attribute '+modeline-buffer-name-inactive-face nil
+                      :foreground (face-foreground 'mode-line))
+  )
+(advice-add #'enable-theme :after #'+update-modeline-faces)
+
 (provide 'init-modeline)
