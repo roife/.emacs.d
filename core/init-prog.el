@@ -46,7 +46,7 @@
   :config
   (setq-default flymake-diagnostic-functions nil)
   ;; Check only on save
-  (setq flymake-no-changes-timeout nil)
+  (setq flymake-no-changes-timeout 1)
   )
 
 ;; PL mode

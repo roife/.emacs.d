@@ -10,23 +10,13 @@
               persp-nil-name "default"
               persp-set-last-persp-for-new-frames nil
               persp-kill-foreign-buffer-behaviour 'kill
-              persp-auto-resume-time 1.0)
+              ;; do not auto load
+              persp-auto-resume-time 0)
   :config
-  ;; Don't save if the state is not loaded
-  (defvar persp-state-loaded nil
-    "Whether the state is loaded.")
-
-  (defun my-persp-after-load-state (&rest _)
-    (setq persp-state-loaded t))
-  (advice-add #'persp-load-state-from-file :after #'my-persp-after-load-state)
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (add-hook 'find-file-hook #'my-persp-after-load-state)))
-
-  (defun my-persp-asave-on-exit (fn &optional interactive-query opt)
-    (or (not persp-state-loaded)
-        (funcall fn interactive-query opt)))
-  (advice-add #'persp-asave-on-exit :around #'my-persp-asave-on-exit)
+  (defun +load-last-persp ()
+    (interactive)
+    "Load last persp."
+    (persp-load-state-from-file))
 
   ;; Don't save dead or temporary buffers
   (add-hook 'persp-filter-save-buffers-functions

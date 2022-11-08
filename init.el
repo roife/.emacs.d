@@ -46,6 +46,7 @@
 (require 'init-test)
 (require 'init-eshell)
 (require 'init-prog)
+(require 'init-writing)
 (require 'init-vcs)
 (require 'init-treemacs)
 (require 'init-lsp)
