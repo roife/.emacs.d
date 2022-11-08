@@ -105,7 +105,7 @@
   :straight t
   :hook ((c-mode c++-mode rust-mode python-mode) . eglot-ensure)
   :config
-  (setq eldoc-echo-area-use-multiline-p 3
+  (setq eldoc-echo-area-use-multiline-p 1
         eldoc-echo-area-display-truncation-message nil
         eglot-events-buffer-size 0
         eglot-send-changes-idle-time 2
