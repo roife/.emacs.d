@@ -50,9 +50,9 @@
 (push '(font . "JetBrains Mono 11") default-frame-alist)
 
 ;; Themes
-;; (use-package one-themes
-;;   :straight t
-;;   :init (load-theme 'one-light t))
+(use-package spacemacs-theme
+  :straight t
+  :init (load-theme 'spacemacs-dark t))
 
 
 ;; [window-divider] Display window divider

@@ -92,6 +92,14 @@
   :straight t)
 
 
+(use-package haskell-mode
+  :straight t)
+
+
+(use-package verilog-mode
+  :straight t)
+
+
 ;; [eglot] LSP support
 (use-package eglot
   :straight t
