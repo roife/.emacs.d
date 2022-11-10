@@ -100,7 +100,38 @@
   :straight t)
 
 
-;; [eglot] LSP support
+;; Major mode for editing web templates
+(use-package web-mode
+  :straight t
+  :mode "\\.\\(phtml\\|php\\|[gj]sp\\|as[cp]x\\|erb\\|djhtml\\|html?\\|hbs\\|ejs\\|jade\\|swig\\|tm?pl\\|vue\\)$"
+  :config
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2))
+
+
+;; [skewer-mode] Live browser JavaScript, CSS, and HTML interaction
+(use-package skewer-mode
+  :straight t
+  :hook (((js-mode js2-mode)   . skewer-mode)
+         (css-mode             . skewer-css-mode)
+         ((html-mode web-mode) . skewer-html-mode)))
+
+
+;; [ts]
+(use-package typescript-mode
+  :straight t
+  :mode ("\\.ts[x]\\'" . typescript-mode))
+
+
+;; [prettier]
+(use-package prettier
+    :straight t
+    :hook ((js-mode js2-mode css-mode sgml-mode web-mode) . prettier-mode)
+    :init (setq prettier-pre-warm 'none))
+
+
+;; [Eglot] LSP support
 (use-package eglot
   :straight t
   :hook ((c-mode c++-mode rust-mode python-mode) . eglot-ensure)
