@@ -47,7 +47,7 @@
    #b00000000])
 
 ;; Font
-(push '(font . "JetBrains Mono 10") default-frame-alist)
+(push '(font . "JetBrains Mono 14") default-frame-alist)
 
 ;; Themes
 (use-package spacemacs-theme
