@@ -10,4 +10,8 @@
 (use-package edit-indirect
   :straight t)
 
+;; [pangu]
+(use-package pangu-spacing
+  :straight t)
+
 (provide 'init-writing)

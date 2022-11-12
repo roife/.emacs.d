@@ -68,12 +68,18 @@
    ;; limit line length
    whitespace-line-column nil
    ;; automatically clean up bad whitespace
-   whitespace-action '(auto-cleanup)
+   whitespace-action '(report-on-bogus)
    ;; only show bad whitespace
    whitespace-style '(face lines-tail
                            trailing space-before-tab
                            indentation space-after-tab))
   )
+
+
+;; [ws-butler] Remove trailing whitespace with lines touched
+(use-package ws-butler
+  :straight t
+  :hook ((prog-mode markdown-mode) . ws-butler-mode))
 
 
 ;; [anzu] Show number of matches in mode-line while searching

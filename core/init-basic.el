@@ -133,4 +133,14 @@
   :hook (text-mode . visual-line-mode))
 
 
+;; [gcmh] Optimize GC
+(use-package gcmh
+  :straight t
+  :hook (emacs-startup . gcmh-mode)
+  :init
+  (setq gcmh-idle-delay 'auto
+        gcmh-auto-idle-delay-factor 10
+        gcmh-high-cons-threshold #x6400000)) ;; 100 MB
+
+
 (provide 'init-basic)
