@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: Blog post metadatas
+# key: markdown, blog, post, metadatas
+# --
+---
+layout: "post"
+title: "$1"
+subtitle: "$2"
+author: "roife"
+date: `(shell-command-to-string "echo -n $(date +%Y-%m-%d)")`
+
+tags: [$3]
+lang: zh
+catalog: true
+header-image: ""
+header-style: text
+---
+
+$0
