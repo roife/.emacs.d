@@ -64,7 +64,7 @@
  ;; disable copy region blink
  copy-region-blink-delay 0
  ;; hscroll only for current line
- ;; auto-hscroll-mode t
+ auto-hscroll-mode t
  ;; set fill column indicator to 80
  fill-column 80
  ;; Keep 5 lines when scrolling

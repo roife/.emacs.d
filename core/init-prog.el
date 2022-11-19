@@ -27,9 +27,9 @@
 
 
 ;; [editorconfig] Code styles
-(use-package editorconfig
-  :straight t
-  :hook ((prog-mode . editorconfig-mode)))
+;; (use-package editorconfig
+;;   :straight t
+;;   :hook ((prog-mode . editorconfig-mode)))
 
 ;; [quickrun] Run commands quickly
 (use-package quickrun
@@ -156,7 +156,7 @@
 ;; [copilot] Copilot
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook ((markdown-mode org-mode prog-mode) . copilot-mode)
+  :hook ((markdown-mode org-mode) . copilot-mode)
   :config
   (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
