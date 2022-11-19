@@ -48,7 +48,6 @@
 
 ;; Font
 (push '(font . "JetBrains Mono 14") default-frame-alist)
-(mac-auto-operator-composition-mode t)
 
 ;; Themes
 (use-package spacemacs-theme

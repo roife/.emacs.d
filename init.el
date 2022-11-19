@@ -2,16 +2,16 @@
 (setq auto-mode-case-fold nil)
 
 ;; startup time
-(defun efs/display-startup-time ()
-  (message
-   "Emacs loaded in %s with %d garbage collections."
-   (format
-    "%.2f seconds"
-    (float-time
-     (time-subtract after-init-time before-init-time)))
-   gcs-done))
-
-(add-hook 'emacs-startup-hook #'efs/display-startup-time)
+;; (defun efs/display-startup-time ()
+;;   (message
+;;    "Emacs loaded in %s with %d garbage collections."
+;;    (format
+;;     "%.2f seconds"
+;;     (float-time
+;;      (time-subtract after-init-time before-init-time)))
+;;    gcs-done))
+;;
+;; (add-hook 'emacs-startup-hook #'efs/display-startup-time)
 
 ;; Suppress flashing at startup
 (setq-default inhibit-redisplay t
@@ -37,6 +37,7 @@
 (require 'init-basic)
 
 ;; UI
+(require 'init-mac)
 (require 'init-highlight)
 (require 'init-edit)
 (require 'init-completion)

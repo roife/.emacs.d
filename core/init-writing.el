@@ -14,4 +14,9 @@
 (use-package pangu-spacing
   :straight t)
 
+;; [mardown-mode]
+(use-package markdown-mode
+  :custom-face
+  (markdown-code-face ((t (:inherit nil)))))
+
 (provide 'init-writing)
