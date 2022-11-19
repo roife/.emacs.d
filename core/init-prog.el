@@ -145,6 +145,15 @@
   )
 
 
+;; [copilot] Copilot
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :hook (markdown-mode . copilot-mode)
+  :config
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+  )
+
 (use-package consult-eglot
   :straight t)
 
