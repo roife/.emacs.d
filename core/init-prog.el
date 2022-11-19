@@ -100,6 +100,14 @@
   :straight t)
 
 
+;; [Proof General] Proof General is a generic front-end for proof assistants
+(use-package proof-general
+  :straight t
+  :config
+  (setq proof-splash-enable nil)
+  )
+
+
 ;; Major mode for editing web templates
 (use-package web-mode
   :straight t
@@ -148,7 +156,7 @@
 ;; [copilot] Copilot
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook (markdown-mode . copilot-mode)
+  :hook ((markdown-mode org-mode prog-mode) . copilot-mode)
   :config
   (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
