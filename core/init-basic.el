@@ -140,7 +140,7 @@
   :init
   (setq gcmh-idle-delay 'auto
         gcmh-auto-idle-delay-factor 10
-        gcmh-high-cons-threshold #x6400000)) ;; 100 MB
+        gcmh-high-cons-threshold #x64000000)) ;; 100 MB
 
 
 (provide 'init-basic)
