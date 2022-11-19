@@ -113,7 +113,7 @@
 ;; [skewer-mode] Live browser JavaScript, CSS, and HTML interaction
 (use-package skewer-mode
   :straight t
-  :hook (((js-mode js2-mode)   . skewer-mode)
+  :hook ((js-mode              . skewer-mode)
          (css-mode             . skewer-css-mode)
          ((html-mode web-mode) . skewer-html-mode)))
 
@@ -127,7 +127,7 @@
 ;; [prettier]
 (use-package prettier
     :straight t
-    :hook ((js-mode js2-mode css-mode sgml-mode web-mode) . prettier-mode)
+    :hook ((js-mode css-mode sgml-mode web-mode) . prettier-mode)
     :init (setq prettier-pre-warm 'none))
 
 
@@ -154,6 +154,7 @@
   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
   )
 
+;; [consult-eglot] Eglot support for consult
 (use-package consult-eglot
   :straight t)
 
