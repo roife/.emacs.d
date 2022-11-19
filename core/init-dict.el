@@ -24,11 +24,4 @@
   )
 
 
-;; [osx-dictionary] macOS native dictionary app
-(use-package osx-dictionary
-  :straight t
-  :when (eq system-type 'darwin)
-  :bind (("C-c d i" . osx-dictionary-search-input)
-         ("C-c d x" . osx-dictionary-search-pointer)))
-
 (provide 'init-dict)

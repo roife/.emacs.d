@@ -50,7 +50,6 @@
 (require 'init-writing)
 (require 'init-vcs)
 (require 'init-treemacs)
-;; (require 'init-lsp)
 (require 'init-dict)
 
 (require 'init-util)
