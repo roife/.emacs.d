@@ -142,7 +142,7 @@
 ;; [Eglot] LSP support
 (use-package eglot
   :straight t
-  :hook ((c-mode c++-mode rust-mode python-mode) . eglot-ensure)
+  :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
   :config
   (setq eldoc-echo-area-use-multiline-p 1
         eldoc-echo-area-display-truncation-message nil
