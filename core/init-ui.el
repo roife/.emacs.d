@@ -47,7 +47,7 @@
    #b00000000])
 
 ;; Font
-(push '(font . "JetBrains Mono 14") default-frame-alist)
+(push '(font . "JetBrains Mono 11") default-frame-alist)
 
 ;; Themes
 (use-package spacemacs-theme
@@ -67,6 +67,31 @@
 (use-package iscroll
   :straight t
   :hook (image-mode . iscroll-mode))
+
+;; [ligature] ligature support for Emacs
+(use-package ligature
+  :straight t
+  :hook ((prog-mode markdown-mode) . ligature-mode)
+  :config
+  ;; Enable traditional ligature support in eww-mode, if the
+  ;; `variable-pitch' face supports it
+  ;; (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+  ;; Enable all Cascadia Code ligatures in programming modes
+  (ligature-set-ligatures '(prog-mode markdown-mode)
+                          '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                            ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                            "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                            "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                            "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                            "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                            "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                            "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                            ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                            "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                            "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                            "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                            "\\\\" "://"))
+  )
 
 
 (provide 'init-ui)
