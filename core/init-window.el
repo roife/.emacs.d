@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-;; [ace-window] switch window in avy style
+;; [winum]
 (use-package winum
   :straight t
   :hook (after-init . winum-mode)
