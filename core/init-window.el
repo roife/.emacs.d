@@ -44,7 +44,7 @@
   :commands popper-group-by-projectile
   :bind (:map popper-mode-map
               ("C-<tab>"   . popper-cycle)
-              ("C-x `" . popper-toggle-type))
+              ("M-`" . popper-toggle-type))
   :hook (emacs-startup . popper-mode)
   :init
   (setq popper-reference-buffers

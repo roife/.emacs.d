@@ -187,7 +187,7 @@
 ;; [hungry-delete] Hungry deletion
 ;; HACK: Hungry delete doesn't work with paredit
 ;; See: https://emacs.stackexchange.com/questions/33734/how-to-get-hungry-delete-working-in-paredit-mode
-(setq backward-delete-char-untabify-method 'all)
+(setq backward-delete-char-untabify-method 'hungry)
 
 
 ;; [subword] Handling capitalized subwords
@@ -225,9 +225,8 @@
 ;; [hideshow] Code folding
 (use-package hideshow
   :hook ((prog-mode conf-mode) . hs-minor-mode)
-  :bind (("C-c `" . hs-toggle-hiding)
-         ("C-c <tab>" . hs-cycle)
-         ("C-c ~" . hs-toggle-all))
+  :bind (("C-c h `" . hs-toggle-hiding)
+         ("C-c h ~" . hs-toggle-all))
   :config
   ;; More functions
   ;; @see https://karthinks.com/software/simple-folding-with-hideshow/

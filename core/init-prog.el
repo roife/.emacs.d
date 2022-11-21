@@ -7,8 +7,7 @@
 ;; [xref] Cross reference
 (use-package xref
   :init
-  (when (executable-find "rg")
-    (setq xref-search-program 'ripgrep))
+  (setq xref-search-program 'ripgrep)
   (setq xref-show-definitions-function #'xref-show-definitions-completing-read
         xref-show-xrefs-function #'xref-show-definitions-completing-read)
   )
@@ -40,9 +39,9 @@
 (use-package flymake
   :straight t
   :hook ((prog-mode . flymake-mode))
-  :bind (("C-c ]" . flymake-goto-next-error)
-         ("C-c [" . flymake-goto-prev-error)
-         ("C-c C-b" . flymake-show-buffer-diagnostics))
+  :bind (("C-c f ]" . flymake-goto-next-error)
+         ("C-c f [" . flymake-goto-prev-error)
+         ("C-c f b" . flymake-show-buffer-diagnostics))
   :config
   (setq-default flymake-diagnostic-functions nil)
   ;; Check only on save
