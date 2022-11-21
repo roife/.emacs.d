@@ -142,4 +142,16 @@
         gcmh-auto-idle-delay-factor 10
         gcmh-high-cons-threshold #x64000000)) ;; 100 MB
 
+
+;; [tramp]
+(use-package tramp
+  :init
+  (setq tramp-default-method "ssh"
+        tramp-persistency-file-name (expand-file-name "tramp" user-emacs-directory)
+        tramp-auto-save-directory (expand-file-name "tramp" user-emacs-directory)
+        tramp-backup-directory-alist backup-directory-alist
+        tramp-verbose 10
+        tramp-ssh-controlmaster-options
+        "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
+
 (provide 'init-basic)
