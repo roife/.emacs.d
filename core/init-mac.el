@@ -18,13 +18,13 @@
   :bind (("C-c d i" . osx-dictionary-search-input)
          ("C-c d d" . osx-dictionary-search-pointer)))
 
-(defun my/apply-theme (appearance)
+;; Automatically switch theme based on the theme of macOS
+(defun +auto-switch-theme (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
   (mapc #'disable-theme custom-enabled-themes)
   (pcase appearance
     ('light (load-theme 'spacemacs-light t))
     ('dark (load-theme 'spacemacs-dark t))))
-
-(add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
+(add-hook 'ns-system-appearance-change-functions #'+auto-switch-theme)
 
 (provide 'init-mac)
