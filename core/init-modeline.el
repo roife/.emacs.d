@@ -19,7 +19,7 @@
 (add-hook 'pre-redisplay-functions #'+modeline-set-selected-window)
 
 ;;; Check whether `window-total-width' is larger than the limit
-(defconst +modeline-window-width-limit 90)
+(defconst +modeline-window-width-limit 80)
 (defvar-local +modeline-large-width-p nil)
 (defun +modeline-window-size-change-function (&rest _)
   "Function for `window-size-change-functions'."
@@ -40,7 +40,7 @@
   :group '+modeline)
 
 (defface +modeline-vc-mode-active-face
-  '((t (:inherit (bold font-lock-constant-face))))
+  '((t (:inherit (font-lock-constant-face))))
   "The face for vc-mode on the mode-line of an active window."
   :group '+modeline)
 
@@ -61,7 +61,7 @@
   :group '+modeline)
 
 (defface +modeline-project-name-active-face
-  '((t (:inherit (font-lock-function-type-face))))
+  '((t (:inherit (bold font-lock-function-type-face))))
   "The face for project name on the mode-line of an active window."
   :group '+modeline)
 
@@ -187,6 +187,7 @@
             (concat " [" err warning note "]"))))
   )
 (advice-add #'flymake--handle-report :after #'+modeline-flymake-update)
+(add-hook 'flymake-mode-hook #'+modeline-flymake-update)
 
 ;;; Cache VCS status
 (defvar-local +modeline-vcs-status nil)
@@ -196,17 +197,17 @@
         (when (and vc-mode buffer-file-name)
           (let* ((backend (vc-backend buffer-file-name))
                  (state   (vc-state (file-local-name buffer-file-name) backend))
-                 (icon (cond ((memq state '(edited added)) ":*")
-                             ((eq state 'needs-merge) ":&")
-                             ((eq state 'needs-update) ":??")
-                             ((eq state 'ignored) ":#")
-                             ((eq state 'unregistered) ":?")
-                             ((memq state '(removed conflict missing)) ":!")
-                             (t ":-")))
+                 (icon (cond ((memq state '(edited added)) "*")
+                             ((eq state 'needs-merge) "&")
+                             ((eq state 'needs-update) "??")
+                             ((eq state 'ignored) "#")
+                             ((eq state 'unregistered) "?")
+                             ((memq state '(removed conflict missing)) "!")
+                             (t "-")))
                  (str (if vc-display-status
                           (substring vc-mode (+ (if (eq backend 'Hg) 2 3) 2))
                         "")))
-            (concat " (" str icon ")")))))
+            (concat "/" str icon)))))
 (add-hook 'find-file-hook #'+modeline-update-vcs-status)
 (add-hook 'after-save-hook #'+modeline-update-vcs-status)
 (advice-add #'vc-refresh-state :after #'+modeline-update-vcs-status)
@@ -241,8 +242,8 @@
                                         (+modeline-overwrite-indicator)))
                              face +modeline-meta-active-face)
                 (:propertize " %*" face +modeline-modification-active-face)
-                " %I "
-                (:propertize ("%b" ,+modeline-remote-host-name)
+                ;; " %I "
+                (:propertize (" %b" ,+modeline-remote-host-name)
                              face +modeline-buffer-name-active-face)
                 (:propertize +modeline-project-name
                              face +modeline-project-name-active-face)
@@ -265,7 +266,7 @@
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
     `(,lhs-str
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) (+ 1 ,rhs-w)))))
+      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
       ,rhs-str)))
 
 
@@ -273,7 +274,7 @@
   "Formatting active-long modeline."
   (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
                              face +modeline-meta-inactive-face)
-                "%* %I "
+                "%* "
                 (:propertize ("%b" ,+modeline-remote-host-name)
                              face +modeline-buffer-name-inactive-face)
                 (:propertize +modeline-project-name
@@ -336,9 +337,7 @@
                 (:propertize ("%b" ,(when +modeline-remote-host-name "@"))
                              face +modeline-buffer-name-inactive-face)
                 ))
-         (rhs '((:eval mode-name)
-                " %l"
-                ))
+         (rhs '(" %l"))
          (lhs-str (format-mode-line lhs))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))

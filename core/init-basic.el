@@ -79,9 +79,7 @@
  sentence-end-double-space nil
  ;; Use y-or-n to replace yes-or-no
  use-short-answers t
- ;; require newline
- require-final-newline t
- )
+)
 
 
 ;; Encoding

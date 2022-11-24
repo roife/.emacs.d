@@ -38,7 +38,7 @@
 ;; [avy] Jump with several key strock
 (use-package avy
   :straight t
-  :bind (("C-, ," . avy-goto-char-2)
+  :bind (("C-, ," . avy-goto-char)
          ("C-, l" . avy-goto-line))
   :hook (after-init . avy-setup-default)
   :config (setq avy-all-windows nil
