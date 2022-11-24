@@ -242,8 +242,8 @@
                                         (+modeline-overwrite-indicator)))
                              face +modeline-meta-active-face)
                 (:propertize " %*" face +modeline-modification-active-face)
-                ;; " %I "
-                (:propertize (" %b" ,+modeline-remote-host-name)
+                " %I "
+                (:propertize ("%b" ,+modeline-remote-host-name)
                              face +modeline-buffer-name-active-face)
                 (:propertize +modeline-project-name
                              face +modeline-project-name-active-face)
@@ -274,7 +274,7 @@
   "Formatting active-long modeline."
   (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
                              face +modeline-meta-inactive-face)
-                "%* "
+                "%* %I "
                 (:propertize ("%b" ,+modeline-remote-host-name)
                              face +modeline-buffer-name-inactive-face)
                 (:propertize +modeline-project-name
