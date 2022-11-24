@@ -68,7 +68,7 @@
    ;; limit line length
    whitespace-line-column nil
    ;; automatically clean up bad whitespace
-   whitespace-action '(report-on-bogus)
+   whitespace-action '(auto-cleanup)
    ;; only show bad whitespace
    whitespace-style '(face lines-tail
                            trailing space-before-tab

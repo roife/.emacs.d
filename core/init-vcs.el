@@ -54,26 +54,6 @@
   )
 
 
-;; [git-timemachine] Walk through git revisions of a file
-(use-package git-timemachine
-  :straight t
-  :custom-face
-  (git-timemachine-minibuffer-author-face ((t (:inherit success :foreground unspecified))))
-  (git-timemachine-minibuffer-detail-face ((t (:inherit warning :foreground unspecified))))
-  :bind (:map vc-prefix-map
-              ("t" . git-timemachine))
-  :hook ((git-timemachine-mode . (lambda ()
-                                   "Improve `git-timemachine' buffers."
-                                   ;; Display different colors in mode-line
-                                   (if (facep 'mode-line-active)
-                                       (face-remap-add-relative 'mode-line-active 'custom-state)
-                                     (face-remap-add-relative 'mode-line 'custom-state))))
-         (before-revert . (lambda ()
-                            (when (bound-and-true-p git-timemachine-mode)
-                              (user-error "Cannot revert the timemachine buffer")))))
-  )
-
-
 ;; [smerge] Resolve diff3 conflicts
 (use-package smerge-mode
   :hook ((find-file . smerge-try-smerge))
