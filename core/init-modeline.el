@@ -19,7 +19,7 @@
 (add-hook 'pre-redisplay-functions #'+modeline-set-selected-window)
 
 ;;; Check whether `window-total-width' is larger than the limit
-(defconst +modeline-window-width-limit 80)
+(defconst +modeline-window-width-limit 90)
 (defvar-local +modeline-large-width-p nil)
 (defun +modeline-window-size-change-function (&rest _)
   "Function for `window-size-change-functions'."
@@ -267,6 +267,7 @@
          (rhs-w (string-width rhs-str)))
     `(,lhs-str
       ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
+      " "
       ,rhs-str)))
 
 
@@ -337,7 +338,9 @@
                 (:propertize ("%b" ,(when +modeline-remote-host-name "@"))
                              face +modeline-buffer-name-inactive-face)
                 ))
-         (rhs '(" %l"))
+         (rhs '(" %l  "
+                (-3 "%p")
+                "%%"))
          (lhs-str (format-mode-line lhs))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
