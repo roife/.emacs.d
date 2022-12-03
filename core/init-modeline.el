@@ -266,7 +266,7 @@
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
     `(,lhs-str
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
+      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) (+ 1 ,rhs-w)))))
       " "
       ,rhs-str)))
 
