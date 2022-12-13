@@ -305,6 +305,40 @@
   )
 
 
+;; [highlight-indent-guides] Highlight indentions
+(use-package highlight-indent-guides
+  :straight t
+  :hook ((prog-mode yaml-mode) . (lambda () (unless (> (car (buffer-line-statistics)) 3000) (highlight-indent-guides-mode 1))))
+  :init (setq highlight-indent-guides-method 'character
+              highlight-indent-guides-responsive 'top
+              highlight-indent-guides-suppress-auto-error t)
+  :config
+  ;; Don't display first level of indentation
+  (defun my-indent-guides-for-all-but-first-column (level responsive display)
+    (unless (< level 1)
+      (highlight-indent-guides--highlighter-default level responsive display)))
+  (setq highlight-indent-guides-highlighter-function
+        #'my-indent-guides-for-all-but-first-column)
+
+  ;; Disable in `macrostep' expanding
+  (with-eval-after-load 'macrostep
+    (advice-add #'macrostep-expand
+                :after (lambda (&rest _)
+                         (when highlight-indent-guides-mode
+                           (highlight-indent-guides-mode -1))))
+    (advice-add #'macrostep-collapse
+                :after (lambda (&rest _)
+                         (when (derived-mode-p 'prog-mode 'yaml-mode)
+                           (highlight-indent-guides-mode 1)))))
+
+  (defun +tab-bar-persp-name ()
+    (when-let ((name (and (bound-and-true-p persp-mode)
+                          persp-last-persp-name)))
+      (concat " (" (propertize name 'face 'font-lock-function-name-face) ") ")))
+  (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name))
+  )
+
+
 ;; [project] Project manager
 (use-package project
   :bind (:map project-prefix-map
