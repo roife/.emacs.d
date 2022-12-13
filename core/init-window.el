@@ -129,8 +129,7 @@
 
 ;; [zoom] Managing the window sizes automatically
 (use-package zoom
-  :straight t
-  :hook (after-init . zoom-mode))
+  :straight t)
 
 
 (provide 'init-window)

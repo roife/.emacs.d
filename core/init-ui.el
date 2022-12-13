@@ -94,4 +94,42 @@
   )
 
 
+;; [tab-bar] Tab bar
+(use-package tab-bar
+  :straight t
+  :hook (after-init . tab-bar-mode)
+  :custom-face
+  (tab-bar-tab ((t (:inverse-video t))))
+  :config
+  (setq tab-bar-separator " "
+        tab-bar-close-button-show nil
+        tab-bar-new-button-show nil
+        tab-bar-tab-hints t
+        tab-bar-new-tab-choice "*scratch*")
+
+  (defun +tab-bar-tab-name-current-with-count-truncated ()
+      (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
+             (count (length (window-list-1 nil 'nomini)))
+             (truncated-tab-name (if (< (length tab-name) tab-bar-tab-name-truncated-max)
+                                     tab-name
+                                   (truncate-string-to-width tab-name
+                                                             tab-bar-tab-name-truncated-max
+                                                             nil nil tab-bar-tab-name-ellipsis))))
+        (if (> count 1)
+            (format "%s (%d)" truncated-tab-name count)
+          truncated-tab-name)))
+  (setq tab-bar-tab-name-function #'+tab-bar-tab-name-current-with-count-truncated)
+
+  (defun +tab-bar-tab-name-format (tab i)
+    (let ((current-p (eq (car tab) 'current-tab)))
+      (propertize
+       (concat " "
+               (if tab-bar-tab-hints (format "%d " i) "")
+               (alist-get 'name tab)
+               " ")
+       'face (funcall tab-bar-tab-face-function tab))))
+
+  (setq tab-bar-tab-name-format-function #'+tab-bar-tab-name-format)
+  )
+
 (provide 'init-ui)
