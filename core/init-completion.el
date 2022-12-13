@@ -212,6 +212,9 @@ See `consult-grep' for more details regarding the asynchronous search."
 (use-package yasnippet
   :straight t
   :hook ((prog-mode conf-mode markdown-mode org-mode) . yas-minor-mode)
+  :bind (:map yas-minor-mode-map
+              ("TAB" . nil)
+              ("<tab>" . nil))
   )
 
 
@@ -231,10 +234,8 @@ See `consult-grep' for more details regarding the asynchronous search."
   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   (corfu-auto-prefix 2)          ;; minimun prefix to enable completion
-
   :hook (((prog-mode conf-mode shell-mode eshell-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil))))
-
   :config
   ;; Transfer completion to the minibuffer
   (defun corfu-move-to-minibuffer ()
