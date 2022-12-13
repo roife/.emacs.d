@@ -46,13 +46,11 @@
    #b00000000
    #b00000000])
 
-;; Font
-(push '(font . "JetBrains Mono 14") default-frame-alist)
-
 ;; Themes
 (use-package spacemacs-theme
   :straight t
-  :init (load-theme 'spacemacs-light t))
+  :init (load-theme 'spacemacs-light t)
+  )
 
 
 ;; [window-divider] Display window divider

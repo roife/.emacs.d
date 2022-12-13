@@ -19,3 +19,6 @@
 (push '(vertical-scroll-bars) default-frame-alist)
 (when (featurep 'ns)
   (push '(ns-transparent-titlebar . t) default-frame-alist))
+
+;; Font
+(push '(font . "JetBrains Mono 14") default-frame-alist)
