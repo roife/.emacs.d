@@ -81,10 +81,10 @@
   "The face for buffer name on the mode-line of an inactive window."
   :group '+modeline)
 
-(defface +modeline-persp-name-active-face
-  '((t (:inherit (bold font-lock-doc-face))))
-  "The face for persp name on the mode-line of an active window."
-  :group '+modeline)
+;; (defface +modeline-persp-name-active-face
+;;   '((t (:inherit (bold font-lock-doc-face))))
+;;   "The face for persp name on the mode-line of an active window."
+;;   :group '+modeline)
 
 ;;; Indicators
 (with-eval-after-load 'popper
@@ -135,19 +135,18 @@
   "")
 
 ;;; Cache persp name
-(defvar-local +modeline-persp-name nil)
-(defun +modeline-update-persp-name (&rest _)
-  "Update perspective name in mode-line."
-  (setq +modeline-persp-name
-        (when-let* ((persp (and (bound-and-true-p persp-mode)
-                                (get-current-persp)))
-                    (name (safe-persp-name persp)))
-          (concat "#"  name " "))))
-(add-hook 'find-file-hook #'+modeline-update-persp-name)
-(add-hook 'buffer-list-update-hook #'+modeline-update-persp-name)
-(add-hook 'find-file-hook #'+modeline-update-persp-name)
-(add-hook 'persp-activated-functions #'+modeline-update-persp-name)
-(add-hook 'persp-renamed-functions #'+modeline-update-persp-name)
+;; (defvar-local +modeline-persp-name nil)
+;; (defun +modeline-update-persp-name (&rest _)
+;;   "Update perspective name in mode-line."
+;;   (setq +modeline-persp-name
+;;         (when-let ((name (and (bound-and-true-p persp-mode)
+;;                               persp-last-persp-name)))
+;;           (concat "#"  name " "))))
+;; (add-hook 'find-file-hook #'+modeline-update-persp-name)
+;; (add-hook 'buffer-list-update-hook #'+modeline-update-persp-name)
+;; (add-hook 'find-file-hook #'+modeline-update-persp-name)
+;; (add-hook 'persp-activated-functions #'+modeline-update-persp-name)
+;; (add-hook 'persp-renamed-functions #'+modeline-update-persp-name)
 
 ;;; Cache project name
 (defvar-local +modeline-project-name nil)
@@ -250,8 +249,9 @@
                 (:propertize +modeline-vcs-status
                              face +modeline-vc-mode-active-face)
                 ))
-         (rhs '((:propertize +modeline-persp-name
-                             face +modeline-persp-name)
+         (rhs '(
+                ;; (:propertize +modeline-persp-name
+                ;;              face +modeline-persp-name)
                 (:propertize mode-name
                              face +modeline-buffer-name-active-face)
                 (:eval +modeline-flymake-indicator)
@@ -312,8 +312,9 @@
                 (:propertize ("%b" ,(when +modeline-remote-host-name "@"))
                              face +modeline-buffer-name-active-face)
                 ))
-         (rhs '((:propertize +modeline-persp-name
-                             face +modeline-persp-name)
+         (rhs '(
+                ;; (:propertize +modeline-persp-name
+                ;;              face +modeline-persp-name)
                 (:propertize mode-name
                              face +modeline-buffer-name-active-face)
                 " "

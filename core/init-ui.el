@@ -104,7 +104,8 @@
         tab-bar-close-button-show nil
         tab-bar-new-button-show nil
         tab-bar-tab-hints t
-        tab-bar-new-tab-choice "*scratch*")
+        tab-bar-new-tab-choice "*scratch*"
+        tab-bar-select-tab-modifiers '(hyper))
 
   (defun +tab-bar-tab-name-current-with-count-truncated ()
       (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
@@ -156,6 +157,12 @@
                 :after (lambda (&rest _)
                          (when (derived-mode-p 'prog-mode 'yaml-mode)
                            (highlight-indent-guides-mode 1)))))
+
+  (defun +tab-bar-persp-name ()
+    (when-let ((name (and (bound-and-true-p persp-mode)
+                          persp-last-persp-name)))
+      (concat " (" (propertize name 'face 'font-lock-function-name-face) ") ")))
+  (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name))
   )
 
 (provide 'init-ui)

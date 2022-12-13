@@ -1,7 +1,9 @@
 ;;; -*- lexical-binding: t -*-
 
-(setq mac-option-modifier 'meta)
-(setq mac-command-modifier 'super)
+(setq mac-option-modifier 'meta
+      mac-command-modifier 'super
+      mac-right-command-modifier 'hyper)
+
 (define-key global-map [?\s-a] #'mark-whole-buffer)
 (define-key global-map [?\s-x] #'kill-region)
 (define-key global-map [?\s-s] #'save-buffer)
