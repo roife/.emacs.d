@@ -330,12 +330,6 @@
                 :after (lambda (&rest _)
                          (when (derived-mode-p 'prog-mode 'yaml-mode)
                            (highlight-indent-guides-mode 1)))))
-
-  (defun +tab-bar-persp-name ()
-    (when-let ((name (and (bound-and-true-p persp-mode)
-                          persp-last-persp-name)))
-      (concat " (" (propertize name 'face 'font-lock-function-name-face) ") ")))
-  (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name))
   )
 
 

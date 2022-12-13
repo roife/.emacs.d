@@ -12,7 +12,8 @@
 (define-key global-map [?\s-z] #'undo)
 (define-key global-map [?\s-Z] #'undo-redo)
 (define-key global-map [?\s-f] #'isearch-forward)
-(define-key global-map [?\s-w] #'delete-window)
+(define-key global-map [?\s-w] #'tab-close)
+(define-key global-map [?\s-t] #'tab-new)
 
 ;; [osx-dictionary] macOS native dictionary app
 (use-package osx-dictionary

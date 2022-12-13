@@ -4,16 +4,16 @@
 (use-package winum
   :straight t
   :hook (after-init . winum-mode)
-  :bind (("s-0" . winum-select-window-0)
-         ("s-1" . winum-select-window-1)
-         ("s-2" . winum-select-window-2)
-         ("s-3" . winum-select-window-3)
-         ("s-4" . winum-select-window-4)
-         ("s-5" . winum-select-window-5)
-         ("s-6" . winum-select-window-6)
-         ("s-7" . winum-select-window-7)
-         ("s-8" . winum-select-window-8)
-         ("s-9" . winum-select-window-9))
+  :bind (("H-0" . delete-window)
+         ("H-1" . winum-select-window-1)
+         ("H-2" . winum-select-window-2)
+         ("H-3" . winum-select-window-3)
+         ("H-4" . winum-select-window-4)
+         ("H-5" . winum-select-window-5)
+         ("H-6" . winum-select-window-6)
+         ("H-7" . winum-select-window-7)
+         ("H-8" . winum-select-window-8)
+         ("H-9" . winum-select-window-9))
   :config (setq winum-auto-setup-mode-line nil)
   )
 
@@ -144,19 +144,19 @@
         tab-bar-new-button-show nil
         tab-bar-tab-hints t
         tab-bar-new-tab-choice "*scratch*"
-        tab-bar-select-tab-modifiers '(hyper))
+        tab-bar-select-tab-modifiers '(super))
 
   (defun +tab-bar-tab-name-current-with-count-truncated ()
-      (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
-             (count (length (window-list-1 nil 'nomini)))
-             (truncated-tab-name (if (< (length tab-name) tab-bar-tab-name-truncated-max)
-                                     tab-name
-                                   (truncate-string-to-width tab-name
-                                                             tab-bar-tab-name-truncated-max
-                                                             nil nil tab-bar-tab-name-ellipsis))))
-        (if (> count 1)
-            (format "%s (%d)" truncated-tab-name count)
-          truncated-tab-name)))
+    (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
+           (count (length (window-list-1 nil 'nomini)))
+           (truncated-tab-name (if (< (length tab-name) tab-bar-tab-name-truncated-max)
+                                   tab-name
+                                 (truncate-string-to-width tab-name
+                                                           tab-bar-tab-name-truncated-max
+                                                           nil nil tab-bar-tab-name-ellipsis))))
+      (if (> count 1)
+          (format "%s (%d)" truncated-tab-name count)
+        truncated-tab-name)))
   (setq tab-bar-tab-name-function #'+tab-bar-tab-name-current-with-count-truncated)
 
   (defun +tab-bar-tab-name-format (tab i)
@@ -167,8 +167,16 @@
                (alist-get 'name tab)
                " ")
        'face (funcall tab-bar-tab-face-function tab))))
-
   (setq tab-bar-tab-name-format-function #'+tab-bar-tab-name-format)
+
+  (defun +tab-bar-persp-name ()
+    (when-let ((name (and (bound-and-true-p persp-mode)
+                          (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
+               (count (length persp-names-cache)))
+      (if (> count 1)
+          (format "(%s/%d) " name count)
+        (concat "(" name ") "))))
+  (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name))
   )
 
 (provide 'init-window)

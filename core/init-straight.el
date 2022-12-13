@@ -4,8 +4,8 @@
 (setq straight-check-for-modifications nil      ; skip modification
       straight-vc-git-default-clone-depth 1     ; shadow clone
       comp-deferred-compilation-deny-list ()    ; config native comp
-      straight-disable-native-compile (and (fboundp 'native-comp-available-p)
-                                           (not (native-comp-available-p))))
+      straight-disable-native-compile (not (and (fboundp 'native-comp-available-p)
+                                                (native-comp-available-p))))
 
 ;; [straight] Installation
 (defvar bootstrap-version)
