@@ -99,6 +99,10 @@
   :straight t)
 
 
+(use-package yaml-mode
+  :straight t)
+
+
 ;; [Proof General] Proof General is a generic front-end for proof assistants
 (use-package proof-general
   :straight t
