@@ -121,14 +121,15 @@
   :hook ((prog-mode yaml-mode) . (lambda () (unless (> (car (buffer-line-statistics)) 3000) (highlight-indent-guides-mode 1))))
   :init (setq highlight-indent-guides-method 'character
               highlight-indent-guides-responsive 'top
-              highlight-indent-guides-suppress-auto-error t)
+              highlight-indent-guides-suppress-auto-error t
+              highlight-indent-guides-delay 0.3)
   :config
   ;; Don't display first level of indentation
-  (defun my-indent-guides-for-all-but-first-column (level responsive display)
+  (defun +indent-guides-for-all-but-first-column (level responsive display)
     (unless (< level 1)
       (highlight-indent-guides--highlighter-default level responsive display)))
   (setq highlight-indent-guides-highlighter-function
-        #'my-indent-guides-for-all-but-first-column)
+        #'+indent-guides-for-all-but-first-column)
 
   ;; Disable in `macrostep' expanding
   (with-eval-after-load 'macrostep
