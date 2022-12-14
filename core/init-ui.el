@@ -92,4 +92,52 @@
   )
 
 
+;; [tab-bar] Tab bar
+(use-package tab-bar
+  :hook (after-init . tab-bar-mode)
+  :custom-face
+  (tab-bar-tab ((t (:inverse-video t))))
+  :config
+  (setq tab-bar-separator " "
+        tab-bar-close-button-show nil
+        tab-bar-new-button-show nil
+        tab-bar-tab-hints t
+        tab-bar-new-tab-choice "*scratch*"
+        tab-bar-select-tab-modifiers '(super)
+        tab-bar-tab-name-truncated-max 15)
+
+  (defun +tab-bar-tab-name-current-with-count-truncated ()
+    (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
+           (count (length (window-list-1 nil 'nomini)))
+           (truncated-tab-name (if (< (length tab-name) tab-bar-tab-name-truncated-max)
+                                   tab-name
+                                 (truncate-string-to-width tab-name
+                                                           tab-bar-tab-name-truncated-max
+                                                           nil nil tab-bar-tab-name-ellipsis))))
+      (if (> count 1)
+          (format "%s (%d)" truncated-tab-name count)
+        truncated-tab-name)))
+  (setq tab-bar-tab-name-function #'+tab-bar-tab-name-current-with-count-truncated)
+
+  (defun +tab-bar-tab-name-format (tab i)
+    (let ((current-p (eq (car tab) 'current-tab)))
+      (propertize
+       (concat " "
+               (when tab-bar-tab-hints (format "%d " i))
+               (alist-get 'name tab)
+               " ")
+       'face (funcall tab-bar-tab-face-function tab))))
+  (setq tab-bar-tab-name-format-function #'+tab-bar-tab-name-format)
+
+  (defun +tab-bar-persp-name ()
+    (when-let ((name (and (bound-and-true-p persp-mode)
+                          (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
+               (count (length persp-names-cache)))
+      (if (> count 1)
+          (format "[%s/%d] " name count)
+        (concat "[" name "] "))))
+  (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name))
+  )
+
+
 (provide 'init-ui)
