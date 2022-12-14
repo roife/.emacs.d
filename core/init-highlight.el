@@ -114,4 +114,71 @@
   (setq-default goggles-pulse nil)
   )
 
+
+;; [highlight-indent-guides] Highlight indentions
+(use-package highlight-indent-guides
+  :straight t
+  :hook ((prog-mode yaml-mode) . (lambda () (unless (> (car (buffer-line-statistics)) 3000) (highlight-indent-guides-mode 1))))
+  :init (setq highlight-indent-guides-method 'character
+              highlight-indent-guides-responsive 'top
+              highlight-indent-guides-suppress-auto-error t)
+  :config
+  ;; Don't display first level of indentation
+  (defun my-indent-guides-for-all-but-first-column (level responsive display)
+    (unless (< level 1)
+      (highlight-indent-guides--highlighter-default level responsive display)))
+  (setq highlight-indent-guides-highlighter-function
+        #'my-indent-guides-for-all-but-first-column)
+
+  ;; Disable in `macrostep' expanding
+  (with-eval-after-load 'macrostep
+    (advice-add #'macrostep-expand
+                :after (lambda (&rest _)
+                         (when highlight-indent-guides-mode
+                           (highlight-indent-guides-mode -1))))
+    (advice-add #'macrostep-collapse
+                :after (lambda (&rest _)
+                         (when (derived-mode-p 'prog-mode 'yaml-mode)
+                           (highlight-indent-guides-mode 1)))))
+  )
+
+
+;; [symbol-overlay] Highlight symbols
+(use-package symbol-overlay
+  :straight t
+  :custom-face
+  (symbol-overlay-default-face ((t (:inherit region :background unspecified :foreground unspecified))))
+  (symbol-overlay-face-1 ((t (:inherit all-the-icons-blue :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-2 ((t (:inherit all-the-icons-pink :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-3 ((t (:inherit all-the-icons-yellow :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-4 ((t (:inherit all-the-icons-orange :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-5 ((t (:inherit all-the-icons-red :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-6 ((t (:inherit all-the-icons-maroon :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-7 ((t (:inherit all-the-icons-green :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-8 ((t (:inherit all-the-icons-cyan :background unspecified :foreground unspecified :inverse-video t))))
+  :bind (("C-c s i" . symbol-overlay-put)
+         ("C-c s n" . symbol-overlay-jump-next)
+         ("C-c s p" . symbol-overlay-jump-prev)
+         ("C-c s N" . symbol-overlay-switch-forward)
+         ("C-c s P" . symbol-overlay-switch-backward)
+         ("C-c s c" . symbol-overlay-remove-all))
+  :hook (((prog-mode yaml-mode) . symbol-overlay-mode))
+  :config
+  (setq symbol-overlay-idle-time 0.3)
+
+  ;; Disable symbol highlighting while selecting
+  (defun turn-off-symbol-overlay (&rest _)
+    "Turn off symbol highlighting."
+    (interactive)
+    (symbol-overlay-mode -1))
+  (advice-add #'set-mark :after #'turn-off-symbol-overlay)
+
+  (defun turn-on-symbol-overlay (&rest _)
+    "Turn on symbol highlighting."
+    (interactive)
+    (when (derived-mode-p 'prog-mode 'yaml-mode)
+      (symbol-overlay-mode 1)))
+  (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay)
+  )
+
 (provide 'init-highlight)

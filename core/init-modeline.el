@@ -130,6 +130,20 @@
   "Display whether it is in overwrite mode."
   (when overwrite-mode "| Ovr "))
 
+(defsubst +modeline-symbol-overlay-indicator ()
+  "Display the number of matches for symbol overlay."
+  (when (and (bound-and-true-p symbol-overlay-keywords-alist)
+             (not (bound-and-true-p symbol-overlay-temp-symbol)))
+    (let* ((keyword (symbol-overlay-assoc (symbol-overlay-get-symbol t)))
+           (symbol (car keyword))
+           (before (symbol-overlay-get-list -1 symbol))
+           (after (symbol-overlay-get-list 1 symbol))
+           (count (length before)))
+      (if (symbol-overlay-assoc symbol)
+          (format (concat  "| %d/%d sym " (and (cadr keyword) "in scope "))
+                  (+ count 1)
+                  (+ count (length after)))))))
+
 (defsubst +modeline-modal-indicator ()
   "Display the modal indicator for modal editing."
   "")
@@ -147,6 +161,7 @@
 ;; (add-hook 'find-file-hook #'+modeline-update-persp-name)
 ;; (add-hook 'persp-activated-functions #'+modeline-update-persp-name)
 ;; (add-hook 'persp-renamed-functions #'+modeline-update-persp-name)
+
 
 ;;; Cache project name
 (defvar-local +modeline-project-name nil)
@@ -237,6 +252,7 @@
                                 (concat (+modeline-macro-indicator)
                                         (+modeline-anzu-indicator)
                                         (+modeline-multiple-cursors-indicator)
+                                        (+modeline-symbol-overlay-indicator)
                                         (+modeline-use-region-indicator)
                                         (+modeline-overwrite-indicator)))
                              face +modeline-meta-active-face)
@@ -304,6 +320,7 @@
                                 (concat (+modeline-macro-indicator)
                                         (+modeline-anzu-indicator)
                                         (+modeline-multiple-cursors-indicator)
+                                        (+modeline-symbol-overlay-indicator)
                                         (+modeline-use-region-indicator)
                                         (+modeline-overwrite-indicator)))
                              face +modeline-meta-active-face)

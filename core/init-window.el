@@ -144,7 +144,8 @@
         tab-bar-new-button-show nil
         tab-bar-tab-hints t
         tab-bar-new-tab-choice "*scratch*"
-        tab-bar-select-tab-modifiers '(super))
+        tab-bar-select-tab-modifiers '(super)
+        tab-bar-tab-name-truncated-max 15)
 
   (defun +tab-bar-tab-name-current-with-count-truncated ()
     (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
@@ -174,8 +175,8 @@
                           (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
                (count (length persp-names-cache)))
       (if (> count 1)
-          (format "(%s/%d) " name count)
-        (concat "(" name ") "))))
+          (format "[%s/%d] " name count)
+        (concat "[" name "] "))))
   (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name))
   )
 
