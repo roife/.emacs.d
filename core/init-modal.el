@@ -4,6 +4,12 @@
   :straight t
   :hook (after-init . meow-global-mode)
   :demand nil
+  :custom-face
+  (meow-normal-indicator ((t (:inherit (font-lock-function-name-face bold)))))
+  (meow-insert-indicator ((t (:inherit (font-lock-keyword-face bold)))))
+  (meow-keypad-indicator ((t (:inherit (font-lock-builtin-face bold)))))
+  (meow-beacon-indicator ((t (:inherit (font-lock-type-face bold)))))
+  (meow-motion-indicator ((t (:inherit (font-lock-doc-face bold)))))
   :config
   (setq meow-replace-state-name-list '((normal . "N")
                                        (motion . "M")
@@ -93,5 +99,6 @@
    '("z" . meow-pop-selection)
    '("'" . repeat)
    '("<escape>" . ignore)))
+
 
 (provide 'init-modal)

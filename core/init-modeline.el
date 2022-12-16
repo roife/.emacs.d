@@ -144,10 +144,6 @@
                   (+ count 1)
                   (+ count (length after)))))))
 
-(defsubst +modeline-modal-indicator ()
-  "Display the modal indicator for modal editing."
-  "")
-
 ;;; Cache persp name
 ;; (defvar-local +modeline-persp-name nil)
 ;; (defun +modeline-update-persp-name (&rest _)
