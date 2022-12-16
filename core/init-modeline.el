@@ -181,9 +181,10 @@
 (defsubst +modeline-update-remote-host-name ()
   "Hostname for remote buffers."
   (setq +modeline-remote-host-name
-        (when (and default-directory
-                   (file-remote-p default-directory 'host))
-          (concat "@" (file-remote-p default-directory 'host)))))
+        (when-let ((name (and default-directory
+                                (file-remote-p default-directory 'host))))
+            (concat "@" name))
+        ))
 (add-hook 'find-file-hook #'+modeline-update-remote-host-name)
 
 ;;; Cache flymake report
@@ -221,7 +222,7 @@
                  (str (if vc-display-status
                           (substring vc-mode (+ (if (eq backend 'Hg) 2 3) 2))
                         "")))
-            (concat "/" str icon)))))
+            (format " #%s%s" str icon)))))
 (add-hook 'find-file-hook #'+modeline-update-vcs-status)
 (add-hook 'after-save-hook #'+modeline-update-vcs-status)
 (advice-add #'vc-refresh-state :after #'+modeline-update-vcs-status)

@@ -53,6 +53,14 @@
   :straight t
   :hook (after-init . ace-pinyin-global-mode))
 
+;; [avy-link] Avy support for links
+(use-package ace-link
+  :straight t
+  :bind (("C-, j" . ace-link-addr))
+  :init
+  (ace-link-setup-default (kbd "C-, j"))
+  )
+
 
 ;; [goto-chg] Goto last change
 (use-package goto-chg
@@ -167,23 +175,6 @@
   :bind ("C-=" . er/expand-region))
 
 
-;; [multiple-cursors] Multi-cursor
-(use-package multiple-cursors
-  :straight t
-  :bind (("C-c m l"       . mc/edit-lines)
-         ("C-c m n"       . mc/mark-next-like-this)
-         ("C-c m p"       . mc/mark-previous-like-this)
-         ("C-c m A"       . mc/mark-all-like-this)
-         ("C-c m N"       . mc/skip-to-next-like-this)
-         ("C-c m P"       . mc/skip-to-previous-like-this)
-         ("s-S-<mouse-1>" . mc/add-cursor-on-click))
-  :config
-  (setq mc/cmds-to-run-for-all '(mwim-beginning-of-code-or-line
-                                 mwim-end-of-code-or-line
-                                 +paredit-backward-delete))
-  )
-
-
 ;; [hungry-delete] Hungry deletion
 ;; HACK: Hungry delete doesn't work with paredit
 ;; See: https://emacs.stackexchange.com/questions/33734/how-to-get-hungry-delete-working-in-paredit-mode
@@ -193,6 +184,10 @@
 ;; [subword] Handling capitalized subwords
 (use-package subword
   :hook (((prog-mode minibuffer-setup) . subword-mode)))
+
+;; [ialign] Interactive align
+(use-package ialign
+  :straight t)
 
 
 ;; [paredit] Better paren editing
@@ -375,5 +370,21 @@
 (use-package fd-dired
   :straight t)
 
+
+;; [multiple-cursors] Multi-cursor
+(use-package multiple-cursors
+  :straight t
+  :bind (("C-c m l"       . mc/edit-lines)
+         ("C-c m n"       . mc/mark-next-like-this)
+         ("C-c m p"       . mc/mark-previous-like-this)
+         ("C-c m A"       . mc/mark-all-like-this)
+         ("C-c m N"       . mc/skip-to-next-like-this)
+         ("C-c m P"       . mc/skip-to-previous-like-this)
+         ("s-S-<mouse-1>" . mc/add-cursor-on-click))
+  :config
+  (setq mc/cmds-to-run-for-all '(mwim-beginning-of-code-or-line
+                                 mwim-end-of-code-or-line
+                                 +paredit-backward-delete))
+  )
 
 (provide 'init-edit)

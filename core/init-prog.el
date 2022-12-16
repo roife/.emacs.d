@@ -48,7 +48,8 @@
   (setq flymake-no-changes-timeout 1)
   )
 
-;; PL mode
+
+;; Langs
 (use-package csv-mode
   :straight t)
 
@@ -58,10 +59,6 @@
 
 
 (use-package json-mode
-  :straight t)
-
-
-(use-package lua-mode
   :straight t)
 
 

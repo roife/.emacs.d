@@ -7,7 +7,7 @@
   :bind (("C-x g" . magit))
   :config
   ;; Exterminate Magit buffers
-  (defun my-magit-kill-buffers (&rest _)
+  (defun +magit-kill-buffers (&rest _)
     "Restore window configuration and kill all Magit buffers."
     (interactive)
     (magit-restore-window-configuration)
@@ -20,7 +20,7 @@
                       (bury-buffer buf)
                     (kill-buffer buf))))
               buffers))))
-  (setq magit-bury-buffer-function #'my-magit-kill-buffers)
+  (setq magit-bury-buffer-function #'+magit-kill-buffers)
   )
 
 
