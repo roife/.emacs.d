@@ -108,16 +108,17 @@
   :straight t)
 
 
-(use-package plantuml-mode
-  :straight t)
-
-
 (use-package rmsbolt          ; A compiler output viewer
   :straight t)
 
 
 (use-package scala-mode
-  :straight t)
+  :straight t
+  :config
+  (setq scala-indent:align-parameters t
+        ;; indent block comments to first asterix, not second
+        scala-indent:use-javadoc-style t)
+  )
 
 
 (use-package swift-mode
@@ -127,7 +128,10 @@
 (use-package rustic
   :straight t
   :config
-  (setq rustic-lsp-client 'eglot))
+  (setq rustic-lsp-client 'eglot
+        rustic-indent-method-chain t
+        rust-prettify-symbols-alist nil)
+  )
 
 
 (use-package rust-playground
@@ -135,7 +139,10 @@
 
 
 (use-package haskell-mode
-  :straight t)
+  :straight t
+  :config
+  (setq haskell-process-suggest-remove-import-lines t
+        haskell-process-auto-import-loaded-modules t))
 
 
 (use-package verilog-mode
@@ -159,9 +166,12 @@
   :straight t
   :mode "\\.\\(phtml\\|php\\|[gj]sp\\|as[cp]x\\|erb\\|djhtml\\|html?\\|hbs\\|ejs\\|jade\\|swig\\|tm?pl\\|vue\\)$"
   :config
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2))
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+        web-mode-enable-html-entities-fontification t
+        web-mode-auto-close-style 1)
+  )
 
 
 ;; [skewer-mode] Live browser JavaScript, CSS, and HTML interaction
