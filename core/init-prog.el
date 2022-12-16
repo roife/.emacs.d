@@ -121,6 +121,16 @@
   )
 
 
+(use-package firrtl-mode
+  :straight t)
+
+
+(use-package llvm-mode
+  :straight (:host github :repo "nverno/llvm-mode" :files ("dist" "*.el"))
+  )
+
+
+
 (use-package swift-mode
   :straight t)
 
@@ -218,8 +228,10 @@
   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
   )
 
+
 ;; [consult-eglot] Eglot support for consult
 (use-package consult-eglot
   :straight t)
+
 
 (provide 'init-prog)
