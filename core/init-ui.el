@@ -131,11 +131,9 @@
 
   (defun +tab-bar-persp-name ()
     (when-let ((name (and (bound-and-true-p persp-mode)
-                          (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
-               (count (length persp-names-cache)))
-      (if (> count 1)
-          (format "[%s/%d]" name count)
-        (concat "[" name "]"))))
+                          (propertize persp-last-persp-name 'face 'font-lock-function-name-face))))
+      (format "(%s)" name))
+    )
 
   (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
   )

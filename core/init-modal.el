@@ -5,11 +5,11 @@
   :hook (after-init . meow-global-mode)
   :demand nil
   :config
-  (setq meow-replace-state-name-list '((normal . "N")
-                                       (motion . "M")
-                                       (keypad . "K")
-                                       (insert . "I")
-                                       (beacon . "B")))
+  (setq meow-replace-state-name-list '((normal . "[N]")
+                                       (motion . "[M]")
+                                       (keypad . "[K]")
+                                       (insert . "[I]")
+                                       (beacon . "[B]")))
   (meow-motion-overwrite-define-key
    '("j" . meow-next)
    '("k" . meow-prev)
