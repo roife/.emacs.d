@@ -61,11 +61,6 @@
         window-divider-default-bottom-width 1
         window-divider-default-right-width 1))
 
-;; [iscroll] Smooth scrolling over images
-(use-package iscroll
-  :straight t
-  :hook (image-mode . iscroll-mode))
-
 ;; [ligature] ligature support for Emacs
 (use-package ligature
   :straight t
