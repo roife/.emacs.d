@@ -35,7 +35,7 @@
   :group 'faces)
 
 (defface +modeline-line-number-active-face
-  `((t (:background ,(face-background 'mode-line-inactive))))
+  '((t (:inherit (mode-line-inactive) :inverse-video t)))
   "The face for line number on the mode-line of an active window."
   :group '+modeline)
 
@@ -45,8 +45,7 @@
   :group '+modeline)
 
 (defface +modeline-meta-active-face
-  `((t (:background ,(face-foreground 'font-lock-function-name-face)
-                    :foreground ,(face-background 'mode-line))))
+  '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
   "Face used for meta panel on the mode-line of an active window."
   :group '+modeline)
 
@@ -61,23 +60,22 @@
   :group '+modeline)
 
 (defface +modeline-project-name-active-face
-  '((t (:inherit (bold font-lock-function-type-face))))
+  '((t (:inherit (bold font-lock-variable-name-face))))
   "The face for project name on the mode-line of an active window."
   :group '+modeline)
 
 (defface +modeline-project-name-inactive-face
-  `((t (:foreground ,(face-foreground 'mode-line))))
+  '((t (:inherit (mode-line))))
   "The face for project name on the mode-line of an inactive window."
   :group '+modeline)
 
 (defface +modeline-buffer-name-active-face
-  '((t (:inherit (bold font-lock-function-name-face))))
+  '((t (:inherit (font-lock-function-name-face bold))))
   "The face for buffer name on the mode-line of an active window."
   :group '+modeline)
 
 (defface +modeline-buffer-name-inactive-face
-  `((t (:foreground ,(face-foreground 'mode-line)
-                    :bold t)))
+  '((t (:inherit (font-lock-function-name-face))))
   "The face for buffer name on the mode-line of an inactive window."
   :group '+modeline)
 
@@ -369,23 +367,5 @@
                          (if +modeline-large-width-p (+mode-line-inactive-long) (+mode-line-inactive-short))))))
 
 (setq-default header-line-format nil)
-
-;; Automatically update face after load-theme
-(defun +update-modeline-faces (&rest _)
-  "Update faces for modeline."
-  (set-face-attribute '+modeline-line-number-active-face nil
-                      :background (face-background 'mode-line-inactive))
-
-  (set-face-attribute '+modeline-meta-active-face nil
-                      :background (face-foreground 'font-lock-function-name-face)
-                      :foreground (face-background 'mode-line))
-
-  (set-face-attribute '+modeline-project-name-inactive-face nil
-                      :foreground (face-foreground 'mode-line))
-
-  (set-face-attribute '+modeline-buffer-name-inactive-face nil
-                      :foreground (face-foreground 'mode-line))
-  )
-(advice-add #'enable-theme :after #'+update-modeline-faces)
 
 (provide 'init-modeline)
