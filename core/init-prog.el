@@ -84,7 +84,6 @@
 
 ;; [flymake] On-the-fly syntax checker
 (use-package flymake
-  :straight t
   :hook ((prog-mode . flymake-mode))
   :bind (("C-c f ]" . flymake-goto-next-error)
          ("C-c f [" . flymake-goto-prev-error)
