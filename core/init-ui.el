@@ -104,7 +104,7 @@
         tab-bar-tab-hints t
         tab-bar-new-tab-choice "*scratch*"
         tab-bar-select-tab-modifiers '(super)
-        tab-bar-tab-name-truncated-max 15)
+        tab-bar-tab-name-truncated-max 20)
 
   (defun +tab-bar-tab-name-current-with-count-truncated ()
     (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
