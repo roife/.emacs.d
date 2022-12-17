@@ -22,3 +22,9 @@
 
 ;; Font
 (push '(font . "JetBrains Mono 14") default-frame-alist)
+
+;; And set these to nil so users don't have to toggle the modes twice to
+;; reactivate them.
+(setq menu-bar-mode nil
+      tool-bar-mode nil
+      scroll-bar-mode nil)

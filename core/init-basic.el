@@ -38,6 +38,7 @@
  ;; improve long line display performance
  bidi-inhibit-bpa t
  bidi-paragraph-direction 'left-to-right
+ bidi-display-reordering 'left-to-right
  ;; allow resize by pixels
  frame-resize-pixelwise t
  x-gtk-resize-child-frames nil
@@ -79,13 +80,17 @@
  sentence-end-double-space nil
  ;; Use y-or-n to replace yes-or-no
  use-short-answers t
+ ;; Don't ping things that look like domain names.
+ ffap-machine-p-known 'reject
 )
 
 
 ;; Encoding
-(set-charset-priority 'unicode)
-(prefer-coding-system 'utf-8)
+;;(set-charset-priority 'unicode)
+;;(prefer-coding-system 'utf-8)
 (setq system-time-locale "C")
+(set-language-environment "UTF-8")
+(setq default-input-method nil)
 
 
 ;; History
