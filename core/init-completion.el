@@ -101,6 +101,13 @@
   :hook (vertico-mode . marginalia-mode))
 
 
+(use-package embark-consult
+  :straight t
+  :after (embark consult)
+  :hook (embark-collect-mode . consult-preview-at-point-mode)
+  )
+
+
 (use-package embark
   :straight t
   :bind (("C-;" . embark-act)
@@ -198,13 +205,6 @@ See `consult-grep' for more details regarding the asynchronous search."
   :config
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t)
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-local t)
-  )
-
-
-(use-package embark-consult
-  :straight t
-  :after (embark consult)
-  :hook (embark-collect-mode . consult-preview-at-point-mode)
   )
 
 

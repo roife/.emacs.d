@@ -95,7 +95,7 @@
 
 ;; History
 ;;; [save-place-mode] save place lastly visited
-(use-package save-place
+(use-package saveplace
   :hook (after-init . save-place-mode))
 
 
@@ -133,6 +133,7 @@
 
 ;; [visual-line-mode] Soft line-wrapping
 (use-package visual-line-mode
+  :defer nil
   :hook (text-mode . visual-line-mode))
 
 

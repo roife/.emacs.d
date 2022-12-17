@@ -3,7 +3,7 @@
 (use-package meow
   :straight t
   :hook (after-init . meow-global-mode)
-  :demand nil
+  :demand t
   :custom-face
   (meow-normal-indicator ((t (:inherit (font-lock-function-name-face bold) :inverse-video t))))
   (meow-insert-indicator ((t (:inherit (font-lock-keyword-face bold) :inverse-video t))))

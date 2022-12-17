@@ -44,7 +44,6 @@
 
 ;; Extra Dired functionality
 (use-package dired-aux
-  :defer t
   :after dired
   :config
   (setq dired-create-destination-dirs 'ask

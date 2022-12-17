@@ -49,18 +49,24 @@
    #b00000000])
 
 ;; Themes
-(use-package spacemacs-theme
+(use-package gruvbox-theme
   :straight t
-  :init (load-theme 'spacemacs-light t)
+  :init
+  (let ((theme (if (eq system-type 'darwin)
+                   (pcase ns-system-appearance
+                     ('light 'gruvbox-light-soft)
+                     ('dark 'gruvbox-dark-soft))
+                 'gruvbox-light-soft-theme)))
+    (load-theme theme t))
   )
 
 
 ;; [window-divider] Display window divider
 (use-package window-divider
+  :defer nil
   :hook (window-setup . window-divider-mode)
   :custom
-  (window-divider-default-places t)
-  (window-divider-default-bottom-width 1)
+  ;; (window-divider-default-places t)
   (window-divider-default-right-width 1)
   )
 
@@ -92,7 +98,7 @@
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
-  :hook (after-init . tab-bar-mode)
+  :hook (window-setup . tab-bar-mode)
   :custom
   (tab-bar-separator " ")
   (tab-bar-close-button-show nil)

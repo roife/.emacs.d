@@ -24,10 +24,13 @@
 ;; Automatically switch theme based on the theme of macOS
 (defun +auto-switch-theme (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
-  (mapc #'disable-theme custom-enabled-themes)
-  (pcase appearance
-    ('light (load-theme 'spacemacs-light t))
-    ('dark (load-theme 'spacemacs-dark t))))
+  (let ((system-theme (pcase appearance
+                        ('light 'gruvbox-light-soft)
+                        ('dark 'gruvbox-dark-soft))))
+    (unless (member system-theme custom-enabled-themes)
+      (mapc #'disable-theme custom-enabled-themes)
+      (load-theme system-theme t)))
+  )
 (add-hook 'ns-system-appearance-change-functions #'+auto-switch-theme)
 
 (provide 'init-mac)

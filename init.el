@@ -38,7 +38,7 @@
 
 ;; UI
 (when (eq system-type 'darwin)
-  (require 'init-mac))
+ (require 'init-mac))
 (require 'init-highlight)
 (require 'init-edit)
 (require 'init-completion)

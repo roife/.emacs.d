@@ -198,13 +198,6 @@
   :mode ("\\.ts[x]\\'" . typescript-mode))
 
 
-;; [prettier]
-(use-package prettier
-    :straight t
-    :hook ((js-mode css-mode sgml-mode web-mode) . prettier-mode)
-    :init (setq prettier-pre-warm 'none))
-
-
 ;; [Eglot] LSP support
 (use-package eglot
   :straight t

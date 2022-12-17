@@ -3,9 +3,10 @@
 ;; See `magit-maybe-define-global-key-bindings'
 (use-package magit
   :straight t
-  :init (setq magit-diff-refine-hunk t)
   :bind (("C-x g" . magit))
   :config
+  (setq magit-diff-refine-hunk t)
+
   ;; Exterminate Magit buffers
   (defun +magit-kill-buffers (&rest _)
     "Restore window configuration and kill all Magit buffers."
