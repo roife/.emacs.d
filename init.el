@@ -45,7 +45,6 @@
 (require 'init-persp)
 (require 'init-window)
 (require 'init-dired)
-(require 'init-test)
 (require 'init-eshell)
 (require 'init-prog)
 (require 'init-writing)

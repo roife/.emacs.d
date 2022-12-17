@@ -4,7 +4,8 @@
 (setq idle-update-delay 1.0
       highlight-nonselected-windows nil
       fast-but-imprecise-scrolling t
-      redisplay-skip-fontification-on-input t)
+      redisplay-skip-fontification-on-input t
+      cursor-in-non-selected-windows nil)
 
 ;; disable cursor blinking
 (blink-cursor-mode -1)
@@ -15,7 +16,8 @@
       inhibit-startup-screen t
       inhibit-startup-echo-area-message user-login-name
       inhibit-default-init t
-      initial-scratch-message nil)
+      initial-scratch-message nil
+      inhibit-compacting-font-caches t)
 
 (unless (daemonp)
   (advice-add #'display-startup-echo-area-message :override #'ignore))
@@ -56,15 +58,11 @@
 ;; [window-divider] Display window divider
 (use-package window-divider
   :hook (window-setup . window-divider-mode)
-  :init
-  (setq window-divider-default-places t
-        window-divider-default-bottom-width 1
-        window-divider-default-right-width 1))
-
-;; [iscroll] Smooth scrolling over images
-(use-package iscroll
-  :straight t
-  :hook (image-mode . iscroll-mode))
+  :custom
+  (window-divider-default-places t)
+  (window-divider-default-bottom-width 1)
+  (window-divider-default-right-width 1)
+  )
 
 ;; [ligature] ligature support for Emacs
 (use-package ligature
@@ -95,17 +93,17 @@
 ;; [tab-bar] Tab bar
 (use-package tab-bar
   :hook (after-init . tab-bar-mode)
+  :custom
+  (tab-bar-separator " ")
+  (tab-bar-close-button-show nil)
+  (tab-bar-new-button-show nil)
+  (tab-bar-tab-hints t)
+  (tab-bar-new-tab-choice "*scratch*")
+  (tab-bar-select-tab-modifiers '(super))
+  (tab-bar-tab-name-truncated-max 20)
   :custom-face
   (tab-bar-tab ((t (:inverse-video t))))
   :config
-  (setq tab-bar-separator " "
-        tab-bar-close-button-show nil
-        tab-bar-new-button-show nil
-        tab-bar-tab-hints t
-        tab-bar-new-tab-choice "*scratch*"
-        tab-bar-select-tab-modifiers '(super)
-        tab-bar-tab-name-truncated-max 20)
-
   (defun +tab-bar-tab-name-current-with-count-truncated ()
     (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
            (count (length (window-list-1 nil 'nomini)))
@@ -120,20 +118,23 @@
   (setq tab-bar-tab-name-function #'+tab-bar-tab-name-current-with-count-truncated)
 
   (defun +tab-bar-tab-name-format (tab i)
-    (let ((current-p (eq (car tab) 'current-tab)))
-      (propertize
-       (concat " "
-               (when tab-bar-tab-hints (format "%d " i))
-               (alist-get 'name tab)
-               " ")
-       'face (funcall tab-bar-tab-face-function tab))))
+    (propertize
+     (concat " "
+             (number-to-string i)
+             " "
+             (alist-get 'name tab)
+             " ")
+       'face (funcall tab-bar-tab-face-function tab))
+    )
   (setq tab-bar-tab-name-format-function #'+tab-bar-tab-name-format)
 
   (defun +tab-bar-persp-name ()
     (when-let ((name (and (bound-and-true-p persp-mode)
-                          (propertize persp-last-persp-name 'face 'font-lock-function-name-face))))
-      (format "(%s)" name))
-    )
+                          (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
+               (count (length persp-names-cache)))
+      (if (> count 1)
+          (format "[%s/%d] " name count)
+        (concat "[" name "] "))))
 
   (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
   )
