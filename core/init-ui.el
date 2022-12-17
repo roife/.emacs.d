@@ -53,16 +53,25 @@
    #b00000000])
 
 ;; Themes
-(use-package gruvbox-theme
+(use-package spacemacs-theme
   :straight t
   :defer t
   :init
-  (let ((theme (if (eq system-type 'darwin)
+  (defun +load-theme ()
+    (let ((theme (if (eq system-type 'darwin)
                    (pcase ns-system-appearance
                      ('light 'spacemacs-light)
                      ((or 'dark _) 'spacemacs-dark))
                  'spacemacs-light)))
-    (load-theme theme t))
+      (load-theme theme t)))
+
+  (+load-theme)
+
+  (when (daemonp)
+    (add-hook 'after-make-frame-functions
+              (lambda (frame)
+                (select-frame frame)
+                (+load-theme))))
   )
 
 ;; [window-divider] Display window divider
@@ -146,7 +155,11 @@
           (format "[%s/%d] " name count)
         (concat "[" name "] "))))
 
-  (setf tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
+  (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
+
+  (when (daemonp)
+    (add-hook 'after-make-frame-functions
+              (lambda (frame) (tab-bar--update-tab-bar-lines (list frame)))))
   )
 
 

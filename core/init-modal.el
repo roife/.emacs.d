@@ -10,13 +10,12 @@
   (meow-keypad-indicator ((t (:inherit (font-lock-builtin-face bold) :inverse-video t))))
   (meow-beacon-indicator ((t (:inherit (font-lock-type-face bold) :inverse-video t))))
   (meow-motion-indicator ((t (:inherit (font-lock-doc-face bold) :inverse-video t))))
-  :custom
-  (meow-replace-state-name-list '((normal . "N")
+  :config
+  (setq-default meow-replace-state-name-list '((normal . "N")
                                   (motion . "M")
                                   (keypad . "K")
                                   (insert . "I")
                                   (beacon . "B")))
-  :config
   (meow-motion-overwrite-define-key
    '("j" . meow-next)
    '("k" . meow-prev)
