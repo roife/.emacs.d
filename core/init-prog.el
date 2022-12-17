@@ -6,10 +6,10 @@
 
 ;; [xref] Cross reference
 (use-package xref
-  :init
-  (setq xref-search-program 'ripgrep)
-  (setq xref-show-definitions-function #'xref-show-definitions-completing-read
-        xref-show-xrefs-function #'xref-show-definitions-completing-read)
+  :custom
+  (xref-search-program 'ripgrep)
+  ;; (xref-show-definitions-function #'xref-show-definitions-completing-read)
+  ;; (xref-show-xrefs-function #'xref-show-definitions-completing-read)
   )
 
 
@@ -18,10 +18,10 @@
   :straight t
   :init
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-  :config
-  (setq dumb-jump-prefer-searcher 'rg
-        dumb-jump-selector 'ido
-        dumb-jump-aggressive nil)
+  :custom
+  (dumb-jump-prefer-searcher 'rg)
+  (dumb-jump-selector 'ido)
+  (dumb-jump-aggressive nil)
   )
 
 
@@ -33,12 +33,13 @@
               ("C-c c p" . citre-peek)
               ("C-c c a" . citre-ace-peek)
               ("C-c c u" . citre-update-this-tags-file))
+  :custom
+  (citre-auto-enable-citre-mode-modes '(prog-mode))
+  (citre-default-create-tags-file-location 'global-cache)
+  (citre-use-project-root-when-creating-tags t)
+  (citre-prompt-language-for-ctags-command t)
   :init
   (require 'citre-config)
-  (setq citre-auto-enable-citre-mode-modes '(prog-mode)
-        citre-default-create-tags-file-location 'global-cache
-        citre-use-project-root-when-creating-tags t
-        citre-prompt-language-for-ctags-command t)
 
   (defun citre-jump+ ()
     "Jump to the definition of the symbol at point. Fallback to `xref-find-definitions'."
@@ -88,10 +89,9 @@
   :bind (("C-c f ]" . flymake-goto-next-error)
          ("C-c f [" . flymake-goto-prev-error)
          ("C-c f b" . flymake-show-buffer-diagnostics))
-  :config
-  (setq-default flymake-diagnostic-functions nil)
-  ;; Check only on save
-  (setq flymake-no-changes-timeout 1)
+  :custom
+  (flymake-diagnostic-functions nil)
+  (flymake-no-changes-timeout 1) ;; Check only on save
   )
 
 
@@ -114,10 +114,9 @@
 
 (use-package scala-mode
   :straight t
-  :config
-  (setq scala-indent:align-parameters t
-        ;; indent block comments to first asterix, not second
-        scala-indent:use-javadoc-style t)
+  :custom
+  (scala-indent:align-parameters t)
+  (scala-indent:use-javadoc-style t) ;; indent block comments to first asterix, not second
   )
 
 
@@ -137,10 +136,10 @@
 
 (use-package rustic
   :straight t
-  :config
-  (setq rustic-lsp-client 'eglot
-        rustic-indent-method-chain t
-        rust-prettify-symbols-alist nil)
+  :custom
+  (rustic-lsp-client 'eglot)
+  (rustic-indent-method-chain t)
+  (rust-prettify-symbols-alist nil)
   )
 
 
@@ -150,9 +149,9 @@
 
 (use-package haskell-mode
   :straight t
-  :config
-  (setq haskell-process-suggest-remove-import-lines t
-        haskell-process-auto-import-loaded-modules t))
+  :custom
+  (haskell-process-suggest-remove-import-lines t)
+  (haskell-process-auto-import-loaded-modules t))
 
 
 (use-package verilog-mode
@@ -166,8 +165,8 @@
 ;; [Proof General] Proof General is a generic front-end for proof assistants
 (use-package proof-general
   :straight t
-  :config
-  (setq proof-splash-enable nil)
+  :custom
+  (proof-splash-enable nil)
   )
 
 
@@ -175,12 +174,12 @@
 (use-package web-mode
   :straight t
   :mode "\\.\\(phtml\\|php\\|[gj]sp\\|as[cp]x\\|erb\\|djhtml\\|html?\\|hbs\\|ejs\\|jade\\|swig\\|tm?pl\\|vue\\)$"
-  :config
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-enable-html-entities-fontification t
-        web-mode-auto-close-style 1)
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-enable-html-entities-fontification t)
+  (web-mode-auto-close-style 1)
   )
 
 
@@ -202,13 +201,12 @@
 (use-package eglot
   :straight t
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
-  :config
-  (setq eldoc-echo-area-use-multiline-p 1
-        eldoc-echo-area-display-truncation-message nil
-        eglot-events-buffer-size 0
-        eglot-send-changes-idle-time 2
-        eglot-autoshutdown t
-        )
+  :custom
+  (eldoc-echo-area-use-multiline-p 1)
+  (eldoc-echo-area-display-truncation-message nil)
+  (eglot-events-buffer-size 0)
+  (eglot-send-changes-idle-time 2)
+  (eglot-autoshutdown t)
   )
 
 
@@ -216,9 +214,9 @@
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :hook ((markdown-mode org-mode) . copilot-mode)
-  :config
-  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
-  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+  :bind (:map copilot-completion-map
+              ("<tab>" . copilot-accept-completion)
+              ("TAB" . copilot-accept-completion))
   )
 
 

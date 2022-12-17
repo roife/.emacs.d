@@ -7,14 +7,16 @@
 
 
 ;; [delsel] delete the whole region when selected
-(use-package delsel
-  :hook (after-init . delete-selection-mode))
+;; (use-package delsel
+;;   :hook (after-init . delete-selection-mode))
 
 
 ;; [autorevert] Automatically reload files
 (use-package autorevert
   :hook (after-init . global-auto-revert-mode)
-  :config (setq revert-without-query (list ".")) ; Only prompts for confirmation when buffer is unsaved.
+  :custom
+  ; Only prompts for confirmation when buffer is unsaved.
+  (revert-without-query (list "."))
   )
 
 
@@ -41,10 +43,12 @@
   :bind (("C-, ," . avy-goto-char)
          ("C-, l" . avy-goto-line))
   :hook (after-init . avy-setup-default)
-  :config (setq avy-all-windows nil
-                avy-all-windows-alt t
-                avy-background t
-                avy-single-candidate-jump nil) ; Do not jump directly even if there is only one candidate, which is confusing
+  :custom
+  (avy-all-windows nil)
+  (avy-all-windows-alt t)
+  (avy-background t)
+  ; Do not jump directly even if there is only one candidate, which is confusing
+  (avy-single-candidate-jump nil)
   )
 
 
@@ -71,14 +75,13 @@
 ;; [whitespace] Show visualize TAB, (HARD) SPC, newline
 (use-package whitespace
   :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
-  :config
-  (setq
-   ;; limit line length
-   whitespace-line-column nil
-   ;; automatically clean up bad whitespace
-   whitespace-action '(auto-cleanup)
-   ;; only show bad whitespace
-   whitespace-style '(face lines-tail
+  :custom
+  ;; limit line length
+  (whitespace-line-column nil)
+  ;; automatically clean up bad whitespace
+  (whitespace-action '(auto-cleanup))
+  ;; only show bad whitespace
+  (whitespace-style '(face lines-tail
                            trailing space-before-tab
                            indentation space-after-tab))
   )
@@ -153,7 +156,8 @@
 ;; [elec-pair] Automatic parenthesis pairing
 (use-package elec-pair
   :hook ((prog-mode conf-mode) . electric-pair-mode)
-  :config (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
+  :custom
+  (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
 
 ;; [mwim] Better C-a C-e for programming
@@ -197,23 +201,11 @@
   :bind (:map paredit-mode-map
               ("M-<up>" . nil)
               ("M-<down>" . nil)
-              (";" . nil)
-              ("DEL" . +paredit-backward-delete))
+              (";" . nil))
   :config
   ;; Don't insert space automatically
   (add-to-list 'paredit-space-for-delimiter-predicates
-               '(lambda (endp delim)
-                  (derived-mode-p 'lisp-mode
-                                  'lisp-interaction-mode
-                                  'emacs-lisp-mode)))
-  ;; Delete region
-  (defun +paredit-backward-delete ()
-    "Make paredit delete region correctly"
-    (interactive)
-    (if (use-region-p)
-        (paredit-delete-region (region-beginning) (region-end))
-      (paredit-backward-delete))
-    )
+               '(lambda (_ _) (derived-mode-p 'lisp-data-mode)))
   )
 
 
@@ -358,7 +350,8 @@
 ;; [wgrep] Edit a grep buffer and apply changes to the file buffer
 (use-package wgrep
   :straight t
-  :config (setq wgrep-auto-save-buffer t))
+  :custom
+  (wgrep-auto-save-buffer t))
 
 
 ;; [rg] support for ripgrep
@@ -381,10 +374,18 @@
          ("C-c m N"       . mc/skip-to-next-like-this)
          ("C-c m P"       . mc/skip-to-previous-like-this)
          ("s-S-<mouse-1>" . mc/add-cursor-on-click))
-  :config
-  (setq mc/cmds-to-run-for-all '(mwim-beginning-of-code-or-line
-                                 mwim-end-of-code-or-line
-                                 +paredit-backward-delete))
+  :custom
+  (mc/cmds-to-run-for-all '(mwim-beginning-of-code-or-line
+                            mwim-end-of-code-or-line))
+  )
+
+
+;; [vundo] Undo tree
+(use-package vundo
+  :straight t
+  :custom
+  (vundo-glyph-alist vundo-unicode-symbols)
+  (vundo-compact-display t)
   )
 
 (provide 'init-edit)

@@ -6,11 +6,12 @@
               ("TAB" . minibuffer-complete))
   :hook ((after-init . vertico-mode)
          (minibuffer-setup . vertico-repeat-save))
-  :config
-  (setq vertico-cycle t
-        vertico-resize nil
-        vertico-count 15)
+  :custom
+  (vertico-cycle t)
+  (vertico-resize nil)
+  (vertico-count 15)
 
+  :config
   (advice-add #'completing-read-multiple :filter-args
               (lambda (args)
                 (cons (format "[CRM%s] %s"

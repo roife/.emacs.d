@@ -273,12 +273,10 @@
                 " "
                 (-3 "%p")
                 "%%"))
-         (lhs-str (format-mode-line lhs))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
-    `(,lhs-str
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) (+ 1 ,rhs-w)))))
-      " "
+    `(,lhs
+      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
       ,rhs-str)))
 
 
@@ -299,11 +297,10 @@
                 "%l,%C "
                 (-3 "%p")
                 "%%"))
-         (lhs-str (format-mode-line lhs))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
-    `(,lhs-str
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) (+ 1 ,rhs-w)))))
+    `(,lhs
+      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
       ,rhs-str)))
 
 
@@ -336,11 +333,10 @@
                 " "
                 (-3 "%p")
                 "%%"))
-         (lhs-str (format-mode-line lhs))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
-    `(,lhs-str
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) (+ 1 ,rhs-w)))))
+    `(,lhs
+      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
       ,rhs-str)))
 
 (defsubst +mode-line-inactive-short ()
@@ -354,11 +350,10 @@
          (rhs '(" %l  "
                 (-3 "%p")
                 "%%"))
-         (lhs-str (format-mode-line lhs))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
-    `(,lhs-str
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) (+ 1 ,rhs-w)))))
+    `(,lhs
+      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
       ,rhs-str)))
 
 (setq-default mode-line-format

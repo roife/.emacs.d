@@ -57,13 +57,12 @@
   :straight t
   :defer t
   :init
-  (when (display-graphic-p)
-    (let ((theme (if (eq system-type 'darwin)
-                     (pcase ns-system-appearance
-                       ('light 'spacemacs-light)
-                       ('dark 'spacemacs-dark))
-                   'spacemacs-light)))
-      (load-theme theme t)))
+  (let ((theme (if (eq system-type 'darwin)
+                   (pcase ns-system-appearance
+                     ('light 'spacemacs-light)
+                     ((or 'dark _) 'spacemacs-dark))
+                 'spacemacs-light)))
+    (load-theme theme t))
   )
 
 ;; [window-divider] Display window divider
