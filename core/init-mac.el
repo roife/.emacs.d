@@ -25,8 +25,8 @@
 (defun +auto-switch-theme (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
   (let ((system-theme (pcase appearance
-                        ('light 'gruvbox-light-soft)
-                        ('dark 'gruvbox-dark-soft))))
+                        ('light 'spacemacs-light)
+                        ('dark 'spacemacs-dark))))
     (unless (member system-theme custom-enabled-themes)
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme system-theme t)))

@@ -22,6 +22,10 @@
 (unless (daemonp)
   (advice-add #'display-startup-echo-area-message :override #'ignore))
 
+(add-hook 'server-after-make-frame-hook
+          (lambda ()
+            (select-frame-set-input-focus (selected-frame))))
+
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)
   (setq mouse-wheel-scroll-amount '(2 ((shift) . hscroll) ((control) . nil))
@@ -51,15 +55,16 @@
 ;; Themes
 (use-package gruvbox-theme
   :straight t
+  :defer t
   :init
-  (let ((theme (if (eq system-type 'darwin)
-                   (pcase ns-system-appearance
-                     ('light 'gruvbox-light-soft)
-                     ('dark 'gruvbox-dark-soft))
-                 'gruvbox-light-soft-theme)))
-    (load-theme theme t))
+  (when (display-graphic-p)
+    (let ((theme (if (eq system-type 'darwin)
+                     (pcase ns-system-appearance
+                       ('light 'spacemacs-light)
+                       ('dark 'spacemacs-dark))
+                   'spacemacs-light)))
+      (load-theme theme t)))
   )
-
 
 ;; [window-divider] Display window divider
 (use-package window-divider
@@ -130,7 +135,7 @@
              " "
              (alist-get 'name tab)
              " ")
-       'face (funcall tab-bar-tab-face-function tab))
+     'face (funcall tab-bar-tab-face-function tab))
     )
   (setq tab-bar-tab-name-format-function #'+tab-bar-tab-name-format)
 
