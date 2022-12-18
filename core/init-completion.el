@@ -227,7 +227,7 @@ See `consult-grep' for more details regarding the asynchronous search."
 
 ;; [corfu] compleletion frontend
 (use-package corfu
-  :straight t
+  :straight (:files (:defaults "extensions/*"))
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
@@ -235,9 +235,16 @@ See `consult-grep' for more details regarding the asynchronous search."
   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   (corfu-auto-prefix 2)          ;; minimun prefix to enable completion
+  (corfu-preview-current nil)
+
   :hook (((prog-mode conf-mode shell-mode eshell-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil))))
   :config
+  ;; Sort with history
+  (corfu-history-mode 1)
+  (with-eval-after-load 'safehist
+    (cl-pushnew 'corfu-history savehist-additional-variables))
+
   ;; Transfer completion to the minibuffer
   (defun corfu-move-to-minibuffer ()
     (interactive)
@@ -252,8 +259,7 @@ See `consult-grep' for more details regarding the asynchronous search."
     (when (where-is-internal #'completion-at-point (list (current-local-map)))
       ;; (setq-local corfu-auto nil) Enable/disable auto completion
       (corfu-mode 1)))
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
-  )
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer))
 
 
 (use-package cape

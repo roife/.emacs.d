@@ -202,7 +202,7 @@
   :straight t
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
   :custom
-  (eldoc-echo-area-use-multiline-p 1)
+  ;; (eldoc-echo-area-use-multiline-p 1)
   (eldoc-echo-area-display-truncation-message nil)
   (eglot-events-buffer-size 0)
   (eglot-send-changes-idle-time 2)
