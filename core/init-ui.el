@@ -14,13 +14,12 @@
 (setq initial-scratch-message nil
       use-file-dialog nil
       use-dialog-box nil
-      inhibit-startup-screen t
-      inhibit-startup-echo-area-message t
       inhibit-default-init t
       inhibit-compacting-font-caches t)
 
 (unless (daemonp)
-  (advice-add #'display-startup-echo-area-message :override #'ignore))
+  (advice-add #'display-startup-echo-area-message :override #'ignore)
+  (advice-add #'display-startup-screen :override #'ignore))
 
 (add-hook 'server-after-make-frame-hook
           (lambda ()
@@ -53,7 +52,6 @@
    #b00000000
    #b00000000
    #b00000000])
-
 
 
 ;; [window-divider] Display window divider

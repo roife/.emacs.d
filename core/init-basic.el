@@ -1,16 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 
 (setq-default
- ;; major mode for scratch
- initial-major-mode 'fundamental-mode
- ;; no start messages
- inhibit-startup-message t
- ;; no welcome screen
- inhibit-startup-screen t
  ;; no client startup messages
  server-client-instructions nil
- ;; no startup messages
- initial-scratch-message nil
  ;; don't create lockfiles
  create-lockfiles nil
  ;; backup setups and version control
