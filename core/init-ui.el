@@ -11,12 +11,12 @@
 (blink-cursor-mode -1)
 
 ;; Suppress GUI features
-(setq use-file-dialog nil
+(setq initial-scratch-message nil
+      use-file-dialog nil
       use-dialog-box nil
       inhibit-startup-screen t
-      inhibit-startup-echo-area-message user-login-name
+      inhibit-startup-echo-area-message t
       inhibit-default-init t
-      initial-scratch-message nil
       inhibit-compacting-font-caches t)
 
 (unless (daemonp)
@@ -24,7 +24,9 @@
 
 (add-hook 'server-after-make-frame-hook
           (lambda ()
-            (select-frame-set-input-focus (selected-frame))))
+            (select-frame-set-input-focus (selected-frame))
+            (select-frame (selected-frame))
+            (+load-theme)))
 
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)
@@ -52,27 +54,7 @@
    #b00000000
    #b00000000])
 
-;; Themes
-(use-package spacemacs-theme
-  :straight t
-  :defer t
-  :init
-  (defun +load-theme ()
-    (let ((theme (if (eq system-type 'darwin)
-                   (pcase ns-system-appearance
-                     ('light 'spacemacs-light)
-                     ((or 'dark _) 'spacemacs-dark))
-                 'spacemacs-light)))
-      (load-theme theme t)))
 
-  (+load-theme)
-
-  (when (daemonp)
-    (add-hook 'after-make-frame-functions
-              (lambda (frame)
-                (select-frame frame)
-                (+load-theme))))
-  )
 
 ;; [window-divider] Display window divider
 (use-package window-divider
@@ -120,8 +102,8 @@
   (tab-bar-new-tab-choice "*scratch*")
   (tab-bar-select-tab-modifiers '(super))
   (tab-bar-tab-name-truncated-max 20)
-  :custom-face
-  (tab-bar-tab ((t (:inverse-video t))))
+  ;; :custom-face
+  ;; (tab-bar-tab ((t (:inverse-video t))))
   :config
   (defun +tab-bar-tab-name-current-with-count-truncated ()
     (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))

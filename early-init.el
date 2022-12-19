@@ -28,3 +28,16 @@
 (setq menu-bar-mode nil
       tool-bar-mode nil
       scroll-bar-mode nil)
+
+;; Load theme in advance to speed up
+(defun +load-theme ()
+  (let ((theme (if (and (eq system-type 'darwin)
+                        (display-graphic-p)
+                        (eq ns-system-appearance 'light))
+                   'modus-operandi
+                 'modus-vivendi)))
+    (unless (member theme custom-enabled-themes)
+      (mapc #'disable-theme custom-enabled-themes)
+      (load-theme theme t))))
+
+(+load-theme)
