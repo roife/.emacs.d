@@ -1,4 +1,5 @@
 ;;; -*- lexical-binding: t -*-
+;;; Mainly for speeding up startup time
 
 ;; Defer gc
 (setq gc-cons-threshold most-positive-fixnum
@@ -40,18 +41,15 @@
 (push '(vertical-scroll-bars) default-frame-alist)
 (when (featurep 'ns)
   (push '(ns-transparent-titlebar . t) default-frame-alist))
-;; And set these to nil so users don't have to toggle the modes twice to
-;; reactivate them.
+; Set these to nil so users don't have to toggle the modes twice to reactivate.
 (setq menu-bar-mode nil
       tool-bar-mode nil
       scroll-bar-mode nil)
 
-;; Font
-(push '(font . "JetBrains Mono 14") default-frame-alist)
-
-;; Speed up startup
+;; Case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
 
+;; `file-name-handler-alist' is consulted on each call to `require', `load', or various file/io functions
 (unless (or (daemonp) noninteractive init-file-debug)
   (let ((old-value file-name-handler-alist))
     (setq file-name-handler-alist nil)
@@ -74,3 +72,6 @@
       (load-theme theme t))))
 
 (+load-theme)
+
+;; Font
+(push '(font . "JetBrains Mono 14") default-frame-alist)

@@ -74,8 +74,9 @@
  use-short-answers t
  ;; Don't ping things that look like domain names.
  ffap-machine-p-known 'reject
+ ;; Allow minibuffer commands while in the minibuffer.
+ enable-recursive-minibuffers t
 )
-
 
 ;; Encoding
 ;;(set-charset-priority 'unicode)
@@ -99,8 +100,8 @@
   (setq recentf-auto-cleanup 'never
         recentf-max-saved-items 300
         recentf-exclude '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-                          "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                          "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                     "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                     "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
                           (lambda (file) (file-in-directory-p file package-user-dir)))
         recentf-keep nil)
   :config
@@ -111,11 +112,12 @@
 ;;; [savehist] Save variables to file
 (use-package savehist
   :hook (after-init . savehist-mode)
-  :init (setq enable-recursive-minibuffers t ; Allow commands in minibuffer
-              savehist-additional-variables '(mark-ring global-mark-ring
-                                              search-ring regexp-search-ring
-                                              kill-ring)
-              savehist-autosave-interval 300))
+  :custom
+  (savehist-additional-variables '(mark-ring global-mark-ring
+                                             search-ring regexp-search-ring
+                                             kill-ring))
+  (savehist-autosave-interval 300)
+  )
 
 
 ;; Workaround for long one-line file
@@ -133,21 +135,24 @@
 (use-package gcmh
   :straight t
   :hook (emacs-startup . gcmh-mode)
-  :init
-  (setq gcmh-idle-delay 'auto
-        gcmh-auto-idle-delay-factor 10
-        gcmh-high-cons-threshold #x64000000)) ;; 100 MB
+  :custom
+  (gcmh-idle-delay 'auto)
+  (gcmh-auto-idle-delay-factor 10)
+  (gcmh-high-cons-threshold #x64000000)
+  )
 
 
 ;; [tramp]
 (use-package tramp
   :init
-  (setq tramp-default-method "ssh"
-        tramp-persistency-file-name (expand-file-name "tramp" user-emacs-directory)
-        tramp-auto-save-directory (expand-file-name "tramp" user-emacs-directory)
+  (let ((tramp-directory (expand-file-name "tramp" user-emacs-directory)))
+    (setq tramp-default-method "ssh"
+        tramp-persistency-file-name tramp-directory
+        tramp-auto-save-directory tramp-directory
         tramp-backup-directory-alist backup-directory-alist
         tramp-verbose 10
         tramp-ssh-controlmaster-options
         "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no"))
+  )
 
 (provide 'init-basic)

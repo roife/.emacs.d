@@ -12,7 +12,6 @@
 
 (add-hook 'emacs-startup-hook #'efs/display-startup-time)
 
-;; Load path. Force "core" at the head to reduce the startup time.
 (push (expand-file-name "core" user-emacs-directory) load-path)
 
 ;; Proxy

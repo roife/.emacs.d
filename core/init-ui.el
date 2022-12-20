@@ -1,30 +1,25 @@
-;;; -*- lexical-binding: t -*-
+;; -*- lexical-binding: t; -*-
 
 ;; Optimization
 (setq idle-update-delay 1.0
-      highlight-nonselected-windows nil
       fast-but-imprecise-scrolling t
       redisplay-skip-fontification-on-input t
+      highlight-nonselected-windows nil
       cursor-in-non-selected-windows nil)
 
 ;; disable cursor blinking
 (blink-cursor-mode -1)
 
 ;; Suppress GUI features
-(setq initial-scratch-message nil
-      use-file-dialog nil
+(setq use-file-dialog nil
       use-dialog-box nil
-      inhibit-default-init t
+      ; Font compacting can be terribly expensive
       inhibit-compacting-font-caches t)
 
-(unless (daemonp)
-  (advice-add #'display-startup-echo-area-message :override #'ignore)
-  (advice-add #'display-startup-screen :override #'ignore))
-
+;; Load theme
 (add-hook 'server-after-make-frame-hook
           (lambda ()
             (select-frame-set-input-focus (selected-frame))
-            (select-frame (selected-frame))
             (+load-theme)))
 
 ;; Smooth Scroll (less "jumpy" than defaults)
@@ -33,35 +28,12 @@
         mouse-wheel-scroll-amount-horizontal 1
         mouse-wheel-progressive-speed nil))
 
-;; Better fringe symbol
-(define-fringe-bitmap 'right-curly-arrow
-  [#b00000000
-   #b00000000
-   #b00000000
-   #b00000000
-   #b11110000
-   #b11110000
-   #b00110000
-   #b00110000])
-(define-fringe-bitmap 'left-curly-arrow
-  [#b00001100
-   #b00001100
-   #b00001111
-   #b00001111
-   #b00000000
-   #b00000000
-   #b00000000
-   #b00000000])
-
 
 ;; [window-divider] Display window divider
-(use-package window-divider
-  :defer nil
-  :hook (window-setup . window-divider-mode)
-  :custom
-  ;; (window-divider-default-places t)
-  (window-divider-default-right-width 1)
-  )
+(setq window-divider-default-places t
+      window-divider-default-bottom-width 1
+      window-divider-default-right-width 1)
+(add-hook 'window-setup-hook #'window-divider-mode)
 
 ;; [ligature] ligature support for Emacs
 (use-package ligature
@@ -71,6 +43,7 @@
   ;; Enable traditional ligature support in eww-mode, if the
   ;; `variable-pitch' face supports it
   ;; (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+
   ;; Enable all Cascadia Code ligatures in programming modes
   (ligature-set-ligatures '(prog-mode markdown-mode)
                           '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
