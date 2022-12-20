@@ -24,4 +24,5 @@ places
 persp-confs/*
 *.sqlite3
 *.sqlite
+*.elc
 elpa/

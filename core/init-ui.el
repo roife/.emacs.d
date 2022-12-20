@@ -7,8 +7,10 @@
       highlight-nonselected-windows nil
       cursor-in-non-selected-windows nil)
 
+
 ;; disable cursor blinking
 (blink-cursor-mode -1)
+
 
 ;; Suppress GUI features
 (setq use-file-dialog nil
@@ -16,11 +18,13 @@
       ; Font compacting can be terribly expensive
       inhibit-compacting-font-caches t)
 
+
 ;; Load theme
 (add-hook 'server-after-make-frame-hook
           (lambda ()
             (select-frame-set-input-focus (selected-frame))
             (+load-theme)))
+
 
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)
@@ -29,11 +33,29 @@
         mouse-wheel-progressive-speed nil))
 
 
+;; Load theme
+(defvar +light-theme 'modus-operandi)
+(defvar +dark-theme 'modus-vivendi)
+(defun +load-theme (&optional theme)
+  (unless theme
+    (setq theme (if (and (eq system-type 'darwin)
+                         (display-graphic-p)
+                         (eq ns-system-appearance 'light))
+                    +light-theme
+                  +dark-theme)))
+  (unless (member theme custom-enabled-themes)
+    (mapc #'disable-theme custom-enabled-themes)
+    (load-theme theme t)))
+
+(+load-theme)
+
+
 ;; [window-divider] Display window divider
 (setq window-divider-default-places t
       window-divider-default-bottom-width 1
       window-divider-default-right-width 1)
 (add-hook 'window-setup-hook #'window-divider-mode)
+
 
 ;; [ligature] ligature support for Emacs
 (use-package ligature

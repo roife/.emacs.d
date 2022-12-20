@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-;; [winum]
+;; [winum] Add number for each window
 (use-package winum
   :straight t
   :hook (after-init . winum-mode)
@@ -21,18 +21,13 @@
 ;; [winner] Restore old window configurations
 (use-package winner
   :commands (winner-undo winner-redo)
+  :init
+  (setq winner-dont-bind-my-keys t)
   :hook (after-init . winner-mode)
   :config
   (setq winner-boring-buffers
-        '("*Completions*"
-          "*Compile-Log*"
-          "*inferior-lisp*"
-          "*Fuzzy Completions*"
-          "*Apropos*"
-          "*Help*"
-          "*cvs*"
-          "*Buffer List*"
-          "*Ibuffer*"
+        '("*Completions*" "*Compile-Log*" "*inferior-lisp*" "*Fuzzy Completions*"
+          "*Apropos*" "*Help*" "*cvs*" "*Buffer List*" "*Ibuffer*"
           "*esh command on file*"))
   )
 
@@ -40,10 +35,8 @@
 ;; [popper] Enforce rules for popup windows like *Help*
 (use-package popper
   :straight t
-  :defines popper-echo-dispatch-actions
-  :commands popper-group-by-projectile
   :bind (:map popper-mode-map
-              ("C-<tab>"   . popper-cycle)
+              ("M-<tab>"   . popper-cycle)
               ("M-`" . popper-toggle-type))
   :hook (emacs-startup . popper-mode)
   :init
@@ -101,19 +94,9 @@
           "\\*rustfmt\\*$" rustic-compilation-mode rustic-cargo-clippy-mode
           rustic-cargo-outdated-mode rustic-cargo-test-moed))
 
-  (setq popper-echo-dispatch-actions t)
-
   :config
   ;; Enable echo in minibuffer
   (popper-echo-mode 1)
-
-  ;; Determine the height of popup window WIN by fitting it to the buffer's content.
-  (setq popper-window-height
-        (lambda ()
-          (fit-window-to-buffer
-           win
-           (floor (frame-height) 3)
-           (floor (frame-height) 3))))
 
   (defun +popper-close-window-hack (&rest _)
     "Close popper window via `C-g'."

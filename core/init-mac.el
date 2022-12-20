@@ -4,6 +4,7 @@
       mac-command-modifier 'super
       mac-right-command-modifier 'hyper)
 
+
 (define-key global-map [?\s-a] #'mark-whole-buffer)
 (define-key global-map [?\s-x] #'kill-region)
 (define-key global-map [?\s-s] #'save-buffer)
@@ -15,22 +16,16 @@
 (define-key global-map [?\s-w] #'tab-close)
 (define-key global-map [?\s-t] #'tab-new)
 
+
 ;; [osx-dictionary] macOS native dictionary app
 (use-package osx-dictionary
   :straight t
   :bind (("C-c d i" . osx-dictionary-search-input)
          ("C-c d d" . osx-dictionary-search-pointer)))
 
+
 ;; Automatically switch theme based on the theme of macOS
-(defun +auto-switch-theme (appearance)
-  "Load theme, taking current system APPEARANCE into consideration."
-  (let ((system-theme (pcase appearance
-                        ('light 'modus-operandi)
-                        ('dark 'modus-vivendi))))
-    (unless (member system-theme custom-enabled-themes)
-      (mapc #'disable-theme custom-enabled-themes)
-      (load-theme system-theme t)))
-  )
-(add-hook 'ns-system-appearance-change-functions #'+auto-switch-theme)
+(add-hook 'ns-system-appearance-change-functions #'(lambda (_) (+load-theme)))
+
 
 (provide 'init-mac)

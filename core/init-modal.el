@@ -12,14 +12,16 @@
   (meow-motion-indicator ((t (:inherit (font-lock-doc-face bold) :inverse-video t))))
   :config
   (setq-default meow-replace-state-name-list '((normal . "N")
-                                  (motion . "M")
-                                  (keypad . "K")
-                                  (insert . "I")
-                                  (beacon . "B")))
+                                               (motion . "M")
+                                               (keypad . "K")
+                                               (insert . "I")
+                                               (beacon . "B")))
+
   (meow-motion-overwrite-define-key
    '("j" . meow-next)
    '("k" . meow-prev)
    '("<escape>" . ignore))
+
   (meow-leader-define-key
    ;; SPC j/k will run the original command in MOTION state.
    '("j" . "H-j")
@@ -37,6 +39,7 @@
    '("0" . meow-digit-argument)
    '("/" . meow-keypad-describe-key)
    '("?" . meow-cheatsheet))
+
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("9" . meow-expand-9)

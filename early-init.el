@@ -60,18 +60,6 @@
                       (delete-dups (append file-name-handler-alist
                                            old-value)))))))
 
-;; Load theme to speed up
-(defun +load-theme ()
-  (let ((theme (if (and (eq system-type 'darwin)
-                        (display-graphic-p)
-                        (eq ns-system-appearance 'light))
-                   'modus-operandi
-                 'modus-vivendi)))
-    (unless (member theme custom-enabled-themes)
-      (mapc #'disable-theme custom-enabled-themes)
-      (load-theme theme t))))
-
-(+load-theme)
 
 ;; Font
 (push '(font . "JetBrains Mono 14") default-frame-alist)

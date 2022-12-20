@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-;; See `magit-maybe-define-global-key-bindings'
+;; [magit] Version control interface
 (use-package magit
   :straight t
   :bind (("C-x g" . magit))
