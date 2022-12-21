@@ -307,7 +307,24 @@
 
 ;; [fd] support for fd
 (use-package fd-dired
-  :straight t)
+  :straight t
+  :config
+  ;; Use [fd] to find file in project
+  ;; Not related with `fd-dired', though
+  (defun +search-project-files-with-fd (dir)
+    "Use `fd' to list files in DIR."
+    (let* ((default-directory dir)
+           (localdir (file-local-name (expand-file-name dir)))
+           (command (format "fd -H -t f -0 . %s" localdir)))
+      (project--remote-file-names
+       (sort (split-string (shell-command-to-string command) "\0" t)
+             #'string<))))
+
+  (cl-defmethod project-files ((project (head local)) &optional dirs)
+    "Override `project-files' to use `fd' in local projects."
+    (mapcan #'+search-project-files-with-fd
+            (or dirs (list (project-root project)))))
+  )
 
 
 ;; [multiple-cursors] Multi-cursor

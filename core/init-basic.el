@@ -1,37 +1,39 @@
 ;;; -*- lexical-binding: t -*-
 
+(defvar +cache-dir (expand-file-name "emacs/" "~/.cache"))
+
 (setq-default
  ;; no client startup messages
  server-client-instructions nil
 
- ;; don't create [lockfile]s
+ ;; Files
+ ;; [lockfile]
  create-lockfiles nil
+ ;; [backup] Use auto-save, which maintains a copy when a buffer is unsaved
+ make-backup-files nil
+ ;; In case I enable it later
+ ;; backup-directory-alist `((".*" . ,(concat +cache-dir "backup/")))
+ ;;; version-control t
+ ;;; backup-by-copying t
+ ;;; delete-old-versions t
+ ;;; kept-new-versions 5
+ ;;; tramp-backup-directory-alist backup-directory-alist
+ ;; [auto-save]
+ auto-save-default t
+ auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
+ auto-save-file-name-transforms `((".*" ,(concat +cache-dir "autosave/") t))
+ auto-save-file-name-transforms (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
+                                            ;; Prefix tramp autosaves to prevent conflicts with local ones
+                                            (concat auto-save-list-file-prefix "tramp-\\2") t)
+                                      (list ".*" auto-save-list-file-prefix t))
 
- ;; [backup and auto-save]
- backup-directory-alist `((".*" . ,temporary-file-directory))
- backup-by-copying t
- version-control t
- delete-old-versions t
- kept-new-versions 4
- auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
- ;; xref no prompt
- xref-prompt-for-identifier nil
- ;; don't wait for keystrokes display
- echo-keystrokes .01
- ;; overline/underline no margin
- overline-margin 0
- underline-minimum-offset 0
- ;; comment over empty lines
- comment-empty-lines t
- ;; improve long line display performance
+ ;; Disable [bidirectional text] scanning for a modest performance
+ ;; Will improve long line display performance
  bidi-inhibit-bpa t
  bidi-paragraph-direction 'left-to-right
  bidi-display-reordering 'left-to-right
- ;; allow resize by pixels
- frame-resize-pixelwise t
- x-gtk-resize-child-frames nil
- x-underline-at-descent-line t
- ;; larger process output buffer
+
+ ;; Larger process output buffer for LSP module
  read-process-output-max (* 1024 1024)
 
  ;; [Wrapping] words at whitespace, but do not wrap by default
@@ -41,8 +43,6 @@
  truncate-lines t
  truncate-partial-width-windows nil
 
- ;; Don't display comp warnings
- warning-suppress-log-types '((comp))
  ;; Custom file path
  custom-file (expand-file-name "custom.el" user-emacs-directory)
 
@@ -50,17 +50,15 @@
  find-file-visit-truename t
  vc-follow-symlinks t
 
- ;; case insensitive completion
+ ;; Case insensitive completion
  read-buffer-completion-ignore-case t
  read-file-name-completion-ignore-case t
- ;; pinentry
- epa-pinentry-mode 'loopback
- ;; disable bell completely
+
+ ;; disable [bell] completely
  ring-bell-function 'ignore
- ;; disable copy region blink
+
+ ;; Disable copy region blink
  copy-region-blink-delay 0
- ;; hscroll only for current line
- auto-hscroll-mode 'current-lin
 
  ;; set [fill column] indicator to 80
  fill-column 80
@@ -74,14 +72,6 @@
  tab-width 4
  c-basic-offset 4
 
- ;; Keep 5 lines when scrolling
- scroll-margin 3
- scroll-conservatively 101
- ;; Moving as visual lines
- line-move-visual t
- ;; Show path if names are same
- uniquify-buffer-name-style 'post-forward-angle-brackets
-
  ;; [sentence end]
  sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*"
  sentence-end-double-space nil
@@ -91,15 +81,28 @@
 
  ;; Don't ping things that look like domain names.
  ffap-machine-p-known 'reject
- ;; Allow minibuffer commands while in the minibuffer.
- enable-recursive-minibuffers t
 
  ;; Disable the "same file" warning, just redirect to the existing buffer
  find-file-suppress-same-file-warnings t
 
  ;; POSIX standard [newline]
  require-final-newline t
-)
+
+ ;;Don't prompt for confirmation when creating a new file or buffer
+ confirm-nonexistent-file-or-buffer nil
+
+ ;; Show path/name if names are same
+ uniquify-buffer-name-style 'forward
+ )
+
+
+;; [autosave]
+;; If a file has autosaved data, `after-find-file' will pause for 1 second to
+;; tell about it, which is very annoying. Just disable it.
+(advice-add #'after-find-file :around
+            (lambda (fn &rest args) (cl-letf (((symbol-function #'sit-for) #'ignore))
+                      (apply fn args))))
+
 
 ;; Encoding
 (set-language-environment "UTF-8")
@@ -195,17 +198,15 @@
 ;; [tramp]
 (use-package tramp
   :config
-  (let ((tramp-directory (expand-file-name "tramp" user-emacs-directory)))
-    (setq tramp-default-method "ssh"
-          tramp-persistency-file-name tramp-directory
-          tramp-auto-save-directory tramp-directory
+  (setq tramp-default-method "ssh"
+          tramp-persistency-file-name (concat +cache-dir "tramp-persist/")
+          tramp-auto-save-directory (concat +cache-dir "tramp-autosave/")
           tramp-backup-directory-alist backup-directory-alist
-          remote-file-name-inhibit-cache 60))
+          remote-file-name-inhibit-cache 60)
   )
 
 
 ;; TODO: better-jump
-;; TODO: dtrt-indent
 
 
 (provide 'init-basic)

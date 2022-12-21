@@ -65,7 +65,7 @@
   :group '+modeline)
 
 (defface +modeline-project-name-inactive-face
-  '((t (:inherit (mode-line))))
+  '((t (:inherit (mode-line-inactive))))
   "The face for project name on the mode-line of an inactive window."
   :group '+modeline)
 
@@ -75,7 +75,7 @@
   :group '+modeline)
 
 (defface +modeline-buffer-name-inactive-face
-  '((t (:inherit (font-lock-function-name-face))))
+  '((t (:inherit (mode-line-inactive bold))))
   "The face for buffer name on the mode-line of an inactive window."
   :group '+modeline)
 

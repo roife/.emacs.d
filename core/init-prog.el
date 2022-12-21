@@ -4,6 +4,32 @@
   :hook ((prog-mode . global-prettify-symbols-mode)))
 
 
+;; [comint]
+(use-package comint
+  :config
+  (setq comint-prompt-read-only t
+        comint-buffer-maximum-size 2048))
+
+
+;; [compile]
+(use-package compile
+  :config
+  (setq compilation-always-kill t       ; kill compilation process before starting another
+        compilation-ask-about-save nil  ; save all buffers on `compile'
+        compilation-scroll-output 'first-error)
+
+  ;; Automatically truncate compilation buffers so they don't accumulate too
+  ;; much data and bog down the rest of Emacs.
+  (autoload 'comint-truncate-buffer "comint" nil t)
+  (add-hook 'compilation-filter-hook #'comint-truncate-buffer)
+  )
+
+
+;; [comment]
+;; comment over empty lines
+(setq comment-empty-lines t)
+
+
 ;; [xref] Cross reference
 (use-package xref
   :custom

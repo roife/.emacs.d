@@ -14,12 +14,12 @@
 ;; Inhibit resizing frame
 (setq frame-inhibit-implied-resize t)
 
-;; Inhibit startup screen
+;; Inhibit startup screen & message
 (setq inhibit-startup-screen t
       inhibit-startup-echo-area-message t
-      initial-major-mode 'fundamental-mode
       inhibit-startup-message t
-      initial-scratch-message nil)
+      initial-scratch-message nil
+      initial-major-mode 'fundamental-mode)
 (advice-add #'display-startup-echo-area-message :override #'ignore)
 (advice-add #'display-startup-screen :override #'ignore)
 
@@ -60,6 +60,7 @@
                       (delete-dups (append file-name-handler-alist
                                            old-value)))))))
 
-
 ;; Font
 (push '(font . "JetBrains Mono 14") default-frame-alist)
+
+;; TODO: optimize `load-suffixes'

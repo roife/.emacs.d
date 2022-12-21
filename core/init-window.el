@@ -61,6 +61,7 @@
           help-mode helpful-mode
           tabulated-list-mode
           Buffer-menu-mode
+          ibuffer-mode
 
           gnus-article-mode devdocs-mode
           grep-mode occur-mode rg-mode ag-mode pt-mode

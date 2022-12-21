@@ -1,22 +1,67 @@
 ;; -*- lexical-binding: t; -*-
 
 ;; Optimization
-(setq idle-update-delay 1.0
-      fast-but-imprecise-scrolling t
-      redisplay-skip-fontification-on-input t
-      highlight-nonselected-windows nil
-      cursor-in-non-selected-windows nil)
+(setq
+ ;; Update UI slowly
+ idle-update-delay 1.0
+
+ ;; Inhibits fontification while receiving input, which should help a little with scrolling performance.
+ redisplay-skip-fontification-on-input t
+
+ ;; [Selected-window]
+ highlight-nonselected-windows nil
+ cursor-in-non-selected-windows nil
+
+ ; Font compacting can be terribly expensive, but may increase memory use
+ inhibit-compacting-font-caches t)
 
 
-;; disable cursor blinking
+;; [Scrolling]
+(setq
+ ;; Performant and rapid scrolling
+ fast-but-imprecise-scrolling t
+
+ ;; Keep 5 lines when scrolling
+ scroll-step 0
+ scroll-margin 5
+ scroll-conservatively 101
+ ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines.
+ auto-window-vscroll nil
+
+ ;; [hscroll]
+ ;; hscroll only for current line
+ auto-hscroll-mode 'current-line
+ hscroll-step 0
+ hscroll-margin 2)
+
+
+;; [Cursor] disable blinking
 (blink-cursor-mode -1)
 
 
-;; Suppress GUI features
+;; [Fringes] Reduce the clutter in the fringes
+(setq indicate-buffer-boundaries nil
+      indicate-empty-lines nil)
+
+
+;; Allow [resize] by pixels.
+(setq frame-resize-pixelwise t)
+
+
+;; Suppress GUI features for consistency
 (setq use-file-dialog nil
-      use-dialog-box nil
-      ; Font compacting can be terribly expensive
-      inhibit-compacting-font-caches t)
+      use-dialog-box nil)
+
+
+;; [Minibuffer]
+;; Allow minibuffer commands while in the minibuffer.
+(setq enable-recursive-minibuffers t
+      echo-keystrokes 0.02)
+;; Keep the cursor out of the read-only portions of the minibuffer
+(setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+;; Allow emacs to query passphrase through minibuffer
+(setq epa-pinentry-mode 'loopback)
 
 
 ;; Load theme
@@ -52,7 +97,7 @@
 
 ;; [window-divider] Display window divider
 (setq window-divider-default-places t
-      window-divider-default-bottom-width 1
+      window-divider-default-bottom-width 0
       window-divider-default-right-width 1)
 (add-hook 'window-setup-hook #'window-divider-mode)
 

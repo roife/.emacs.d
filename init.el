@@ -38,6 +38,7 @@
 (require 'init-vcs)
 (require 'init-treemacs)
 (require 'init-dict)
+(require 'init-ibuffer)
 
 (require 'init-util)
 (require 'init-modal)
