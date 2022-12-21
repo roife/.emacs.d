@@ -10,6 +10,11 @@
 (use-package go-translate
   :straight t
   :bind (("C-c d g" . gts-do-translate))
+  :functions (gts-posframe-pop-render
+              gts-google-parser
+              gts-engine
+              gts-picker
+              gts-translator)
   :config
   (setq gts-translate-list '(("en" "zh") ("zh" "en")))
   (setq gts-default-translator

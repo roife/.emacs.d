@@ -11,12 +11,12 @@
 (use-package ibuffer-project
   :straight t
   :hook (ibuffer . +ibuffer-project-activete)
+  :defines ibuffer-project-groups
   :config
   ;; WORKAROUND: temperary buffer
   (defun +ibuffer-project-activete ()
     "Activate ibuffer-project"
-    (let ((ibuffer-project-groups (ibuffer-project-generate-filter-groups))
-          (starred-name-filter '(starred-name . "")))
+    (let ((starred-name-filter '(starred-name . "")))
       (setq ibuffer-filter-groups
             (mapcar (lambda (p) (cons (car p)
                                  `((and ,(car (cdr p)) (not ,starred-name-filter)))))

@@ -5,17 +5,19 @@
   :bind (:map dired-mode-map
               ("C-c C-p" . wdired-change-to-wdired-mode))
   :config
-  ;; Always delete and copy recursively
-  (setq dired-recursive-deletes 'top
-        dired-recursive-copies 'always
-        ;; Move between two dired buffer quickly
-        dired-dwim-target t
-        ;; Ask whether destination dirs should get created when copying/removing files.
-        dired-create-destination-dirs 'ask
-        ;; don't prompt to revert, just do it
-        dired-auto-revert-buffer #'dired-buffer-stale-p
-        dired-hide-details-hide-symlink-targets nil
-        )
+  (setq
+   ;; Always delete and copy recursively
+   dired-recursive-deletes 'top
+   dired-recursive-copies 'always
+   ;; Move between two dired buffer quickly
+   dired-dwim-target t
+   ;; Ask whether destination dirs should get created when copying/removing files.
+   dired-create-destination-dirs 'ask
+   ;; don't prompt to revert, just do it
+   dired-auto-revert-buffer #'dired-buffer-stale-p
+   ;; symlink
+   dired-hide-details-hide-symlink-targets nil
+   )
 
   (when (eq system-type 'darwin)
     (if (executable-find "gls")
@@ -35,7 +37,7 @@
   :straight t
   :after dired
   :bind (:map dired-mode-map
-              (")" . dired-git-info-mode))
+              ("g" . dired-git-info-mode))
   :config
   (setq dgi-commit-message-format "%h %cs %s"
         dgi-auto-hide-details-p nil)
@@ -50,7 +52,8 @@
         dired-vc-rename-file t))
 
 (use-package dired-x
-  :hook (dired-mode . dired-omit-mode)
+  :bind (:map dired-mode-map
+              ("h" . dired-omit-mode))
   :config
   (let ((cmd (cond ((and (eq system-type 'darwin) (display-graphic-p)) "open")
                    ((and (eq system-type 'gnu/linux) (display-graphic-p)) "xdg-open")
@@ -68,16 +71,22 @@
             ("\\.\\(?:mp3\\|flac\\)\\'" ,cmd))))
 
   (setq dired-omit-verbose nil
-        dired-omit-files
-        (concat dired-omit-files
-                "\\|^.DS_Store$\\|^.projectile$\\|^.git*\\|^.svn$\\|^.vscode$\\|\\.js\\.meta$\\|\\.meta$\\|\\.elc$"))
+        dired-omit-files (concat dired-omit-files
+                                 "\\|^\\.DS_Store\\'"
+                                 "\\|^\\.project\\(?:ile\\)?\\'"
+                                 "\\|^\\.\\(?:svn\\|git\\)\\'"
+                                 "\\|^\\.ccls-cache\\'"
+                                 "\\|\\(?:\\.js\\)?\\.meta\\'"
+                                 "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
 
-  ;; Disable the prompt about whether I want to kill the Dired buffer for a deleted directory.
+  ;; Disable the prompt about killing the Dired buffer for a deleted directory.
   (setq dired-clean-confirm-killing-deleted-buffers nil)
   )
 
+
 (use-package fd-dired
   :straight t
-  :if (executable-find "fd"))
+  :bind ([remap find-dired] . fd-dired))
+
 
 (provide 'init-dired)
