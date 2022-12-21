@@ -37,7 +37,8 @@
                     (string-match-p "\\.bin\\|\\.so\\|\\.dll\\|\\.exe\\'" bname)))))
 
   ;; Don't save persp configs in `recentf'
-  (push persp-save-dir recentf-exclude)
+  (with-eval-after-load 'recentf
+    (push persp-save-dir recentf-exclude))
 
   ;; Eshell integration
   (persp-def-buffer-save/load

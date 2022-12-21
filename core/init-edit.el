@@ -1,17 +1,13 @@
 ;;; -*- lexical-binding: t -*-
 
-;; Kill ring
-(setq kill-ring-max 200)
-;;; Save clipboard contents into kill-ring before replace them
+;; Donot add the duplicates that the same as the last one to kill-ring
+(setq kill-do-not-save-duplicates t)
+
+;; Save clipboard contents into kill-ring before replace them
 (setq save-interprogram-paste-before-kill t)
 
 
-;; [delsel] delete the whole region when selected
-;; (use-package delsel
-;;   :hook (after-init . delete-selection-mode))
-
-
-;; [autorevert] Automatically reload files
+;; [autorevert] TODO: Add hooks as what doom has done?
 (use-package autorevert
   :hook (after-init . global-auto-revert-mode)
   :custom
@@ -25,9 +21,6 @@
   :defines dired-mode-map
   :bind (("C-, o" . browse-url-at-point)
          ("C-, e" . browse-url-emacs))
-  :init
-  (with-eval-after-load 'dired
-    (bind-key "C-, f" #'browse-url-of-file dired-mode-map))
   )
 
 
@@ -43,23 +36,23 @@
   :bind (("C-, ," . avy-goto-char)
          ("C-, l" . avy-goto-line))
   :hook (after-init . avy-setup-default)
-  :custom
-  (avy-all-windows nil)
-  (avy-all-windows-alt t)
-  (avy-background t)
-  ; Do not jump directly even if there is only one candidate, which is confusing
-  (avy-single-candidate-jump nil)
+  :config
+  (setq avy-single-candidate-jump nil)
   )
 
 
 ;; [avy-pinyin] Avy support for pinyin
 (use-package ace-pinyin
   :straight t
-  :hook (after-init . ace-pinyin-global-mode))
+  :after avy
+  :hook (after-init . ace-pinyin-global-mode)
+  )
+
 
 ;; [avy-link] Avy support for links
 (use-package ace-link
   :straight t
+  :after avy
   :bind (("C-, j" . ace-link-addr))
   :init
   (ace-link-setup-default (kbd "C-, j"))
@@ -78,12 +71,9 @@
   :custom
   ;; limit line length
   (whitespace-line-column nil)
-  ;; automatically clean up bad whitespace
-  (whitespace-action '(auto-cleanup))
   ;; only show bad whitespace
-  (whitespace-style '(face lines-tail
-                           trailing space-before-tab
-                           indentation space-after-tab))
+  (whitespace-style '(face trailing lines-tail empty
+                      indentation space-before-tab space-after-tab))
   )
 
 
@@ -105,6 +95,7 @@
   :config
   ;; Ensure anzu state is cleared when searches are done
   (add-hook 'isearch-mode-end-hook #'anzu--reset-status t)
+
   ;; Fix matches segment mirroring across all buffers
   (mapc #'make-variable-buffer-local
         '(anzu--total-matched
@@ -121,7 +112,6 @@
              when (and (>= here start) (<= here end))
              return (length before)
              finally return 0))
-
   (advice-add #'anzu--where-is-here :override #'+modeline-fix-anzu-count)
   )
 
@@ -131,16 +121,15 @@
   :hook ((ediff-before-setup . +ediff-save-window-config)
          ((ediff-quit ediff-suspend) . +ediff-restore-window-config))
   :config
+
   ;; unfold outlines when using ediff
   (with-eval-after-load 'outline
     (add-hook 'ediff-prepare-buffer-hook #'outline-show-all))
 
   ;; Restore window config after quitting ediff
   (defvar +ediff-saved-window-config nil)
-
   (defun +ediff-save-window-config ()
     (setq +ediff-saved-window-config (current-window-configuration)))
-
   (defun +ediff-restore-window-config ()
     (when (window-configuration-p +ediff-saved-window-config)
       (set-window-configuration +ediff-saved-window-config)))
@@ -189,6 +178,7 @@
 (use-package subword
   :hook (((prog-mode minibuffer-setup) . subword-mode)))
 
+
 ;; [ialign] Interactive align
 (use-package ialign
   :straight t)
@@ -210,9 +200,10 @@
 
 
 ;; [hideshow] Code folding
+;; TODO: Highlight by indentation
 (use-package hideshow
   :hook ((prog-mode conf-mode) . hs-minor-mode)
-  :bind (("C-c h `" . hs-toggle-hiding)
+  :bind (("C-c h TAB" . hs-toggle-hiding)
          ("C-c h ~" . hs-toggle-all))
   :config
   ;; More functions
@@ -246,38 +237,10 @@
       ('hs-toggle-all
        (save-excursion (hs-show-all))
        (setq this-command 'hs-global-show))
-      (_ (hs-hide-all))))
-
-  ;; Support for more langauges
-  (setq hs-special-modes-alist
-        (append
-         '((yaml-mode "\\s-*\\_<\\(?:[^:]+\\)\\_>"
-                      ""
-                      "#"
-                      +fold-hideshow-forward-block-by-indent-fn nil)
-           (ruby-mode "class\\|d\\(?:ef\\|o\\)\\|module\\|[[{]"
-                      "end\\|[]}]"
-                      "#\\|=begin"
-                      ruby-forward-sexp)
-           (matlab-mode "if\\|switch\\|case\\|otherwise\\|while\\|for\\|try\\|catch"
-                        "end"
-                        nil (lambda (_arg) (matlab-forward-sexp)))
-           (latex-mode
-            ;; LaTeX-find-matching-end needs to be inside the env
-            ("\\\\begin{[a-zA-Z*]+}\\(\\)" 1)
-            "\\\\end{[a-zA-Z*]+}"
-            "%"
-            (lambda (_arg)
-              ;; Don't fold whole document, that's useless
-              (unless (save-excursion
-                        (search-backward "\\begin{document}"
-                                         (line-beginning-position) t))
-                (LaTeX-find-matching-end)))
-            nil))
-         hs-special-modes-alist))
+        (_ (hs-hide-all))))
 
   ;; Display line counts
-  (defun hs-display-code-line-counts (ov)
+  (defun +hs-display-code-line-counts (ov)
     "Display line counts when hiding codes."
     (when (eq 'code (overlay-get ov 'hs))
       (overlay-put ov 'display
@@ -288,7 +251,7 @@
                              (count-lines (overlay-start ov) (overlay-end ov)))
                      'face '(:inherit shadow :height 0.8))
                     " "))))
-  (setq hs-set-up-overlay #'hs-display-code-line-counts)
+  (setq hs-set-up-overlay #'+hs-display-code-line-counts)
   )
 
 
@@ -320,24 +283,7 @@
 
 
 ;; [bookmark] Bookmarks for files and directories
-(use-package bookmark
-  :config
-  (define-derived-mode bookmark-bmenu-mode tabulated-list-mode "Bookmark Menu"
-    (setq truncate-lines t)
-    (setq buffer-read-only t)
-    (setq tabulated-list-format
-          `[("" 1) ;; Space to add "*" for bookmark with annotation
-            ("" ,(if (icon-displayable-p) 2 0)) ;; Icons
-            ("Bookmark" ,bookmark-bmenu-file-column bookmark-bmenu--name-predicate)
-            ("Type" 9)
-            ,@(if bookmark-bmenu-toggle-filenames
-                  '(("File" 0 bookmark-bmenu--file-predicate)))])
-    (setq tabulated-list-padding bookmark-bmenu-marks-width)
-    (setq tabulated-list-sort-key '("Bookmark" . nil))
-    (add-hook 'tabulated-list-revert-hook #'bookmark-bmenu--revert nil t)'
-    (setq revert-buffer-function #'bookmark-bmenu--revert)
-    (tabulated-list-init-header))
-  )
+(use-package bookmark)
 
 
 ;; [easy-kill] Kill & Mark things easily, extends functionality of M-w
@@ -374,18 +320,18 @@
          ("C-c m N"       . mc/skip-to-next-like-this)
          ("C-c m P"       . mc/skip-to-previous-like-this)
          ("s-S-<mouse-1>" . mc/add-cursor-on-click))
-  :custom
-  (mc/cmds-to-run-for-all '(mwim-beginning-of-code-or-line
-                            mwim-end-of-code-or-line))
+  :config
+  (setq mc/cmds-to-run-for-all '(mwim-beginning-of-code-or-line
+                                 mwim-end-of-code-or-line))
   )
 
 
 ;; [vundo] Undo tree
 (use-package vundo
   :straight t
-  :custom
-  (vundo-glyph-alist vundo-unicode-symbols)
-  (vundo-compact-display t)
+  :config
+  (setq vundo-compact-display t)
   )
+
 
 (provide 'init-edit)

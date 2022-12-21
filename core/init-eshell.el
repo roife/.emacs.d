@@ -6,9 +6,10 @@
   :functions eshell/alias
   :hook (eshell-mode . +eshell/define-alias)
   :config
+  (bind-key "C-l" 'eshell/clear eshell-mode-map)
+
   (defun +eshell/define-alias ()
     "Define alias for eshell"
-    (bind-key "C-l" 'eshell/clear eshell-mode-map)
     ;; Aliases
     (eshell/alias "f" "find-file $1")
     (eshell/alias "fo" "find-file-other-window $1")
@@ -84,14 +85,16 @@
 ;; [esh-syntax-highlighting] Fish-like syntax highlighting
 (use-package eshell-syntax-highlighting
   :straight t
-  :hook (eshell-mode . eshell-syntax-highlighting-mode))
+  :hook (eshell-mode . eshell-syntax-highlighting-mode)
+  )
 
 
 ;; [esh-help] `eldoc' support
 (use-package esh-help
   :straight t
   :after eshell
-  :config (setup-esh-help-eldoc))
+  :config (setup-esh-help-eldoc)
+  )
 
 
 ;; [eshell-z] `cd' to frequent directory in `eshell'
