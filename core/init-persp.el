@@ -6,16 +6,19 @@
   :defines (recentf-exclude)
   :commands (get-current-persp persp-contain-buffer-p)
   :hook ((after-init . persp-mode))
-  :init (setq persp-keymap-prefix (kbd "C-x p")
-              persp-nil-name "default"
-              persp-set-last-persp-for-new-frames nil
-              persp-kill-foreign-buffer-behaviour 'kill
-              ;; do not auto load
-              persp-auto-resume-time 0)
   :config
+  (setq
+   persp-autokill-buffer-on-remove 'kill-weak
+   persp-keymap-prefix (kbd "C-x p")
+   persp-nil-name "default"
+   persp-set-last-persp-for-new-frames nil
+   persp-kill-foreign-buffer-behaviour 'kill
+   ;; do not auto load
+   persp-auto-resume-time 0)
+
   (defun +load-last-persp ()
-    (interactive)
     "Load last persp."
+    (interactive)
     (persp-load-state-from-file))
 
   ;; Don't save dead or temporary buffers
@@ -51,5 +54,3 @@
    :mode-restore-function (lambda (_) (shell))
    :save-vars '(major-mode default-directory))
   )
-
-

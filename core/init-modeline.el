@@ -79,6 +79,11 @@
   "The face for buffer name on the mode-line of an inactive window."
   :group '+modeline)
 
+(defface +modeline-host-name-active-face
+  '((t (:inherit (font-lock-function-name-face bold italic))))
+  "The face for host name on the mode-line of an active window."
+  :group '+modeline)
+
 ;; (defface +modeline-persp-name-active-face
 ;;   '((t (:inherit (bold font-lock-doc-face))))
 ;;   "The face for persp name on the mode-line of an active window."
@@ -93,8 +98,8 @@
 
 (defsubst +modeline-macro-indicator ()
   "Display current Emacs macro being recorded."
-  (cond (defining-kbd-macro "| Macro   ")
-        (executing-kbd-macro "| Macro   ")))
+  (cond (defining-kbd-macro "| MacroDef ")
+        (executing-kbd-macro "| MacroExc ")))
 
 (defsubst +modeline-anzu-indicator ()
   "Display the number for anzu."
@@ -174,9 +179,10 @@
 (defsubst +modeline-update-remote-host-name ()
   "Hostname for remote buffers."
   (setq +modeline-remote-host-name
-        (when-let ((name (and default-directory
-                                (file-remote-p default-directory 'host))))
-            (concat "@" name))
+        (when-let ((hostname (and default-directory
+                              (file-remote-p default-directory 'host))))
+          (when (not (string-equal hostname "localhost"))
+            (format "@%s" hostname)))
         ))
 (add-hook 'find-file-hook #'+modeline-update-remote-host-name)
 
@@ -252,8 +258,9 @@
                              face +modeline-meta-active-face)
                 (:propertize " %*" face +modeline-modification-active-face)
                 " %I "
-                (:propertize ("%b" ,+modeline-remote-host-name)
-                             face +modeline-buffer-name-active-face)
+                (:propertize "%b" face +modeline-buffer-name-active-face)
+                (:propertize +modeline-remote-host-name
+                             face +modeline-host-name-active-face)
                 (:propertize +modeline-project-name
                              face +modeline-project-name-active-face)
                 (:propertize +modeline-vcs-status
@@ -284,8 +291,9 @@
   (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
                              face +modeline-meta-inactive-face)
                 "%* %I "
-                (:propertize ("%b" ,+modeline-remote-host-name)
-                             face +modeline-buffer-name-inactive-face)
+                (:propertize "%b" face +modeline-buffer-name-active-face)
+                (:propertize +modeline-remote-host-name
+                             face +modeline-host-name-active-face)
                 (:propertize +modeline-project-name
                              face +modeline-project-name-inactive-face)
                 (:eval +modeline-vcs-status)
@@ -317,8 +325,9 @@
                              face +modeline-meta-active-face)
                 (:propertize " %*" face +modeline-modification-active-face)
                 " "
-                (:propertize ("%b" ,(when +modeline-remote-host-name "@"))
-                             face +modeline-buffer-name-active-face)
+                (:propertize "%b" face +modeline-buffer-name-active-face)
+                (:propertize +modeline-remote-host-name
+                             face +modeline-host-name-active-face)
                 ))
          (rhs '(
                 ;; (:propertize +modeline-persp-name
@@ -343,8 +352,9 @@
   (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
                              face +modeline-meta-inactive-face)
                 "%* "
-                (:propertize ("%b" ,(when +modeline-remote-host-name "@"))
-                             face +modeline-buffer-name-inactive-face)
+                (:propertize "%b" face +modeline-buffer-name-active-face)
+                (:propertize +modeline-remote-host-name
+                             face +modeline-host-name-active-face)
                 ))
          (rhs '(" %l  "
                 (-3 "%p")
@@ -361,5 +371,3 @@
                          (if +modeline-large-width-p (+mode-line-inactive-long) (+mode-line-inactive-short))))))
 
 (setq-default header-line-format nil)
-
-

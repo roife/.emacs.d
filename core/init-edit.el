@@ -33,7 +33,7 @@
 ;; [avy] Jump with several key strock
 (use-package avy
   :straight t
-  :bind (("C-, ," . avy-goto-char)
+  :bind (("C-, ," . avy-goto-char-2)
          ("C-, l" . avy-goto-line))
   :hook (after-init . avy-setup-default)
   :config
@@ -344,4 +344,9 @@
   )
 
 
-
+;; [sudo-edit] edit file with su permissions
+(use-package sudo-edit
+  :straight t
+  :config
+  (sudo-edit-indicator-mode t)
+  )
