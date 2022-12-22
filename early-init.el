@@ -64,3 +64,10 @@
 (push '(font . "JetBrains Mono 14") default-frame-alist)
 
 ;; TODO: optimize `load-suffixes'
+
+;; Site files will use `load-file', which emit messages and triggers redisplay
+;; Make it silent and undo advice later
+(define-advice load-file (:override (file) silence)
+  (load file nil 'nomessage))
+(define-advice startup--load-user-init-file (:after (&rest _) undo-silence)
+  (advice-remove #'load-file #'load-file@silence))

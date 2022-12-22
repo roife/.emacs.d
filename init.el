@@ -12,34 +12,35 @@
 
 (add-hook 'emacs-startup-hook #'efs/display-startup-time)
 
-(push (expand-file-name "core" user-emacs-directory) load-path)
-
 ;; Proxy
 (setq url-proxy-services
       '(("http" . "127.0.0.1:7890")
         ("https" . "127.0.0.1:7890")))
 
-;; Package Manager
-(require 'init-straight)
-(require 'init-ui)
-(require 'init-basic)
-(when (eq system-type 'darwin)
-  (require 'init-mac))
+(setq +init-files (list
+                   'init-straight
+                   'init-ui
+                   'init-basic
+                   (when (eq system-type 'darwin) 'init-mac)
+                   'init-highlight
+                   'init-edit
+                   'init-completion
+                   'init-persp
+                   'init-window
+                   'init-dired
+                   ;; 'init-eshell
+                   'init-prog
+                   'init-writing
+                   'init-vcs
+                   'init-treemacs
+                   'init-dict
+                   'init-ibuffer
+                   'init-util
+                   'init-modal
+                   'init-modeline
+                   ))
 
-(require 'init-highlight)
-(require 'init-edit)
-(require 'init-completion)
-(require 'init-persp)
-(require 'init-window)
-(require 'init-dired)
-;; (require 'init-eshell)
-(require 'init-prog)
-(require 'init-writing)
-(require 'init-vcs)
-(require 'init-treemacs)
-(require 'init-dict)
-(require 'init-ibuffer)
-
-(require 'init-util)
-(require 'init-modal)
-(require 'init-modeline)
+(let ((init-directory (expand-file-name "core/" user-emacs-directory)))
+  (dolist (file +init-files)
+    (when file
+      (load-file (concat init-directory (symbol-name file) ".el")))))
