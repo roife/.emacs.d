@@ -95,7 +95,7 @@
           rustic-cargo-outdated-mode rustic-cargo-test-moed))
 
   :config
-  ;; Enable echo in minibuffer
+  ;; Enable indicator in minibuffer
   (popper-echo-mode 1)
 
   (defun +popper-close-window-hack (&rest _)
@@ -113,6 +113,3 @@
 ;; [zoom] Managing the window sizes automatically
 (use-package zoom
   :straight t)
-
-
-

@@ -73,9 +73,23 @@
 (use-package diff-hl
   :straight t
   :defines desktop-minor-mode-table
-  :hook (after-init . global-diff-hl-mode)
+  :hook ((find-file    . diff-hl-mode)
+         (vc-dir-mode  . diff-hl-dir-mode)
+         (dired-mode   . diff-hl-dired-mode))
+  ; Fall back to the display margin since the fringe is unavailable in tty
+  :hook ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) .
+         (lambda ()
+           (diff-hl-update-once)
+           (unless (display-graphic-p) (diff-hl-margin-local-mode 1))))
   :config
-  (setq diff-hl-draw-borders nil)
+  (setq
+   diff-hl-draw-borders nil
+   ;; Reduce load on remote
+   diff-hl-disable-on-remote t
+   ;; A slightly faster algorithm for diffing
+   vc-git-diff-switches '("--histogram"))
+
+  ;; The gutter looks less cramped with some space between it and  buffer.
   (setq-default fringes-outside-margins t)
 
   ;; Make fringes look better
@@ -86,17 +100,14 @@
             1 8
             '(center t))))
 
-  (unless (display-graphic-p)
-    ;; Fall back to the display margin since the fringe is unavailable in tty
-    (diff-hl-margin-mode 1)
-    ;; Avoid restoring `diff-hl-margin-mode'
-    (with-eval-after-load 'desktop
-      (add-to-list 'desktop-minor-mode-table '(diff-hl-margin-mode nil))))
-
   ;; Integration with magit
   (with-eval-after-load 'magit
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+
+  ;; Integration with flymake
+  (with-eval-after-load 'flymake
+    (setq flymake-fringe-indicator-position 'right-fringe))
   )
 
 

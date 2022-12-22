@@ -10,10 +10,14 @@
   (setq
    persp-autokill-buffer-on-remove 'kill-weak
    persp-keymap-prefix (kbd "C-x p")
+   persp-nil-hidden t
+   persp-save-dir (concat +cache-dir "persp-confs/")
    persp-nil-name "default"
-   persp-set-last-persp-for-new-frames nil
+   persp-set-last-persp-for-new-frames t
+   persp-switch-to-added-buffer nil
    persp-kill-foreign-buffer-behaviour 'kill
-   ;; do not auto load
+   persp-remove-buffers-from-nil-persp-behaviour nil
+   ;; Do not auto load
    persp-auto-resume-time 0)
 
   (defun +load-last-persp ()

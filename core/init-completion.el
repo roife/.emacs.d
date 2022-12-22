@@ -3,7 +3,8 @@
 (use-package vertico
   :straight (:files (:defaults "extensions/*"))
   :bind (:map vertico-map
-              ("TAB" . minibuffer-complete))
+              ("TAB" . minibuffer-complete)
+              ("<tab>" . minibuffer-complete))
   :hook ((after-init . vertico-mode))
   :defines (crm-separator)
   :config

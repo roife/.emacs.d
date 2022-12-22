@@ -13,7 +13,7 @@
   :hook (ibuffer . +ibuffer-project-activete)
   :defines ibuffer-project-groups
   :config
-  ;; WORKAROUND: temperary buffer
+  ;; HACK: Push temperary buffers in a standalone group
   (defun +ibuffer-project-activete ()
     "Activate ibuffer-project"
     (let ((starred-name-filter '(starred-name . "")))

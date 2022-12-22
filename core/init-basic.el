@@ -199,10 +199,10 @@
 (use-package tramp
   :config
   (setq tramp-default-method "ssh"
-          tramp-persistency-file-name (concat +cache-dir "tramp-persist/")
-          tramp-auto-save-directory (concat +cache-dir "tramp-autosave/")
-          tramp-backup-directory-alist backup-directory-alist
-          remote-file-name-inhibit-cache 60)
+        tramp-persistency-file-name (concat +cache-dir "tramp-persist")
+        tramp-auto-save-directory (concat +cache-dir "tramp-autosave/")
+        tramp-backup-directory-alist backup-directory-alist
+        remote-file-name-inhibit-cache 60)
   )
 
 

@@ -350,3 +350,11 @@
   :config
   (sudo-edit-indicator-mode t)
   )
+
+
+;; [persistent-scratch]
+(use-package persistent-scratch
+  :straight t
+  :config
+  (setq persistent-scratch-save-file (concat +cache-dir ".persistent-scratch"))
+  (persistent-scratch-autosave-mode 1))

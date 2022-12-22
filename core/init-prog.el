@@ -44,10 +44,11 @@
   :straight t
   :init
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-  :custom
-  (dumb-jump-prefer-searcher 'rg)
-  (dumb-jump-selector 'ido)
-  (dumb-jump-aggressive nil)
+  :config
+  (setq dumb-jump-prefer-searcher 'rg
+        dumb-jump-selector 'ido
+        dumb-jump-aggressive nil
+        dumb-jump-default-project user-emacs-directory)
   )
 
 
@@ -59,11 +60,6 @@
               ("C-c c p" . citre-peek)
               ("C-c c a" . citre-ace-peek)
               ("C-c c u" . citre-update-this-tags-file))
-  :custom
-  (citre-auto-enable-citre-mode-modes '(prog-mode))
-  (citre-default-create-tags-file-location 'global-cache)
-  (citre-use-project-root-when-creating-tags t)
-  (citre-prompt-language-for-ctags-command t)
   :init
   (require 'citre-config)
 
@@ -83,6 +79,11 @@
                  (call-interactively #'xref-go-back)
                (call-interactively #'xref-pop-marker-stack)))))
   :config
+  (setq citre-auto-enable-citre-mode-modes '(prog-mode)
+        citre-default-create-tags-file-location 'global-cache
+        citre-use-project-root-when-creating-tags t
+        citre-prompt-language-for-ctags-command t)
+
   (define-advice xref--create-fetcher (:around (fn &rest args) fallback)
     (let ((fetcher (apply fn args))
           (citre-fetcher
@@ -247,7 +248,5 @@
 
 ;; [consult-eglot] Eglot support for consult
 (use-package consult-eglot
+  :after consult eglot
   :straight t)
-
-
-
