@@ -4,8 +4,14 @@
 (use-package magit
   :straight t
   :bind (("C-x g" . magit))
+  :hook ((magit-process-mode . goto-address-mode))
   :config
-  (setq magit-diff-refine-hunk t)
+  (setq
+   magit-diff-refine-hunk t
+   ;; Don't autosave repo buffers. This is too magical
+   magit-save-repository-buffers nil
+   ;; Don't display parent/related refs in commit buffers; they are rarely helpful and only add to runtime costs.
+   magit-revision-insert-related-refs nil)
 
   ;; Exterminate Magit buffers
   (defun +magit-kill-buffers (&rest _)
@@ -43,12 +49,10 @@
 (use-package magit-todos
   :straight t
   :after magit
-  :defines magit-todos-nice
-  :init
-  (setq magit-todos-nice (if (executable-find "nice") t nil))
+  :config
   (let ((inhibit-message t))
     (magit-todos-mode 1))
-  :config
+
   (with-eval-after-load 'magit-status
     (transient-append-suffix 'magit-status-jump '(0 0 -1)
       '("t " "Todos" magit-todos-jump-to-todos)))
@@ -79,6 +83,3 @@
 ;; Git configuration major modes
 (use-package git-modes
   :straight t)
-
-
-

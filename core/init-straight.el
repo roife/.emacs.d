@@ -1,9 +1,10 @@
 ;;; -*- lexical-binding: t -*-
 
 ;; [straight] Package manager config (should put setq before installation for `straight`)
-(setq straight-check-for-modifications nil      ; skip modification
-      straight-vc-git-default-clone-depth '(1 single-branch)     ; shadow clone
-      comp-deferred-compilation-deny-list ()    ; config native comp
+(setq straight-check-for-modifications nil                   ; skip modification
+      straight-vc-git-default-clone-depth '(1 single-branch) ; shadow clone
+      comp-deferred-compilation-deny-list ()                 ; config native comp
+      warning-suppress-log-types '((comp))                   ; Don't display comp warnings
       straight-disable-native-compile (not (and (fboundp 'native-comp-available-p)
                                                 (native-comp-available-p))))
 
@@ -29,5 +30,3 @@
       use-package-always-defer (not (daemonp))
       use-package-expand-minimally t
       use-package-enable-imenu-support t)
-
-

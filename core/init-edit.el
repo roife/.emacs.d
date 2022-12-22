@@ -45,7 +45,6 @@
 (use-package ace-pinyin
   :straight t
   :after avy
-  :hook (after-init . ace-pinyin-global-mode)
   )
 
 
@@ -91,7 +90,6 @@
          :map isearch-mode-map
          ([remap isearch-query-replace] . anzu-isearch-query-replace)
          ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
-  :hook (after-init . global-anzu-mode)
   :config
   ;; Ensure anzu state is cleared when searches are done
   (add-hook 'isearch-mode-end-hook #'anzu--reset-status t)

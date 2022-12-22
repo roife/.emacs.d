@@ -110,15 +110,18 @@
   :straight t
   :bind (("C-c r"  . quickrun)))
 
+
 ;; [flymake] On-the-fly syntax checker
 (use-package flymake
   :hook ((prog-mode . flymake-mode))
   :bind (("C-c f ]" . flymake-goto-next-error)
          ("C-c f [" . flymake-goto-prev-error)
          ("C-c f b" . flymake-show-buffer-diagnostics))
-  :custom
-  (flymake-diagnostic-functions nil)
-  (flymake-no-changes-timeout 1) ;; Check only on save
+  :config
+  (setq
+   flymake-diagnostic-functions nil
+   ;; Check only on save
+   flymake-no-changes-timeout 1)
   )
 
 
@@ -135,15 +138,17 @@
   :straight t)
 
 
-(use-package rmsbolt          ; A compiler output viewer
+(use-package rmsbolt ; A compiler output viewer
   :straight t)
 
 
 (use-package scala-mode
   :straight t
-  :custom
-  (scala-indent:align-parameters t)
-  (scala-indent:use-javadoc-style t) ;; indent block comments to first asterix, not second
+  :config
+  (setq
+   scala-indent:align-parameters t
+   ;; indent block comments to first asterix, not second
+   scala-indent:use-javadoc-style t)
   )
 
 
@@ -155,17 +160,17 @@
   :straight (:host github :repo "nverno/llvm-mode" :files ("dist" "*.el")))
 
 
-
 (use-package swift-mode
   :straight t)
 
 
 (use-package rustic
   :straight t
-  :custom
-  (rustic-lsp-client 'eglot)
-  (rustic-indent-method-chain t)
-  (rust-prettify-symbols-alist nil)
+  :config
+  (setq
+   rustic-lsp-client 'eglot
+   rustic-indent-method-chain t
+   rust-prettify-symbols-alist nil)
   )
 
 
@@ -175,9 +180,11 @@
 
 (use-package haskell-mode
   :straight t
-  :custom
-  (haskell-process-suggest-remove-import-lines t)
-  (haskell-process-auto-import-loaded-modules t))
+  :config
+  (setq
+   haskell-process-suggest-remove-import-lines t
+   haskell-process-auto-import-loaded-modules t)
+  )
 
 
 (use-package verilog-mode
@@ -191,21 +198,36 @@
 ;; [Proof General] Proof General is a generic front-end for proof assistants
 (use-package proof-general
   :straight t
-  :custom
-  (proof-splash-enable nil)
+  :config
+  (setq proof-splash-enable nil)
   )
 
 
 ;; Major mode for editing web templates
 (use-package web-mode
   :straight t
-  :mode "\\.\\(phtml\\|php\\|[gj]sp\\|as[cp]x\\|erb\\|djhtml\\|html?\\|hbs\\|ejs\\|jade\\|swig\\|tm?pl\\|vue\\)$"
-  :custom
-  (web-mode-markup-indent-offset 2)
-  (web-mode-css-indent-offset 2)
-  (web-mode-code-indent-offset 2)
-  (web-mode-enable-html-entities-fontification t)
-  (web-mode-auto-close-style 1)
+  :mode "\\.[px]?html?\\'"
+  :mode "\\.\\(?:tpl\\|blade\\)\\(?:\\.php\\)?\\'"
+  :mode "\\.erb\\'"
+  :mode "\\.[lh]?eex\\'"
+  :mode "\\.jsp\\'"
+  :mode "\\.as[cp]x\\'"
+  :mode "\\.ejs\\'"
+  :mode "\\.hbs\\'"
+  :mode "\\.mustache\\'"
+  :mode "\\.svelte\\'"
+  :mode "\\.twig\\'"
+  :mode "\\.jinja2?\\'"
+  :mode "\\.eco\\'"
+  :mode "wp-content/themes/.+/.+\\.php\\'"
+  :mode "templates/.+\\.php\\'"
+  :config
+  (setq
+   web-mode-markup-indent-offset 2
+   web-mode-css-indent-offset 2
+   web-mode-code-indent-offset 2
+   web-mode-enable-html-entities-fontification t
+   web-mode-auto-close-style 1)
   )
 
 
@@ -227,12 +249,12 @@
 (use-package eglot
   :straight t
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
-  :custom
-  ;; (eldoc-echo-area-use-multiline-p 1)
-  (eldoc-echo-area-display-truncation-message nil)
-  (eglot-events-buffer-size 0)
-  (eglot-send-changes-idle-time 2)
-  (eglot-autoshutdown t)
+  :config
+  (setq eldoc-echo-area-display-truncation-message nil
+        eglot-events-buffer-size 0
+        eglot-send-changes-idle-time 2
+        eglot-connect-timeout 10
+        eglot-autoshutdown t)
   )
 
 
@@ -249,4 +271,6 @@
 ;; [consult-eglot] Eglot support for consult
 (use-package consult-eglot
   :after consult eglot
-  :straight t)
+  :straight t
+  :bind (:map eglot-mode-map
+              ([remap xref-find-apropos] . consult-eglot-symbols)))
