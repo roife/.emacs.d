@@ -115,4 +115,4 @@
   :straight t)
 
 
-(provide 'init-window)
+

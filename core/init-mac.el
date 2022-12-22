@@ -28,4 +28,4 @@
 (add-hook 'ns-system-appearance-change-functions #'(lambda (_) (+load-theme)))
 
 
-(provide 'init-mac)
+

@@ -362,4 +362,4 @@
 
 (setq-default header-line-format nil)
 
-(provide 'init-modeline)
+

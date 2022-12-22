@@ -23,4 +23,4 @@
   (markdown-code-face ((t (:inherit nil)))))
 
 
-(provide 'init-writing)
+

@@ -148,4 +148,4 @@
   :hook (((prog-mode yaml-mode) . symbol-overlay-mode)))
 
 
-(provide 'init-highlight)
+

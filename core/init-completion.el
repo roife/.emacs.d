@@ -303,4 +303,4 @@ See `consult-grep' for more details regarding the asynchronous search."
 ;; TODO: Consult-dash
 
 
-(provide 'init-completion)
+

@@ -52,4 +52,4 @@
    :save-vars '(major-mode default-directory))
   )
 
-(provide 'init-persp)
+

@@ -61,4 +61,4 @@
 ;;   :config (treemacs-set-scope-type 'Tab))
 
 
-(provide 'init-treemacs)
+

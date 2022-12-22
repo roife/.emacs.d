@@ -105,4 +105,4 @@
 
 ;; TODO: better C-g like doom?
 
-(provide 'init-modal)
+

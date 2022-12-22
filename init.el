@@ -17,28 +17,28 @@
       '(("http" . "127.0.0.1:7890")
         ("https" . "127.0.0.1:7890")))
 
-(setq +init-files (list
-                   'init-straight
-                   'init-ui
-                   'init-basic
-                   (when (eq system-type 'darwin) 'init-mac)
-                   'init-highlight
-                   'init-edit
-                   'init-completion
-                   'init-persp
-                   'init-window
-                   'init-dired
-                   ;; 'init-eshell
-                   'init-prog
-                   'init-writing
-                   'init-vcs
-                   'init-treemacs
-                   'init-dict
-                   'init-ibuffer
-                   'init-util
-                   'init-modal
-                   'init-modeline
-                   ))
+(defvar +init-files (list
+                     'init-straight
+                     'init-ui
+                     'init-basic
+                     (when (eq system-type 'darwin) 'init-mac)
+                     'init-highlight
+                     'init-edit
+                     'init-completion
+                     'init-persp
+                     'init-window
+                     'init-dired
+                     ;; 'init-eshell
+                     'init-prog
+                     'init-writing
+                     'init-vcs
+                     'init-treemacs
+                     'init-dict
+                     'init-ibuffer
+                     'init-util
+                     'init-modal
+                     'init-modeline
+                     ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))
   (dolist (file +init-files)

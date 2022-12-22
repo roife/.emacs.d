@@ -30,4 +30,4 @@
       use-package-expand-minimally t
       use-package-enable-imenu-support t)
 
-(provide 'init-straight)
+

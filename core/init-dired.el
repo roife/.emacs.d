@@ -89,4 +89,4 @@
   :bind ([remap find-dired] . fd-dired))
 
 
-(provide 'init-dired)
+
