@@ -58,10 +58,13 @@
 (setq enable-recursive-minibuffers t
       echo-keystrokes 0.02)
 ;; Keep the cursor out of the read-only portions of the minibuffer
-(setq minibuffer-prompt-properties '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
+(setq minibuffer-prompt-properties '(read-only t
+                                               intangible t
+                                               cursor-intangible t
+                                               face minibuffer-prompt))
 (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 ;; Allow emacs to query passphrase through minibuffer
-(setq epa-pinentry-mode 'loopback)
+(setq epg-pinentry-mode 'loopback)
 
 
 ;; Load theme
@@ -132,41 +135,38 @@
 ;; [tab-bar] Tab bar
 (use-package tab-bar
   :hook (window-setup . tab-bar-mode)
-  :custom
-  (tab-bar-separator " ")
-  (tab-bar-close-button-show nil)
-  (tab-bar-new-button-show nil)
-  (tab-bar-tab-hints t)
-  (tab-bar-new-tab-choice "*scratch*")
-  (tab-bar-select-tab-modifiers '(super))
-  (tab-bar-tab-name-truncated-max 20)
   ;; :custom-face
   ;; (tab-bar-tab ((t (:inverse-video t))))
   :config
-  (defun +tab-bar-tab-name-current-with-count-truncated ()
-    (let* ((tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
-           (count (length (window-list-1 nil 'nomini)))
-           (truncated-tab-name (if (< (length tab-name) tab-bar-tab-name-truncated-max)
-                                   tab-name
-                                 (truncate-string-to-width tab-name
-                                                           tab-bar-tab-name-truncated-max
-                                                           nil nil tab-bar-tab-name-ellipsis))))
-      (if (> count 1)
-          (format "%s (%d)" truncated-tab-name count)
-        truncated-tab-name)))
-  (setq tab-bar-tab-name-function #'+tab-bar-tab-name-current-with-count-truncated)
+  (setq tab-bar-separator " "
+        tab-bar-close-button-show nil
+        tab-bar-tab-hints t
+        tab-bar-new-tab-choice "*scratch*"
+        tab-bar-select-tab-modifiers '(super)
+        tab-bar-tab-name-truncated-max 20
+        )
 
-  (defun +tab-bar-tab-name-format (tab i)
-    (propertize
-     (concat " "
-             (number-to-string i)
-             " "
-             (alist-get 'name tab)
-             " ")
-     'face (funcall tab-bar-tab-face-function tab))
-    )
-  (setq tab-bar-tab-name-format-function #'+tab-bar-tab-name-format)
+  ;; truncate for [tab name] and add count
+  (setq tab-bar-tab-name-function
+        (lambda () (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
+                     (count (length (window-list-1 nil 'nomini)))
+                     (truncated-tab-name (if (< (length raw-tab-name)
+                                                tab-bar-tab-name-truncated-max)
+                                             raw-tab-name
+                                           (truncate-string-to-width raw-tab-name
+                                                                     tab-bar-tab-name-truncated-max
+                                                                     nil nil tab-bar-tab-name-ellipsis))))
+                (if (> count 1)
+                    (format "%s (%d)" truncated-tab-name count)
+                  truncated-tab-name))))
 
+  ;; add spaces for tab-name
+  (setq tab-bar-tab-name-format-function
+        (lambda (tab i) (propertize
+                    (format " %d %s " i (alist-get 'name tab))
+                    'face (funcall tab-bar-tab-face-function tab))))
+
+  ;; add [persp-name] and [meow-indicator] on tab-bar
   (defun +tab-bar-persp-name ()
     (when-let ((name (and (bound-and-true-p persp-mode)
                           (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
@@ -174,9 +174,9 @@
       (if (> count 1)
           (format "[%s/%d] " name count)
         (concat "[" name "] "))))
-
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
+  ;; WORDAROUND: fresh tab-bar for daemon
   (when (daemonp)
     (add-hook 'after-make-frame-functions
               (lambda (frame) (tab-bar--update-tab-bar-lines (list frame)))))

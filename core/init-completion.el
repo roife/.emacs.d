@@ -4,14 +4,13 @@
   :straight (:files (:defaults "extensions/*"))
   :bind (:map vertico-map
               ("TAB" . minibuffer-complete))
-  :hook ((after-init . vertico-mode)
-         (minibuffer-setup . vertico-repeat-save))
-  :custom
-  (vertico-cycle t)
-  (vertico-resize nil)
-  (vertico-count 15)
-
+  :hook ((after-init . vertico-mode))
+  :defines (crm-separator)
   :config
+  (setq vertico-cycle t
+        vertico-resize nil
+        vertico-count 17)
+
   (advice-add #'completing-read-multiple :filter-args
               (lambda (args)
                 (cons (format "[CRM%s] %s"
@@ -39,6 +38,12 @@
               ("M-DEL" . vertico-directory-delete-word))
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy) ; Cleans up path when moving directories with shadowed paths syntax
   )
+
+
+(use-package vertico-repeat
+  :straight nil
+  :after vertico
+  :hook (minibuffer-setup . vertico-repeat-save))
 
 
 (use-package orderless
@@ -87,11 +92,11 @@
      "Use basic completion on remote files only"))
 
   ;; configuration
-  (setq completion-styles '(basic orderless)
+  (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-ignore-case t
         ;; despite override in the name, orderless can still be used in find-file etc.
-        completion-category-overrides '((file (styles +vertico-basic-remote basic orderless)))
+        completion-category-overrides '((file (styles +vertico-basic-remote orderless partial-completion)))
         orderless-style-dispatchers '(+vertico-orderless-dispatch)
         orderless-component-separator "[ &]")
   )
@@ -114,10 +119,12 @@
   :bind (("C-;" . embark-act)
          ("C-c ; e" . embark-export)
          ("C-c ; c" . embark-collect)
+         :map minibuffer-local-map
          ("C-c C-e" . +embark-export-write)
          :map embark-file-map
          ("s" . +reopen-file-with-sudo)
          ("g" . +embark-magit-status))
+  :defines (wgrep-change-to-wgrep-mode)
   :init
   (setq prefix-help-command 'embark-prefix-help-command)
   :config
@@ -163,22 +170,20 @@
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop))
   :config
+  (setq consult-narrow-key "<")
+
   ;; replace multi-occur with consult-multi-occur
   (advice-add #'multi-occur :override #'consult-multi-occur)
 
-  ;; Optionally configure the register formatting.
+  ;; [consult-register] Configure the register formatting.
   (setq register-preview-delay 0.5
         register-preview-function #'consult-register-format)
-
-  ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
 
-  ;; Use Consult to select xref locations with preview
+  ;; [consult-xref] Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
-
-  (setq consult-narrow-key "<")
 
   ;; better preview
   (consult-customize
@@ -187,14 +192,12 @@
    consult--source-recent-file
    consult--source-project-recent-file consult--source-bookmark
    :preview-key (kbd "s-p"))
-
   (consult-customize
    consult-theme
    :preview-key (list (kbd "s-p") :debounce 0.6 'any))
 
-  ;; consult-fd
+  ;; [consult-fd]
   (defvar consult-fd-args "fd --color=never -i -H -E .git --regex ")
-
   (defun +consult--fd-builder (input)
     (pcase-let* ((cmd (split-string-and-unquote consult-fd-args))
                  (`(,arg . ,opts) (consult--command-split input))
@@ -204,7 +207,6 @@
                                (list (consult--join-regexps re 'extended))
                                opts)
               :highlight hl))))
-
   (defun consult-fd (&optional dir initial)
     "Search for regexp with fd in DIR with INITIAL input.
 The find process is started asynchronously, similar to `consult-grep'.
@@ -248,22 +250,19 @@ See `consult-grep' for more details regarding the asynchronous search."
 ;; [corfu] compleletion frontend
 (use-package corfu
   :straight (:files (:defaults "extensions/*"))
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  (corfu-separator "&")          ;; Orderless field separator
-  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-  (corfu-auto-prefix 2)          ;; minimun prefix to enable completion
-  (corfu-preview-current nil)
-
   :hook (((prog-mode conf-mode shell-mode eshell-mode) . corfu-mode)
-         ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil))))
+         ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
+         (minibuffer-setup . corfu-enable-in-minibuffer))
+  :bind (:map corfu-map
+              ("H-m" . corfu-move-to-minibuffer))
   :config
-  ;; Sort with history
-  (corfu-history-mode 1)
-  (with-eval-after-load 'safehist
-    (cl-pushnew 'corfu-history savehist-additional-variables))
+  (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
+        corfu-auto t                 ;; Enable auto completion
+        corfu-separator "&"          ;; Orderless field separator
+        corfu-quit-at-boundary nil   ;; Never quit at completion boundary
+        corfu-echo-documentation nil ;; Disable documentation in the echo area
+        corfu-auto-prefix 2          ;; minimun prefix to enable completion
+        corfu-preview-current nil)
 
   ;; Transfer completion to the minibuffer
   (defun corfu-move-to-minibuffer ()
@@ -271,15 +270,24 @@ See `consult-grep' for more details regarding the asynchronous search."
     (let ((completion-extra-properties corfu--extra)
           completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
-  (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
 
   ;; Completing in the minibuffer
   (defun corfu-enable-in-minibuffer ()
     "Enable Corfu in the minibuffer if `completion-at-point' is bound."
     (when (where-is-internal #'completion-at-point (list (current-local-map)))
-      ;; (setq-local corfu-auto nil) Enable/disable auto completion
       (corfu-mode 1)))
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer))
+  )
+
+
+(use-package corfu-history
+  :straight nil
+  :after corfu
+  :init
+  (corfu-history-mode 1)
+  :config
+  (with-eval-after-load 'savehist
+    (cl-pushnew 'corfu-history savehist-additional-variables))
+  )
 
 
 (use-package cape
@@ -287,10 +295,12 @@ See `consult-grep' for more details regarding the asynchronous search."
   :hook (corfu-mode . +corfu-add-cape-backends)
   :config
   (defun +corfu-add-cape-backends ()
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    (add-to-list 'completion-at-point-functions #'cape-file))
+    (add-to-list 'completion-at-point-functions #'cape-file :append)
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev :append))
   )
 
+
 ;; TODO: Consult-dash
+
 
 (provide 'init-completion)
