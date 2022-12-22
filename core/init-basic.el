@@ -204,9 +204,3 @@
         tramp-backup-directory-alist backup-directory-alist
         remote-file-name-inhibit-cache 60)
   )
-
-
-;; TODO: better-jump
-
-
-

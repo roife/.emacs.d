@@ -34,7 +34,7 @@
   :config
   ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
   ;; @see https://emacs.stackexchange.com/questions/36420
-  (defun my-rainbow-colorize-match (color &optional match)
+  (defun +rainbow-colorize-match (color &optional match)
     (let* ((match (or match 0))
            (ov (make-overlay (match-beginning match) (match-end match))))
       (overlay-put ov 'ov-rainbow t)
@@ -42,13 +42,13 @@
                                                 "white"
                                               "black"))
                               (:background ,color)))))
-  (advice-add #'rainbow-colorize-match :override #'my-rainbow-colorize-match)
+  (advice-add #'rainbow-colorize-match :override #'+rainbow-colorize-match)
 
   ;; Clear overlays when exit
-  (defun my-rainbow-clear-overlays ()
+  (defun +rainbow-clear-overlays ()
     "Clear all rainbow overlays."
     (remove-overlays (point-min) (point-max) 'ov-rainbow t))
-  (advice-add #'rainbow-turn-off :after #'my-rainbow-clear-overlays)
+  (advice-add #'rainbow-turn-off :after #'+rainbow-clear-overlays)
   )
 
 
@@ -81,6 +81,7 @@
          (lambda ()
            (diff-hl-update-once)
            (unless (display-graphic-p) (diff-hl-margin-local-mode 1))))
+  :hook ((focus-in . diff-hl-update-once))
   :config
   (setq
    diff-hl-draw-borders nil
@@ -108,6 +109,9 @@
   ;; Integration with flymake
   (with-eval-after-load 'flymake
     (setq flymake-fringe-indicator-position 'right-fringe))
+
+  ;; WORKAROUND: Integration with ws-butler
+  (advice-add #'ws-butler-after-save :after #'diff-hl-update-once)
   )
 
 
@@ -156,7 +160,23 @@
   :straight t
   :bind (("C-c s i" . symbol-overlay-put)
          ("C-c s c" . symbol-overlay-remove-all))
-  :hook (((prog-mode yaml-mode) . symbol-overlay-mode)))
-
-
-
+  :hook (((prog-mode yaml-mode) . symbol-overlay-mode))
+  :config
+  ;; FIXME: https://github.com/wolray/symbol-overlay/issues/88
+  (defun symbol-overlay-get-list (dir &optional symbol exclude)
+    "Get all highlighted overlays in the buffer.
+ If SYMBOL is non-nil, get the overlays that belong to it.
+ DIR is an integer.
+ If EXCLUDE is non-nil, get all overlays excluding those belong to SYMBOL."
+    (let ((lists (progn (overlay-recenter (point)) (overlay-lists)))
+          (func (if (> dir 0) 'cdr (if (< dir 0) 'car nil))))
+      (seq-filter
+       (lambda (ov)
+         (let ((value (overlay-get ov 'symbol)))
+           (and value
+                (or (not symbol)
+                    (if (string= value symbol) (not exclude)
+                      (and exclude (not (string= value ""))))))))
+       (if func (funcall func lists)
+         (append (car lists) (cdr lists))))))
+  )

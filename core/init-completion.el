@@ -208,7 +208,8 @@
                                (list (consult--join-regexps re 'extended))
                                opts)
               :highlight hl))))
-  (defun consult-fd (&optional dir initial)
+
+  (defun +consult-fd (&optional dir initial)
     "Search for regexp with fd in DIR with INITIAL input.
 The find process is started asynchronously, similar to `consult-grep'.
 See `consult-grep' for more details regarding the asynchronous search."
@@ -302,6 +303,3 @@ See `consult-grep' for more details regarding the asynchronous search."
 
 
 ;; TODO: Consult-dash
-
-
-

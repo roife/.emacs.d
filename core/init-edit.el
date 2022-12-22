@@ -85,6 +85,7 @@
 ;; [anzu] Show number of matches in mode-line while searching
 (use-package anzu
   :straight t
+  :hook (after-init . global-anzu-mode)
   :bind (([remap query-replace] . anzu-query-replace)
          ([remap query-replace-regexp] . anzu-query-replace-regexp)
          :map isearch-mode-map

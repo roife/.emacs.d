@@ -30,7 +30,7 @@
 
  ;; [hscroll]
  ;; hscroll only for current line
- auto-hscroll-mode 'current-line
+ auto-hscroll-mode t
  hscroll-step 0
  hscroll-margin 2)
 

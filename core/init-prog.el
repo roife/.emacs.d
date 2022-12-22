@@ -32,10 +32,11 @@
 
 ;; [xref] Cross reference
 (use-package xref
-  :custom
-  (xref-search-program 'ripgrep)
-  ;; (xref-show-definitions-function #'xref-show-definitions-completing-read)
-  ;; (xref-show-xrefs-function #'xref-show-definitions-completing-read)
+  :config
+  (setq
+   xref-search-program 'ripgrep
+   xref-show-definitions-function #'xref-show-definitions-completing-read
+   xref-show-xrefs-function #'xref-show-definitions-completing-read)
   )
 
 
