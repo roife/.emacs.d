@@ -65,6 +65,28 @@
                     (cl-destructuring-bind (buffer-name vars &rest _rest) (cdr savelist)
                       (magit-status (alist-get 'default-directory vars)))))
 
+  ;; Tab bar integration
+  (with-eval-after-load 'tab-bar
+    ;; Save the current workspace's tab bar data.
+    (add-hook 'persp-before-deactivate-functions
+              (lambda (_)
+                (when (get-current-persp)
+                  (set-persp-parameter 'tab-bar-tabs (tab-bar-tabs))
+                  (set-persp-parameter 'tab-bar-closed-tabs tab-bar-closed-tabs))))
+    ;; Restores the tab bar data of the workspace we have just switched to.
+    (add-hook 'persp-activated-functions
+              (lambda (_)
+                (tab-bar-tabs-set (persp-parameter 'tab-bar-tabs))
+                (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))
+                (tab-bar--update-tab-bar-lines t)))
+
+    (add-hook 'persp-before-save-state-to-file-functions
+              (lambda (&rest _)
+                (when (get-current-persp)
+                  (set-persp-parameter 'tab-bar-tabs (frameset-filter-tabs (tab-bar-tabs) nil nil t))
+                  (set-persp-parameter 'tab-bar-closed-tabs (frameset-filter-tabs tab-bar-closed-tabs nil nil t)))))
+    )
+
   ;; Per-workspace [winner-mode] history
   (add-to-list 'window-persistent-parameters '(winner-ring . t))
 
@@ -94,4 +116,7 @@
   (add-hook 'persp-filter-save-buffers-functions
             (lambda (buf) (let ((dir (buffer-local-value 'default-directory buf)))
                        (ignore-errors (file-remote-p dir)))))
+
+  ;; Visual selection surviving workspace changes
+  (add-hook 'persp-before-deactivate-functions #'deactivate-mark)
   )
