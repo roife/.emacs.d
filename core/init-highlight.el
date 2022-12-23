@@ -2,12 +2,10 @@
 
 ;; [hl-line] Highlight current line
 (use-package hl-line
-  :hook ((prog-mode text-mode conf-mode special-mode org-agenda-mode dired-mode) . hl-line-mode))
-
-
+  :hook ((prog-mode text-mode yaml-mode conf-mode special-mode org-agenda-mode dired-mode) . hl-line-mode))
 ;; [show-paren-mode] Highlight matching parens
 (use-package paren
-  :hook ((prog-mode conf-mode) . show-paren-mode)
+  :hook ((prog-mode conf-mode yaml-mode) . show-paren-mode)
   :preface (defvar show-paren-delay 0.1)
   :config
   (setq show-paren-when-point-inside-paren t
@@ -18,7 +16,7 @@
 ;; [rainbow-delimiters] Highlight brackets according to their depth
 (use-package rainbow-delimiters
   :straight t
-  :hook ((prog-mode conf-mode) . rainbow-delimiters-mode)
+  :hook ((prog-mode conf-mode yaml-mode) . rainbow-delimiters-mode)
   :config
   (setq rainbow-delimiters-max-face-count 4)
   )
@@ -118,7 +116,7 @@
 ;; [goggles] Highlight modified region
 (use-package goggles
   :straight t
-  :hook ((prog-mode conf-mode text-mode) . goggles-mode)
+  :hook ((prog-mode conf-mode yaml-mode text-mode) . goggles-mode)
   :config
   (setq-default goggles-pulse nil)
   )

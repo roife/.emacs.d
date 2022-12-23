@@ -42,6 +42,44 @@
 ;; [Fringes] Reduce the clutter in the fringes
 (setq indicate-buffer-boundaries nil
       indicate-empty-lines nil)
+;; Better fringe symbol
+(define-fringe-bitmap 'right-curly-arrow
+  [#b00000000
+   #b00000000
+   #b00000000
+   #b00000000
+   #b11110000
+   #b11110000
+   #b00110000
+   #b00110000])
+(define-fringe-bitmap 'left-curly-arrow
+  [#b00001100
+   #b00001100
+   #b00001111
+   #b00001111
+   #b00000000
+   #b00000000
+   #b00000000
+   #b00000000])
+
+(define-fringe-bitmap 'right-arrow
+  [#b00000000
+   #b00000000
+   #b01110000
+   #b01110000
+   #b01110000
+   #b00000000
+   #b00000000
+   #b00000000])
+(define-fringe-bitmap 'left-arrow
+  [#b00000000
+   #b00000000
+   #b00000000
+   #b00111000
+   #b00111000
+   #b00111000
+   #b00000000
+   #b00000000])
 
 
 ;; Allow [resize] by pixels.
@@ -73,6 +111,20 @@
             (select-frame-set-input-focus (selected-frame))
             (+load-theme)))
 
+
+;; Font
+(defun +setup-fonts ()
+  "Setup fonts."
+  (set-face-attribute 'default nil :font (font-spec :family "JetBrains Mono" :size 14))
+
+  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 14))
+  (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
+
+  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size 12))
+  (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append))
+
+(add-hook 'window-setup-hook #'+setup-fonts)
+(add-hook 'server-after-make-frame-hook #'+setup-fonts)
 
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)

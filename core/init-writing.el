@@ -23,4 +23,30 @@
   (markdown-code-face ((t (:inherit nil)))))
 
 
+;; [auctex]
+(use-package tex
+  :straight auctex
+  :config
+  (setq TeX-parse-self t ; parse on load
+        TeX-auto-save t  ; parse on save
+        ;; Use hidden directories for AUCTeX files.
+        TeX-auto-local ".auctex-auto"
+        TeX-style-local ".auctex-style"
+        TeX-source-correlate-mode t
+        TeX-source-correlate-method 'synctex
+        ;; Don't start the Emacs server when correlating sources.
+        TeX-source-correlate-start-server nil
+        ;; Automatically insert braces after sub/superscript in `LaTeX-math-mode'.
+        TeX-electric-sub-and-superscript t
+        ;; Just save, don't ask before each compilation.
+        TeX-save-query nil))
 
+
+;; [cdlatex]
+(use-package cdlatex
+  :straight t)
+
+
+;; [reftex]
+(use-package reftex
+  :straight t)

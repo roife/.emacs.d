@@ -17,11 +17,13 @@
                                                (insert . "I")
                                                (beacon . "B")))
 
+  ;; [motion]
   (meow-motion-overwrite-define-key
    '("j" . meow-next)
    '("k" . meow-prev)
    '("<escape>" . ignore))
 
+  ;; [leader]
   (meow-leader-define-key
    ;; SPC j/k will run the original command in MOTION state.
    '("j" . "H-j")
@@ -40,6 +42,7 @@
    '("/" . meow-keypad-describe-key)
    '("?" . meow-cheatsheet))
 
+  ;; [normal]
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("9" . meow-expand-9)
@@ -101,8 +104,5 @@
    '("Y" . meow-sync-grab)
    '("z" . meow-pop-selection)
    '("'" . repeat)
-   '("<escape>" . ignore)))
-
-;; TODO: better C-g like doom?
-
-
+   '("<escape>" . ignore))
+  )
