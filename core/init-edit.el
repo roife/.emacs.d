@@ -200,7 +200,6 @@
 
 
 ;; [hideshow] Code folding
-;; TODO: Highlight by indentation
 (use-package hideshow
   :hook ((prog-mode conf-mode yaml-mode) . hs-minor-mode)
   :bind (("C-c h TAB" . hs-toggle-hiding)
