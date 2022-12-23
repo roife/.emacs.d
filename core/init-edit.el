@@ -144,7 +144,7 @@
 
 ;; [elec-pair] Automatic parenthesis pairing
 (use-package elec-pair
-  :hook ((prog-mode conf-mode) . electric-pair-mode)
+  :hook ((prog-mode conf-mode yaml-mode) . electric-pair-mode)
   :custom
   (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
@@ -187,7 +187,7 @@
 ;; [paredit] Better paren editing
 (use-package paredit
   :straight t
-  :hook (((prog-mode conf-mode) . paredit-mode))
+  :hook (((prog-mode conf-mode yaml-mode) . paredit-mode))
   :bind (:map paredit-mode-map
               ("M-<up>" . nil)
               ("M-<down>" . nil)
@@ -202,7 +202,7 @@
 ;; [hideshow] Code folding
 ;; TODO: Highlight by indentation
 (use-package hideshow
-  :hook ((prog-mode conf-mode) . hs-minor-mode)
+  :hook ((prog-mode conf-mode yaml-mode) . hs-minor-mode)
   :bind (("C-c h TAB" . hs-toggle-hiding)
          ("C-c h ~" . hs-toggle-all))
   :config
@@ -252,6 +252,93 @@
                      'face '(:inherit shadow :height 0.8))
                     " "))))
   (setq hs-set-up-overlay #'+hs-display-code-line-counts)
+
+  ;; hide-show by indentation
+  (defun +fold--hideshow-empty-line-p (_)
+  (string= "" (string-trim (thing-at-point 'line 'no-props))))
+
+  (defun +fold--hideshow-geq-or-empty-p (base-indent)
+    (or (+fold--hideshow-empty-line-p base-indent)
+        (>= (current-indentation) base-indent)))
+
+  (defun +fold--hideshow-g-or-empty-p (base-indent)
+    (or (+fold--hideshow-empty-line-p base-indent)
+        (> (current-indentation) base-indent)))
+
+  (defun +fold--hideshow-seek (start direction before skip predicate base-indent)
+    "Seeks forward (if direction is 1) or backward (if direction is -1) from start, until predicate
+fails. If before is nil, it will return the first line where predicate fails, otherwise it returns
+the last line where predicate holds."
+    (save-excursion
+      (goto-char start)
+      (goto-char (point-at-bol))
+      (let ((bnd (if (> 0 direction)
+                     (point-min)
+                   (point-max)))
+            (pt (point)))
+        (when skip (forward-line direction))
+        (cl-loop while (and (/= (point) bnd) (funcall predicate base-indent))
+                 do (progn
+                      (when before (setq pt (point-at-bol)))
+                      (forward-line direction)
+                      (unless before (setq pt (point-at-bol)))))
+        pt)))
+
+  (defun +fold-hideshow-indent-range (&optional point)
+    "Return the point at the begin and end of the text block with the same (or
+greater) indentation. If `point' is supplied and non-nil it will return the
+begin and end of the block surrounding point."
+    (save-excursion
+      (when point
+        (goto-char point))
+      (let ((base-indent (current-indentation))
+            (begin (point))
+            (end (point)))
+        (setq begin (+fold--hideshow-seek begin -1 t nil #'+fold--hideshow-geq-or-empty-p base-indent)
+              begin (+fold--hideshow-seek begin 1 nil nil #'+fold--hideshow-g-or-empty-p base-indent)
+              end   (+fold--hideshow-seek end 1 t nil #'+fold--hideshow-geq-or-empty-p base-indent)
+              end   (+fold--hideshow-seek end -1 nil nil #'+fold--hideshow-empty-line-p base-indent))
+        (list begin end base-indent))))
+
+  (defun +fold-hideshow-forward-block-by-indent-fn (_arg)
+    (let ((start (current-indentation)))
+      (forward-line)
+      (unless (= start (current-indentation))
+        (let ((range (+fold-hideshow-indent-range)))
+          (goto-char (cadr range))
+          (end-of-line)))))
+
+  ;; support for special modes
+  (setq hs-special-modes-alist
+        (append
+         '((yaml-mode "\\s-*\\_<\\(?:[^:]+\\)\\_>"
+                      ""
+                      "#"
+                      +fold-hideshow-forward-block-by-indent-fn nil)
+           (ruby-mode "class\\|d\\(?:ef\\|o\\)\\|module\\|[[{]"
+                      "end\\|[]}]"
+                      "#\\|=begin"
+                      ruby-forward-sexp)
+           (matlab-mode "if\\|switch\\|case\\|otherwise\\|while\\|for\\|try\\|catch"
+                        "end"
+                        nil (lambda (_arg) (matlab-forward-sexp)))
+           (nxml-mode "<!--\\|<[^/>]*[^/]>"
+                      "-->\\|</[^/>]*[^/]>"
+                      "<!--" sgml-skip-tag-forward nil)
+           (latex-mode
+            ;; LaTeX-find-matching-end needs to be inside the env
+            ("\\\\begin{[a-zA-Z*]+}\\(\\)" 1)
+            "\\\\end{[a-zA-Z*]+}"
+            "%"
+            (lambda (_arg)
+              ;; Don't fold whole document, that's useless
+              (unless (save-excursion
+                        (search-backward "\\begin{document}"
+                                         (line-beginning-position) t))
+                (LaTeX-find-matching-end)))
+            nil))
+         hs-special-modes-alist
+         '((t))))
   )
 
 

@@ -236,7 +236,7 @@ See `consult-grep' for more details regarding the asynchronous search."
 ;; [yasnippet]
 (use-package yasnippet
   :straight t
-  :hook ((prog-mode conf-mode markdown-mode org-mode) . yas-minor-mode)
+  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . yas-minor-mode)
   :bind (:map yas-minor-mode-map
               ("TAB" . nil)
               ("<tab>" . nil))
@@ -252,7 +252,7 @@ See `consult-grep' for more details regarding the asynchronous search."
 ;; [corfu] compleletion frontend
 (use-package corfu
   :straight (:files (:defaults "extensions/*"))
-  :hook (((prog-mode conf-mode shell-mode eshell-mode) . corfu-mode)
+  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . corfu-enable-in-minibuffer))
   :bind (:map corfu-map
