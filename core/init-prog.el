@@ -105,12 +105,13 @@
             (lambda () (if (eglot-managed-p)
                       (add-to-list 'completion-at-point-functions #'+eglot-citre-capf))))
 
-  (dolist (func '(find-function
+  (with-eval-after-load 'xref
+    (dolist (func '(find-function
                   consult-imenu
                   consult-ripgrep
                   citre-jump))
     (advice-add func :before (lambda (&rest r)
-                               (xref-push-marker-stack (point-marker)))))
+                               (xref-push-marker-stack (point-marker))))))
   )
 
 

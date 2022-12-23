@@ -264,7 +264,8 @@ See `consult-grep' for more details regarding the asynchronous search."
         corfu-quit-at-boundary nil   ;; Never quit at completion boundary
         corfu-echo-documentation nil ;; Disable documentation in the echo area
         corfu-auto-prefix 2          ;; minimun prefix to enable completion
-        corfu-preview-current nil)
+        corfu-preview-current nil
+        corfu-count 15)
 
   ;; Transfer completion to the minibuffer
   (defun corfu-move-to-minibuffer ()
@@ -294,12 +295,28 @@ See `consult-grep' for more details regarding the asynchronous search."
 
 (use-package cape
   :straight t
-  :hook (corfu-mode . +corfu-add-cape-backends)
+  :hook ((corfu-mode . +corfu-add-cape-backends)
+         ((TeX-mode LaTeX-mode org-mode markdown-mode) . +corfu-add-cape-tex-backends))
   :config
   (defun +corfu-add-cape-backends ()
     (add-to-list 'completion-at-point-functions #'cape-file :append)
     (add-to-list 'completion-at-point-functions #'cape-dabbrev :append))
+
+  (defun +corfu-add-cape-tex-backends ()
+    (add-to-list 'completion-at-point-functions #'cape-tex :append))
   )
+
+
+(use-package dabbrev
+  :config
+  (setq dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+
+
+(use-package corfu-terminal
+  :straight t
+  :when (not (display-graphic-p))
+  :after corfu
+  :init (corfu-terminal-mode 1))
 
 
 ;; TODO: Consult-dash
