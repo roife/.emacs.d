@@ -157,8 +157,7 @@
 
 (use-package consult
   :straight t
-  :bind (([remap apropos]                       . consult-apropos)
-         ([remap bookmark-jump]                 . consult-bookmark)
+  :bind (([remap bookmark-jump]                 . consult-bookmark)
          ([remap list-registers]                . consult-register)
          ([remap goto-line]                     . consult-goto-line)
          ([remap imenu]                         . consult-imenu)
@@ -169,7 +168,8 @@
          ([remap switch-to-buffer]              . consult-buffer)
          ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
-         ([remap yank-pop]                      . consult-yank-pop))
+         ([remap yank-pop]                      . consult-yank-pop)
+         ("C-c d r" . consult-ripgrep))
   :config
   (setq consult-narrow-key "<")
 

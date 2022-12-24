@@ -58,12 +58,6 @@
   )
 
 
-;; [goto-chg] Goto last change
-(use-package goto-chg
-  :straight t
-  :bind ("C-, ." . goto-last-change))
-
-
 ;; [whitespace] Show visualize TAB, (HARD) SPC, newline
 (use-package whitespace
   :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
