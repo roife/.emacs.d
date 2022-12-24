@@ -20,15 +20,24 @@
 (use-package markdown-mode
   :straight t
   :custom-face
-  (markdown-code-face ((t (:inherit nil)))))
+  (markdown-code-face ((t (:inherit nil))))
+  :config
+  (setq markdown-enable-math t
+        markdown-enable-wiki-links t
+        markdown-italic-underscore t
+        markdown-asymmetric-header t
+        markdown-nested-imenu-heading-index t
+        markdown-fontify-code-blocks-natively t)
+  (add-to-list 'markdown-code-lang-modes '("rust" . rustic-mode))
+  (add-to-list 'markdown-code-lang-modes '("verilog" . verilog-mode)))
 
 
 ;; [auctex]
 (use-package tex
   :straight auctex
   :config
-  (setq TeX-parse-self t ; parse on load
-        TeX-auto-save t  ; parse on save
+  (setq TeX-parse-self t             ; parse on load
+        TeX-auto-save t              ; parse on save
         ;; Use hidden directories for AUCTeX files.
         TeX-auto-local ".auctex-auto"
         TeX-style-local ".auctex-style"
