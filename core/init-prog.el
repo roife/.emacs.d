@@ -268,16 +268,6 @@
   )
 
 
-;; [copilot] Copilot
-(use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook ((markdown-mode org-mode) . copilot-mode)
-  :bind (:map copilot-completion-map
-              ("<tab>" . copilot-accept-completion)
-              ("TAB" . copilot-accept-completion))
-  )
-
-
 ;; [consult-eglot] Eglot support for consult
 (use-package consult-eglot
   :after consult eglot

@@ -157,6 +157,8 @@
 (use-package symbol-overlay
   :straight t
   :bind (("C-c s i" . symbol-overlay-put)
+         ("C-c s n" . symbol-overlay-switch-forward)
+         ("C-c s p" . symbol-overlay-switch-backward)
          ("C-c s c" . symbol-overlay-remove-all))
   :hook (((prog-mode yaml-mode) . symbol-overlay-mode))
   :config
