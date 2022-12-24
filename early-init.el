@@ -60,9 +60,6 @@
                       (delete-dups (append file-name-handler-alist
                                            old-value)))))))
 
-;; Font
-(push '(font . "JetBrains Mono 14") default-frame-alist)
-
 ;; TODO: optimize `load-suffixes'
 
 ;; Site files will use `load-file', which emit messages and triggers redisplay

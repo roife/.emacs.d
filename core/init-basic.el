@@ -42,6 +42,8 @@
  ;; don't do any wrapping by default since it's expensive
  truncate-lines t
  truncate-partial-width-windows nil
+ ;; better wrapping for cjk
+ word-wrap-by-category t
 
  ;; Custom file path
  custom-file (expand-file-name "custom.el" user-emacs-directory)
