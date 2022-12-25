@@ -123,9 +123,7 @@
   (require 'smartparens-config)
 
   (setq
-   ;; TODO:
-   ;; Overlays are too distracting and not terribly helpful. show-parens does
-   ;; this for us already (and is faster), so...
+   ;; Show-parens does this for us already (and is faster)
    sp-highlight-pair-overlay nil
    sp-highlight-wrap-overlay nil
    sp-highlight-wrap-tag-overlay nil
@@ -135,7 +133,7 @@
    sp-max-pair-length 4
    )
 
-  ;; TODO: Silence some harmless but annoying echo-area spam
+  ;; Silence some harmless but annoying [echo-area] spam
   (dolist (key '(:unmatched-expression :no-matching-tag))
     (setf (alist-get key sp-message-alist) nil))
 
@@ -145,7 +143,7 @@
             (lambda () (when smartparens-global-mode
                     (smartparens-mode +1))))
 
-  ;; We're likely writing lisp in the minibuffer, therefore, disable these quote pair
+  ;; Likely writing lisp in the minibuffer, so disable these quote pair
   (sp-local-pair '(minibuffer-mode minibuffer-inactive-mode) "'" nil :actions nil)
   (sp-local-pair '(minibuffer-mode minibuffer-inactive-mode) "`" nil :actions nil)
 
@@ -179,8 +177,7 @@
                  :unless '(sp-point-before-word-p sp-point-before-same-p)
                  :actions '(insert) :post-handlers '(("| " "SPC")))
 
-  ;; Disable electric keys in C modes because it interferes with smartparens
-  ;; and custom bindings. We'll do it ourselves (mostly).
+  ;; Disable electric keys in C modes because it interferes with smartparens and custom bindings.
   (with-eval-after-load 'cc-mode
     (setq-default c-electric-flag nil)
     (dolist (key '("#" "{" "}" "/" "*" ";" "," ":" "(" ")" "\177"))
@@ -283,10 +280,7 @@
       (sp-local-pair "f'''" "'''")
       (sp-local-pair "f'" "'"))
     ;; Original keybind interferes with smartparens rules
-    (define-key python-mode-map (kbd "DEL") nil)
-    ;; Interferes with the def snippet in doom-snippets
-    ;; TODO Fix this upstream, in doom-snippets, instead
-    (setq sp-python-insert-colon-in-function-definitions nil))
+    (define-key python-mode-map (kbd "DEL") nil))
 
   (with-eval-after-load 'web-mode
     (defun +web-is-auto-close-style-3 (_id action _context)
