@@ -319,8 +319,8 @@ See `consult-grep' for more details regarding the asynchronous search."
   :init
   (corfu-popupinfo-mode 1)
   :config
-  (setq corfu-popupinfo-delay '(0.5 . 1.0)
-        corfu-popupinfo-max-height 15
+  (setq corfu-popupinfo-delay '(0.8 . 0.8)
+        corfu-popupinfo-max-height 18
         corfu-popupinfo-max-width 100)
   )
 
