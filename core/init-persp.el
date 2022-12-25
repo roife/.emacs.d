@@ -65,6 +65,19 @@
                     (cl-destructuring-bind (buffer-name vars &rest _rest) (cdr savelist)
                       (magit-status (alist-get 'default-directory vars)))))
 
+  ;; Eww integration
+  (persp-def-buffer-save/load
+   :mode 'eww-mode :tag-symbol 'def-eww-status-buffer
+   :save-vars '(major-mode eww-history eww-data eww-history-position)
+   :after-load-function
+   #'(lambda (b &rest _)
+       (let ((cur-buf (current-buffer)))
+         (with-current-buffer b
+           (when-let ((url (plist-get eww-data :url)))
+             (eww url nil)))
+         ;; restore buffer
+         (switch-to-buffer cur-buf))))
+
   ;; Tab bar integration
   (with-eval-after-load 'tab-bar
     ;; Save the current workspace's tab bar data.
