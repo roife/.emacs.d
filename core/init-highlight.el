@@ -151,6 +151,16 @@
                 :after (lambda (&rest _)
                          (when (derived-mode-p 'prog-mode 'yaml-mode)
                            (highlight-indent-guides-mode 1)))))
+
+  ;; HACK: `highlight-indent-guides' acalculates its faces from the current theme,
+  ;; but is unable to do so properly in terminal Emacs
+  (defun +highligh-indent-guides-auto-set-faces ()
+    (when (display-graphic-p)
+            (highlight-indent-guides-auto-set-faces)))
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook
+                #'+highligh-indent-guides-auto-set-faces)
+    (advice-add #'enable-theme :after #'+highligh-indent-guides-auto-set-faces))
   )
 
 

@@ -249,6 +249,7 @@ See `consult-grep' for more details regarding the asynchronous search."
 
 
 (use-package tempel
+  :straight t
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
          ("M-*" . tempel-insert))
   :hook (((prog-mode text-mode) . +tempel-setup-capf)
@@ -260,7 +261,7 @@ See `consult-grep' for more details regarding the asynchronous search."
                       completion-at-point-functions)))
 
   (setq tempel-trigger-prefix "<")
-)
+  )
 
 
 (use-package tempel-collection
