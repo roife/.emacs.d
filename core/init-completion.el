@@ -92,12 +92,27 @@
      +vertico-basic-remote-all-completions
      "Use basic completion on remote files only"))
 
+  (defun orderless+basic-all (str table pred point)
+    (or (orderless-all-completions str table pred point)
+        (completion-basic-all-completions str table pred point)))
+
+  (defun orderless+basic-try (str table pred point)
+    (or (completion-basic-try-completion str table pred point)
+        (orderless-try-completion str table pred point)))
+
+  (add-to-list 'completion-styles-alist
+               '(orderless+basic
+                 orderless+basic-try
+                 orderless+basic-all
+                 "Unholy mix of Orderless and Basic."))
+
+
   ;; configuration
-  (setq completion-styles '(orderless basic)
+  (setq completion-styles '(orderless+basic)
         completion-category-defaults nil
         completion-ignore-case t
         ;; despite override in the name, orderless can still be used in find-file etc.
-        completion-category-overrides '((file (styles +vertico-basic-remote orderless partial-completion)))
+        completion-category-overrides '((file (styles +vertico-basic-remote orderless+basic)))
         orderless-style-dispatchers '(+vertico-orderless-dispatch)
         orderless-component-separator "[ &]")
   )
@@ -233,25 +248,28 @@ See `consult-grep' for more details regarding the asynchronous search."
   )
 
 
-;; [yasnippet]
-(use-package yasnippet
-  :straight t
-  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . yas-minor-mode)
-  :bind (:map yas-minor-mode-map
-              ("TAB" . nil)
-              ("<tab>" . nil))
-  )
+(use-package tempel
+  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+  :hook (((prog-mode text-mode) . +tempel-setup-capf)
+         ((prog-mode text-mode) . tempel-abbrev-mode))
+  :config
+  (defun +tempel-setup-capf ()
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
+
+  (setq tempel-trigger-prefix "<")
+)
 
 
-(use-package yasnippet-snippets
-  :straight t
-  :after yasnippet
-  )
+(use-package tempel-collection
+  :straight t)
 
 
 ;; [corfu] compleletion frontend
 (use-package corfu
-  :straight (:files (:defaults "extensions/*"))
+  :straight (:files (:defaults "extensions/*.el"))
   :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . corfu-enable-in-minibuffer))
@@ -290,6 +308,20 @@ See `consult-grep' for more details regarding the asynchronous search."
   :config
   (with-eval-after-load 'savehist
     (cl-pushnew 'corfu-history savehist-additional-variables))
+  )
+
+
+(use-package corfu-popupinfo
+  :straight nil
+  :after corfu
+  :custom-face
+  (corfu-popupinfo ((t (:height 1))))
+  :init
+  (corfu-popupinfo-mode 1)
+  :config
+  (setq corfu-popupinfo-delay '(0.5 . 1.0)
+        corfu-popupinfo-max-height 15
+        corfu-popupinfo-max-width 100)
   )
 
 

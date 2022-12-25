@@ -97,21 +97,21 @@
               (funcall fetcher))
             (funcall citre-fetcher)))))
 
-  ;; Integration with [eglot]
-  (defalias #'+eglot-citre-capf
-    (cape-super-capf #'eglot-completion-at-point #'citre-completion-at-point))
-
-  (add-hook 'eglot-managed-mode-hook
-            (lambda () (if (eglot-managed-p)
-                      (add-to-list 'completion-at-point-functions #'+eglot-citre-capf))))
+  ;; Integration with [eglot] as super capf
+  ;; (defalias #'+eglot-citre-capf
+  ;;   (cape-super-capf #'eglot-completion-at-point #'citre-completion-at-point))
+  ;;
+  ;; (add-hook 'eglot-managed-mode-hook
+  ;;           (lambda () (if (eglot-managed-p)
+  ;;                     (add-to-list 'completion-at-point-functions #'+eglot-citre-capf))))
 
   (require 'xref)
   (dolist (func '(find-function
                   consult-imenu
                   consult-ripgrep
                   citre-jump))
-    (advice-add func :before (lambda (&rest r)
-                               (xref-push-marker-stack (point-marker)))))
+    (advice-add func :before
+                (lambda (&rest r) (xref-push-marker-stack (point-marker)))))
   )
 
 
@@ -198,7 +198,25 @@
 
 
 (use-package verilog-mode
-  :straight t)
+  :straight t
+  :config
+  (setq verilog-align-ifelse t
+        verilog-auto-delete-trailing-whitespace t
+        verilog-auto-inst-param-value t
+        verilog-auto-inst-vector nil
+        verilog-auto-lineup (quote all)
+        verilog-auto-newline nil
+        verilog-auto-save-policy nil
+        verilog-auto-template-warn-unused t
+        verilog-case-indent 4
+        verilog-cexp-indent 4
+        verilog-highlight-grouping-keywords t
+        verilog-highlight-modules t
+        verilog-indent-level 4
+        verilog-indent-level-behavioral 4
+        verilog-indent-level-declaration 4
+        verilog-indent-level-module 4
+        verilog-tab-to-comment t))
 
 
 (use-package yaml-mode
@@ -264,7 +282,9 @@
         eglot-events-buffer-size 0
         eglot-send-changes-idle-time 2
         eglot-connect-timeout 10
-        eglot-autoshutdown t)
+        eglot-autoshutdown t
+        ;; use global completion styles
+        completion-category-defaults nil)
   )
 
 
