@@ -137,10 +137,10 @@
 
 
 ;; [elec-pair] Automatic parenthesis pairing
-(use-package elec-pair
-  :hook ((prog-mode conf-mode yaml-mode) . electric-pair-mode)
-  :custom
-  (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
+;; (use-package elec-pair
+;;   :hook ((prog-mode conf-mode yaml-mode) . electric-pair-mode)
+;;   :custom
+;;   (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
 
 ;; [mwim] Better C-a C-e for programming
@@ -163,9 +163,13 @@
 
 
 ;; [hungry-delete] Hungry deletion
-;; HACK: Hungry delete doesn't work with paredit
-;; See: https://emacs.stackexchange.com/questions/33734/how-to-get-hungry-delete-working-in-paredit-mode
-(setq backward-delete-char-untabify-method 'hungry)
+(use-package hungry-delete
+  :straight t
+  :hook (after-init . global-hungry-delete-mode)
+  :config
+  (setq hungry-delete-chars-to-skip " \t\f\v"
+        hungry-delete-except-modes
+        '(help-mode minibuffer-mode minibuffer-inactive-mode calc-mode)))
 
 
 ;; [subword] Handling capitalized subwords
@@ -176,21 +180,6 @@
 ;; [ialign] Interactive align
 (use-package ialign
   :straight t)
-
-
-;; [paredit] Better paren editing
-(use-package paredit
-  :straight t
-  :hook (((prog-mode conf-mode yaml-mode) . paredit-mode))
-  :bind (:map paredit-mode-map
-              ("M-<up>" . nil)
-              ("M-<down>" . nil)
-              (";" . nil))
-  :config
-  ;; Don't insert space automatically
-  (add-to-list 'paredit-space-for-delimiter-predicates
-               '(lambda (_ _) (derived-mode-p 'lisp-data-mode)))
-  )
 
 
 ;; [hideshow] Code folding

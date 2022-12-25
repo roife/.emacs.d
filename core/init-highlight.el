@@ -3,10 +3,11 @@
 ;; [hl-line] Highlight current line
 (use-package hl-line
   :hook ((prog-mode text-mode yaml-mode conf-mode special-mode org-agenda-mode dired-mode) . hl-line-mode))
+
+
 ;; [show-paren-mode] Highlight matching parens
 (use-package paren
   :hook ((prog-mode conf-mode yaml-mode) . show-paren-mode)
-  :preface (defvar show-paren-delay 0.1)
   :config
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t)
@@ -150,6 +151,16 @@
                 :after (lambda (&rest _)
                          (when (derived-mode-p 'prog-mode 'yaml-mode)
                            (highlight-indent-guides-mode 1)))))
+
+  ;; HACK: `highlight-indent-guides' acalculates its faces from the current theme,
+  ;; but is unable to do so properly in terminal Emacs
+  (defun +highligh-indent-guides-auto-set-faces ()
+    (when (display-graphic-p)
+            (highlight-indent-guides-auto-set-faces)))
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook
+                #'+highligh-indent-guides-auto-set-faces)
+    (advice-add #'enable-theme :after #'+highligh-indent-guides-auto-set-faces))
   )
 
 

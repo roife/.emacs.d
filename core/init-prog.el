@@ -279,6 +279,7 @@
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
   :config
   (setq eldoc-echo-area-display-truncation-message nil
+        eldoc-echo-area-prefer-doc-buffer t
         eglot-events-buffer-size 0
         eglot-send-changes-idle-time 2
         eglot-connect-timeout 10
