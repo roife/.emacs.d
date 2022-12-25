@@ -15,7 +15,7 @@
 (define-key global-map [?\s-f] #'isearch-forward)
 (define-key global-map [?\s-w] #'tab-close)
 (define-key global-map [?\s-t] #'tab-new)
-
+(define-key global-map [?\H-o] #'other-window)
 
 ;; [osx-dictionary] macOS native dictionary app
 (use-package osx-dictionary
@@ -26,6 +26,3 @@
 
 ;; Automatically switch theme based on the theme of macOS
 (add-hook 'ns-system-appearance-change-functions #'(lambda (_) (+load-theme)))
-
-
-

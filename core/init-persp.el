@@ -101,12 +101,12 @@
     )
 
   ;; Per-workspace [winner-mode] history
-  (add-to-list 'window-persistent-parameters '(winner-ring . t))
+  (with-eval-after-load 'winner
+    (add-to-list 'window-persistent-parameters '(winner-ring . t))
 
   (add-hook 'persp-before-deactivate-functions
             (lambda (_)
-              (when (and (bound-and-true-p winner-mode)
-                         (get-current-persp))
+              (when (get-current-persp)
                 (set-persp-parameter
                  'winner-ring (list winner-currents
                                     winner-ring-alist
@@ -114,14 +114,18 @@
 
   (add-hook 'persp-activated-functions
             (lambda (_)
-              (when (bound-and-true-p winner-mode)
-                (cl-destructuring-bind
+              (cl-destructuring-bind
                     (currents alist pending-undo-ring)
                     (or (persp-parameter 'winner-ring) (list nil nil nil))
                   (setq winner-undo-frame nil
                         winner-currents currents
                         winner-ring-alist alist
-                        winner-pending-undo-ring pending-undo-ring)))))
+                        winner-pending-undo-ring pending-undo-ring))))
+
+  (add-hook 'persp-before-save-state-to-file-functions
+            (lambda (&rest _)
+              (delete-persp-parameter 'winner-ring)))
+    )
 
   ;; Don't try to persist dead/remote buffers. They cause errors.
   (add-hook 'persp-filter-save-buffers-functions
