@@ -13,11 +13,11 @@
 
   (setq
    eshell-banner-message
-           '(format "%s %s\n"
-                    (propertize (format " %s " (string-trim (buffer-name)))
-                                'face 'mode-line-highlight)
-                    (propertize (current-time-string)
-                             'face 'font-lock-keyword-face))
+   '(format "%s %s\n"
+            (propertize (format " %s " (string-trim (buffer-name)))
+                        'face 'mode-line-highlight)
+            (propertize (current-time-string)
+                        'face 'font-lock-keyword-face))
    ;; scrolling
    eshell-scroll-to-bottom-on-input 'all
    eshell-scroll-to-bottom-on-output 'all
@@ -119,11 +119,11 @@
 
   ;; Sync buffer name
   (defun eshell-sync-dir-buffer-name ()
-  "Change eshell buffer name by directory change."
-  (when (equal major-mode 'eshell-mode)
-    (rename-buffer
-     (format "Esh: %s" (abbreviate-file-name default-directory))
-     t)))
+    "Change eshell buffer name by directory change."
+    (when (equal major-mode 'eshell-mode)
+      (rename-buffer
+       (format "Esh: %s" (abbreviate-file-name default-directory))
+       t)))
 
   (add-hook 'eshell-directory-change-hook #'eshell-sync-dir-buffer-name)
   (add-hook 'eshell-mode-hook #'eshell-sync-dir-buffer-name)

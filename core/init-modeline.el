@@ -209,17 +209,18 @@
 (defvar-local +modeline-eshell-vcs nil)
 
 (defsubst +modeline-vcs-get-direcroty-info (dir)
-  (when-let* ((backend (vc-responsible-backend dir 'noerror))
-              (rev (vc-working-revision dir backend))
-              (disp-rev (condition-case nil
-                            (or (vc-call-backend backend '-symbolic-ref default-directory)
-                                (and rev (substring rev 0 7)))
-                          (error nil)))
-         (def-ml (vc-default-mode-line-string backend dir)))
-    (concat " "
-            (substring def-ml 0
-                       (if (eq backend 'Hg) 3 4))
-            disp-rev)))
+  (when-let ((backend (vc-responsible-backend dir 'noerror)))
+    (vc-state-refresh default-directory backend)
+    (when-let ((rev (vc-working-revision dir backend))
+               (disp-rev (condition-case nil
+                             (or (vc-call-backend backend '-symbolic-ref default-directory)
+                                 (and rev (substring rev 0 7)))
+                           (error nil)))
+               (def-ml (vc-default-mode-line-string backend dir)))
+      (concat " "
+              (substring def-ml 0
+                         (if (eq backend 'Hg) 3 4))
+              disp-rev))))
 
 (defun +modeline-update-eshell-vcs-info (&rest _)
   "Update icon of vcs state in mode-line."
