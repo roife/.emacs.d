@@ -10,9 +10,9 @@
 ;; [autorevert] TODO: Add hooks as what doom has done?
 (use-package autorevert
   :hook (after-init . global-auto-revert-mode)
-  :custom
+  :config
   ; Only prompts for confirmation when buffer is unsaved.
-  (revert-without-query (list "."))
+  (setq revert-without-query (list "."))
   )
 
 
@@ -61,12 +61,13 @@
 ;; [whitespace] Show visualize TAB, (HARD) SPC, newline
 (use-package whitespace
   :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
-  :custom
-  ;; limit line length
-  (whitespace-line-column nil)
-  ;; only show bad whitespace
-  (whitespace-style '(face trailing lines-tail empty
-                      indentation space-before-tab space-after-tab))
+  :config
+  (setq
+   ;; limit line length
+   whitespace-line-column nil
+   ;; only show bad whitespace
+   whitespace-style '(face trailing lines-tail empty
+                           indentation space-before-tab space-after-tab))
   )
 
 
@@ -379,8 +380,9 @@ begin and end of the block surrounding point."
 ;; [wgrep] Edit a grep buffer and apply changes to the file buffer
 (use-package wgrep
   :straight t
-  :custom
-  (wgrep-auto-save-buffer t))
+  :config
+  (setq wgrep-auto-save-buffer t)
+  )
 
 
 ;; [rg] support for ripgrep
@@ -424,5 +426,4 @@ begin and end of the block surrounding point."
 (use-package persistent-scratch
   :straight t
   :config
-  (setq persistent-scratch-save-file (concat +cache-dir ".persistent-scratch"))
   (persistent-scratch-autosave-mode 1))

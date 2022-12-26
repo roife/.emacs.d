@@ -28,7 +28,7 @@
                      'init-persp
                      'init-window
                      'init-dired
-                     ;; 'init-eshell
+                     'init-eshell
                      'init-prog
                      'init-smartparens
                      'init-writing
