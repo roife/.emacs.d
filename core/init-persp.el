@@ -82,9 +82,8 @@
     ;; Save the current workspace's tab bar data.
     (add-hook 'persp-before-deactivate-functions
               (lambda (_)
-                (when (get-current-persp)
-                  (set-persp-parameter 'tab-bar-tabs (tab-bar-tabs))
-                  (set-persp-parameter 'tab-bar-closed-tabs tab-bar-closed-tabs))))
+                (set-persp-parameter 'tab-bar-tabs (tab-bar-tabs))
+                (set-persp-parameter 'tab-bar-closed-tabs tab-bar-closed-tabs)))
     ;; Restores the tab bar data of the workspace we have just switched to.
     (add-hook 'persp-activated-functions
               (lambda (_)
@@ -92,11 +91,29 @@
                 (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))
                 (tab-bar--update-tab-bar-lines t)))
 
-    (add-hook 'persp-before-save-state-to-file-functions
-              (lambda (&rest _)
-                (when (get-current-persp)
-                  (set-persp-parameter 'tab-bar-tabs (frameset-filter-tabs (tab-bar-tabs) nil nil t))
-                  (set-persp-parameter 'tab-bar-closed-tabs (frameset-filter-tabs tab-bar-closed-tabs nil nil t)))))
+    ;; Filter frame parameters
+    (setq +persp-filter-parameters-on-save
+          '((tab-bar-tabs . (lambda (conf) (frameset-filter-tabs conf nil nil t)))
+            (winner-ring . ignore)))
+
+    (advice-add #'persp-save-state-to-file :around
+                (lambda (fn &rest args)
+                  (let ((all-persp-confs (make-hash-table))
+                        (ret-val))
+                    (dolist (persp (hash-table-values *persp-hash*))
+                      (let ((cur-persp-confs (make-hash-table)))
+                        (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
+                                 do (let ((old (persp-parameter tag persp)))
+                                      (puthash persp old cur-persp-confs)
+                                      (set-persp-parameter tag (funcall filter old) persp)))
+                        (puthash persp cur-persp-confs all-persp-confs)))
+                    (setq ret-val (apply fn args))
+                    (dolist (persp (hash-table-values *persp-hash*))
+                      (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
+                               do (let* ((cur-persp-confs (gethash persp all-persp-confs))
+                                         (old (gethash tag cur-persp-confs)))
+                                    (set-persp-parameter tag old persp))))
+                    ret-val)))
     )
 
   ;; Per-workspace [winner-mode] history

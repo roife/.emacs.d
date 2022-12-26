@@ -51,9 +51,20 @@
     (eshell/alias "d" "dired $1")
     (eshell/alias "l" "ls -lah $*")
     (eshell/alias "q" "exit")
-    (eshell/alias "git" "git -P $*")
     (eshell/alias "rg" "rg --color=always $*")
-    (eshell/alias "clear" "clear-scrollback"))
+    (eshell/alias "clear" "clear-scrollback")
+    ;; git related
+    (eshell/alias "git" "git -P $*")
+    (eshell/alias "gst" "git status -P $*")
+    (eshell/alias "ga" "git add -P $*")
+    (eshell/alias "gc" "git commit -P $*")
+    (eshell/alias "gp" "git push -P $*")
+    (eshell/alias "gb" "git branch $*")
+    (eshell/alias "gch" "git checkout $*")
+    (eshell/alias "gcb" "git checkout -b $*")
+    )
+  ;; Don't auto-write our aliases! Let us manage our own `eshell-aliases-file' via elisp
+  (advice-add #'eshell-write-aliases-list :override #'ignore)
 
   (defun eshell/clear ()
     "Clear the eshell buffer."
@@ -161,7 +172,7 @@
   :after eshell
   :commands (eshell-up eshell-up-peek)
   :config
-  (eshell/alias "up" :"eshell-up")
+  (eshell/alias "up" "eshell-up")
   (eshell/alias "pk" "eshell-up-peek")
   )
 

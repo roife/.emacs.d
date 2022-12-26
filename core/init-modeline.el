@@ -84,11 +84,6 @@
   "The face for host name on the mode-line of an active window."
   :group '+modeline)
 
-;; (defface +modeline-persp-name-active-face
-;;   '((t (:inherit (bold font-lock-doc-face))))
-;;   "The face for persp name on the mode-line of an active window."
-;;   :group '+modeline)
-
 ;;; Indicators
 (with-eval-after-load 'popper
   ;; modeline indicator
@@ -146,20 +141,6 @@
                   (+ count 1)
                   (+ count (length after)))))))
 
-;;; Cache persp name
-;; (defvar-local +modeline-persp-name nil)
-;; (defun +modeline-update-persp-name (&rest _)
-;;   "Update perspective name in mode-line."
-;;   (setq +modeline-persp-name
-;;         (when-let ((name (and (bound-and-true-p persp-mode)
-;;                               persp-last-persp-name)))
-;;           (concat "#"  name " "))))
-;; (add-hook 'find-file-hook #'+modeline-update-persp-name)
-;; (add-hook 'buffer-list-update-hook #'+modeline-update-persp-name)
-;; (add-hook 'find-file-hook #'+modeline-update-persp-name)
-;; (add-hook 'persp-activated-functions #'+modeline-update-persp-name)
-;; (add-hook 'persp-renamed-functions #'+modeline-update-persp-name)
-
 
 ;;; Cache project name
 (defvar-local +modeline-project-name nil)
@@ -174,7 +155,6 @@
              ":")))))
 (add-hook 'find-file-hook #'+modeline-update-project-name)
 (add-hook 'after-change-major-mode-hook #'+modeline-update-project-name)
-(add-hook 'eshell-mode-hook #'+modeline-update-project-name)
 
 ;;; Cache remote host name
 (defvar-local +modeline-remote-host-name nil)
@@ -204,31 +184,6 @@
   )
 (advice-add #'flymake--handle-report :after #'+modeline-flymake-update)
 (add-hook 'flymake-mode-hook #'+modeline-flymake-update)
-
-;;; Cache VCS status
-(defvar-local +modeline-eshell-vcs nil)
-
-(defsubst +modeline-vcs-get-direcroty-info (dir)
-  (when-let ((backend (vc-responsible-backend dir 'noerror)))
-    (vc-state-refresh default-directory backend)
-    (when-let ((rev (vc-working-revision dir backend))
-               (disp-rev (condition-case nil
-                             (or (vc-call-backend backend '-symbolic-ref default-directory)
-                                 (and rev (substring rev 0 7)))
-                           (error nil)))
-               (def-ml (vc-default-mode-line-string backend dir)))
-      (concat " "
-              (substring def-ml 0
-                         (if (eq backend 'Hg) 3 4))
-              disp-rev))))
-
-(defun +modeline-update-eshell-vcs-info (&rest _)
-  "Update icon of vcs state in mode-line."
-  (setq +modeline-eshell-vcs
-        (when (eq major-mode 'eshell-mode)
-          (+modeline-vcs-get-direcroty-info default-directory))))
-(add-hook 'eshell-post-command-hook #'+modeline-update-eshell-vcs-info)
-(add-hook 'eshell-mode-hook #'+modeline-update-eshell-vcs-info)
 
 ;;; Cache encoding info
 (defvar-local +modeline-encoding nil)
@@ -269,12 +224,8 @@
                              face +modeline-host-name-active-face)
                 (:propertize vc-mode
                              face +modeline-vc-mode-active-face)
-                (:propertize +modeline-eshell-vcs
-                             face +modeline-vc-mode-active-face)
                 ))
          (rhs '(
-                ;; (:propertize +modeline-persp-name
-                ;;              face +modeline-persp-name)
                 (:propertize mode-name
                              face +modeline-buffer-name-active-face)
                 (:eval +modeline-flymake-indicator)
@@ -303,7 +254,6 @@
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
                 (:eval vc-mode)
-                (:eval +modeline-eshell-vcs)
                 ))
          (rhs '((:eval mode-name)
                 " "
@@ -337,8 +287,6 @@
                              face +modeline-host-name-active-face)
                 ))
          (rhs '(
-                ;; (:propertize +modeline-persp-name
-                ;;              face +modeline-persp-name)
                 (:propertize mode-name
                              face +modeline-buffer-name-active-face)
                 " "
