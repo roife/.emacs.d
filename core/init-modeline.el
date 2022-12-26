@@ -210,19 +210,20 @@
 (defun +modeline-update-vcs-status (&rest _)
   "Update icon of vcs state in mode-line."
   (setq +modeline-vcs-status
-        (when (and vc-mode buffer-file-name)
+        (when (and vc-mode vc-display-status buffer-file-name)
           (let* ((backend (vc-backend buffer-file-name))
                  (state   (vc-state (file-local-name buffer-file-name) backend))
-                 (icon (cond ((memq state '(edited added)) "*")
-                             ((eq state 'needs-merge) "&")
-                             ((eq state 'needs-update) "??")
+                 (icon (cond ((eq state 'added) "+")
+                             ((eq state 'edited) "*")
+                             ((eq state 'needs-merge) "?&")
+                             ((eq state 'needs-update) "?↓")
                              ((eq state 'ignored) "#")
                              ((eq state 'unregistered) "?")
-                             ((memq state '(removed conflict missing)) "!")
+                             ((eq state 'conflict) "!!")
+                             ((eq state 'removed) "%")
+                             ((eq state 'missing) "??")
                              (t "-")))
-                 (str (if vc-display-status
-                          vc-mode
-                        "")))
+                 (str vc-mode))
             (format "%s%s" str icon)))))
 (add-hook 'find-file-hook #'+modeline-update-vcs-status)
 (add-hook 'after-save-hook #'+modeline-update-vcs-status)
