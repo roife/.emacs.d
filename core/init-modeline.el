@@ -166,13 +166,15 @@
 (defsubst +modeline-update-project-name ()
   "Get project name for current buffer."
   (setq +modeline-project-name
-        (when-let ((project (project-current)))
-          (concat
-           " "
-           (file-name-nondirectory
-            (directory-file-name (project-root project)))
-           ))))
+        (when (buffer-file-name)
+          (when-let ((project (project-current)))
+            (concat
+             (file-name-nondirectory
+              (directory-file-name (project-root project)))
+             ":")))))
 (add-hook 'find-file-hook #'+modeline-update-project-name)
+(add-hook 'after-change-major-mode-hook #'+modeline-update-project-name)
+(add-hook 'eshell-mode-hook #'+modeline-update-project-name)
 
 ;;; Cache remote host name
 (defvar-local +modeline-remote-host-name nil)
@@ -219,11 +221,12 @@
                              ((memq state '(removed conflict missing)) "!")
                              (t "-")))
                  (str (if vc-display-status
-                          (substring vc-mode (+ (if (eq backend 'Hg) 2 3) 2))
+                          vc-mode
                         "")))
-            (format " #%s%s" str icon)))))
+            (format "%s%s" str icon)))))
 (add-hook 'find-file-hook #'+modeline-update-vcs-status)
 (add-hook 'after-save-hook #'+modeline-update-vcs-status)
+(add-hook 'after-change-major-mode-hook #'+modeline-update-vcs-status)
 (advice-add #'vc-refresh-state :after #'+modeline-update-vcs-status)
 
 ;;; Cache encoding info
@@ -258,11 +261,11 @@
                              face +modeline-meta-active-face)
                 (:propertize " %*" face +modeline-modification-active-face)
                 " %I "
+                (:propertize +modeline-project-name
+                             face +modeline-project-name-active-face)
                 (:propertize "%b" face +modeline-buffer-name-active-face)
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
-                (:propertize +modeline-project-name
-                             face +modeline-project-name-active-face)
                 (:propertize +modeline-vcs-status
                              face +modeline-vc-mode-active-face)
                 ))
@@ -291,11 +294,11 @@
   (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
                              face +modeline-meta-inactive-face)
                 "%* %I "
+                (:propertize +modeline-project-name
+                             face +modeline-project-name-inactive-face)
                 (:propertize "%b" face +modeline-buffer-name-active-face)
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
-                (:propertize +modeline-project-name
-                             face +modeline-project-name-inactive-face)
                 (:eval +modeline-vcs-status)
                 ))
          (rhs '((:eval mode-name)

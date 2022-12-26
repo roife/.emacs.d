@@ -116,6 +116,17 @@
             (forward-line line))
         (eshell-view-file (pop args)))))
   (defalias 'eshell/more #'eshell/less)
+
+  ;; Sync buffer name
+  (defun eshell-sync-dir-buffer-name ()
+  "Change eshell buffer name by directory change."
+  (when (equal major-mode 'eshell-mode)
+    (rename-buffer
+     (format "Esh: %s" (abbreviate-file-name default-directory))
+     t)))
+
+  (add-hook 'eshell-directory-change-hook #'eshell-sync-dir-buffer-name)
+  (add-hook 'eshell-mode-hook #'eshell-sync-dir-buffer-name)
   )
 
 
@@ -152,4 +163,11 @@
   :config
   (eshell/alias "up" :"eshell-up")
   (eshell/alias "pk" "eshell-up-peek")
+  )
+
+
+;; [esh-autosuggest]
+(use-package esh-autosuggest
+  :straight t
+  :hook (eshell-mode . esh-autosuggest-mode)
   )
