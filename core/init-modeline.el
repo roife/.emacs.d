@@ -206,29 +206,28 @@
 (add-hook 'flymake-mode-hook #'+modeline-flymake-update)
 
 ;;; Cache VCS status
-(defvar-local +modeline-vcs-status nil)
-(defun +modeline-update-vcs-status (&rest _)
+(defvar-local +modeline-eshell-vcs nil)
+
+(defsubst +modeline-vcs-get-direcroty-info (dir)
+  (when-let* ((backend (vc-responsible-backend dir 'noerror))
+              (rev (vc-working-revision dir backend))
+              (disp-rev (condition-case nil
+                            (or (vc-call-backend backend '-symbolic-ref default-directory)
+                                (and rev (substring rev 0 7)))
+                          (error nil)))
+         (def-ml (vc-default-mode-line-string backend dir)))
+    (concat " "
+            (substring def-ml 0
+                       (if (eq backend 'Hg) 3 4))
+            disp-rev)))
+
+(defun +modeline-update-eshell-vcs-info (&rest _)
   "Update icon of vcs state in mode-line."
-  (setq +modeline-vcs-status
-        (when (and vc-mode vc-display-status buffer-file-name)
-          (let* ((backend (vc-backend buffer-file-name))
-                 (state   (vc-state (file-local-name buffer-file-name) backend))
-                 (icon (cond ((eq state 'added) "+")
-                             ((eq state 'edited) "*")
-                             ((eq state 'needs-merge) "?&")
-                             ((eq state 'needs-update) "?↓")
-                             ((eq state 'ignored) "#")
-                             ((eq state 'unregistered) "?")
-                             ((eq state 'conflict) "!!")
-                             ((eq state 'removed) "%")
-                             ((eq state 'missing) "??")
-                             (t "-")))
-                 (str vc-mode))
-            (format "%s%s" str icon)))))
-(add-hook 'find-file-hook #'+modeline-update-vcs-status)
-(add-hook 'after-save-hook #'+modeline-update-vcs-status)
-(add-hook 'after-change-major-mode-hook #'+modeline-update-vcs-status)
-(advice-add #'vc-refresh-state :after #'+modeline-update-vcs-status)
+  (setq +modeline-eshell-vcs
+        (when (eq major-mode 'eshell-mode)
+          (+modeline-vcs-get-direcroty-info default-directory))))
+(add-hook 'eshell-post-command-hook #'+modeline-update-eshell-vcs-info)
+(add-hook 'eshell-mode-hook #'+modeline-update-eshell-vcs-info)
 
 ;;; Cache encoding info
 (defvar-local +modeline-encoding nil)
@@ -267,7 +266,9 @@
                 (:propertize "%b" face +modeline-buffer-name-active-face)
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
-                (:propertize +modeline-vcs-status
+                (:propertize vc-mode
+                             face +modeline-vc-mode-active-face)
+                (:propertize +modeline-eshell-vcs
                              face +modeline-vc-mode-active-face)
                 ))
          (rhs '(
@@ -300,7 +301,8 @@
                 (:propertize "%b" face +modeline-buffer-name-active-face)
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
-                (:eval +modeline-vcs-status)
+                (:eval vc-mode)
+                (:eval +modeline-eshell-vcs)
                 ))
          (rhs '((:eval mode-name)
                 " "
