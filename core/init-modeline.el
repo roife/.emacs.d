@@ -208,6 +208,26 @@
 ;;; Cache VCS status
 (defvar-local +modeline-eshell-vcs nil)
 
+(defun +vc-git-state-dir (dir)
+  "Git-specific version of `vc-state' (for directories)."
+  (let* ((args
+          `("status" "--porcelain" "-z"
+            ;; Just to be explicit, it's the default anyway.
+            "--untracked-files"
+            "--"))
+        (status (apply #'vc-git--run-command-string dir args)))
+    (if (null status)
+        ;; If status is nil, there was an error calling git, likely because
+        ;; the file is not in a git repo.
+        'unregistered
+      ;; If this code is adapted to parse 'git status' for a directory,
+      ;; note that a renamed file takes up two null values and needs to be
+      ;; treated slightly more carefully.
+      (vc-git--git-status-to-vc-state
+       (mapcar (lambda (s)
+                 (substring s 0 2))
+               (split-string status "\0" t))))))
+
 (defsubst +modeline-vcs-get-direcroty-info (dir)
   (when-let ((backend (vc-responsible-backend dir 'noerror)))
     (vc-state-refresh default-directory backend)
@@ -216,7 +236,8 @@
                              (or (vc-call-backend backend '-symbolic-ref default-directory)
                                  (and rev (substring rev 0 7)))
                            (error nil)))
-               (def-ml (vc-default-mode-line-string backend dir)))
+               (def-ml (cl-letf (((symbol-function #'vc-git-state) #'+vc-git-state-dir))
+                         (vc-default-mode-line-string backend dir))))
       (concat " "
               (substring def-ml 0
                          (if (eq backend 'Hg) 3 4))
