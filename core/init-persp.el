@@ -12,7 +12,6 @@
   :config
   (setq
    persp-keymap-prefix (kbd "C-x p")
-   persp-save-dir (concat +cache-dir "persp-confs/")
    persp-autokill-buffer-on-remove 'kill-weak
    persp-reset-windows-on-nil-window-conf nil
    persp-set-last-persp-for-new-frames t

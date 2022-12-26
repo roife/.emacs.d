@@ -3,7 +3,7 @@
 ;; [smartparens] Better handle for parenthesis
 (use-package smartparens
   :straight t
-  :hook ((prog-mode conf-mode yaml-mode) . smartparens-strict-mode)
+  :hook ((prog-mode conf-mode yaml-mode eshell-mode) . smartparens-strict-mode)
   :config
   (require 'smartparens-config)
 
@@ -25,8 +25,7 @@
   ;; [minibuffer]
   ;; Enable `smartparens-mode' in the minibuffer for `eval-expression'.
   (add-hook 'eval-expression-minibuffer-setup-hook
-            (lambda () (when smartparens-global-mode
-                    (smartparens-mode +1))))
+            (lambda () (smartparens-mode +1)))
 
   ;; Likely writing lisp in the minibuffer, so disable these quote pair
   (sp-local-pair '(minibuffer-mode minibuffer-inactive-mode) "'" nil :actions nil)

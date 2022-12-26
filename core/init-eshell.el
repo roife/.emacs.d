@@ -1,12 +1,47 @@
 ;;; -*- lexical-binding: t -*-
 
 ;; [eshell] Emacs command shell
-(use-package eshell
+(use-package esh-mode
   :defines eshell-prompt-function
   :functions eshell/alias
   :hook (eshell-mode . +eshell/define-alias)
   :config
-  (bind-key "C-l" 'eshell/clear eshell-mode-map)
+  (bind-keys
+   :map eshell-mode-map
+   ("C-l" . eshell-clear)
+   ("M-s" . consult-history))
+
+  (setq
+   eshell-banner-message
+           '(format "%s %s\n"
+                    (propertize (format " %s " (string-trim (buffer-name)))
+                                'face 'mode-line-highlight)
+                    (propertize (current-time-string)
+                             'face 'font-lock-keyword-face))
+   ;; scrolling
+   eshell-scroll-to-bottom-on-input 'all
+   eshell-scroll-to-bottom-on-output 'all
+
+   eshell-kill-processes-on-exit t
+   eshell-hist-ignoredups t
+
+   eshell-input-filter #'eshell-input-filter-initial-space
+
+   ;; em-glob
+   eshell-glob-case-insensitive t
+   eshell-error-if-no-glob t)
+
+  ;; [UI]
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (set-window-fringes nil 0 0)
+              (set-window-margins nil 1 nil)
+              (visual-line-mode +1)
+              (set-display-table-slot standard-display-table 0 ?\ )))
+
+  (setq
+   ;; Visual commands require a proper terminal. Eshell can't handle that
+   eshell-visual-commands '("top" "htop" "less" "more" "bat" "vim"))
 
   (defun +eshell/define-alias ()
     "Define alias for eshell"
@@ -14,7 +49,11 @@
     (eshell/alias "f" "find-file $1")
     (eshell/alias "fo" "find-file-other-window $1")
     (eshell/alias "d" "dired $1")
-    (eshell/alias "l" "ls -lah"))
+    (eshell/alias "l" "ls -lah $*")
+    (eshell/alias "q" "exit")
+    (eshell/alias "git" "git -P $*")
+    (eshell/alias "rg" "rg --color=always $*")
+    (eshell/alias "clear" "clear-scrollback"))
 
   (defun eshell/clear ()
     "Clear the eshell buffer."
@@ -24,11 +63,9 @@
       (eshell-send-input)))
 
   (defun eshell/emacs (&rest args)
-    "Open a file (ARGS) in Emacs.  Some habits die hard."
+    "Open a file (ARGS) in Emacs."
     (if (null args)
-        ;; If I just ran "emacs", I probably expect to be launching
-        ;; Emacs, which is rather silly since I'm already in Emacs.
-        ;; So just pretend to do what I ask.
+        ;; If I just ran "emacs"
         (bury-buffer)
       ;; We have to expand the file names or else naming a directory in an
       ;; argument causes later arguments to be looked for in that directory,
@@ -85,6 +122,7 @@
 ;; [esh-syntax-highlighting] Fish-like syntax highlighting
 (use-package eshell-syntax-highlighting
   :straight t
+  :after esh-mode
   :hook (eshell-mode . eshell-syntax-highlighting-mode)
   )
 
@@ -92,7 +130,7 @@
 ;; [esh-help] `eldoc' support
 (use-package esh-help
   :straight t
-  :after eshell
+  :after esh-mode
   :config (setup-esh-help-eldoc)
   )
 
@@ -101,8 +139,35 @@
 (use-package eshell-z
   :straight t
   :commands (eshell/z)
-  :after eshell
+  :after esh-mode
   )
 
 
+;; [esh-help] eldoc support
+(use-package esh-help
+  :straight t
+  :after esh-mode
+  :config (setup-esh-help-eldoc)
+  )
 
+
+;; [eshell-up] Quickly navigating to a specific parent directory in eshell
+(use-package eshell-up
+  :straight t
+  :after esh-mode
+  :config
+  (eshell/alias "up" "eshell-up")
+  (eshell/alias "pk" "eshell-up-peek")
+  )
+
+;; [eshell-did-you-mean]
+(use-package eshell-did-you-mean
+  :straight t
+  :after esh-mode
+  :config
+  (eshell-did-you-mean-setup)
+  ;; HACK There is a known issue with `eshell-did-you-mean' where it does not
+  ;;      work on first invocation, so we invoke it once manually by setting the
+  ;;      last command and then calling the output filter.
+  (setq eshell-last-command-name "catt")
+  (eshell-did-you-mean-output-filter "catt: command not found"))

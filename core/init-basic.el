@@ -1,7 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(defvar +cache-dir (expand-file-name "emacs/" "~/.cache"))
-
 (setq-default
  ;; no client startup messages
  server-client-instructions nil
@@ -12,7 +10,6 @@
  ;; [backup] Use auto-save, which maintains a copy when a buffer is unsaved
  make-backup-files nil
  ;; In case I enable it later
- ;; backup-directory-alist `((".*" . ,(concat +cache-dir "backup/")))
  ;;; version-control t
  ;;; backup-by-copying t
  ;;; delete-old-versions t
@@ -21,7 +18,7 @@
  ;; [auto-save]
  auto-save-default t
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
- auto-save-file-name-transforms `((".*" ,(concat +cache-dir "autosave/") t))
+ auto-save-file-name-transforms `((".*" ,(expand-file-name "autosaves/" user-emacs-directory) t))
  auto-save-file-name-transforms (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
                                             ;; Prefix tramp autosaves to prevent conflicts with local ones
                                             (concat auto-save-list-file-prefix "tramp-\\2") t)
@@ -34,7 +31,7 @@
  bidi-display-reordering 'left-to-right
 
  ;; Larger process output buffer for LSP module
- read-process-output-max (* 1024 1024)
+ read-process-output-max (* 3 1024 1024)
 
  ;; [Wrapping] words at whitespace, but do not wrap by default
  ;; Wrapp words at whitespace, rather than in the middle of a word.
@@ -186,14 +183,27 @@
   :hook (text-mode . visual-line-mode))
 
 
+;; [Scrolling keybinding]
+(defvar +scrolling-lines 5)
+(bind-keys*
+ ("C-M-v" . (lambda () (interactive) (scroll-other-window +scrolling-lines)))
+ ("M-<down>" . (lambda () (interactive) (scroll-other-window +scrolling-lines)))
+
+ ("C-M-S-v" . (lambda () (interactive) (scroll-other-window (- +scrolling-lines))))
+ ("M-<up>" . (lambda () (interactive) (scroll-other-window (- +scrolling-lines))))
+
+ ("C-v" . (lambda () (interactive) (scroll-up +scrolling-lines)))
+ ("M-v" . (lambda () (interactive) (scroll-up (- +scrolling-lines)))))
+
+
 ;; [gcmh] Optimize GC
 (use-package gcmh
   :straight t
   :hook (emacs-startup . gcmh-mode)
-  :custom
-  (gcmh-idle-delay 'auto)
-  (gcmh-auto-idle-delay-factor 10)
-  (gcmh-high-cons-threshold #x64000000)
+  :config
+  (setq gcmh-idle-delay 'auto
+        gcmh-auto-idle-delay-factor 10
+        gcmh-high-cons-threshold #x64000000)
   )
 
 
@@ -201,8 +211,7 @@
 (use-package tramp
   :config
   (setq tramp-default-method "ssh"
-        tramp-persistency-file-name (concat +cache-dir "tramp-persist")
-        tramp-auto-save-directory (concat +cache-dir "tramp-autosave/")
+        tramp-auto-save-directory (expand-file-name "tramp-autosaves/" user-emacs-directory)
         tramp-backup-directory-alist backup-directory-alist
         remote-file-name-inhibit-cache 60)
   )
