@@ -230,7 +230,8 @@
 
 (defsubst +modeline-vcs-get-direcroty-info (dir)
   (when-let ((backend (vc-responsible-backend dir 'noerror)))
-    (vc-state-refresh default-directory backend)
+    (vc-file-clearprops dir)
+    (vc-state-refresh default-directory 'Git)
     (when-let ((rev (vc-working-revision dir backend))
                (disp-rev (condition-case nil
                              (or (vc-call-backend backend '-symbolic-ref default-directory)
