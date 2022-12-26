@@ -26,3 +26,4 @@ persp-confs/*
 *.sqlite
 *.elc
 elpa/
+.persistent-scratch

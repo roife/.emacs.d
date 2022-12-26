@@ -8,7 +8,7 @@
   :config
   (bind-keys
    :map eshell-mode-map
-   ("C-l" . eshell-clear)
+   ("C-l" . eshell/clear)
    ("M-s" . consult-history))
 
   (setq
@@ -122,7 +122,7 @@
 ;; [esh-syntax-highlighting] Fish-like syntax highlighting
 (use-package eshell-syntax-highlighting
   :straight t
-  :after esh-mode
+  :after eshell
   :hook (eshell-mode . eshell-syntax-highlighting-mode)
   )
 
@@ -130,8 +130,9 @@
 ;; [esh-help] `eldoc' support
 (use-package esh-help
   :straight t
-  :after esh-mode
-  :config (setup-esh-help-eldoc)
+  :after eshell
+  :init
+  (setup-esh-help-eldoc)
   )
 
 
@@ -139,35 +140,16 @@
 (use-package eshell-z
   :straight t
   :commands (eshell/z)
-  :after esh-mode
-  )
-
-
-;; [esh-help] eldoc support
-(use-package esh-help
-  :straight t
-  :after esh-mode
-  :config (setup-esh-help-eldoc)
+  :after eshell
   )
 
 
 ;; [eshell-up] Quickly navigating to a specific parent directory in eshell
 (use-package eshell-up
   :straight t
-  :after esh-mode
+  :after eshell
+  :commands (eshell-up eshell-up-peek)
   :config
-  (eshell/alias "up" "eshell-up")
+  (eshell/alias "up" :"eshell-up")
   (eshell/alias "pk" "eshell-up-peek")
   )
-
-;; [eshell-did-you-mean]
-(use-package eshell-did-you-mean
-  :straight t
-  :after esh-mode
-  :config
-  (eshell-did-you-mean-setup)
-  ;; HACK There is a known issue with `eshell-did-you-mean' where it does not
-  ;;      work on first invocation, so we invoke it once manually by setting the
-  ;;      last command and then calling the output filter.
-  (setq eshell-last-command-name "catt")
-  (eshell-did-you-mean-output-filter "catt: command not found"))
