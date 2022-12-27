@@ -138,10 +138,10 @@
 
 
 ;; [elec-pair] Automatic parenthesis pairing
-;; (use-package elec-pair
-;;   :hook ((prog-mode conf-mode yaml-mode) . electric-pair-mode)
-;;   :custom
-;;   (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
+(use-package elec-pair
+  :hook ((prog-mode conf-mode yaml-mode) . electric-pair-mode)
+  :custom
+  (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 
 
 ;; [mwim] Better C-a C-e for programming
@@ -164,13 +164,14 @@
 
 
 ;; [hungry-delete] Hungry deletion
-(use-package hungry-delete
-  :straight t
-  :hook (after-init . global-hungry-delete-mode)
-  :config
-  (setq hungry-delete-chars-to-skip " \t\f\v"
-        hungry-delete-except-modes
-        '(help-mode minibuffer-mode minibuffer-inactive-mode calc-mode)))
+;; (use-package hungry-delete
+;;   :straight t
+;;   :hook (after-init . global-hungry-delete-mode)
+;;   :config
+;;   (setq hungry-delete-chars-to-skip " \t\f\v"
+;;         hungry-delete-except-modes
+;;         '(help-mode minibuffer-mode minibuffer-inactive-mode calc-mode)))
+;; (setq backward-delete-char-untabify-method 'all)
 
 
 ;; [subword] Handling capitalized subwords
@@ -421,3 +422,9 @@ begin and end of the block surrounding point."
   (sudo-edit-indicator-mode t)
   )
 
+
+;; [puni]
+(use-package puni
+  :straight t
+  :hook ((prog-mode sgml-mode nxml-mode tex-mode eval-expression-minibuffer-setup) . puni-mode)
+  )

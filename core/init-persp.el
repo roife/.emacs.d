@@ -9,9 +9,9 @@
   :defines (recentf-exclude)
   :commands (get-current-persp persp-contain-buffer-p)
   :hook ((after-init . persp-mode))
+  :init (setq persp-keymap-prefix (kbd "H-p"))
   :config
   (setq
-   persp-keymap-prefix (kbd "C-x p")
    persp-autokill-buffer-on-remove 'kill-weak
    persp-reset-windows-on-nil-window-conf nil
    persp-set-last-persp-for-new-frames t
@@ -90,31 +90,31 @@
                 (tab-bar-tabs-set (persp-parameter 'tab-bar-tabs))
                 (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))
                 (tab-bar--update-tab-bar-lines t)))
-
-    ;; Filter frame parameters
-    (setq +persp-filter-parameters-on-save
-          '((tab-bar-tabs . (lambda (conf) (frameset-filter-tabs conf nil nil t)))
-            (winner-ring . ignore)))
-
-    (advice-add #'persp-save-state-to-file :around
-                (lambda (fn &rest args)
-                  (let ((all-persp-confs (make-hash-table))
-                        (ret-val))
-                    (dolist (persp (hash-table-values *persp-hash*))
-                      (let ((cur-persp-confs (make-hash-table)))
-                        (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
-                                 do (let ((old (persp-parameter tag persp)))
-                                      (puthash persp old cur-persp-confs)
-                                      (set-persp-parameter tag (funcall filter old) persp)))
-                        (puthash persp cur-persp-confs all-persp-confs)))
-                    (setq ret-val (apply fn args))
-                    (dolist (persp (hash-table-values *persp-hash*))
-                      (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
-                               do (let* ((cur-persp-confs (gethash persp all-persp-confs))
-                                         (old (gethash tag cur-persp-confs)))
-                                    (set-persp-parameter tag old persp))))
-                    ret-val)))
     )
+
+  ;; Filter frame parameters
+  (setq +persp-filter-parameters-on-save
+        '((tab-bar-tabs . (lambda (conf) (frameset-filter-tabs conf nil nil t)))
+          (winner-ring . ignore)))
+
+  (advice-add #'persp-save-state-to-file :around
+              (lambda (fn &rest args)
+                (let ((all-persp-confs (make-hash-table))
+                      (ret-val))
+                  (dolist (persp (hash-table-values *persp-hash*))
+                    (let ((cur-persp-confs (make-hash-table)))
+                      (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
+                               do (let ((old (persp-parameter tag persp)))
+                                    (puthash persp old cur-persp-confs)
+                                    (set-persp-parameter tag (funcall filter old) persp)))
+                      (puthash persp cur-persp-confs all-persp-confs)))
+                  (setq ret-val (apply fn args))
+                  (dolist (persp (hash-table-values *persp-hash*))
+                    (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
+                             do (let* ((cur-persp-confs (gethash persp all-persp-confs))
+                                       (old (gethash tag cur-persp-confs)))
+                                  (set-persp-parameter tag old persp))))
+                  ret-val)))
 
   ;; Per-workspace [winner-mode] history
   (with-eval-after-load 'winner

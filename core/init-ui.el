@@ -233,6 +233,3 @@
     (add-hook 'after-make-frame-functions
               (lambda (frame) (tab-bar--update-tab-bar-lines (list frame)))))
   )
-
-
-

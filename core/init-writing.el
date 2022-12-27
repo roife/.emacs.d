@@ -1,9 +1,12 @@
 ;;; -*- lexical-binding: t -*-
 
-;; [olivetti] Center align the editing area
-(use-package olivetti
+(use-package visual-fill-column
   :straight t
-  :hook ((markdown-mode . olivetti-mode)))
+  :hook ((markdown-mode org-mode) . +center-text)
+  :config
+  (defun +center-text ()
+    (visual-fill-column-mode)
+    (setq visual-fill-column-center-text t)))
 
 
 ;; [edit-indirect] Edit code blocks indirectly

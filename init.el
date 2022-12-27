@@ -30,7 +30,7 @@
                      'init-dired
                      'init-eshell
                      'init-prog
-                     'init-smartparens
+                     ;; 'init-smartparens
                      'init-writing
                      'init-vcs
                      'init-treemacs
