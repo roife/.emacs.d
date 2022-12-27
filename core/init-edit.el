@@ -421,9 +421,3 @@ begin and end of the block surrounding point."
   (sudo-edit-indicator-mode t)
   )
 
-
-;; [persistent-scratch]
-(use-package persistent-scratch
-  :straight t
-  :config
-  (persistent-scratch-autosave-mode 1))
