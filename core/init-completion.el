@@ -312,18 +312,9 @@ See `consult-grep' for more details regarding the asynchronous search."
   )
 
 
-(use-package corfu-popupinfo
+(use-package corfu-info
   :straight nil
-  :after corfu
-  :custom-face
-  (corfu-popupinfo ((t (:height 1))))
-  :init
-  (corfu-popupinfo-mode 1)
-  :config
-  (setq corfu-popupinfo-delay '(0.8 . 0.8)
-        corfu-popupinfo-max-height 18
-        corfu-popupinfo-max-width 100)
-  )
+  :after corfu)
 
 
 (use-package cape
