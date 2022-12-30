@@ -96,19 +96,19 @@
   (cond (defining-kbd-macro "| MacroDef ")
         (executing-kbd-macro "| MacroExc ")))
 
-(defsubst +modeline-anzu-indicator ()
-  "Display the number for anzu."
-  (when (bound-and-true-p anzu--state)
-    (let ((here anzu--current-position)
-          (total anzu--total-matched))
-      (cond ((eq anzu--state 'replace-query)
-             (format "| %d replace " anzu--cached-count))
-            ((eq anzu--state 'replace)
-             (format "| %d/%d " here total))
-            (anzu--overflow-p
-             (format "| %s+ " total))
-            (t
-             (format "| %s/%d search " here total))))))
+;; (defsubst +modeline-anzu-indicator ()
+;;   "Display the number for anzu."
+;;   (when (bound-and-true-p anzu--state)
+;;     (let ((here anzu--current-position)
+;;           (total anzu--total-matched))
+;;       (cond ((eq anzu--state 'replace-query)
+;;              (format "| %d replace " anzu--cached-count))
+;;             ((eq anzu--state 'replace)
+;;              (format "| %d/%d " here total))
+;;             (anzu--overflow-p
+;;              (format "| %s+ " total))
+;;             (t
+;;              (format "| %s/%d search " here total))))))
 
 (defsubst +modeline-multiple-cursors-indicator ()
   "Display the number of multiple cursors."
@@ -209,7 +209,7 @@
                              face +modeline-meta-active-face)
                 (:propertize ,(when (+modeline-window-active-p)
                                 (concat (+modeline-macro-indicator)
-                                        (+modeline-anzu-indicator)
+                                        ;; (+modeline-anzu-indicator)
                                         (+modeline-multiple-cursors-indicator)
                                         (+modeline-symbol-overlay-indicator)
                                         (+modeline-use-region-indicator)
@@ -274,7 +274,7 @@
                              face +modeline-meta-active-face)
                 (:propertize ,(when (+modeline-window-active-p)
                                 (concat (+modeline-macro-indicator)
-                                        (+modeline-anzu-indicator)
+                                        ;; (+modeline-anzu-indicator)
                                         (+modeline-multiple-cursors-indicator)
                                         (+modeline-symbol-overlay-indicator)
                                         (+modeline-use-region-indicator)

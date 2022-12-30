@@ -5,7 +5,7 @@
   :straight t
   :functions (treemacs-filewatch-mode treemacs-git-mode treemacs-delete-other-windows)
   :custom-face
-  (cfrs-border-color ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))
+  (cfrs-border-color ((t (:inherit posframe-border))))
   :bind (("s-`"       . treemacs-select-window)
          ("C-x t t"   . treemacs)
          :map treemacs-mode-map

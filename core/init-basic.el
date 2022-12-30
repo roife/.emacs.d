@@ -96,11 +96,11 @@
 
 
 ;; [autosave]
-;; If a file has autosaved data, `after-find-file' will pause for 1 second to
+;; TRICK: If a file has autosaved data, `after-find-file' will pause for 1 second to
 ;; tell about it, which is very annoying. Just disable it.
 (advice-add #'after-find-file :around
             (lambda (fn &rest args) (cl-letf (((symbol-function #'sit-for) #'ignore))
-                      (apply fn args))))
+                                 (apply fn args))))
 
 
 ;; Encoding
@@ -113,7 +113,7 @@
 (use-package saveplace
   :hook (after-init . save-place-mode)
   :config
-  ;; `save-place-alist-to-file' uses `pp' to prettify the contents of its cache, which is expensive and useless.
+  ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its cache, which is expensive and useless.
   ;; replace it with `prin1'
   (advice-add #'save-place-alist-to-file :around
               (lambda (fn) (cl-letf (((symbol-function #'pp) #'prin1))
@@ -137,7 +137,7 @@
 
   (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
 
-  ;; Text properties inflate the size of recentf's files, and there is
+  ;; HACK: Text properties inflate the size of recentf's files, and there is
   ;; no purpose in persisting them (Must be first in the list!)
   (add-to-list 'recentf-filename-handlers #'substring-no-properties)
 
@@ -155,7 +155,7 @@
                                                   kill-ring)
         savehist-autosave-interval 300)
 
-  ;; Remove text properties from `kill-ring' to reduce savehist cache size.
+  ;; HACK: Remove text properties from `kill-ring' to reduce savehist cache size.
   (add-hook 'savehist-save-hook
             (lambda () (setq kill-ring
                         (mapcar #'substring-no-properties

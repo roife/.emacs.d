@@ -2,7 +2,9 @@
 
 ;; [hl-line] Highlight current line
 (use-package hl-line
-  :hook ((prog-mode text-mode yaml-mode conf-mode special-mode org-agenda-mode dired-mode) . hl-line-mode)
+  :hook ((prog-mode text-mode
+                    yaml-mode conf-mode
+                    special-mode org-agenda-mode dired-mode) . hl-line-mode)
   :config
   (setq hl-line-sticky-flag nil))
 
@@ -21,7 +23,7 @@
   :straight t
   :hook ((prog-mode conf-mode yaml-mode) . rainbow-delimiters-mode)
   :config
-  (setq rainbow-delimiters-max-face-count 4)
+  (setq rainbow-delimiters-max-face-count 5)
   )
 
 
@@ -31,7 +33,7 @@
   :functions (rainbow-turn-off rainbow-colorize-match rainbow-x-color-luminance)
   :bind (:map help-mode-map
               ("w" . rainbow-mode))
-  :hook ((html-mode php-mode css-mode) . rainbow-mode)
+  :hook ((html-mode css-mode) . rainbow-mode)
   :config
   ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
   ;; @see https://emacs.stackexchange.com/questions/36420

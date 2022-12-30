@@ -77,37 +77,13 @@
   :hook ((prog-mode markdown-mode) . ws-butler-mode))
 
 
-;; [anzu] Show number of matches in mode-line while searching
-(use-package anzu
-  :straight t
-  :hook (after-init . global-anzu-mode)
-  :bind (([remap query-replace] . anzu-query-replace)
-         ([remap query-replace-regexp] . anzu-query-replace-regexp)
-         :map isearch-mode-map
-         ([remap isearch-query-replace] . anzu-isearch-query-replace)
-         ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
+;; Use [isearch] to replace anzu
+(use-package isearch
+  :bind (:map isearch-mode-map
+              ([remap isearch-delete-char] . isearch-del-char))
   :config
-  ;; Ensure anzu state is cleared when searches are done
-  (add-hook 'isearch-mode-end-hook #'anzu--reset-status t)
-
-  ;; Fix matches segment mirroring across all buffers
-  (mapc #'make-variable-buffer-local
-        '(anzu--total-matched
-          anzu--current-position anzu--state anzu--cached-count
-          anzu--cached-positions anzu--last-command
-          anzu--last-isearch-string anzu--overflow-p))
-
-  ;; manage modeline segment ourselves
-  (setq anzu-cons-mode-line-p nil)
-  (defun +modeline-fix-anzu-count (positions here)
-    "Calulate anzu count via POSITIONS and HERE."
-    (cl-loop for (start . end) in positions
-             collect t into before
-             when (and (>= here start) (<= here end))
-             return (length before)
-             finally return 0))
-  (advice-add #'anzu--where-is-here :override #'+modeline-fix-anzu-count)
-  )
+  (setq isearch-lazy-count t
+        lazy-highlight-cleanup nil))
 
 
 ;; [ediff] Diff & patch

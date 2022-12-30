@@ -49,10 +49,8 @@
 
 (use-package orderless
   :straight t
-  :after vertico
   :init (require 'orderless)
   :config
-
   ;; Dispatchers
   (defun +vertico-orderless-dispatch (pattern _index _total)
     (cond
@@ -105,7 +103,6 @@
                  orderless+basic-try
                  orderless+basic-all
                  "Unholy mix of Orderless and Basic."))
-
 
   ;; configuration
   (setq completion-styles '(orderless+basic)
@@ -284,7 +281,8 @@ See `consult-grep' for more details regarding the asynchronous search."
         corfu-echo-documentation nil ;; Disable documentation in the echo area
         corfu-auto-prefix 2          ;; minimun prefix to enable completion
         corfu-preview-current nil
-        corfu-count 15)
+        corfu-count 15
+        corfu-auto-delay 0.1)
 
   ;; Transfer completion to the minibuffer
   (defun corfu-move-to-minibuffer ()
