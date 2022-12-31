@@ -228,7 +228,7 @@
         (concat "[" name "] "))))
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
-  ;; WORDAROUND: fresh tab-bar for daemon
+  ;; WORKAROUND: fresh tab-bar for daemon
   (when (daemonp)
     (add-hook 'after-make-frame-functions
               (lambda (frame) (tab-bar--update-tab-bar-lines (list frame)))))
