@@ -176,22 +176,4 @@
          ("C-c s p" . symbol-overlay-switch-backward)
          ("C-c s c" . symbol-overlay-remove-all))
   :hook (((prog-mode yaml-mode) . symbol-overlay-mode))
-  :config
-  ;; FIXME: https://github.com/wolray/symbol-overlay/issues/88
-  (defun symbol-overlay-get-list (dir &optional symbol exclude)
-    "Get all highlighted overlays in the buffer.
- If SYMBOL is non-nil, get the overlays that belong to it.
- DIR is an integer.
- If EXCLUDE is non-nil, get all overlays excluding those belong to SYMBOL."
-    (let ((lists (progn (overlay-recenter (point)) (overlay-lists)))
-          (func (if (> dir 0) 'cdr (if (< dir 0) 'car nil))))
-      (seq-filter
-       (lambda (ov)
-         (let ((value (overlay-get ov 'symbol)))
-           (and value
-                (or (not symbol)
-                    (if (string= value symbol) (not exclude)
-                      (and exclude (not (string= value ""))))))))
-       (if func (funcall func lists)
-         (append (car lists) (cdr lists))))))
   )
