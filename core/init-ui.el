@@ -196,6 +196,7 @@
         tab-bar-new-tab-choice "*scratch*"
         tab-bar-select-tab-modifiers '(super)
         tab-bar-tab-name-truncated-max 20
+        tab-bar-auto-width nil
         )
 
   ;; truncate for [tab name] and add count
