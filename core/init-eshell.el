@@ -4,7 +4,8 @@
 (use-package esh-mode
   :defines eshell-prompt-function
   :functions eshell/alias
-  :hook (eshell-mode . +eshell/define-alias)
+  :hook ((eshell-mode . +eshell/define-alias)
+         (eshell-mode . compilation-shell-minor-mode))
   :config
   (bind-keys
    :map eshell-mode-map
@@ -181,4 +182,6 @@
 (use-package esh-autosuggest
   :straight t
   :hook (eshell-mode . esh-autosuggest-mode)
+  :bind (:map esh-autosuggest-active-map
+              ("C-e" . 'company-complete-selection))
   )

@@ -63,10 +63,8 @@
   :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
   :config
   (setq
-   ;; limit line length
-   whitespace-line-column nil
    ;; only show bad whitespace
-   whitespace-style '(face trailing lines-tail empty
+   whitespace-style '(face trailing empty
                            indentation space-before-tab space-after-tab))
   )
 
