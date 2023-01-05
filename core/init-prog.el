@@ -81,9 +81,7 @@
     (interactive)
     (condition-case _
         (citre-jump-back)
-      (error (if (fboundp #'xref-go-back)
-                 (call-interactively #'xref-go-back)
-               (call-interactively #'xref-pop-marker-stack)))))
+      (error (call-interactively #'xref-go-back))))
 
   ;; Use Citre xref backend as a [fallback]
   (define-advice xref--create-fetcher (:around (fn &rest args) fallback)
@@ -141,10 +139,6 @@
 
 
 (use-package cmake-mode
-  :straight t)
-
-
-(use-package json-mode
   :straight t)
 
 
