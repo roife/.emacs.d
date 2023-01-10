@@ -36,8 +36,6 @@
   :bind (("C-, ," . avy-goto-char-2)
          ("C-, l" . avy-goto-line))
   :hook (after-init . avy-setup-default)
-  :config
-  (setq avy-single-candidate-jump nil)
   )
 
 
@@ -55,17 +53,6 @@
   :bind (("C-, j" . ace-link-addr))
   :init
   (ace-link-setup-default (kbd "C-, j"))
-  )
-
-
-;; [whitespace] Show visualize TAB, (HARD) SPC, newline
-(use-package whitespace
-  :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
-  :config
-  (setq
-   ;; only show bad whitespace
-   whitespace-style '(face trailing empty
-                           indentation space-before-tab space-after-tab))
   )
 
 

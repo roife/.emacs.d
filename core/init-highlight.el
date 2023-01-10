@@ -18,6 +18,17 @@
   )
 
 
+;; [whitespace] Show visualize TAB, (HARD) SPC, newline
+(use-package whitespace
+  :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
+  :config
+  (setq
+   ;; only show bad whitespace
+   whitespace-style '(face trailing empty
+                           indentation space-before-tab space-after-tab))
+  )
+
+
 ;; [rainbow-delimiters] Highlight brackets according to their depth
 (use-package rainbow-delimiters
   :straight t

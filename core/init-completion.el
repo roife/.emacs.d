@@ -272,7 +272,8 @@ See `consult-grep' for more details regarding the asynchronous search."
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . corfu-enable-in-minibuffer))
   :bind (:map corfu-map
-              ("H-m" . corfu-move-to-minibuffer))
+              ("H-m" . corfu-move-to-minibuffer)
+              ("RET" . nil))
   :config
   (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
         corfu-auto t                 ;; Enable auto completion
