@@ -33,7 +33,7 @@
                      ;; 'init-smartparens
                      'init-writing
                      'init-vcs
-                     'init-treemacs
+                     ;; 'init-treemacs
                      'init-dict
                      'init-ibuffer
                      'init-util
