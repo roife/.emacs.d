@@ -181,7 +181,8 @@
          ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop)
-         ("C-c d r" . consult-ripgrep))
+         ("C-c d r" . consult-ripgrep)
+         ("C-c d f" . +consult-fd))
   :config
   (setq consult-narrow-key "<")
 
