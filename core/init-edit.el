@@ -133,7 +133,7 @@
 ;;   (setq hungry-delete-chars-to-skip " \t\f\v"
 ;;         hungry-delete-except-modes
 ;;         '(help-mode minibuffer-mode minibuffer-inactive-mode calc-mode)))
-;; (setq backward-delete-char-untabify-method 'all)
+(setq backward-delete-char-untabify-method 'hungry)
 
 
 ;; [subword] Handling capitalized subwords
@@ -389,4 +389,16 @@ begin and end of the block surrounding point."
 (use-package puni
   :straight t
   :hook ((prog-mode sgml-mode nxml-mode tex-mode eval-expression-minibuffer-setup) . puni-mode)
+  :bind (:map puni-mode-map
+              ("DEL" . +puni-hungry-delete))
+  :config
+  (defun +puni-hungry-delete ()
+    (interactive)
+    (if (looking-back "^[[:blank:]]+")
+        (let* ((puni-mode nil)
+               (original-func (key-binding (kbd "DEL"))))
+          ;; original-func is whatever DEL would be if
+          ;; my-minor-mode were disabled
+          (call-interactively original-func))
+      (puni-backward-delete-char)))
   )

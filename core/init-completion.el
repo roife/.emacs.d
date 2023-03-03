@@ -205,10 +205,10 @@
    consult-bookmark consult-recent-file
    consult--source-recent-file
    consult--source-project-recent-file consult--source-bookmark
-   :preview-key (kbd "s-p"))
+   :preview-key "s-p")
   (consult-customize
    consult-theme
-   :preview-key (list (kbd "s-p") :debounce 0.6 'any))
+   :preview-key (list "s-p" :debounce 0.6 'any))
 
   ;; [consult-fd]
   (defvar consult-fd-args "fd --color=never -i -H -E .git --regex ")
