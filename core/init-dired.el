@@ -31,7 +31,6 @@
           dired-listing-switches "-alh --group-directories-first"))
   )
 
-
 ;; Show git info in dired
 (use-package dired-git-info
   :straight t
@@ -42,7 +41,6 @@
   (setq dgi-commit-message-format "%h %cs %s"
         dgi-auto-hide-details-p nil)
   )
-
 
 ;; Extra Dired functionality
 (use-package dired-aux
@@ -83,10 +81,9 @@
   (setq dired-clean-confirm-killing-deleted-buffers nil)
   )
 
-
 (use-package fd-dired
   :straight t
   :bind ([remap find-dired] . fd-dired))
 
-
-
+(use-package dired-hacks
+  :straight t)
