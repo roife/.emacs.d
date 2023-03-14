@@ -174,7 +174,7 @@
 
   ;; HACK: `highlight-indent-guides' acalculates its faces from the current theme,
   ;; but is unable to do so properly in terminal Emacs
-  (defun +highligh-indent-guides-auto-set-faces ()
+  (defun +highligh-indent-guides-auto-set-faces (&rest _)
     (when (display-graphic-p)
             (highlight-indent-guides-auto-set-faces)))
   (if (daemonp)

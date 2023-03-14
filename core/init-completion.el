@@ -182,7 +182,7 @@
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop)
          ("C-c d r" . consult-ripgrep)
-         ("C-c d f" . +consult-fd))
+         ("C-c d f" . consult-fd))
   :config
   (setq consult-narrow-key "<")
 
@@ -211,25 +211,29 @@
    :preview-key (list "s-p" :debounce 0.6 'any))
 
   ;; [consult-fd]
-  (defvar consult-fd-args "fd --color=never -i -H -E .git --regex ")
-  (defun +consult--fd-builder (input)
-    (pcase-let* ((cmd (split-string-and-unquote consult-fd-args))
-                 (`(,arg . ,opts) (consult--command-split input))
-                 (`(,re . ,hl) (funcall consult--regexp-compiler arg 'extended t)))
+  (defvar consult--fd-command nil)
+  (defun consult--fd-builder (input)
+    (unless consult--fd-command
+      (setq consult--fd-command
+            (if (eq 0 (call-process-shell-command "fdfind"))
+                "fdfind"
+              "fd")))
+    (pcase-let* ((`(,arg . ,opts) (consult--command-split input))
+                 (`(,re . ,hl) (funcall consult--regexp-compiler
+                                        arg 'extended t)))
       (when re
-        (list :command (append cmd
-                               (list (consult--join-regexps re 'extended))
-                               opts)
-              :highlight hl))))
+        (cons (append
+               (list consult--fd-command
+                     "--color=never" "--full-path"
+                     (consult--join-regexps re 'extended))
+               opts)
+              hl))))
 
-  (defun +consult-fd (&optional dir initial)
-    "Search for regexp with fd in DIR with INITIAL input.
-The find process is started asynchronously, similar to `consult-grep'.
-See `consult-grep' for more details regarding the asynchronous search."
+  (defun consult-fd (&optional dir initial)
     (interactive "P")
     (let* ((prompt-dir (consult--directory-prompt "Fd" dir))
            (default-directory (cdr prompt-dir)))
-      (find-file (consult--find (car prompt-dir) #'+consult--fd-builder initial))))
+      (find-file (consult--find (car prompt-dir) #'consult--fd-builder initial))))
   )
 
 
