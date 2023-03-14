@@ -174,6 +174,11 @@
   :straight t)
 
 
+(use-package js-mode
+  :config
+  (setq js-indent-level 2))
+
+
 (use-package rustic
   :straight t
   :config
@@ -280,6 +285,7 @@
   :config
   (setq eldoc-echo-area-display-truncation-message nil
         eldoc-echo-area-prefer-doc-buffer t
+        eldoc-echo-area-use-multiline-p nil
         eglot-events-buffer-size 0
         eglot-send-changes-idle-time 2
         eglot-connect-timeout 10
@@ -295,3 +301,18 @@
   :straight t
   :bind (:map eglot-mode-map
               ([remap xref-find-apropos] . consult-eglot-symbols)))
+
+;; [copilot]
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :config
+  (defun +copilot-tab ()
+    (interactive)
+    (or (copilot-accept-completion)
+        (and (frame-live-p corfu--frame)
+             (frame-visible-p corfu--frame)
+             (corfu-complete))
+        (indent-for-tab-command)))
+
+  (with-eval-after-load 'copilot
+    (define-key copilot-mode-map (kbd "<tab>") #'+copilot-tab)))
