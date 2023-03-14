@@ -305,14 +305,12 @@
 ;; [copilot]
 (use-package copilot
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :hook ((prog-mode . copilot-mode))
   :config
-  (defun +copilot-tab ()
+  (defun +copilot-complete ()
     (interactive)
     (or (copilot-accept-completion)
-        (and (frame-live-p corfu--frame)
-             (frame-visible-p corfu--frame)
-             (corfu-complete))
-        (indent-for-tab-command)))
+        (mwim-end-of-code-or-line)))
 
   (with-eval-after-load 'copilot
-    (define-key copilot-mode-map (kbd "<tab>") #'+copilot-tab)))
+    (define-key copilot-mode-map (kbd "C-e") #'+copilot-complete)))
