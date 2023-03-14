@@ -37,7 +37,7 @@
                      'init-dict
                      'init-ibuffer
                      'init-util
-                     'init-test
+                     ;; 'init-test
                      'init-modal
                      'init-modeline
                      ))
