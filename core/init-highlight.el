@@ -116,7 +116,7 @@
   (setq diff-hl-fringe-bmp-function
         (lambda (&rest _)
           (define-fringe-bitmap 'my-diff-hl-bmp
-            (vector #b11100000)
+            (vector #b11000000)
             1 8
             '(center t))))
 
