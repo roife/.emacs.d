@@ -284,7 +284,6 @@
         corfu-auto t                 ;; Enable auto completion
         corfu-separator "&"          ;; Orderless field separator
         corfu-quit-at-boundary nil   ;; Never quit at completion boundary
-        corfu-echo-documentation nil ;; Disable documentation in the echo area
         corfu-auto-prefix 2          ;; minimun prefix to enable completion
         corfu-preview-current nil
         corfu-count 15
@@ -316,7 +315,7 @@
   )
 
 
-(use-package corfu-info
+(use-package corfu-popupinfo
   :straight nil
   :after corfu)
 

@@ -295,6 +295,12 @@
   )
 
 
+;; [eldoc-box] Eldoc with childframe
+(use-package eldoc-box
+  :straight t
+  :hook (eldoc-mode . eldoc-box-hover-at-point-mode))
+
+
 ;; [consult-eglot] Eglot support for consult
 (use-package consult-eglot
   :after consult eglot
