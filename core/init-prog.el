@@ -283,16 +283,29 @@
   :straight t
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
   :config
-  (setq eldoc-echo-area-display-truncation-message nil
-        eldoc-echo-area-prefer-doc-buffer t
-        eldoc-echo-area-use-multiline-p nil
-        eglot-events-buffer-size 0
-        eglot-send-changes-idle-time 2
+  (setq eglot-events-buffer-size 0
+        eglot-send-changes-idle-time 1
         eglot-connect-timeout 10
         eglot-autoshutdown t
         ;; use global completion styles
         completion-category-defaults nil)
   )
+
+
+;; [Eldoc]
+(use-package eldoc
+  :config
+  (setq eldoc-echo-area-display-truncation-message nil
+        eldoc-echo-area-prefer-doc-buffer t
+        eldoc-echo-area-use-multiline-p nil))
+
+
+;; [eldoc-box] Eldoc with childframe
+(use-package eldoc-box
+  :straight t
+  :hook (eldoc-mode . eldoc-box-hover-mode)
+  :config
+  (setq eldoc-box-only-multi-line t))
 
 
 ;; [consult-eglot] Eglot support for consult
@@ -313,4 +326,13 @@
         (mwim-end-of-code-or-line)))
 
   (with-eval-after-load 'copilot
-    (define-key copilot-mode-map (kbd "C-e") #'+copilot-complete)))
+    (define-key copilot-mode-map (kbd "C-e") #'+copilot-complete))
+
+  (defun +copilot-complete-word ()
+    (interactive)
+    (or (copilot-accept-completion-by-word 1)
+        (forward-word)))
+
+  (with-eval-after-load 'copilot
+    (define-key copilot-mode-map (kbd "M-f") #'+copilot-complete-word))
+  )
