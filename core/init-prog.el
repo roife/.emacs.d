@@ -287,12 +287,18 @@
         eldoc-echo-area-prefer-doc-buffer t
         eldoc-echo-area-use-multiline-p nil
         eglot-events-buffer-size 0
-        eglot-send-changes-idle-time 2
+        eglot-send-changes-idle-time 1
         eglot-connect-timeout 10
         eglot-autoshutdown t
         ;; use global completion styles
         completion-category-defaults nil)
   )
+
+
+;; [eldoc-box] Eldoc with childframe
+(use-package eldoc-box
+  :straight t
+  :hook (eldoc-mode . eldoc-box-hover-at-point-mode))
 
 
 ;; [consult-eglot] Eglot support for consult
