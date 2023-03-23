@@ -134,8 +134,11 @@
 
 
 ;; Load theme
-(defvar +light-theme 'modus-operandi)
-(defvar +dark-theme 'modus-vivendi)
+(use-package doom-themes
+  :straight t)
+
+(defvar +light-theme 'doom-solarized-light)
+(defvar +dark-theme 'doom-gruvbox)
 (defun +load-theme (&optional theme)
   (unless theme
     (setq theme (if (and (eq system-type 'darwin)
