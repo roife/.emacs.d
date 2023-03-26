@@ -227,8 +227,8 @@
                           (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
                (count (length persp-names-cache)))
       (if (> count 1)
-          (format "[%s/%d] " name count)
-        (concat "[" name "] "))))
+          (format "[%s/%d]" name count)
+        (concat "[" name "]"))))
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
   ;; WORKAROUND: fresh tab-bar for daemon

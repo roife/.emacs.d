@@ -399,6 +399,8 @@ begin and end of the block surrounding point."
                (original-func (key-binding (kbd "DEL"))))
           ;; original-func is whatever DEL would be if
           ;; my-minor-mode were disabled
-          (call-interactively original-func))
+          (if (eq original-func 'delete-backward-char)
+              (backward-delete-char-untabify 1)
+            (call-interactively original-func)))
       (puni-backward-delete-char)))
   )
