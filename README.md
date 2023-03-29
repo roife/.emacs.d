@@ -2,6 +2,7 @@
 
 - `rg`
 - `fd`
+- `aspell`
 
 # TODO
 
