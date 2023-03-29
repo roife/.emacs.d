@@ -341,3 +341,12 @@
   (with-eval-after-load 'copilot
     (define-key copilot-mode-map (kbd "M-f") #'+copilot-complete-word))
   )
+
+
+;; [separedit]
+(use-package separedit
+  :straight t
+  :bind (:map prog-mode-map
+              ("C-c '" . separedit))
+  :config
+  (setq separedit-default-mode 'markdown-mode))
