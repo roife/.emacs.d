@@ -36,8 +36,6 @@
   :bind (("C-, ," . avy-goto-char-2)
          ("C-, l" . avy-goto-line))
   :hook (after-init . avy-setup-default)
-  :config
-  (setq avy-single-candidate-jump nil)
   )
 
 
@@ -55,17 +53,6 @@
   :bind (("C-, j" . ace-link-addr))
   :init
   (ace-link-setup-default (kbd "C-, j"))
-  )
-
-
-;; [whitespace] Show visualize TAB, (HARD) SPC, newline
-(use-package whitespace
-  :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
-  :config
-  (setq
-   ;; only show bad whitespace
-   whitespace-style '(face trailing empty
-                           indentation space-before-tab space-after-tab))
   )
 
 
@@ -146,7 +133,7 @@
 ;;   (setq hungry-delete-chars-to-skip " \t\f\v"
 ;;         hungry-delete-except-modes
 ;;         '(help-mode minibuffer-mode minibuffer-inactive-mode calc-mode)))
-;; (setq backward-delete-char-untabify-method 'all)
+(setq backward-delete-char-untabify-method 'hungry)
 
 
 ;; [subword] Handling capitalized subwords
@@ -402,4 +389,53 @@ begin and end of the block surrounding point."
 (use-package puni
   :straight t
   :hook ((prog-mode sgml-mode nxml-mode tex-mode eval-expression-minibuffer-setup) . puni-mode)
+  :bind (:map puni-mode-map
+              ("DEL" . +puni-hungry-delete))
+  :config
+  (defun +puni-hungry-delete ()
+    (interactive)
+    (if (looking-back "^[[:blank:]]+")
+        (let* ((puni-mode nil)
+               (original-func (key-binding (kbd "DEL"))))
+          ;; original-func is whatever DEL would be if
+          ;; my-minor-mode were disabled
+          (if (eq original-func 'delete-backward-char)
+              (backward-delete-char-untabify 1)
+            (call-interactively original-func)))
+      (puni-backward-delete-char)))
+  )
+
+
+;; [ispell] spell checker
+(use-package ispell
+  :hook (((org-mode markdown-mode) . ispell-minor-mode)
+         (org-mode . org-skip-region-alist)
+         (markdown-mode . markdown-skip-region-alist))
+  :config
+  ;; Don't spellcheck org blocks
+  (defun org-skip-region-alist ()
+    (make-local-variable 'ispell-skip-region-alist)
+    (dolist (pair '((org-property-drawer-re)
+                    ("~" "~") ("=" "=")
+                    ("^#\\+BEGIN_SRC" "^#\\+END_SRC")
+                    ("\\\\(" "\\\\)") ("\\[" "\\]")
+                    ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
+      (add-to-list 'ispell-skip-region-alist pair)))
+
+  (defun markdown-skip-region-alist ()
+    (make-local-variable 'ispell-skip-region-alist)
+    (dolist (pair '(("`" "`")
+                    ("^```" "^```")
+                    ("{{" "}}")
+                    ("\\\\(" "\\\\)") ("\\[" "\\]")
+                    ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
+      (add-to-list 'ispell-skip-region-alist pair)))
+
+  (setq ispell-program-name "aspell"
+        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--sug-mode=ultra" "--run-together")
+        ispell-dictionary "en_US")
+
+  (setq ispell-aspell-dict-dir (ispell-get-aspell-config-value "dict-dir")
+        ispell-aspell-data-dir (ispell-get-aspell-config-value "data-dir")
+        ispell-personal-dictionary (expand-file-name "ispell/.pws" user-emacs-directory))
   )

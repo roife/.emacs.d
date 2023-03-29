@@ -27,3 +27,5 @@ persp-confs/*
 *.elc
 elpa/
 .persistent-scratch
+tree-sitter/
+ispell/

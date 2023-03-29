@@ -168,6 +168,16 @@
   :straight t)
 
 
+(use-package js
+  :config
+  (setq js-indent-level 2))
+
+
+(use-package css-mode
+  :config
+  (setq css-indent-offset 2))
+
+
 (use-package rustic
   :straight t
   :config
@@ -271,9 +281,7 @@
 (use-package eglot
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
   :config
-  (setq eldoc-echo-area-display-truncation-message nil
-        eldoc-echo-area-prefer-doc-buffer t
-        eglot-events-buffer-size 0
+  (setq eglot-events-buffer-size 0
         eglot-send-changes-idle-time 1
         eglot-connect-timeout 10
         eglot-autoshutdown t
@@ -282,9 +290,56 @@
   )
 
 
+;; [Eldoc]
+(use-package eldoc
+  :config
+  (setq eldoc-echo-area-display-truncation-message nil
+        eldoc-echo-area-prefer-doc-buffer t
+        eldoc-echo-area-use-multiline-p nil))
+
+
+;; [eldoc-box] Eldoc with childframe
+(use-package eldoc-box
+  :straight t
+  :hook (eldoc-mode . eldoc-box-hover-mode)
+  :config
+  (setq eldoc-box-only-multi-line t))
+
+
 ;; [consult-eglot] Eglot support for consult
 (use-package consult-eglot
   :after consult eglot
   :straight t
   :bind (:map eglot-mode-map
               ([remap xref-find-apropos] . consult-eglot-symbols)))
+
+;; [copilot]
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :hook ((prog-mode . copilot-mode))
+  :config
+  (defun +copilot-complete ()
+    (interactive)
+    (or (copilot-accept-completion)
+        (mwim-end-of-code-or-line)))
+
+  (with-eval-after-load 'copilot
+    (define-key copilot-mode-map (kbd "C-e") #'+copilot-complete))
+
+  (defun +copilot-complete-word ()
+    (interactive)
+    (or (copilot-accept-completion-by-word 1)
+        (forward-word)))
+
+  (with-eval-after-load 'copilot
+    (define-key copilot-mode-map (kbd "M-f") #'+copilot-complete-word))
+  )
+
+
+;; [separedit]
+(use-package separedit
+  :straight t
+  :bind (:map prog-mode-map
+              ("C-c '" . separedit))
+  :config
+  (setq separedit-default-mode 'markdown-mode))

@@ -35,16 +35,6 @@
   (add-to-list 'markdown-code-lang-modes '("verilog" . verilog-mode))
   (add-to-list 'markdown-code-lang-modes '("agda" . agda2-mode)))
 
-
-;; [org-fragtog] Preview and edit latex in md/org
-(use-package org-fragtog
-  :straight t
-  :hook (markdown-mode . org-fragtog-mode)
-  :config
-  (setq org-latex-create-formula-image-program 'dvisvgm)
-  (plist-put org-format-latex-options :scale 1.5))
-
-
 ;; [auctex]
 (use-package tex
   :straight auctex

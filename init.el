@@ -32,8 +32,9 @@
                      'init-prog
                      ;; 'init-smartparens
                      'init-writing
+                     'init-org
                      'init-vcs
-                     'init-treemacs
+                     ;; 'init-treemacs
                      'init-dict
                      'init-ibuffer
                      'init-util

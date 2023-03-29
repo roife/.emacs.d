@@ -6,15 +6,32 @@
                     yaml-mode conf-mode
                     special-mode org-agenda-mode dired-mode) . hl-line-mode)
   :config
-  (setq hl-line-sticky-flag nil))
+  (setq hl-line-sticky-flag nil)
+  ;; Highlight EOF
+  (setq hl-line-range-function (lambda ()
+                               (cons
+                                (line-end-position)
+                                (line-beginning-position 2)))))
 
 
 ;; [show-paren-mode] Highlight matching parens
 (use-package paren
   :hook ((prog-mode conf-mode yaml-mode) . show-paren-mode)
+  :custom-face (show-paren-match ((t (:underline t))))
   :config
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t)
+  )
+
+
+;; [whitespace] Show visualize TAB, (HARD) SPC, newline
+(use-package whitespace
+  :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
+  :config
+  (setq
+   ;; only show bad whitespace
+   whitespace-style '(face trailing empty
+                           indentation space-before-tab space-after-tab))
   )
 
 
@@ -37,21 +54,21 @@
   :config
   ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
   ;; @see https://emacs.stackexchange.com/questions/36420
-  (defun +rainbow-colorize-match (color &optional match)
-    (let* ((match (or match 0))
-           (ov (make-overlay (match-beginning match) (match-end match))))
-      (overlay-put ov 'ov-rainbow t)
-      (overlay-put ov 'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
-                                                "white"
-                                              "black"))
-                              (:background ,color)))))
-  (advice-add #'rainbow-colorize-match :override #'+rainbow-colorize-match)
-
-  ;; Clear overlays when exit
-  (defun +rainbow-clear-overlays ()
-    "Clear all rainbow overlays."
-    (remove-overlays (point-min) (point-max) 'ov-rainbow t))
-  (advice-add #'rainbow-turn-off :after #'+rainbow-clear-overlays)
+  ;; (defun +rainbow-colorize-match (color &optional match)
+  ;;   (let* ((match (or match 0))
+  ;;          (ov (make-overlay (match-beginning match) (match-end match))))
+  ;;     (overlay-put ov 'ov-rainbow t)
+  ;;     (overlay-put ov 'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
+  ;;                                               "white"
+  ;;                                             "black"))
+  ;;                             (:background ,color)))))
+  ;; (advice-add #'rainbow-colorize-match :override #'+rainbow-colorize-match)
+  ;;
+  ;; ;; Clear overlays when exit
+  ;; (defun +rainbow-clear-overlays ()
+  ;;   "Clear all rainbow overlays."
+  ;;   (remove-overlays (point-min) (point-max) 'ov-rainbow t))
+  ;; (advice-add #'rainbow-turn-off :after #'+rainbow-clear-overlays)
   )
 
 
@@ -100,7 +117,7 @@
   (setq diff-hl-fringe-bmp-function
         (lambda (&rest _)
           (define-fringe-bitmap 'my-diff-hl-bmp
-            (vector (if (eq system-type 'darwin) #b11100000 #b11111100))
+            (vector #b00000000)
             1 8
             '(center t))))
 
@@ -158,7 +175,7 @@
 
   ;; HACK: `highlight-indent-guides' acalculates its faces from the current theme,
   ;; but is unable to do so properly in terminal Emacs
-  (defun +highligh-indent-guides-auto-set-faces ()
+  (defun +highligh-indent-guides-auto-set-faces (&rest _)
     (when (display-graphic-p)
             (highlight-indent-guides-auto-set-faces)))
   (if (daemonp)

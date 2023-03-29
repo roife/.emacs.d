@@ -10,7 +10,7 @@
   :config
   (setq vertico-cycle t
         vertico-resize nil
-        vertico-count 17)
+        vertico-count 15)
 
   (advice-add #'completing-read-multiple :filter-args
               (lambda (args)
@@ -55,8 +55,7 @@
   (defun +vertico-orderless-dispatch (pattern _index _total)
     (cond
      ;; Ensure $ works with Consult commands, which add disambiguation suffixes
-     ((string-suffix-p "$" pattern)
-      `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x200000-\x300000]*$")))
+     ((string-suffix-p "$" pattern) `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x200000-\x300000]*$")))
      ;; Ignore single !
      ((string= "!" pattern) `(orderless-literal . ""))
      ;; Without literal
@@ -181,9 +180,11 @@
          ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop)
-         ("C-c d r" . consult-ripgrep))
+         ("C-c d r" . consult-ripgrep)
+         ("C-c d f" . consult-fd))
   :config
-  (setq consult-narrow-key "<")
+  (setq consult-narrow-key "<"
+        consult-async-min-input 2)
 
   ;; replace multi-occur with consult-multi-occur
   (advice-add #'multi-occur :override #'consult-multi-occur)
@@ -204,31 +205,35 @@
    consult-bookmark consult-recent-file
    consult--source-recent-file
    consult--source-project-recent-file consult--source-bookmark
-   :preview-key (kbd "s-p"))
+   :preview-key "s-p")
   (consult-customize
    consult-theme
-   :preview-key (list (kbd "s-p") :debounce 0.6 'any))
+   :preview-key (list "s-p" :debounce 0.6 'any))
 
   ;; [consult-fd]
-  (defvar consult-fd-args "fd --color=never -i -H -E .git --regex ")
-  (defun +consult--fd-builder (input)
-    (pcase-let* ((cmd (split-string-and-unquote consult-fd-args))
-                 (`(,arg . ,opts) (consult--command-split input))
-                 (`(,re . ,hl) (funcall consult--regexp-compiler arg 'extended t)))
+  (defvar consult--fd-command nil)
+  (defun consult--fd-builder (input)
+    (unless consult--fd-command
+      (setq consult--fd-command
+            (if (eq 0 (call-process-shell-command "fdfind"))
+                "fdfind"
+              "fd")))
+    (pcase-let* ((`(,arg . ,opts) (consult--command-split input))
+                 (`(,re . ,hl) (funcall consult--regexp-compiler
+                                        arg 'extended t)))
       (when re
-        (list :command (append cmd
-                               (list (consult--join-regexps re 'extended))
-                               opts)
-              :highlight hl))))
+        (cons (append
+               (list consult--fd-command
+                     "--color=never" "--full-path"
+                     (consult--join-regexps re 'extended))
+               opts)
+              hl))))
 
-  (defun +consult-fd (&optional dir initial)
-    "Search for regexp with fd in DIR with INITIAL input.
-The find process is started asynchronously, similar to `consult-grep'.
-See `consult-grep' for more details regarding the asynchronous search."
+  (defun consult-fd (&optional dir initial)
     (interactive "P")
     (let* ((prompt-dir (consult--directory-prompt "Fd" dir))
            (default-directory (cdr prompt-dir)))
-      (find-file (consult--find (car prompt-dir) #'+consult--fd-builder initial))))
+      (find-file (consult--find (car prompt-dir) #'consult--fd-builder initial))))
   )
 
 
@@ -272,16 +277,14 @@ See `consult-grep' for more details regarding the asynchronous search."
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . corfu-enable-in-minibuffer))
   :bind (:map corfu-map
-              ("H-m" . corfu-move-to-minibuffer))
+              ("H-m" . corfu-move-to-minibuffer)
+              ("RET" . nil))
   :config
   (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
         corfu-auto t                 ;; Enable auto completion
         corfu-separator "&"          ;; Orderless field separator
-        corfu-quit-at-boundary nil   ;; Never quit at completion boundary
-        corfu-echo-documentation nil ;; Disable documentation in the echo area
         corfu-auto-prefix 2          ;; minimun prefix to enable completion
         corfu-preview-current nil
-        corfu-count 15
         corfu-auto-delay 0.1)
 
   ;; Transfer completion to the minibuffer
@@ -310,7 +313,7 @@ See `consult-grep' for more details regarding the asynchronous search."
   )
 
 
-(use-package corfu-info
+(use-package corfu-popupinfo
   :straight nil
   :after corfu)
 
