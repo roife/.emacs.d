@@ -135,8 +135,11 @@
 
 
 ;; Load theme
-(defvar +light-theme 'modus-operandi)
-(defvar +dark-theme 'modus-vivendi)
+(use-package doom-themes
+  :straight t)
+
+(defvar +light-theme 'doom-solarized-light)
+(defvar +dark-theme 'doom-gruvbox)
 (defun +load-theme (&optional theme)
   (unless theme
     (setq theme (if (and (eq system-type 'darwin)
@@ -225,8 +228,8 @@
                           (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
                (count (length persp-names-cache)))
       (if (> count 1)
-          (format "[%s/%d] " name count)
-        (concat "[" name "] "))))
+          (format "[%s/%d]" name count)
+        (concat "[" name "]"))))
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
   ;; WORKAROUND: fresh tab-bar for daemon

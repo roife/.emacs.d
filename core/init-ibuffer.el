@@ -11,11 +11,11 @@
 (use-package ibuffer-project
   :straight t
   :hook (ibuffer . +ibuffer-project-activete)
-  :defines ibuffer-project-groups
   :config
   ;; HACK: Push temperary buffers in a standalone group
   (defun +ibuffer-project-activete ()
     "Activate ibuffer-project"
+    (interactive)
     (let ((starred-name-filter '(starred-name . "")))
       (setq ibuffer-filter-groups
             (mapcar (lambda (p) (cons (car p)
@@ -27,15 +27,13 @@
       (ibuffer-do-sort-by-project-file-relative))
     )
 
-  (custom-set-variables
-   '(ibuffer-formats
-     '((mark modified read-only locked " "
-             (name 18 18 :left :elide)
-             " "
-             (size 9 -1 :right)
-             " "
-             (mode 16 16 :left :elide)
-             " " project-file-relative))))
+  (setq ibuffer-formats
+        '((mark modified read-only locked " "
+                (name 18 18 :left :elide)
+                " "
+                (size 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " "
+                project-file-relative)))
   )
-
-

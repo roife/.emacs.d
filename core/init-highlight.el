@@ -17,6 +17,7 @@
 ;; [show-paren-mode] Highlight matching parens
 (use-package paren
   :hook ((prog-mode conf-mode yaml-mode) . show-paren-mode)
+  :custom-face (show-paren-match ((t (:underline t))))
   :config
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t)

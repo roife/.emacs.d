@@ -10,7 +10,7 @@
   :config
   (setq vertico-cycle t
         vertico-resize nil
-        vertico-count 17)
+        vertico-count 15)
 
   (advice-add #'completing-read-multiple :filter-args
               (lambda (args)
@@ -55,8 +55,7 @@
   (defun +vertico-orderless-dispatch (pattern _index _total)
     (cond
      ;; Ensure $ works with Consult commands, which add disambiguation suffixes
-     ((string-suffix-p "$" pattern)
-      `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x200000-\x300000]*$")))
+     ((string-suffix-p "$" pattern) `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x200000-\x300000]*$")))
      ;; Ignore single !
      ((string= "!" pattern) `(orderless-literal . ""))
      ;; Without literal
@@ -184,7 +183,8 @@
          ("C-c d r" . consult-ripgrep)
          ("C-c d f" . consult-fd))
   :config
-  (setq consult-narrow-key "<")
+  (setq consult-narrow-key "<"
+        consult-async-min-input 2)
 
   ;; replace multi-occur with consult-multi-occur
   (advice-add #'multi-occur :override #'consult-multi-occur)
@@ -283,10 +283,8 @@
   (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
         corfu-auto t                 ;; Enable auto completion
         corfu-separator "&"          ;; Orderless field separator
-        corfu-quit-at-boundary nil   ;; Never quit at completion boundary
         corfu-auto-prefix 2          ;; minimun prefix to enable completion
         corfu-preview-current nil
-        corfu-count 15
         corfu-auto-delay 0.1)
 
   ;; Transfer completion to the minibuffer

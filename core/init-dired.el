@@ -36,7 +36,8 @@
   :straight t
   :after dired
   :bind (:map dired-mode-map
-              ("g" . dired-git-info-mode))
+              ("g" . dired-git-info-mode)
+              ("r" . revert-buffer))
   :config
   (setq dgi-commit-message-format "%h %cs %s"
         dgi-auto-hide-details-p nil)
