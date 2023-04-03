@@ -36,6 +36,7 @@
                      'init-vcs
                      ;; 'init-treemacs
                      'init-dict
+                     'init-elfeed
                      'init-ibuffer
                      'init-util
                      'init-test
