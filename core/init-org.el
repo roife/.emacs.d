@@ -43,6 +43,12 @@
   )
 
 
+;; [org-indent]
+(use-package org-indent
+  :after org
+  :hook (org-mode . org-indent-mode))
+
+
 ;; [ox]
 (use-package ox
   :config

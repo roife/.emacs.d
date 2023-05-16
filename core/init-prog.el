@@ -134,8 +134,13 @@
    flymake-no-changes-timeout 1)
   )
 
-
 ;; Langs
+(use-package cc-mode
+  :config
+  (setq c-basic-offset 4)
+  (c-set-offset 'case-label '+))
+
+
 (use-package csv-mode
   :straight t)
 
@@ -236,7 +241,7 @@
 ;; [Proof General] Proof General is a generic front-end for proof assistants
 (use-package proof-general
   :straight t
-  :config
+  :init
   (setq proof-splash-enable nil)
   )
 

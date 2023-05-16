@@ -11,9 +11,8 @@
   ;;        ("k" . scroll-down-line))
   :config
   (setq elfeed-db-directory (expand-file-name "elfeed" user-emacs-directory)
-        elfeed-feeds '(("https://www.v2ex.com/index.xml" v2ex)
+        elfeed-feeds '(("https://rsshub.app/v2ex/topics/hot" v2ex)
                        ("http://www.v2ex.com/feed/apple.xml" v2ex apple)
-                       ("https://www.reddit.com/r/emacs.rss" reddit emacs)
                        ("https://www.solidot.org/index.rss" tech)
                        ("https://news.ycombinator.com/rss" hacknews))
         elfeed-enclosure-default-dir "~/Downloads/"

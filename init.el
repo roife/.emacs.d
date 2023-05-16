@@ -35,6 +35,7 @@
                      'init-org
                      'init-vcs
                      ;; 'init-treemacs
+                     'init-eww
                      'init-dict
                      'init-elfeed
                      'init-ibuffer
@@ -42,6 +43,7 @@
                      'init-test
                      'init-modal
                      'init-modeline
+                     'init-bib
                      ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))

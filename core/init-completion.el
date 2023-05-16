@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
 (use-package vertico
-  :straight (:files (:defaults "extensions/*"))
+  :straight (:files (:defaults "extensions/*.el"))
   :bind (:map vertico-map
               ("TAB" . minibuffer-complete)
               ("<tab>" . minibuffer-complete))
@@ -278,7 +278,8 @@
          (minibuffer-setup . corfu-enable-in-minibuffer))
   :bind (:map corfu-map
               ("H-m" . corfu-move-to-minibuffer)
-              ("RET" . nil))
+              ("RET" . nil)
+              ("C-SPC" . corfu-insert-separator))
   :config
   (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
         corfu-auto t                 ;; Enable auto completion
