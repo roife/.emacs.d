@@ -61,6 +61,7 @@
 (use-package ox-hugo
   :straight t
   :after ox
+  :init (require 'ox-hugo)
   :config
   (setq org-hugo-default-section-directory "posts"
         org-hugo-base-dir (expand-file-name "~/roife.github.io/")
