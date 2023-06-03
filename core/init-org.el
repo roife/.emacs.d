@@ -13,13 +13,14 @@
 
   :config
   ;; 让中文也可以不加空格就使用行内格式
-  (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:][:alpha:]"
-                                         "-[:space:].,:!?;'\")}\\[[:nonascii:][:alpha:]"
+  (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:]"
+                                         "-[:space:].,:!?;'\")}\\[[:nonascii:]"
                                          "[:space:]"
                                          "."
                                          1))
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
   (org-element-update-syntax)
+
   ;; 规定上下标必须加 {}，否则中文使用下划线时它会以为是两个连着的下标
   (setq org-use-sub-superscripts "{}")
 
@@ -40,6 +41,8 @@
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil)
   (plist-put org-format-latex-options :scale 1.5)
+
+  (setq org-support-shift-select t)
   )
 
 
@@ -64,6 +67,6 @@
   :init (require 'ox-hugo)
   :config
   (setq org-hugo-default-section-directory "posts"
-        org-hugo-base-dir (expand-file-name "~/roife.github.io/")
+        org-hugo-base-dir +blog-dir
         org-hugo-external-file-extensions-allowed-for-copying nil)
   )

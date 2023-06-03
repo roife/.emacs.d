@@ -15,7 +15,7 @@
                        ("http://www.v2ex.com/feed/apple.xml" v2ex apple)
                        ("https://www.solidot.org/index.rss" tech)
                        ("https://news.ycombinator.com/rss" hacknews))
-        elfeed-enclosure-default-dir "~/Downloads/"
+        elfeed-enclosure-default-dir +elfeed-enclosure-dir
         elfeed-search-filter "@4-months-ago +"
         elfeed-search-clipboard-type 'CLIPBOARD
         elfeed-search-title-max-width 100

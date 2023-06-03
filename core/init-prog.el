@@ -129,9 +129,7 @@
          ("C-c f b" . flymake-show-buffer-diagnostics))
   :config
   (setq
-   flymake-diagnostic-functions nil
-   ;; Check only on save
-   flymake-no-changes-timeout nil)
+   flymake-diagnostic-functions nil)
   )
 
 ;; Langs

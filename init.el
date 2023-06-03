@@ -17,6 +17,11 @@
       '(("http" . "127.0.0.1:7890")
         ("https" . "127.0.0.1:7890")))
 
+;; custom directory
+(defvar +blog-dir (expand-file-name "~/source/roife.github.io/"))
+(defvar +ebib-bib-dir (expand-file-name "~/Documents/papers/"))
+(defvar +elfeed-enclosure-dir (expand-file-name "~/Downloads/"))
+
 (defvar +init-files (list
                      'init-straight
                      'init-ui
