@@ -11,10 +11,14 @@
   ;;        ("k" . scroll-down-line))
   :config
   (setq elfeed-db-directory (expand-file-name "elfeed" user-emacs-directory)
-        elfeed-feeds '(("https://rsshub.app/v2ex/topics/hot" v2ex)
-                       ("http://www.v2ex.com/feed/apple.xml" v2ex apple)
-                       ("https://www.solidot.org/index.rss" tech)
-                       ("https://news.ycombinator.com/rss" hacknews))
+        elfeed-feeds '(("https://sspai.com/feed" sspai)
+                       ("https://nikonrumors.com/feed/" nikon-rumors)
+                       ("https://rss.utgd.net/feed" utgd)
+                       ;; bilibili
+                       ("https://rsshub.app/bilibili/user/video/3816626" bili-links)
+                       ("https://rsshub.app/bilibili/user/video/110683415" bili-taro)
+                       ("https://rsshub.app/bilibili/user/video/389245745" bili-leya)
+                       ("https://rsshub.app/bilibili/user/video/63231" bili-fansuki))
         elfeed-enclosure-default-dir +elfeed-enclosure-dir
         elfeed-search-filter "@4-months-ago +"
         elfeed-search-clipboard-type 'CLIPBOARD

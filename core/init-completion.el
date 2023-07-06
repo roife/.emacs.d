@@ -262,12 +262,14 @@
                 (cons #'tempel-expand
                       completion-at-point-functions)))
 
-  (setq tempel-trigger-prefix "<")
+  (setq tempel-trigger-prefix "\\"
+        tempel-path (expand-file-name "tempel-templates" user-emacs-directory))
   )
 
 
 (use-package tempel-collection
-  :straight t)
+  :straight t
+  :after tempel)
 
 
 ;; [corfu] compleletion frontend
