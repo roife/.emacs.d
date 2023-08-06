@@ -69,7 +69,6 @@
  indent-tabs-mode nil
  tab-always-indent t
  tab-width 4
- c-basic-offset 4
 
  ;; [sentence end]
  sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*"
@@ -92,6 +91,9 @@
 
  ;; Show path/name if names are same
  uniquify-buffer-name-style 'forward
+
+ ;; Fix alignment problem
+ truncate-string-ellipsis "..."
  )
 
 

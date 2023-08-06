@@ -115,12 +115,12 @@
 ;; Font
 (defun +setup-fonts ()
   "Setup fonts."
-  (set-face-attribute 'default nil :font (font-spec :family "JetBrains Mono" :size 14))
+  (set-face-attribute 'default nil :font (font-spec :family "Iosevka" :size 15))
 
-  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 14))
+  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 16))
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
 
-  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size 12))
+  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size 11))
   (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append))
 
 (add-hook 'window-setup-hook #'+setup-fonts)
@@ -134,16 +134,17 @@
 
 
 ;; Load theme
-(use-package doom-themes
+(use-package gruvbox-theme
   :straight t)
 
-(defvar +light-theme 'doom-solarized-light)
-(defvar +dark-theme 'doom-gruvbox)
+(defvar +light-theme 'modus-operandi)
+(defvar +dark-theme 'gruvbox)
 (defun +load-theme (&optional theme)
   (unless theme
     (setq theme (if (and (eq system-type 'darwin)
                          (display-graphic-p)
-                         (eq ns-system-appearance 'light))
+                         (eq (plist-get (mac-application-state) ':appearance)
+                             "NSAppearanceNameAqua"))
                     +light-theme
                   +dark-theme)))
   (unless (member theme custom-enabled-themes)
@@ -165,12 +166,8 @@
   :straight t
   :hook ((prog-mode markdown-mode) . ligature-mode)
   :config
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  ;; (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-
   ;; Enable all Cascadia Code ligatures in programming modes
-  (ligature-set-ligatures '(prog-mode markdown-mode)
+  (ligature-set-ligatures '(prog-mode markdown-mode org-mode)
                           '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
                             ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
                             "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
@@ -228,8 +225,8 @@
                           (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
                (count (length persp-names-cache)))
       (if (> count 1)
-          (format "[%s/%d]" name count)
-        (concat "[" name "]"))))
+          (format "[%s/%d] " name count)
+        (concat "[" name "] "))))
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
   ;; WORKAROUND: fresh tab-bar for daemon

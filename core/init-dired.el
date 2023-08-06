@@ -87,4 +87,11 @@
   :bind ([remap find-dired] . fd-dired))
 
 (use-package dired-hacks
-  :straight t)
+  :straight (:files (:defaults "*.el"))
+  :after dired
+  :bind (:map dired-mode-map
+              ("TAB" . dired-subtree-toggle)))
+
+(use-package diredfl
+  :straight t
+  :hook (dired-mode . diredfl-mode))

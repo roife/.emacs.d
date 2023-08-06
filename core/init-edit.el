@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-;; Donot add the duplicates that the same as the last one to kill-ring
+;; Do not add the duplicates that the same as the last one to kill-ring
 (setq kill-do-not-save-duplicates t)
 
 ;; Save clipboard contents into kill-ring before replace them
@@ -21,6 +21,8 @@
   :defines dired-mode-map
   :bind (("C-, o" . browse-url-at-point)
          ("C-, e" . browse-url-emacs))
+  :config
+  (setq browse-url-browser-function 'eww)
   )
 
 
@@ -408,8 +410,7 @@ begin and end of the block surrounding point."
 
 ;; [ispell] spell checker
 (use-package ispell
-  :hook (((org-mode markdown-mode) . ispell-minor-mode)
-         (org-mode . org-skip-region-alist)
+  :hook ((org-mode . org-skip-region-alist)
          (markdown-mode . markdown-skip-region-alist))
   :config
   ;; Don't spellcheck org blocks
@@ -432,7 +433,7 @@ begin and end of the block surrounding point."
       (add-to-list 'ispell-skip-region-alist pair)))
 
   (setq ispell-program-name "aspell"
-        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--sug-mode=ultra" "--run-together")
+        ispell-extra-args '("--sug-mode=ultra" "--run-together")
         ispell-dictionary "en_US")
 
   (setq ispell-aspell-dict-dir (ispell-get-aspell-config-value "dict-dir")

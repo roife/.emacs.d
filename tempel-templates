@@ -1,0 +1,11 @@
+org-mode markdown-mode
+
+(optt "\\operatorname{\\mathtt{" p "}}")
+(oprm "\\operatorname{\\mathrm{" p "}}")
+(dfr "\\dfrac{" p "}{" p "}")
+(bbra "\\llbracket " p " \\rrbracket")
+(brace "\\{" p "\\}")
+(rcd "\\{" p "_{" (s v) "}^{" v " \\in 1 \\dots " p "}" "\\} ")
+(trcd "\\{" p "_{" (s v) "} : " p "_{" v "}^{" v " \\in 1 \\dots " p "}" "\\} ")
+(ifo "\\(" p "\\)")
+(fo "\\[" n p n "\\]")

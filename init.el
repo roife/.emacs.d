@@ -17,6 +17,11 @@
       '(("http" . "127.0.0.1:7890")
         ("https" . "127.0.0.1:7890")))
 
+;; custom directory
+(defvar +blog-dir (expand-file-name "~/source/roife.github.io/"))
+(defvar +ebib-bib-dir (expand-file-name "~/Documents/papers/"))
+(defvar +elfeed-enclosure-dir (expand-file-name "~/Downloads/"))
+
 (defvar +init-files (list
                      'init-straight
                      'init-ui
@@ -35,12 +40,15 @@
                      'init-org
                      'init-vcs
                      ;; 'init-treemacs
+                     'init-eww
                      'init-dict
+                     'init-elfeed
                      'init-ibuffer
                      'init-util
                      'init-test
                      'init-modal
                      'init-modeline
+                     'init-bib
                      ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))
