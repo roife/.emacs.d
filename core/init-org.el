@@ -48,9 +48,9 @@
 
 
 ;; ;; [org-indent]
-;; (use-package org-indent
-;;   :after org
-;;   :hook (org-mode . org-indent-mode))
+(use-package org-indent
+  :after org
+  :hook (org-mode . org-indent-mode))
 
 
 ;; [org-modern]
