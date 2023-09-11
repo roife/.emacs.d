@@ -135,11 +135,11 @@
 
 
 ;; Load theme
-(use-package doom-themes
+(use-package gruvbox-theme
   :straight t)
 
-(defvar +light-theme 'doom-solarized-light)
-(defvar +dark-theme 'doom-gruvbox)
+(defvar +light-theme 'modus-operandi)
+(defvar +dark-theme 'gruvbox)
 (defun +load-theme (&optional theme)
   (unless theme
     (setq theme (if (and (eq system-type 'darwin)
@@ -166,12 +166,8 @@
   :straight t
   :hook ((prog-mode markdown-mode) . ligature-mode)
   :config
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  ;; (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-
   ;; Enable all Cascadia Code ligatures in programming modes
-  (ligature-set-ligatures '(prog-mode markdown-mode)
+  (ligature-set-ligatures '(prog-mode markdown-mode org-mode)
                           '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
                             ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
                             "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
@@ -228,8 +224,8 @@
                           (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
                (count (length persp-names-cache)))
       (if (> count 1)
-          (format "[%s/%d]" name count)
-        (concat "[" name "]"))))
+          (format "[%s/%d] " name count)
+        (concat "[" name "] "))))
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
   ;; WORKAROUND: fresh tab-bar for daemon

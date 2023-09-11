@@ -1,0 +1,7 @@
+org-mode markdown-mode
+
+(optt "\\operatorname{\\mathtt{" p "}}")
+(oprm "\\operatorname{\\mathrm{" p "}}")
+(dfr "\\dfrac{" p "}{" p "}")
+(bbra "\\llbracket " p " \\rrbracket")
+(brace "\\{" p "\\}")

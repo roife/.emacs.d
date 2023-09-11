@@ -3,6 +3,7 @@
 - `rg`
 - `fd`
 - `aspell`
+- `readability-cli`
 
 # TODO
 

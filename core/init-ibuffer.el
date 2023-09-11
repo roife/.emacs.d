@@ -16,11 +16,17 @@
   (defun +ibuffer-project-activete ()
     "Activate ibuffer-project"
     (interactive)
-    (let ((starred-name-filter '(starred-name . "")))
+    (let ((starred-name-filter '(starred-name . ""))
+          (ebib-filter '(name . "^\\*Ebib-.*\\*$"))
+          (elfeed-filter '(name . "^\\*elfeed-.*\\*$"))
+          (eww-filter '(name . "^\\*eww\\*\\(<[[:digit:]]>\\)?$")))
       (setq ibuffer-filter-groups
             (mapcar (lambda (p) (cons (car p)
                                  `((and ,(car (cdr p)) (not ,starred-name-filter)))))
                     (ibuffer-project-generate-filter-groups)))
+      (add-to-list 'ibuffer-filter-groups (list "Eww" eww-filter) :append)
+      (add-to-list 'ibuffer-filter-groups (list "Ebib" ebib-filter) :append)
+      (add-to-list 'ibuffer-filter-groups (list "Elfeed" elfeed-filter) :append)
       (add-to-list 'ibuffer-filter-groups (list "Temporary buffers" starred-name-filter) :append))
 
     (unless (eq ibuffer-sorting-mode 'project-file-relative)

@@ -129,13 +129,16 @@
          ("C-c f b" . flymake-show-buffer-diagnostics))
   :config
   (setq
-   flymake-diagnostic-functions nil
-   ;; Check only on save
-   flymake-no-changes-timeout 1)
+   flymake-diagnostic-functions nil)
   )
 
-
 ;; Langs
+(use-package cc-mode
+  :config
+  (setq c-basic-offset 4)
+  (c-set-offset 'case-label '+))
+
+
 (use-package csv-mode
   :straight t)
 
@@ -236,7 +239,7 @@
 ;; [Proof General] Proof General is a generic front-end for proof assistants
 (use-package proof-general
   :straight t
-  :config
+  :init
   (setq proof-splash-enable nil)
   )
 
@@ -289,7 +292,6 @@
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
   :config
   (setq eglot-events-buffer-size 0
-        eglot-send-changes-idle-time 1
         eglot-connect-timeout 10
         eglot-autoshutdown t
         ;; use global completion styles
@@ -297,12 +299,6 @@
   )
 
 
-<<<<<<< HEAD
-;; [eldoc-box] Eldoc with childframe
-(use-package eldoc-box
-  :straight t
-  :hook (eldoc-mode . eldoc-box-hover-at-point-mode))
-=======
 ;; [Eldoc]
 (use-package eldoc
   :config
@@ -317,7 +313,6 @@
   :hook (eldoc-mode . eldoc-box-hover-mode)
   :config
   (setq eldoc-box-only-multi-line t))
->>>>>>> master
 
 
 ;; [consult-eglot] Eglot support for consult
