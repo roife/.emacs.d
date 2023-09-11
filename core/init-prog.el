@@ -81,9 +81,7 @@
     (interactive)
     (condition-case _
         (citre-jump-back)
-      (error (if (fboundp #'xref-go-back)
-                 (call-interactively #'xref-go-back)
-               (call-interactively #'xref-pop-marker-stack)))))
+      (error (call-interactively #'xref-go-back))))
 
   ;; Use Citre xref backend as a [fallback]
   (define-advice xref--create-fetcher (:around (fn &rest args) fallback)
@@ -144,10 +142,6 @@
 
 
 (use-package cmake-mode
-  :straight t)
-
-
-(use-package json-mode
   :straight t)
 
 
@@ -288,7 +282,6 @@
 
 ;; [Eglot] LSP support
 (use-package eglot
-  :straight t
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
   :config
   (setq eglot-events-buffer-size 0

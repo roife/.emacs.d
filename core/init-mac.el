@@ -25,4 +25,4 @@
 
 
 ;; Automatically switch theme based on the theme of macOS
-(add-hook 'ns-system-appearance-change-functions #'(lambda (_) (+load-theme)))
+(add-hook 'mac-effective-appearance-change-hook #'(lambda (_) (+load-theme)))

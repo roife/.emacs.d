@@ -22,10 +22,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-
-;; [use-package] Installation
-(straight-use-package 'use-package)
-
+;; [use-package] config
 (setq use-package-always-demand (daemonp)
       use-package-always-defer (not (daemonp))
       use-package-expand-minimally t

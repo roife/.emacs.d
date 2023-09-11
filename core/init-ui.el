@@ -144,7 +144,8 @@
   (unless theme
     (setq theme (if (and (eq system-type 'darwin)
                          (display-graphic-p)
-                         (eq ns-system-appearance 'light))
+                         (eq (plist-get (mac-application-state) ':appearance)
+                             "NSAppearanceNameAqua"))
                     +light-theme
                   +dark-theme)))
   (unless (member theme custom-enabled-themes)
@@ -196,6 +197,7 @@
         tab-bar-new-tab-choice "*scratch*"
         tab-bar-select-tab-modifiers '(super)
         tab-bar-tab-name-truncated-max 20
+        tab-bar-auto-width nil
         )
 
   ;; truncate for [tab name] and add count

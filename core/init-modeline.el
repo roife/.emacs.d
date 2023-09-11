@@ -91,6 +91,10 @@
         '(:propertize " POP |"
                       face +modeline-meta-active-face)))
 
+(defsubst +modeline-get-window-name ()
+  "Get window name for current window."
+  (concat " " (window-parameter (selected-window) 'ace-window-path) " "))
+
 (defsubst +modeline-macro-indicator ()
   "Display current Emacs macro being recorded."
   (cond (defining-kbd-macro "| MacroDef ")
@@ -205,7 +209,7 @@
 
 (defsubst +mode-line-active-long ()
   "Formatting active-long modeline."
-  (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
+  (let* ((lhs `((:propertize ,(+modeline-get-window-name)
                              face +modeline-meta-active-face)
                 (:propertize ,(when (+modeline-window-active-p)
                                 (concat (+modeline-macro-indicator)
@@ -245,7 +249,7 @@
 
 (defsubst +mode-line-inactive-long ()
   "Formatting active-long modeline."
-  (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
+  (let* ((lhs `((:propertize ,(+modeline-get-window-name)
                              face +modeline-meta-inactive-face)
                 "%* %I "
                 (:propertize +modeline-project-name
@@ -270,7 +274,7 @@
 
 (defsubst +mode-line-active-short ()
   "Formatting active-long modeline."
-  (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
+  (let* ((lhs `((:propertize ,(+modeline-get-window-name)
                              face +modeline-meta-active-face)
                 (:propertize ,(when (+modeline-window-active-p)
                                 (concat (+modeline-macro-indicator)
@@ -304,7 +308,7 @@
 
 (defsubst +mode-line-inactive-short ()
   "Formatting active-long modeline."
-  (let* ((lhs `((:propertize (" " ,(winum-get-number-string)  " ")
+  (let* ((lhs `((:propertize ,(+modeline-get-window-name)
                              face +modeline-meta-inactive-face)
                 "%* "
                 (:propertize "%b" face +modeline-buffer-name-active-face)
