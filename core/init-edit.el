@@ -102,7 +102,7 @@
 
 ;; [elec-pair] Automatic parenthesis pairing
 (use-package elec-pair
-  :hook ((prog-mode conf-mode yaml-mode) . electric-pair-mode)
+  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-mode) . electric-pair-mode)
   :config
   (setq electric-pair-inhibit-predicate 'electric-pair-default-inhibit)
   )
@@ -124,7 +124,7 @@
 ;; [expand-region] Select a region quickly
 (use-package expand-region
   :straight t
-  :bind ("C-=" . er/expand-region))
+  :bind ("C-+" . er/expand-region))
 
 
 ;; [hungry-delete] Hungry deletion

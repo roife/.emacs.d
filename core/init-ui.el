@@ -113,16 +113,20 @@
 
 
 ;; Font
+
+(defvar +font-en-size (if (eq system-type 'darwin) 15 26))
+(defvar +font-zh-size (if (eq system-type 'darwin) 16 26))
+(defvar +font-emoji-size (if (eq system-type 'darwin) 11 16))
+
 (defun +setup-fonts ()
   "Setup fonts."
-  (set-face-attribute 'default nil :font (font-spec :family "JetBrains Mono" :size 18))
+  (set-face-attribute 'default nil :font (font-spec :family "Iosevka" :size +font-en-size))
 
-  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 18))
+  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size +font-zh-size))
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
 
-  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size 16))
-  (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append)
-  )
+  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
+  (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append))
 
 (add-hook 'window-setup-hook #'+setup-fonts)
 (add-hook 'server-after-make-frame-hook #'+setup-fonts)

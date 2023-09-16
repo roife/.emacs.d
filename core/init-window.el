@@ -115,7 +115,8 @@
           "\\*docker-.+\\*"
           "\\*prolog\\*" inferior-python-mode inf-ruby-mode swift-repl-mode
           "\\*rustfmt\\*$" rustic-compilation-mode rustic-cargo-clippy-mode
-          rustic-cargo-outdated-mode rustic-cargo-test-moed))
+          rustic-cargo-outdated-mode rustic-cargo-test-mode
+	  ))
 
   :config
   ;; Enable indicator in minibuffer

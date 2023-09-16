@@ -10,26 +10,35 @@
 (use-package org
   :custom-face
   (org-quote ((t (:inherit org-block-begin-line))))
-
+  :hook ((org-mode . +org-dabbrev-skipping-leading-char)
+         (org-mode . +org-add-electric-pairs)
+         )
   :config
-  ;; 让中文也可以不加空格就使用行内格式
-  (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:]"
-                                         "-[:space:].,:!?;'\")}\\[[:nonascii:]"
-                                         "[:space:]"
-                                         "."
-                                         1))
-  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
-  (org-element-update-syntax)
+  (defun +org-dabbrev-skipping-leading-char ()
+    (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))
 
-  ;; 规定上下标必须加 {}，否则中文使用下划线时它会以为是两个连着的下标
+  (defvar +org-electric-pairs '((?/ . ?/)
+                               (?= . ?=)
+                               (?* . ?*)
+                               (?+ . ?+)
+                               (?_ . ?_)
+                               (?~ . ?~))
+    "Electric pairs for org-mode.")
+  (defun +org-add-electric-pairs ()
+    (with-eval-after-load 'elec-pair
+      (setq-local electric-pair-pairs (append electric-pair-pairs +org-electric-pairs))
+      (setq-local electric-pair-text-pairs electric-pair-pairs))
+    )
+
+  ;; Use {} for sub- or super- scripts
   (setq org-use-sub-superscripts "{}")
 
-  ;; 高亮 quote 和 verse block
+  ;; Highlight quote and verse blocks
   (setq org-fontify-quote-and-verse-blocks t)
 
   (defun org-custom-link-img-follow (path)
     (org-open-file
-     (format "%s/%s" (project-root (project-current)) path)))
+     (format "%s/static/%s" (project-root (project-current)) path)))
 
   (defun org-custom-link-img-export (path desc format)
     (cond
@@ -44,21 +53,7 @@
   (plist-put org-format-latex-options :scale 1.5)
 
   (setq org-support-shift-select t)
-  )
 
-
-;; ;; [org-indent]
-(use-package org-indent
-  :after org
-  :hook (org-mode . org-indent-mode))
-
-
-;; [org-modern]
-(use-package org-modern
-  :after org
-  :straight t
-  :hook (org-mode . org-modern-mode)
-  :config
   (setq
    ;; Edit settings
    org-auto-align-tags nil
@@ -73,6 +68,11 @@
    org-ellipsis "…")
   )
 
+
+;; ;; [org-indent]
+(use-package org-indent
+  :after org
+  :hook (org-mode . org-indent-mode))
 
 ;; [ox]
 (use-package ox

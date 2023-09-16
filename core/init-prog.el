@@ -304,8 +304,7 @@
 (use-package eldoc-box
   :straight t
   :hook (eldoc-mode . eldoc-box-hover-mode)
-  :config
-  (setq eldoc-box-only-multi-line t))
+ )
 
 
 ;; [consult-eglot] Eglot support for consult

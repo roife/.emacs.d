@@ -191,7 +191,7 @@
   :hook (prog-mode . indent-bars-mode)
   :config
   (setq indent-bars-display-on-blank-lines nil
-        indent-bars-width-frac 0.3))
+        indent-bars-width-frac 0.1))
 
 
 ;; [symbol-overlay] Highlight symbols
