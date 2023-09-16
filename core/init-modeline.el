@@ -178,9 +178,9 @@
   "Display flymake info for current buffer."
   (setq +modeline-flymake-indicator
         (when (and flymake-mode (flymake-running-backends))
-          (let* ((err-count (cadadr (flymake--mode-line-counter :error t)))
-                 (warning-count (cadadr (flymake--mode-line-counter :warning t)))
-                 (note-count (cadadr (flymake--mode-line-counter :note t)))
+          (let* ((err-count (cadadr (flymake--mode-line-counter :error)))
+                 (warning-count (cadadr (flymake--mode-line-counter :warning)))
+                 (note-count (cadadr (flymake--mode-line-counter :note)))
                  (err (when err-count (propertize err-count 'face '(:inherit compilation-error))))
                  (warning (when warning-count (propertize (concat " " warning-count) 'face '(:inherit compilation-warning))))
                  (note (when note-count (propertize (concat " " note-count) 'face '(:inherit compilation-info)))))
