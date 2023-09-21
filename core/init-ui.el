@@ -115,9 +115,9 @@
 ;; Font
 (defun +setup-fonts ()
   "Setup fonts."
-  (set-face-attribute 'default nil :font (font-spec :family "JetBrains Mono" :size 18))
+  (set-face-attribute 'default nil :font (font-spec :family "JetBrains Mono" :size 26))
 
-  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 18))
+  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size 26))
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
 
   (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size 16))

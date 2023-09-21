@@ -10,8 +10,10 @@
 (use-package org
   :custom-face
   (org-quote ((t (:inherit org-block-begin-line))))
-
+  :hook ((org-mode . +set-dabbrev-skipping-leading-char))
   :config
+  (defun +set-dabbrev-skipping-leading-char ()
+    (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))
   ;; 让中文也可以不加空格就使用行内格式
   (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:]"
                                          "-[:space:].,:!?;'\")}\\[[:nonascii:]"
@@ -44,21 +46,7 @@
   (plist-put org-format-latex-options :scale 1.5)
 
   (setq org-support-shift-select t)
-  )
 
-
-;; ;; [org-indent]
-(use-package org-indent
-  :after org
-  :hook (org-mode . org-indent-mode))
-
-
-;; [org-modern]
-(use-package org-modern
-  :after org
-  :straight t
-  :hook (org-mode . org-modern-mode)
-  :config
   (setq
    ;; Edit settings
    org-auto-align-tags nil
@@ -73,6 +61,11 @@
    org-ellipsis "…")
   )
 
+
+;; ;; [org-indent]
+(use-package org-indent
+  :after org
+  :hook (org-mode . org-indent-mode))
 
 ;; [ox]
 (use-package ox
