@@ -36,23 +36,19 @@
   ;; Highlight quote and verse blocks
   (setq org-fontify-quote-and-verse-blocks t)
 
-  (defun org-custom-link-img-follow (path)
+  (defun +org-custom-link-img-follow (path)
     (org-open-file
      (format "%s/static/%s" (project-root (project-current)) path)))
-
-  (defun org-custom-link-img-export (path desc format)
+  (defun +org-custom-link-img-export (path desc format)
     (cond
      ((eq format 'html)
       (format "<img src=\"/images/%s\" alt=\"%s\"/>" path desc))))
-
-  (org-link-set-parameters "img" :follow 'org-custom-link-img-follow :export 'org-custom-link-img-export)
+  (org-link-set-parameters "img" :follow '+org-custom-link-img-follow :export '+org-custom-link-img-export)
 
   ;; Org Latex Preview
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil)
   (plist-put org-format-latex-options :scale 1.5)
-
-  (setq org-support-shift-select t)
 
   (setq
    ;; Edit settings
@@ -61,10 +57,9 @@
    org-catch-invisible-edits 'show-and-error
    org-special-ctrl-a/e t
    org-insert-heading-respect-content t
+   org-support-shift-select t
 
-   ;; Org styling, hide markup etc.
-   ;; org-hide-emphasis-markers t
-   ;; org-pretty-entities t
+   org-pretty-entities t
    org-ellipsis "…")
   )
 
@@ -80,7 +75,15 @@
   (setq org-export-with-smart-quotes t
         org-html-validation-link nil
         org-latex-prefer-user-labels t
-        org-export-with-latex t))
+        org-export-with-latex t)
+  ;; styles for chineses (zero-width-space)
+  (defun +org-export-remove-zero-width-space (text _backend _info)
+    "Remove zero width space character (U+200B) from TEXT."
+    (unless (org-export-derived-backend-p 'org)
+      (replace-regexp-in-string "\x200B" "" text)))
+
+  (add-to-list 'org-export-filter-final-output-functions
+               #'+org-export-remove-zero-width-space))
 
 ;; [ox-hugo]
 (use-package ox-hugo

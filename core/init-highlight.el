@@ -27,11 +27,22 @@
 ;; [whitespace] Show visualize TAB, (HARD) SPC, newline
 (use-package whitespace
   :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
+  :init
   :config
   (setq
    ;; only show bad whitespace
-   whitespace-style '(face trailing empty
-                           indentation space-before-tab space-after-tab))
+   whitespace-style '(face trailing empty indentation space-before-tab space-after-tab))
+
+  ;; toggle zero-width space display
+  (add-to-list 'whitespace-display-mappings '(space-mark #x200b [183]))
+  (add-to-list 'whitespace-display-mappings '(space-mark #x20 [? ]) t)
+  (defun +toggle-zero-width-space-display ()
+    (interactive)
+    (if (member 'space-mark whitespace-style)
+        (setq whitespace-style (remove 'space-mark whitespace-style))
+      (add-to-list 'whitespace-style 'space-mark))
+    (whitespace-mode -1)
+    (whitespace-mode +1))
   )
 
 
