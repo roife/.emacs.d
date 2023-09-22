@@ -3,6 +3,11 @@
 (eval-when-compile (require 'subr-x))
 (eval-when-compile (require 'cl-lib))
 
+; show encodings for UTF-8:LF
+(defvar +modeline-show-common-encodings nil)
+; show VC tools name for Git
+(defvar +modeline-show-common-vc-tools-name nil)
+
 ;;; Get current window
 (defvar +modeline-current-window nil)
 (defun +modeline-set-selected-window (&rest _)
@@ -39,10 +44,10 @@
   "The face for line number on the mode-line of an active window."
   :group '+modeline)
 
-(defface +modeline-vc-mode-active-face
-  '((t (:inherit (font-lock-constant-face))))
-  "The face for vc-mode on the mode-line of an active window."
-  :group '+modeline)
+;; (defface +modeline-vc-mode-active-face
+;;   '((t (:inherit (font-lock-constant-face))))
+;;   "The face for vc-mode on the mode-line of an active window."
+;;   :group '+modeline)
 
 (defface +modeline-meta-active-face
   '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
@@ -59,15 +64,15 @@
   "The face for modification indicator on the mode-line of an active window."
   :group '+modeline)
 
-(defface +modeline-project-name-active-face
-  '((t (:inherit (bold font-lock-variable-name-face))))
-  "The face for project name on the mode-line of an active window."
-  :group '+modeline)
-
-(defface +modeline-project-name-inactive-face
-  '((t (:inherit (mode-line-inactive))))
-  "The face for project name on the mode-line of an inactive window."
-  :group '+modeline)
+;; (defface +modeline-project-name-active-face
+;;   '((t (:inherit (bold font-lock-variable-name-face))))
+;;   "The face for project name on the mode-line of an active window."
+;;   :group '+modeline)
+;;
+;; (defface +modeline-project-name-inactive-face
+;;   '((t (:inherit (mode-line-inactive))))
+;;   "The face for project name on the mode-line of an inactive window."
+;;   :group '+modeline)
 
 (defface +modeline-buffer-name-active-face
   '((t (:inherit (font-lock-function-name-face bold))))
@@ -99,20 +104,6 @@
   "Display current Emacs macro being recorded."
   (cond (defining-kbd-macro "| MacroDef ")
         (executing-kbd-macro "| MacroExc ")))
-
-;; (defsubst +modeline-anzu-indicator ()
-;;   "Display the number for anzu."
-;;   (when (bound-and-true-p anzu--state)
-;;     (let ((here anzu--current-position)
-;;           (total anzu--total-matched))
-;;       (cond ((eq anzu--state 'replace-query)
-;;              (format "| %d replace " anzu--cached-count))
-;;             ((eq anzu--state 'replace)
-;;              (format "| %d/%d " here total))
-;;             (anzu--overflow-p
-;;              (format "| %s+ " total))
-;;             (t
-;;              (format "| %s/%d search " here total))))))
 
 (defsubst +modeline-multiple-cursors-indicator ()
   "Display the number of multiple cursors."
@@ -147,18 +138,17 @@
 
 
 ;;; Cache project name
-(defvar-local +modeline-project-name nil)
-(defsubst +modeline-update-project-name ()
-  "Get project name for current buffer."
-  (setq +modeline-project-name
-        (when (buffer-file-name)
-          (when-let ((project (project-current)))
-            (concat
-             (file-name-nondirectory
-              (directory-file-name (project-root project)))
-             ":")))))
-(add-hook 'find-file-hook #'+modeline-update-project-name)
-(add-hook 'after-change-major-mode-hook #'+modeline-update-project-name)
+;; (defvar-local +modeline-project-name nil)
+;; (defsubst +modeline-update-project-name ()
+;;   "Get project name for current buffer."
+;;   (setq +modeline-project-name
+;;         (when (buffer-file-name)
+;;           (when-let ((project (project-current)))
+;;             (concat " "
+;;                     (file-name-nondirectory
+;;                      (directory-file-name (project-root project))))))))
+;; (add-hook 'find-file-hook #'+modeline-update-project-name)
+;; (add-hook 'after-change-major-mode-hook #'+modeline-update-project-name)
 
 ;;; Cache remote host name
 (defvar-local +modeline-remote-host-name nil)
@@ -196,10 +186,10 @@
   (setq +modeline-encoding
         `(,(if (memq (coding-system-category buffer-file-coding-system)
                      '(coding-category-undecided coding-category-utf-8))
-               "UTF-8"
+               (when +modeline-show-common-encodings "UTF-8")
              (upcase (symbol-name (coding-system-get buffer-file-coding-system :name))))
           ,(pcase (coding-system-eol-type buffer-file-coding-system)
-             (0 ":LF ")
+             (0 (when +modeline-show-common-encodings ":LF "))
              (1 ":CRLF ")
              (2 ":CR ")
              (_ " ")))))
@@ -213,7 +203,6 @@
                              face +modeline-meta-active-face)
                 (:propertize ,(when (+modeline-window-active-p)
                                 (concat (+modeline-macro-indicator)
-                                        ;; (+modeline-anzu-indicator)
                                         (+modeline-multiple-cursors-indicator)
                                         (+modeline-symbol-overlay-indicator)
                                         (+modeline-use-region-indicator)
@@ -221,21 +210,18 @@
                              face +modeline-meta-active-face)
                 (:propertize " %*" face +modeline-modification-active-face)
                 " %I "
-                (:propertize +modeline-project-name
-                             face +modeline-project-name-active-face)
                 (:propertize "%b" face +modeline-buffer-name-active-face)
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
-                (:propertize vc-mode
-                             face +modeline-vc-mode-active-face)
                 ))
-         (rhs '(
+         (rhs '((:propertize vc-mode face +modeline-vc-mode-active-face)
+                " "
                 (:propertize mode-name
                              face +modeline-buffer-name-active-face)
                 (:eval +modeline-flymake-indicator)
                 " "
                 (:eval +modeline-encoding)
-                (:propertize " %l,%C "
+                (:propertize " %l:%C "
                              face +modeline-line-number-active-face)
                 " "
                 (-3 "%p")
@@ -252,17 +238,14 @@
   (let* ((lhs `((:propertize ,(+modeline-get-window-name)
                              face +modeline-meta-inactive-face)
                 "%* %I "
-                (:propertize +modeline-project-name
-                             face +modeline-project-name-inactive-face)
                 (:propertize "%b" face +modeline-buffer-name-active-face)
-                (:propertize +modeline-remote-host-name
-                             face +modeline-host-name-active-face)
-                (:eval vc-mode)
                 ))
-         (rhs '((:eval mode-name)
+         (rhs '((:eval vc-mode)
+                " "
+                (:eval mode-name)
                 " "
                 (:eval +modeline-encoding)
-                "%l,%C "
+                "%l:%C "
                 (-3 "%p")
                 "%%"))
          (rhs-str (format-mode-line rhs))
@@ -278,7 +261,6 @@
                              face +modeline-meta-active-face)
                 (:propertize ,(when (+modeline-window-active-p)
                                 (concat (+modeline-macro-indicator)
-                                        ;; (+modeline-anzu-indicator)
                                         (+modeline-multiple-cursors-indicator)
                                         (+modeline-symbol-overlay-indicator)
                                         (+modeline-use-region-indicator)
@@ -290,8 +272,7 @@
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
                 ))
-         (rhs '(
-                (:propertize mode-name
+         (rhs '((:propertize mode-name
                              face +modeline-buffer-name-active-face)
                 " "
                 (:eval +modeline-encoding)
@@ -329,4 +310,27 @@
                            (if +modeline-large-width-p (+mode-line-active-long) (+mode-line-active-short))
                          (if +modeline-large-width-p (+mode-line-inactive-long) (+mode-line-inactive-short))))))
 
+
+;; Cache project info
+(defvar-local +mode-line-project-info nil)
+(defsubst +mode-line-update-project-info ()
+  (setq +mode-line-project-info
+        ))
+
 (setq-default header-line-format nil)
+
+(defsubst +header-line-update ()
+  (setq-local header-line-format
+              (when (and buffer-file-name (project-current))
+                '((:eval (let* ((lhs '(" "
+                                       (:eval breadcrumb--header-line)))
+                                (rhs '((:eval vc-mode)
+                                       " "))
+                                (rhs-str (format-mode-line rhs))
+                                (rhs-w (string-width rhs-str)))
+                           `(,lhs
+                             ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
+                             ,rhs-str))))))
+  )
+(add-hook 'find-file-hook #'+header-line-update)
+(add-hook 'after-change-major-mode-hook #'+header-line-update)

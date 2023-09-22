@@ -142,14 +142,15 @@
 (use-package gruvbox-theme
   :straight t)
 
-(defvar +light-theme 'modus-operandi)
+(defvar +light-theme 'gruvbox-light-medium)
 (defvar +dark-theme 'gruvbox)
 (defun +load-theme (&optional theme)
   (unless theme
-    (setq theme (if (and (eq system-type 'darwin)
-                         (display-graphic-p)
-                         (eq (plist-get (mac-application-state) ':appearance)
-                             "NSAppearanceNameAqua"))
+    (setq theme (if (and (display-graphic-p)
+                         (cond ((eq system-type 'darwin)
+                                (string= (plist-get (mac-application-state) ':appearance)
+                                         "NSAppearanceNameAqua"))
+                               (t t)))
                     +light-theme
                   +dark-theme)))
   (unless (member theme custom-enabled-themes)
@@ -195,7 +196,7 @@
   ;; :custom-face
   ;; (tab-bar-tab ((t (:inverse-video t))))
   :config
-  (setq tab-bar-separator " "
+  (setq tab-bar-separator "​​​"
         tab-bar-close-button-show nil
         tab-bar-tab-hints t
         tab-bar-new-tab-choice "*scratch*"
@@ -226,12 +227,13 @@
 
   ;; add [persp-name] and [meow-indicator] on tab-bar
   (defun +tab-bar-persp-name ()
-    (when-let ((name (and (bound-and-true-p persp-mode)
-                          (propertize persp-last-persp-name 'face 'font-lock-function-name-face)))
-               (count (length persp-names-cache)))
-      (if (> count 1)
-          (format "[%s/%d] " name count)
-        (concat "[" name "] "))))
+    (when-let* ((name (and (bound-and-true-p persp-mode)
+                           persp-last-persp-name))
+                (count (length persp-names-cache))
+                (text (if (> count 1)
+                          (format " %s/%d " name count)
+                        (concat " " name " "))))
+      (propertize text 'face '(:inherit font-lock-variable-use-face :inverse-video t))))
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
   ;; WORKAROUND: fresh tab-bar for daemon
@@ -239,3 +241,19 @@
     (add-hook 'after-make-frame-functions
               (lambda (frame) (tab-bar--update-tab-bar-lines (list frame)))))
   )
+
+(setq frame-title-format
+      '((:eval (or buffer-file-truename "%b"))
+        (" · Emacs")))
+
+;; [breadcrumb]
+(use-package breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb" :files ("dist" "*.el"))
+  :hook ((find-file . +breadcrumb-local-mode-if-in-project))
+  :config
+  (defun +breadcrumb-local-mode-if-in-project ()
+    (when (project-current)
+      (breadcrumb-local-mode t)))
+
+  (setq breadcrumb-project-max-length 0.4
+        breadcrumb-imenu-crumb-separator "·"))

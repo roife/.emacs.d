@@ -25,4 +25,7 @@
 
 
 ;; Automatically switch theme based on the theme of macOS
-(add-hook 'mac-effective-appearance-change-hook #'(lambda (_) (+load-theme)))
+(add-hook 'mac-effective-appearance-change-hook #'(lambda () (+load-theme)))
+
+;; Selects the most-recently-used ASCII-capable keyboard input source when in chineses input mode
+(mac-auto-ascii-mode)

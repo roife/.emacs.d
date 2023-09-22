@@ -59,6 +59,3 @@
 ;;   :after treemacs tab-bar
 ;;   :functions treemacs-set-scope-type
 ;;   :config (treemacs-set-scope-type 'Tab))
-
-
-

@@ -291,7 +291,6 @@
         completion-category-defaults nil)
   )
 
-
 ;; [Eldoc]
 (use-package eldoc
   :config
@@ -303,7 +302,7 @@
 ;; [eldoc-box] Eldoc with childframe
 (use-package eldoc-box
   :straight t
-  :hook (eldoc-mode . eldoc-box-hover-mode)
+  :hook (eldoc-mode . eldoc-box-hover-at-point-mode)
  )
 
 
@@ -316,6 +315,7 @@
 
 ;; [copilot]
 (use-package copilot
+  :when (executable-find "node")
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :hook ((prog-mode . copilot-mode))
   :config
@@ -344,3 +344,11 @@
               ("C-c '" . separedit))
   :config
   (setq separedit-default-mode 'markdown-mode))
+
+
+;; [agda]
+(use-package agda
+  :when (executable-find "agda-mode")
+  :init
+  (load-file (let ((coding-system-for-read 'utf-8))
+             (shell-command-to-string "agda-mode locate"))))

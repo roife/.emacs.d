@@ -35,7 +35,8 @@
 ;; [avy] Jump with several key strock
 (use-package avy
   :straight t
-  :bind (("C-, ," . avy-goto-char-2)
+  :bind (("C-, ." . avy-goto-char)
+         ("C-, ," . avy-goto-char-2)
          ("C-, l" . avy-goto-line))
   :hook (after-init . avy-setup-default)
   )
@@ -439,4 +440,12 @@ begin and end of the block surrounding point."
   (setq ispell-aspell-dict-dir (ispell-get-aspell-config-value "dict-dir")
         ispell-aspell-data-dir (ispell-get-aspell-config-value "data-dir")
         ispell-personal-dictionary (expand-file-name "ispell/.pws" user-emacs-directory))
+  )
+
+
+;; [embrace]
+(use-package embrace
+  :straight t
+  :bind ("C-." . embrace-commander)
+  :hook (org-mode . embrace-org-mode-hook)
   )
