@@ -302,7 +302,7 @@
 ;; [eldoc-box] Eldoc with childframe
 (use-package eldoc-box
   :straight t
-  :hook (eldoc-mode . eldoc-box-hover-at-point-mode)
+  :hook (eldoc-mode . eldoc-box-hover-mode)
  )
 
 

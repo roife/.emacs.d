@@ -7,7 +7,7 @@
   :custom-face
   (cfrs-border-color ((t (:inherit posframe-border))))
   :bind (("s-`"       . treemacs-select-window)
-         ("C-x t t"   . treemacs)
+         ("C-x t t"   . +treemacs-toggle)
          :map treemacs-mode-map
          ([mouse-1]   . treemacs-single-click-expand-action))
   :config
@@ -31,7 +31,23 @@
         treemacs-width                   30
         treemacs-no-png-images           t)
 
-  (treemacs-filewatch-mode t))
+  (treemacs-filewatch-mode t)
+  (treemacs-follow-mode -1)
+
+  (defun +treemacs-toggle ()
+    "Initialize or toggle treemacs.
+
+Ensures that only the current project is present and all other projects have
+been removed.
+
+Use `treemacs' command for old functionality."
+    (interactive)
+    (require 'treemacs)
+    (pcase (treemacs-current-visibility)
+      (`visible (delete-window (treemacs-get-local-window)))
+      (_ (if (project-current)
+             (treemacs-add-and-display-current-project-exclusively)
+           (treemacs))))))
 
 
 (use-package treemacs-magit
@@ -51,11 +67,3 @@
   :after treemacs persp-mode
   :functions treemacs-set-scope-type
   :config (treemacs-set-scope-type 'Perspectives))
-
-
-;; (use-package treemacs-tab-bar
-;;   :straight t
-;;   :demand t
-;;   :after treemacs tab-bar
-;;   :functions treemacs-set-scope-type
-;;   :config (treemacs-set-scope-type 'Tab))
