@@ -3,9 +3,9 @@
 (eval-when-compile (require 'subr-x))
 (eval-when-compile (require 'cl-lib))
 
-; show encodings for UTF-8:LF
+                                        ; show encodings for UTF-8:LF
 (defvar +modeline-show-common-encodings nil)
-; show VC tools name for Git
+                                        ; show VC tools name for Git
 (defvar +modeline-show-common-vc-tools-name nil)
 
 ;;; Get current window
@@ -156,7 +156,7 @@
   "Hostname for remote buffers."
   (setq +modeline-remote-host-name
         (when-let ((hostname (and default-directory
-                              (file-remote-p default-directory 'host))))
+                                  (file-remote-p default-directory 'host))))
           (when (not (string-equal hostname "localhost"))
             (format "@%s" hostname)))
         ))
@@ -214,9 +214,7 @@
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
                 ))
-         (rhs '((:propertize vc-mode face +modeline-vc-mode-active-face)
-                " "
-                (:propertize mode-name
+         (rhs '((:propertize mode-name
                              face +modeline-buffer-name-active-face)
                 (:eval +modeline-flymake-indicator)
                 " "
@@ -238,11 +236,8 @@
   (let* ((lhs `((:propertize ,(+modeline-get-window-name)
                              face +modeline-meta-inactive-face)
                 "%* %I "
-                (:propertize "%b" face +modeline-buffer-name-active-face)
-                ))
-         (rhs '((:eval vc-mode)
-                " "
-                (:eval mode-name)
+                (:propertize "%b" face +modeline-buffer-name-active-face)))
+         (rhs '((:eval mode-name)
                 " "
                 (:eval +modeline-encoding)
                 "%l:%C "
@@ -254,83 +249,38 @@
       ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
       ,rhs-str)))
 
-
-(defsubst +mode-line-active-short ()
-  "Formatting active-long modeline."
-  (let* ((lhs `((:propertize ,(+modeline-get-window-name)
-                             face +modeline-meta-active-face)
-                (:propertize ,(when (+modeline-window-active-p)
-                                (concat (+modeline-macro-indicator)
-                                        (+modeline-multiple-cursors-indicator)
-                                        (+modeline-symbol-overlay-indicator)
-                                        (+modeline-use-region-indicator)
-                                        (+modeline-overwrite-indicator)))
-                             face +modeline-meta-active-face)
-                (:propertize " %*" face +modeline-modification-active-face)
-                " "
-                (:propertize "%b" face +modeline-buffer-name-active-face)
-                (:propertize +modeline-remote-host-name
-                             face +modeline-host-name-active-face)
-                ))
-         (rhs '((:propertize mode-name
-                             face +modeline-buffer-name-active-face)
-                " "
-                (:eval +modeline-encoding)
-                (:propertize " %l "
-                             face +modeline-line-number-active-face)
-                " "
-                (-3 "%p")
-                "%%"))
-         (rhs-str (format-mode-line rhs))
-         (rhs-w (string-width rhs-str)))
-    `(,lhs
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
-      ,rhs-str)))
-
-(defsubst +mode-line-inactive-short ()
-  "Formatting active-long modeline."
-  (let* ((lhs `((:propertize ,(+modeline-get-window-name)
-                             face +modeline-meta-inactive-face)
-                "%* "
-                (:propertize "%b" face +modeline-buffer-name-active-face)
-                (:propertize +modeline-remote-host-name
-                             face +modeline-host-name-active-face)
-                ))
-         (rhs '(" %l  "
-                (-3 "%p")
-                "%%"))
-         (rhs-str (format-mode-line rhs))
-         (rhs-w (string-width rhs-str)))
-    `(,lhs
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
-      ,rhs-str)))
-
 (setq-default mode-line-format
               '((:eval (if (+modeline-window-active-p)
-                           (if +modeline-large-width-p (+mode-line-active-long) (+mode-line-active-short))
-                         (if +modeline-large-width-p (+mode-line-inactive-long) (+mode-line-inactive-short))))))
+                           (+mode-line-active-long)
+                         (+mode-line-inactive-long)))))
 
 
-;; Cache project info
-(defvar-local +mode-line-project-info nil)
-(defsubst +mode-line-update-project-info ()
-  (setq +mode-line-project-info
-        ))
+;;; Header Line
+
+;; [breadcrumb]
+(use-package breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
+  :commands breadcrumb--header-line
+  :config
+  (setq breadcrumb-project-max-length 0.5
+        breadcrumb-imenu-crumb-separator "·"))
 
 (setq-default header-line-format nil)
 
 (defsubst +header-line-update ()
   (setq-local header-line-format
               (when (and buffer-file-name (project-current))
-                '((:eval (let* ((lhs '(" "
-                                       (:eval breadcrumb--header-line)))
-                                (rhs '((:eval vc-mode)
-                                       " "))
-                                (rhs-str (format-mode-line rhs))
-                                (rhs-w (string-width rhs-str)))
-                           `(,lhs
-                             ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
-                             ,rhs-str))))))
+                '((:eval
+                   (let* ((lhs '(" "
+                                 (:eval (breadcrumb--header-line))))
+                          (rhs '((:eval vc-mode)
+                                 " "))
+                          (rhs-str (format-mode-line rhs))
+                          (rhs-w (string-width rhs-str)))
+                     `(,lhs
+                       ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
+                       ,rhs-str))))))
   )
+
 (add-hook 'find-file-hook #'+header-line-update)
 (add-hook 'after-change-major-mode-hook #'+header-line-update)

@@ -196,7 +196,7 @@
   ;; :custom-face
   ;; (tab-bar-tab ((t (:inverse-video t))))
   :config
-  (setq tab-bar-separator "​​​"
+  (setq tab-bar-separator "​​​​"
         tab-bar-close-button-show nil
         tab-bar-tab-hints t
         tab-bar-new-tab-choice "*scratch*"
@@ -219,10 +219,10 @@
                     (format "%s (%d)" truncated-tab-name count)
                   truncated-tab-name))))
 
-  ;; add spaces for tab-name
+  ;; Add spaces for tab-name
   (setq tab-bar-tab-name-format-function
         (lambda (tab i) (propertize
-                    (format " %d %s " i (alist-get 'name tab))
+                    (format "​​​​​​​%d​​​​​​​%s​​​​​​​" i (alist-get 'name tab))
                     'face (funcall tab-bar-tab-face-function tab))))
 
   ;; add [persp-name] and [meow-indicator] on tab-bar
@@ -236,7 +236,7 @@
       (propertize text 'face '(:inherit font-lock-variable-use-face :inverse-video t))))
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
-  ;; WORKAROUND: fresh tab-bar for daemon
+  ;; [WORKAROUND]: fresh tab-bar for daemon
   (when (daemonp)
     (add-hook 'after-make-frame-functions
               (lambda (frame) (tab-bar--update-tab-bar-lines (list frame)))))
@@ -245,15 +245,3 @@
 (setq frame-title-format
       '((:eval (or buffer-file-truename "%b"))
         (" · Emacs")))
-
-;; [breadcrumb]
-(use-package breadcrumb
-  :straight (:host github :repo "joaotavora/breadcrumb" :files ("dist" "*.el"))
-  :hook ((find-file . +breadcrumb-local-mode-if-in-project))
-  :config
-  (defun +breadcrumb-local-mode-if-in-project ()
-    (when (project-current)
-      (breadcrumb-local-mode t)))
-
-  (setq breadcrumb-project-max-length 0.4
-        breadcrumb-imenu-crumb-separator "·"))

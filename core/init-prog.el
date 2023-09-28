@@ -164,7 +164,7 @@
 
 
 (use-package llvm-mode
-  :straight (:host github :repo "nverno/llvm-mode" :files ("dist" "*.el")))
+  :straight (:host github :repo "nverno/llvm-mode" :files ("*.el")))
 
 
 (use-package swift-mode

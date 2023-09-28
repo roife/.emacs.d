@@ -39,7 +39,7 @@
                      'init-writing
                      'init-org
                      'init-vcs
-                     'init-treemacs
+                     ;; 'init-treemacs
                      'init-eww
                      'init-dict
                      'init-elfeed

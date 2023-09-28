@@ -12,6 +12,7 @@
   (org-quote ((t (:inherit org-block-begin-line))))
   :hook ((org-mode . +org-dabbrev-skipping-leading-char))
   :config
+  ;; [WORKAROUND] inline highlight for CJK
   (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:][:alpha:]"
                                          "-[:space:].,:!?;'\")}\\[[:nonascii:][:alpha:]"
                                          "[:space:]"
@@ -115,8 +116,6 @@ Assume point is at first MARK."
                                    :contents-end contents-end)))))))))))))
   (advice-add #'org-element--parse-generic-emphasis :override #'+org-element--parse-generic-emphasis)
 
-
-
   (defun +org-dabbrev-skipping-leading-char ()
     (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))
 
@@ -168,15 +167,7 @@ Assume point is at first MARK."
   (setq org-export-with-smart-quotes t
         org-html-validation-link nil
         org-latex-prefer-user-labels t
-        org-export-with-latex t)
-  ;; styles for chineses (zero-width-space)
-  (defun +org-export-remove-zero-width-space (text _backend _info)
-    "Remove zero width space character (U+200B) from TEXT."
-    (unless (org-export-derived-backend-p 'org)
-      (replace-regexp-in-string "\x200B" "" text)))
-
-  (add-to-list 'org-export-filter-final-output-functions
-               #'+org-export-remove-zero-width-space))
+        org-export-with-latex t))
 
 ;; [ox-hugo]
 (use-package ox-hugo
