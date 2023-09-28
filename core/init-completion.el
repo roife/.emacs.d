@@ -4,7 +4,8 @@
   :straight (:files (:defaults "extensions/*.el"))
   :bind (:map vertico-map
               ("TAB" . minibuffer-complete)
-              ("<tab>" . minibuffer-complete))
+              ("<tab>" . minibuffer-complete)
+              ("C-r" . vertico-repeat-select))
   :hook ((after-init . vertico-mode))
   :defines (crm-separator)
   :config

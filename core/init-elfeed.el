@@ -1,14 +1,16 @@
 ;;; -*- lexical-binding: t -*-
 
+
+;; [elfeed] Read rss within Emacs
 (use-package elfeed
   :straight t
-  ;; :bind (:map elfeed-search-mode-map
-  ;;        ("g" . elfeed-update)
-  ;;        ("G" . elfeed-search-update--force)
-  ;;        :map elfeed-show-mode-map
-  ;;        ("M-v" . scroll-down-command)
-  ;;        ("j" . scroll-up-line)
-  ;;        ("k" . scroll-down-line))
+  :bind (:map elfeed-search-mode-map
+         ("g" . elfeed-update)
+         ("G" . elfeed-search-update--force)
+         :map elfeed-show-mode-map
+         ("M-v" . scroll-down-command)
+         ("j" . scroll-up-line)
+         ("k" . scroll-down-line))
   :config
   (setq elfeed-db-directory (expand-file-name "elfeed" user-emacs-directory)
         elfeed-feeds '(("https://sspai.com/feed" sspai)

@@ -31,19 +31,7 @@
   :config
   (setq
    ;; only show bad whitespace
-   whitespace-style '(face trailing empty indentation space-before-tab space-after-tab))
-
-  ;; toggle zero-width space display
-  (add-to-list 'whitespace-display-mappings '(space-mark #x200b [183]))
-  (add-to-list 'whitespace-display-mappings '(space-mark #x20 [? ]) t)
-  (defun +toggle-zero-width-space-display ()
-    (interactive)
-    (if (member 'space-mark whitespace-style)
-        (setq whitespace-style (remove 'space-mark whitespace-style))
-      (add-to-list 'whitespace-style 'space-mark))
-    (whitespace-mode -1)
-    (whitespace-mode +1))
-  )
+   whitespace-style '(face trailing empty indentation space-before-tab space-after-tab)))
 
 
 ;; [rainbow-delimiters] Highlight brackets according to their depth
@@ -93,14 +81,22 @@
   (setq hl-todo-require-punctuation t
         hl-todo-highlight-punctuation ":")
 
-  (dolist (keyword '("BUG" "DEFECT" "ISSUE" "FIXME"))
-    (cl-pushnew `(,keyword . ,(face-foreground 'error)) hl-todo-keyword-faces))
-  (dolist (keyword '("WORKAROUND" "HACK" "TRICK"))
-    (cl-pushnew `(,keyword . ,(face-foreground 'warning)) hl-todo-keyword-faces))
+  (defun +hl-todo-add-keywords (keys color)
+    (dolist (keyword keys)
+      (if-let ((item (assoc keyword hl-todo-keyword-faces)))
+          (setf (cdr item) color)
+        (push `(,keyword . ,color) hl-todo-keyword-faces))))
+
+  ;; HACK: `hl-todo' won't update face when changing theme, so we must add a hook for it
+  (defun +hl-update-keyword-faces (&rest _)
+    (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
+    (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning)))
+  (+hl-update-keyword-faces)
+  (advice-add #'enable-theme :after #'+hl-update-keyword-faces)
   )
 
 
-;; [diff-hl] Highlight uncommitted changes using VC
+;; ;; [diff-hl] Highlight uncommitted changes using VC
 (use-package diff-hl
   :straight t
   :defines desktop-minor-mode-table
@@ -155,54 +151,21 @@
   )
 
 
-;; [highlight-indent-guides] Highlight indentions
-;; (use-package highlight-indent-guides
-;;   :straight t
-;;   :functions (macrostep-collapse macrostep-expand)
-;;   :hook ((prog-mode yaml-mode) . (lambda () (unless (> (car (buffer-line-statistics)) 3000) (highlight-indent-guides-mode 1))))
-;;   :config
-;;   (setq highlight-indent-guides-method 'character
-;;               highlight-indent-guides-responsive 'top
-;;               highlight-indent-guides-suppress-auto-error t
-;;               highlight-indent-guides-delay 0.3)
-;;
-;;   ;; Don't display first level of indentation
-;;   (defun +indent-guides-for-all-but-first-column (level responsive display)
-;;     (unless (< level 1)
-;;       (highlight-indent-guides--highlighter-default level responsive display)))
-;;   (setq highlight-indent-guides-highlighter-function
-;;         #'+indent-guides-for-all-but-first-column)
-;;
-;;   ;; Disable in `macrostep' expanding
-;;   (with-eval-after-load 'macrostep
-;;     (advice-add #'macrostep-expand
-;;                 :after (lambda (&rest _)
-;;                          (when highlight-indent-guides-mode
-;;                            (highlight-indent-guides-mode -1))))
-;;     (advice-add #'macrostep-collapse
-;;                 :after (lambda (&rest _)
-;;                          (when (derived-mode-p 'prog-mode 'yaml-mode)
-;;                            (highlight-indent-guides-mode 1)))))
-;;
-;;   ;; HACK: `highlight-indent-guides' calculates its faces from the current theme,
-;;   ;; but is unable to do so properly in terminal Emacs
-;;   (defun +highligh-indent-guides-auto-set-faces (&rest _)
-;;     (when (display-graphic-p)
-;;             (highlight-indent-guides-auto-set-faces)))
-;;   (if (daemonp)
-;;       (add-hook 'server-after-make-frame-hook
-;;                 #'+highligh-indent-guides-auto-set-faces)
-;;     (advice-add #'enable-theme :after #'+highligh-indent-guides-auto-set-faces))
-;;   )
-
-
 ;; [indent-bars] Highlight indentions effectively
 (use-package indent-bars
   :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
   :hook (prog-mode . indent-bars-mode)
   :config
   (setq indent-bars-display-on-blank-lines nil
-        indent-bars-width-frac 0.1))
+        indent-bars-width-frac 0.2)
+
+  ;; HACK: `indent-bars' calculates its faces from the current theme,
+  ;; but is unable to do so properly in terminal Emacs
+  (defun +indent-bars-auto-set-faces (&rest _)
+    (when indent-bars-mode
+      (indent-bars-reset)))
+  (advice-add #'enable-theme :after #'+indent-bars-auto-set-faces)
+  )
 
 
 ;; [symbol-overlay] Highlight symbols

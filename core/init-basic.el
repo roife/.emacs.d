@@ -170,7 +170,7 @@
   )
 
 
-;; Workaround for long one-line file
+;; [so-long] Workaround for long one-line file
 (use-package so-long
   :hook (after-init . global-so-long-mode)
   :config
@@ -209,7 +209,7 @@
   )
 
 
-;; [tramp]
+;; [tramp] Edit file remotely
 (use-package tramp
   :config
   (setq tramp-default-method "ssh"

@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
+
+;; [emms] Enjoy music inside Emacs
 (use-package emms
   :straight t
   :config

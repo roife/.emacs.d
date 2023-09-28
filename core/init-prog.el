@@ -95,14 +95,6 @@
               (funcall fetcher))
             (funcall citre-fetcher)))))
 
-  ;; Integration with [eglot] as super capf
-  ;; (defalias #'+eglot-citre-capf
-  ;;   (cape-super-capf #'eglot-completion-at-point #'citre-completion-at-point))
-  ;;
-  ;; (add-hook 'eglot-managed-mode-hook
-  ;;           (lambda () (if (eglot-managed-p)
-  ;;                     (add-to-list 'completion-at-point-functions #'+eglot-citre-capf))))
-
   (require 'xref)
   (dolist (func '(find-function
                   consult-imenu
@@ -348,6 +340,7 @@
 
 ;; [agda]
 (use-package agda
+  :no-require t
   :when (executable-find "agda-mode")
   :init
   (load-file (let ((coding-system-for-read 'utf-8))

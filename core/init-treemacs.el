@@ -50,6 +50,7 @@ Use `treemacs' command for old functionality."
            (treemacs))))))
 
 
+;; [treemacs-magit] Magit integration for Treemacs
 (use-package treemacs-magit
   :straight t
   :demand t
@@ -61,6 +62,7 @@ Use `treemacs' command for old functionality."
           magit-post-unstage) . treemacs-magit--schedule-update))
 
 
+;; [treemacs-persp] Treemacs integration for persp-mode
 (use-package treemacs-persp
   :straight t
   :demand t

@@ -3,9 +3,9 @@
 (eval-when-compile (require 'subr-x))
 (eval-when-compile (require 'cl-lib))
 
-                                        ; show encodings for UTF-8:LF
+;; show encodings for UTF-8:LF
 (defvar +modeline-show-common-encodings nil)
-                                        ; show VC tools name for Git
+;; show VC tools name for Git
 (defvar +modeline-show-common-vc-tools-name nil)
 
 ;;; Get current window
@@ -257,7 +257,7 @@
 
 ;;; Header Line
 
-;; [breadcrumb]
+;; [breadcrumb] Add breadcrumb navigation in header-line
 (use-package breadcrumb
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
@@ -269,7 +269,7 @@
 
 (defsubst +header-line-update ()
   (setq-local header-line-format
-              (when (and buffer-file-name (project-current))
+              (when (and buffer-file-name (vc-backend buffer-file-name))
                 '((:eval
                    (let* ((lhs '(" "
                                  (:eval (breadcrumb--header-line))))

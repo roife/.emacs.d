@@ -122,6 +122,7 @@
   ;; Enable indicator in minibuffer
   (popper-echo-mode 1)
 
+  ;; HACK: close popper with `C-g'
   (defun +popper-close-window-hack (&rest _)
     "Close popper window via `C-g'."
     (when (and (called-interactively-p 'interactive)

@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+
+;; [meow] Modal editing
 (use-package meow
   :straight t
   :hook (after-init . meow-global-mode)

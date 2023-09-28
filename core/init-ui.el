@@ -113,7 +113,6 @@
 
 
 ;; Font
-
 (defvar +font-en-size (if (eq system-type 'darwin) 15 26))
 (defvar +font-zh-size (if (eq system-type 'darwin) 16 26))
 (defvar +font-emoji-size (if (eq system-type 'darwin) 11 16))
@@ -196,7 +195,7 @@
   ;; :custom-face
   ;; (tab-bar-tab ((t (:inverse-video t))))
   :config
-  (setq tab-bar-separator "​​​​"
+  (setq tab-bar-separator " "
         tab-bar-close-button-show nil
         tab-bar-tab-hints t
         tab-bar-new-tab-choice "*scratch*"
@@ -222,7 +221,7 @@
   ;; Add spaces for tab-name
   (setq tab-bar-tab-name-format-function
         (lambda (tab i) (propertize
-                    (format "​​​​​​​%d​​​​​​​%s​​​​​​​" i (alist-get 'name tab))
+                    (format " %d %s " i (alist-get 'name tab))
                     'face (funcall tab-bar-tab-face-function tab))))
 
   ;; add [persp-name] and [meow-indicator] on tab-bar
@@ -236,7 +235,7 @@
       (propertize text 'face '(:inherit font-lock-variable-use-face :inverse-video t))))
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
 
-  ;; [WORKAROUND]: fresh tab-bar for daemon
+  ;; WORKAROUND: fresh tab-bar for daemon
   (when (daemonp)
     (add-hook 'after-make-frame-functions
               (lambda (frame) (tab-bar--update-tab-bar-lines (list frame)))))

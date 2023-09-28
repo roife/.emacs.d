@@ -1,5 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
+;; [ebib] Managing BibTeX and biblatex databases
 (use-package ebib
   :straight t
   :config

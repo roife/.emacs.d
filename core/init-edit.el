@@ -65,7 +65,7 @@
   :hook ((prog-mode markdown-mode) . ws-butler-mode))
 
 
-;; Use [isearch] to replace anzu
+;; [isearch] Use builtin isearch to replace `anzu'
 (use-package isearch
   :bind (:map isearch-mode-map
               ([remap isearch-delete-char] . isearch-del-char))
@@ -128,14 +128,7 @@
   :bind ("C-+" . er/expand-region))
 
 
-;; [hungry-delete] Hungry deletion
-;; (use-package hungry-delete
-;;   :straight t
-;;   :hook (after-init . global-hungry-delete-mode)
-;;   :config
-;;   (setq hungry-delete-chars-to-skip " \t\f\v"
-;;         hungry-delete-except-modes
-;;         '(help-mode minibuffer-mode minibuffer-inactive-mode calc-mode)))
+;; Alternatives to [hungry-delete]
 (setq backward-delete-char-untabify-method 'hungry)
 
 
@@ -400,8 +393,7 @@ begin and end of the block surrounding point."
     (if (looking-back "^[[:blank:]]+")
         (let* ((puni-mode nil)
                (original-func (key-binding (kbd "DEL"))))
-          ;; original-func is whatever DEL would be if
-          ;; my-minor-mode were disabled
+          ;; original-func is what `DEL' would be if puni-mode were disabled
           (if (eq original-func 'delete-backward-char)
               (backward-delete-char-untabify 1)
             (call-interactively original-func)))
@@ -443,7 +435,7 @@ begin and end of the block surrounding point."
   )
 
 
-;; [embrace]
+;; [embrace] Add/change/delete pairs of symbol
 (use-package embrace
   :straight t
   :bind ("C-." . embrace-commander)

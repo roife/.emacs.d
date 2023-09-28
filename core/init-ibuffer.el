@@ -7,7 +7,7 @@
         ibuffer-use-other-window t)
   )
 
-;; Group ibuffer's list by project root
+;; [ibuffer-project] Group ibuffer's list by project root
 (use-package ibuffer-project
   :straight t
   :hook (ibuffer . +ibuffer-project-activete)

@@ -1,18 +1,16 @@
 ;;; -*- lexical-binding: t -*-
 
-;; [org-fragtog] Preview and edit latex in md/org
+;; [org-fragtog] Preview and edit latex in md/org elegantly
 (use-package org-fragtog
   :straight t
-  :hook ((org-mode . org-fragtog-mode))
-  )
+  :hook ((org-mode . org-fragtog-mode)))
 
 ;; [org]
 (use-package org
-  :custom-face
-  (org-quote ((t (:inherit org-block-begin-line))))
-  :hook ((org-mode . +org-dabbrev-skipping-leading-char))
+  :custom-face (org-quote ((t (:inherit org-block-begin-line))))
+  :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
   :config
-  ;; [WORKAROUND] inline highlight for CJK
+  ;; HACK: inline highlight for CJK
   (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:][:alpha:]"
                                          "-[:space:].,:!?;'\")}\\[[:nonascii:][:alpha:]"
                                          "[:space:]"
@@ -116,9 +114,6 @@ Assume point is at first MARK."
                                    :contents-end contents-end)))))))))))))
   (advice-add #'org-element--parse-generic-emphasis :override #'+org-element--parse-generic-emphasis)
 
-  (defun +org-dabbrev-skipping-leading-char ()
-    (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))
-
   ;; Use {} for sub- or super- scripts
   (setq org-use-sub-superscripts "{}")
 
@@ -206,9 +201,9 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
           (message "No Org files found in %s" search-path)
         (let ((cnt 1)
               (num-files (length org-files)))
-            (dolist (org-file org-files)
-              (with-current-buffer (find-file-noselect org-file)
-                (message "[ox-hugo/export-all file %d/%d] Exporting %s" cnt num-files org-file)
-                (org-hugo-export-wim-to-md :all-subtrees)
-                (cl-incf cnt)))))))
+          (dolist (org-file org-files)
+            (with-current-buffer (find-file-noselect org-file)
+              (message "[ox-hugo/export-all file %d/%d] Exporting %s" cnt num-files org-file)
+              (org-hugo-export-wim-to-md :all-subtrees)
+              (cl-incf cnt)))))))
   )

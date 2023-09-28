@@ -31,7 +31,7 @@
           dired-listing-switches "-alh --group-directories-first"))
   )
 
-;; Show git info in dired
+;; [dired-git-info] Show git info in dired
 (use-package dired-git-info
   :straight t
   :after dired
@@ -43,16 +43,19 @@
         dgi-auto-hide-details-p nil)
   )
 
-;; Extra Dired functionality
+;; [dired-aux] Extra Dired functionality
 (use-package dired-aux
   :after dired
   :config
   (setq dired-create-destination-dirs 'ask
         dired-vc-rename-file t))
 
+
+;; [dired-x] Extra Dired functionality
 (use-package dired-x
+  :after dired
   :bind (:map dired-mode-map
-              ("h" . dired-omit-mode))
+              ("." . dired-omit-mode))
   :config
   (let ((cmd (cond ((and (eq system-type 'darwin) (display-graphic-p)) "open")
                    ((and (eq system-type 'gnu/linux) (display-graphic-p)) "xdg-open")
@@ -70,28 +73,33 @@
             ("\\.\\(?:mp3\\|flac\\)\\'" ,cmd))))
 
   (setq dired-omit-verbose nil
-        dired-omit-files (concat dired-omit-files
-                                 "\\|^\\.DS_Store\\'"
-                                 "\\|^\\.project\\(?:ile\\)?\\'"
-                                 "\\|^\\.\\(?:svn\\|git\\)\\'"
-                                 "\\|^\\.ccls-cache\\'"
-                                 "\\|\\(?:\\.js\\)?\\.meta\\'"
-                                 "\\|\\.\\(?:elc\\|o\\|pyo\\|swp\\|class\\)\\'"))
+        ;; hide dot files
+        dired-omit-files "^\\..*\\'")
 
   ;; Disable the prompt about killing the Dired buffer for a deleted directory.
   (setq dired-clean-confirm-killing-deleted-buffers nil)
   )
 
+
+;; [fd-dired] Using `fd' with `find-dired'
 (use-package fd-dired
   :straight t
   :bind ([remap find-dired] . fd-dired))
 
+
+;; [dired-hacks] Several additional extensions for dired
 (use-package dired-hacks
   :straight (:files (:defaults "*.el"))
   :after dired
   :bind (:map dired-mode-map
-              ("TAB" . dired-subtree-toggle)))
+              ("TAB" . dired-subtree-toggle))
+  :init
+  ;; Don't show background, which is ugly in light themes
+  (with-eval-after-load 'dired-subtree
+    (setq dired-subtree-use-backgrounds nil)))
 
+
+;; [diredfl] Make dired colorful
 (use-package diredfl
   :straight t
   :hook (dired-mode . diredfl-mode))

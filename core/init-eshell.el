@@ -51,6 +51,7 @@
     (eshell/alias "fo" "find-file-other-window $1")
     (eshell/alias "d" "dired $1")
     (eshell/alias "l" "ls -lah $*")
+    (eshell/alias "ll" "ls -laG $*")
     (eshell/alias "q" "exit")
     (eshell/alias "rg" "rg --color=always $*")
     (eshell/alias "clear" "clear-scrollback")
@@ -100,7 +101,7 @@
                (eshell-parse-command (car l) (cdr l))))))
   (put 'eshell/ebc 'eshell-no-numeric-conversions t)
 
-  (defun eshell-view-file (file)
+  (defun +eshell-view-file (file)
     "View FILE.  A version of `view-file' which properly rets the eshell prompt."
     (interactive "fView file: ")
     (unless (file-exists-p file) (error "%s does not exist" file))
@@ -124,21 +125,21 @@
       (if (string-match "\\`\\+\\([0-9]+\\)\\'" (car args))
           (let* ((line (string-to-number (match-string 1 (pop args))))
                  (file (pop args)))
-            (eshell-view-file file)
+            (+eshell-view-file file)
             (forward-line line))
-        (eshell-view-file (pop args)))))
+        (+eshell-view-file (pop args)))))
   (defalias 'eshell/more #'eshell/less)
 
   ;; Sync buffer name
-  (defun eshell-sync-dir-buffer-name ()
+  (defun +eshell-sync-dir-buffer-name ()
     "Change eshell buffer name by directory change."
     (when (equal major-mode 'eshell-mode)
       (rename-buffer
        (format "Esh: %s" (abbreviate-file-name default-directory))
        t)))
 
-  (add-hook 'eshell-directory-change-hook #'eshell-sync-dir-buffer-name)
-  (add-hook 'eshell-mode-hook #'eshell-sync-dir-buffer-name)
+  (add-hook 'eshell-directory-change-hook #'+eshell-sync-dir-buffer-name)
+  (add-hook 'eshell-mode-hook #'+eshell-sync-dir-buffer-name)
   )
 
 

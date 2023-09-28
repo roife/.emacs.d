@@ -59,16 +59,17 @@
   )
 
 
-;; [smerge] Resolve diff3 conflicts
+;; [smerge] Highlight all the conflicted regions for git
 (use-package smerge-mode
   :hook ((find-file . smerge-try-smerge))
   :config
   (defun smerge-try-smerge ()
-    (save-excursion
-      (goto-char (point-min))
-      (when (re-search-forward "^<<<<<<< " nil t)
-        (require 'smerge-mode)
-        (smerge-mode 1))))
+    (when (and buffer-file-name (vc-backend buffer-file-name))
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "^<<<<<<< " nil t)
+          (require 'smerge-mode)
+          (smerge-mode 1)))))
   )
 
 
@@ -80,6 +81,6 @@
   )
 
 
-;; Git configuration major modes
+;; [git-modes] Git configuration major modes
 (use-package git-modes
   :straight t)

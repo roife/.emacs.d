@@ -35,7 +35,6 @@
                      'init-dired
                      'init-eshell
                      'init-prog
-                     ;; 'init-smartparens
                      'init-writing
                      'init-org
                      'init-vcs
@@ -49,10 +48,11 @@
                      'init-modal
                      'init-modeline
                      'init-bib
-                     ;; 'init-emms
+                     'init-emms
                      ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))
   (dolist (file +init-files)
     (when file
       (load-file (concat init-directory (symbol-name file) ".el")))))
+(put 'dired-find-alternate-file 'disabled nil)
