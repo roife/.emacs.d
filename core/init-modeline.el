@@ -263,12 +263,15 @@
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
-  (setq breadcrumb-project-max-length 0.5
-        breadcrumb-imenu-crumb-separator "·"
+  (setq breadcrumb-imenu-crumb-separator "·"
         breadcrumb-idle-time 10))
 
 
 ;; Cache vc info
+(defconst +vc-header-line-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [header-line down-mouse-1] vc-menu-entry)
+    map))
 (defvar-local +modeline-vcs-info nil)
 (defsubst +mode-line-update-vcs-info ()
   (when (and vc-mode buffer-file-name)
@@ -295,9 +298,12 @@
                                      ((eq state 'unregistered) "+")
                                      ((stringp state) (concat "#" state ":"))
                                      ((t " ")))))
-            (propertize (concat " (" rev state-symbol ")")
-                        'face face
-                        'help-echo (get-text-property 1 'help-echo vc-mode))))))
+            (concat " "
+                    (propertize (concat "(" rev state-symbol ")")
+                                'face face
+                                'help-echo (get-text-property 1 'help-echo vc-mode)
+                                'local-map +vc-header-line-map
+                                'mouse-face 'mode-line-highlight))))))
 (add-hook 'find-file-hook #'+mode-line-update-vcs-info)
 (add-hook 'after-save-hook #'+mode-line-update-vcs-info)
 (advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
