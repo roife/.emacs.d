@@ -138,3 +138,31 @@
 ;; [zoom] Managing the window sizes automatically
 (use-package zoom
   :straight t)
+
+
+;; [transient for window operations]
+(transient-define-prefix +frame-window-management ()
+  "Frame Window Management"
+  :transient-suffix     'transient--do-stay
+  :transient-non-suffix 'transient--do-warn
+  [["Actions"
+    ("TAB" "switch" other-window)
+    ("d" "delete" ace-delete-window)
+    ("D" "delete other" ace-delete-other-windows)
+    ("s" "swap" ace-swap-window)
+    ("a" "select" ace-select-window)]
+   ["Resize"
+    ("h"  "←" shrink-window-horizontally)
+    ("j" "→" enlarge-window)
+    ("k" "→" shrink-window)
+    ("l" "→" enlarge-window-horizontally)
+    ("n" "balance" balance-windows)]
+   ["Split"
+    ("r" "horizontally" split-window-right)
+    ("v" "vertically" split-window-below)]]
+  [["Font"
+    ("C-+" "larger" text-scale-increase)
+    ("C-=" "larger" text-scale-increase)
+    ("C--" "smaller" text-scale-decrease)
+    ("C-_" "smaller" text-scale-decrease)
+    ("C-0" "reset" (lambda () (interactive) (text-scale-increase 0)))]])
