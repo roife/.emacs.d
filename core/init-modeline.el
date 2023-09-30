@@ -259,28 +259,60 @@
 
 ;; [breadcrumb] Add breadcrumb navigation in header-line
 (use-package breadcrumb
+  :custom-face (breadcrumb-project-base-face ((t (:inherit breadcrumb-project-crumbs-face :bold t))))
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
   (setq breadcrumb-project-max-length 0.5
-        breadcrumb-imenu-crumb-separator "·"))
+        breadcrumb-imenu-crumb-separator "·"
+        breadcrumb-idle-time 10))
+
+
+;; Cache vc info
+(defvar-local +modeline-vcs-info nil)
+(defsubst +mode-line-update-vcs-info ()
+  (when (and vc-mode buffer-file-name)
+    (setq +modeline-vcs-info
+          (let* ((backend (vc-backend buffer-file-name))
+                 (state   (vc-state buffer-file-name backend))
+                 (rev     (if vc-display-status
+                              (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))
+                            ""))
+                 (face (cond ((eq state 'up-to-date) '(vc-dir-status-up-to-date))
+                             ((eq state 'ignored) '(vc-dir-status-ignored))
+                             ((memq state '(needs-update needs-merge conflict missing)) '(vc-dir-status-warning))
+                             (t '(vc-dir-status-edited))))
+                 (state-symbol (cond ((eq state 'up-to-date) "√")
+                                     ((eq state 'edited) "*")
+                                     ((eq state 'added) "@")
+                                     ((eq state 'needs-update) "￬")
+                                     ((eq state 'needs-merge) "&")
+                                     ((eq state 'unlocked-changes) "")
+                                     ((eq state 'removed) "×")
+                                     ((eq state 'conflict) "!")
+                                     ((eq state 'missing) "?")
+                                     ((eq state 'ignored) "-")
+                                     ((eq state 'unregistered) "+")
+                                     ((stringp state) (concat "#" state ":"))
+                                     ((t " ")))))
+            (propertize (concat " (" rev state-symbol ")")
+                        'face face
+                        'help-echo (get-text-property 1 'help-echo vc-mode))))))
+(add-hook 'find-file-hook #'+mode-line-update-vcs-info)
+(add-hook 'after-save-hook #'+mode-line-update-vcs-info)
+(advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
+
 
 (setq-default header-line-format nil)
 
 (defsubst +header-line-update ()
   (setq-local header-line-format
               (when (and buffer-file-name (vc-backend buffer-file-name))
-                '((:eval
-                   (let* ((lhs '(" "
-                                 (:eval (breadcrumb--header-line))))
-                          (rhs '((:eval vc-mode)
-                                 " "))
-                          (rhs-str (format-mode-line rhs))
-                          (rhs-w (string-width rhs-str)))
-                     `(,lhs
-                       ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
-                       ,rhs-str))))))
+                '((:eval +modeline-vcs-info)
+                  " "
+                  (:eval (breadcrumb--header-line)))))
   )
 
 (add-hook 'find-file-hook #'+header-line-update)
 (add-hook 'after-change-major-mode-hook #'+header-line-update)
+
