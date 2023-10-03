@@ -36,6 +36,7 @@
 (setq package-enable-at-startup nil)
 
 ;; Faster to disable these here (before initialized)
+(push '(tab-bar-lines . 1) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -44,7 +45,8 @@
 ; Set these to nil so users don't have to toggle the modes twice to reactivate.
 (setq menu-bar-mode nil
       tool-bar-mode nil
-      scroll-bar-mode nil)
+      scroll-bar-mode nil
+      tab-bar-mode t)
 
 ;; Case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)

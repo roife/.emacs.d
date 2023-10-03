@@ -127,8 +127,9 @@
   (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
   (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append))
 
-(add-hook 'window-setup-hook #'+setup-fonts)
-(add-hook 'server-after-make-frame-hook #'+setup-fonts)
+(+setup-fonts)
+;; (add-hook 'window-setup-hook #'+setup-fonts)
+;; (add-hook 'server-after-make-frame-hook #'+setup-fonts)
 
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)
@@ -136,13 +137,9 @@
         mouse-wheel-scroll-amount-horizontal 1
         mouse-wheel-progressive-speed nil))
 
-
 ;; Load theme
-(use-package gruvbox-theme
-  :straight t)
-
-(defvar +light-theme 'gruvbox-light-medium)
-(defvar +dark-theme 'gruvbox)
+(defvar +light-theme 'modus-operandi)
+(defvar +dark-theme 'modus-vivendi)
 (defun +load-theme (&optional theme)
   (unless theme
     (setq theme (if (and (display-graphic-p)
@@ -157,7 +154,6 @@
     (load-theme theme t)))
 
 (+load-theme)
-
 
 ;; [window-divider] Display window divider
 (setq window-divider-default-places t
@@ -191,18 +187,17 @@
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
-  :hook (window-setup . tab-bar-mode)
-  ;; :custom-face
-  ;; (tab-bar-tab ((t (:inverse-video t))))
+  ;; Turn on tab-bar-mode in early-init to speed-up
+  ;; :hook (window-setup . tab-bar-mode)
   :config
   (setq tab-bar-separator " "
-        tab-bar-close-button-show nil
-        tab-bar-tab-hints t
         tab-bar-new-tab-choice "*scratch*"
-        tab-bar-select-tab-modifiers '(super)
         tab-bar-tab-name-truncated-max 20
         tab-bar-auto-width nil
-        )
+        tab-bar-close-button-show nil
+        tab-bar-tab-hints t)
+
+  (customize-set-variable 'tab-bar-select-tab-modifiers '(super))
 
   ;; truncate for [tab name] and add count
   (setq tab-bar-tab-name-function
@@ -232,14 +227,15 @@
           (when-let* ((persp-list (and (bound-and-true-p persp-mode)
                                        (persp-names-current-frame-fast-ordered)))
                       (cur-persp (safe-persp-name (get-current-persp)))
-                      (persp-list-text (concat " " (string-join (cl-substitute (concat "@" cur-persp) cur-persp persp-list :count 1) " ") " "))
-                      (propertized-text (propertize persp-list-text
-                                                    'face '(:inherit font-lock-variable-name-face :inverse-video t))))
-            `((persp-indicator
-               menu-item
-               ,propertized-text
-               +tab-bar-persp-menu
-               :help "Perp-mode indicator\nmouse-1: popup menu")))))
+                      (subst-persp-list (cl-substitute (concat "@" cur-persp) cur-persp persp-list :count 1))
+                      (persp-list-text (concat " " (string-join subst-persp-list " "))))
+            (propertize persp-list-text 'face '(:inherit font-lock-variable-name-face))
+            ;; `((persp-indicator
+            ;;    menu-item
+            ;;    ,propertized-text
+            ;;    +tab-bar-persp-menu
+            ;;    :help "Perp-mode indicator\nmouse-1: popup menu"))
+            )))
   (defun +tab-bar-persp-indicator ()
     (or +tab-bar-persp-indicator-cache (+tab-bar-update-persp-indicator)))
 
@@ -252,24 +248,26 @@
                        (+tab-bar-update-persp-indicator)
                        (force-mode-line-update t))))
 
-  (defun +tab-bar-persp-menu (event)
-    "Pop up the same menu as displayed by the menu bar.
-Used by `tab-bar-format-menu-bar'."
-    (interactive "e")
-    (let ((menu (make-sparse-keymap (propertize "Menu Bar" 'hide t))))
-      (run-hooks 'activate-menubar-hook 'menu-bar-update-hook)
-      (map-keymap (lambda (key binding)
-                    (when (consp binding)
-                      (define-key-after menu (vector key)
-                        (copy-sequence binding))))
-                  persp-minor-mode-menu)
-      (popup-menu menu event)))
-  (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-indicator meow-indicator))
+;;   (defun +tab-bar-persp-menu (event)
+;;     "Pop up the same menu as displayed by the menu bar.
+;; Used by `tab-bar-format-menu-bar'."
+;;     (interactive "e")
+;;     (let ((menu (make-sparse-keymap (propertize "Menu Bar" 'hide t))))
+;;       (run-hooks 'activate-menubar-hook 'menu-bar-update-hook)
+;;       (map-keymap (lambda (key binding)
+;;                     (when (consp binding)
+;;                       (define-key-after menu (vector key)
+;;                         (copy-sequence binding))))
+;;                   persp-minor-mode-menu)
+  ;;       (popup-menu menu event)))
+
+
+  (setq tab-bar-format '(meow-indicator +tab-bar-persp-indicator tab-bar-format-tabs tab-bar-separator))
 
   ;; WORKAROUND: fresh tab-bar for daemon
   (when (daemonp)
     (add-hook 'after-make-frame-functions
-              #'(lambda (&rest _) (force-mode-line-update t))))
+              #'(lambda (&rest _) (force-mode-line-update))))
   )
 
 (setq frame-title-format
