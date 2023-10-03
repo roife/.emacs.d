@@ -20,7 +20,8 @@
   :custom-face (show-paren-match ((t (:underline t))))
   :config
   (setq show-paren-when-point-inside-paren t
-        show-paren-when-point-in-periphery t)
+        show-paren-when-point-in-periphery t
+        show-paren-context-when-offscreen t)
   )
 
 
@@ -48,7 +49,7 @@
   :straight t
   :functions (rainbow-turn-off rainbow-colorize-match rainbow-x-color-luminance)
   :bind (:map help-mode-map
-              ("w" . rainbow-mode))
+              ("r" . rainbow-mode))
   :hook ((html-mode css-mode) . rainbow-mode)
   :config
   ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
@@ -174,6 +175,13 @@
   :bind (("C-c s i" . symbol-overlay-put)
          ("C-c s n" . symbol-overlay-switch-forward)
          ("C-c s p" . symbol-overlay-switch-backward)
-         ("C-c s c" . symbol-overlay-remove-all))
+         ("C-c s c" . symbol-overlay-remove-all)
+         :map symbol-overlay-map
+         ;; conflits with `meow'
+         ("h" . nil)
+         ("q" . nil)
+         ("R" . symbol-overlay-query-replace)
+         ("?" . symbol-overlay-map-help)
+         )
   :hook (((prog-mode yaml-mode) . symbol-overlay-mode))
   )

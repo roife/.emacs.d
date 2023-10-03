@@ -9,7 +9,6 @@
   ;; (aw-mode-line-face ((t (:inherit mode-line-emphasis :bold t))))
   :bind (([remap other-window] . ace-window))
   :hook ((window-configuration-change . aw-update)) ;; For modeline
-  ;; (add-hook 'after-make-frame-functions #'aw--after-make-frame t)
   :config
   (setq aw-scope 'frame
         aw-background nil
@@ -141,28 +140,34 @@
 
 
 ;; [transient for window operations]
-(transient-define-prefix +frame-window-management ()
-  "Frame Window Management"
-  :transient-suffix     'transient--do-stay
-  :transient-non-suffix 'transient--do-warn
-  [["Actions"
-    ("TAB" "switch" other-window)
-    ("d" "delete" ace-delete-window)
-    ("D" "delete other" ace-delete-other-windows)
-    ("s" "swap" ace-swap-window)
-    ("a" "select" ace-select-window)]
-   ["Resize"
-    ("h"  "←" shrink-window-horizontally)
-    ("j" "→" enlarge-window)
-    ("k" "→" shrink-window)
-    ("l" "→" enlarge-window-horizontally)
-    ("n" "balance" balance-windows)]
-   ["Split"
-    ("r" "horizontally" split-window-right)
-    ("v" "vertically" split-window-below)]]
-  [["Font"
-    ("C-+" "larger" text-scale-increase)
-    ("C-=" "larger" text-scale-increase)
-    ("C--" "smaller" text-scale-decrease)
-    ("C-_" "smaller" text-scale-decrease)
-    ("C-0" "reset" (lambda () (interactive) (text-scale-increase 0)))]])
+;; (transient-define-prefix +frame-window-management ()
+;;   "Frame Window Management"
+;;   :transient-suffix     'transient--do-stay
+;;   ;; :transient-non-suffix 'transient--do-warn
+;;   [["Actions"
+;;     ("TAB" "switch" other-window)
+;;     ("d" "delete" ace-delete-window)
+;;     ("D" "delete other" ace-delete-other-windows)
+;;     ("s" "swap" ace-swap-window)
+;;     ("a" "select" ace-select-window)]
+;;    ["Resize"
+;;     (""  "←" shrink-window-horizontally)
+;;     ("j" "→" enlarge-window)
+;;     ("k" "→" shrink-window)
+;;     ("l" "→" enlarge-window-horizontally)
+;;     ("n" "balance" balance-windows)]
+;;    ["Split"
+;;     ("" "right" split-window-right)
+;;     ("" "below" split-window-below)]
+;;    ["Winner"]]
+;;   [["Popper"
+;;     ]
+;;    ["Move"
+;;     ]
+;;    ["Font"
+;;     ("C-=" "larger" text-scale-increase)
+;;     ("C--" "smaller" text-scale-decrease)
+;;     ("C-0" "reset" (lambda () (interactive) (text-scale-increase 0)))]
+;;    ["Zoom"
+;;     ("z" "zoom-mode" zoom-mode)
+;;     ("Z" "zoom" zoom)]])

@@ -173,6 +173,8 @@
          ([remap list-registers]                . consult-register)
          ([remap goto-line]                     . consult-goto-line)
          ([remap imenu]                         . consult-imenu)
+         ("C-c i"                               . consult-imenu)
+         ("C-c I"                               . consult-imenu-multi)
          ([remap locate]                        . consult-locate)
          ([remap load-theme]                    . consult-theme)
          ([remap man]                           . consult-man)
@@ -181,8 +183,8 @@
          ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop)
-         ("C-c d r" . consult-ripgrep)
-         ("C-c d f" . consult-fd))
+         ("C-c d r"                             . consult-ripgrep)
+         ("C-c d f"                             . consult-fd))
   :config
   (setq consult-narrow-key "<"
         consult-async-min-input 2)

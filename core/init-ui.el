@@ -12,7 +12,7 @@
  highlight-nonselected-windows nil
  cursor-in-non-selected-windows nil
 
- ; Font compacting can be terribly expensive, but may increase memory use
+					; Font compacting can be terribly expensive, but may increase memory use
  inhibit-compacting-font-caches t)
 
 
@@ -119,7 +119,7 @@
 
 (defun +setup-fonts ()
   "Setup fonts."
-  (set-face-attribute 'default nil :font (font-spec :family "JetBrains Mono" :size +font-en-size))
+  (set-face-attribute 'default nil :font (font-spec :family "Iosevka" :size +font-en-size))
 
   (set-fontset-font t 'han (font-spec :family "PingFang SC" :size +font-zh-size))
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
@@ -207,40 +207,77 @@
   ;; truncate for [tab name] and add count
   (setq tab-bar-tab-name-function
         (lambda () (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
-                     (count (length (window-list-1 nil 'nomini)))
-                     (truncated-tab-name (if (< (length raw-tab-name)
-                                                tab-bar-tab-name-truncated-max)
-                                             raw-tab-name
-                                           (truncate-string-to-width raw-tab-name
-                                                                     tab-bar-tab-name-truncated-max
-                                                                     nil nil tab-bar-tab-name-ellipsis))))
-                (if (> count 1)
-                    (format "%s (%d)" truncated-tab-name count)
-                  truncated-tab-name))))
+			  (count (length (window-list-1 nil 'nomini)))
+			  (truncated-tab-name (if (< (length raw-tab-name)
+                                                     tab-bar-tab-name-truncated-max)
+						  raw-tab-name
+						(truncate-string-to-width raw-tab-name
+									  tab-bar-tab-name-truncated-max
+									  nil nil tab-bar-tab-name-ellipsis))))
+                     (if (> count 1)
+			 (format "%s (%d)" truncated-tab-name count)
+                       truncated-tab-name))))
 
   ;; Add spaces for tab-name
   (setq tab-bar-tab-name-format-function
         (lambda (tab i) (propertize
-                    (format " %d %s " i (alist-get 'name tab))
-                    'face (funcall tab-bar-tab-face-function tab))))
+			 (format " %d %s " i (alist-get 'name tab))
+			 'face (funcall tab-bar-tab-face-function tab))))
 
+  ;; cache for persp indicator
   ;; add [persp-name] and [meow-indicator] on tab-bar
-  (defun +tab-bar-persp-name ()
-    (when-let* ((name (and (bound-and-true-p persp-mode)
-                           persp-last-persp-name))
-                (count (length persp-names-cache))
-                (text (if (> count 1)
-                          (format " %s/%d " name count)
-                        (concat " " name " "))))
-      (propertize text 'face '(:inherit font-lock-variable-use-face :inverse-video t))))
-  (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-name meow-indicator))
+  (defvar +tab-bar-persp-indicator-cache nil)
+  (defun +tab-bar-update-persp-indicator (&rest _)
+    (setq +tab-bar-persp-indicator-cache
+	  (when-let* ((persp-list (and (bound-and-true-p persp-mode)
+                                       (persp-names-current-frame-fast-ordered)))
+                      (cur-persp-name (safe-persp-name (get-current-persp)))
+                      (prefix-length (cl-loop for persp in persp-list
+                                              for index from 1
+                                              while (not (string= persp cur-persp-name))
+                                              sum (length persp) into length-sum
+                                              finally (return (+ length-sum index))))
+                      (propertized-text (propertize (concat " " (string-join persp-list " ") " ")
+						    'face '(:inherit font-lock-variable-name-face :inverse-video t))))
+	    (add-face-text-property prefix-length (+ prefix-length (length cur-persp-name)) '(:underline t) t propertized-text)
+	    `((persp-indicator
+           menu-item
+           ,propertized-text
+           +tab-bar-persp-menu
+           :help "Perp-mode indicator\nmouse-1: popup menu"))))
+    )
+  (defun +tab-bar-persp-indicator ()
+    (or +tab-bar-persp-indicator-cache (+tab-bar-update-persp-indicator)))
+
+  ;; TODO: KILL
+  (dolist (hook '(persp-created-functions
+                  persp-renamed-functions
+                  persp-activated-functions
+                  persp-after-load-state-functions))
+    (add-hook hook #'(lambda (&rest _)
+                       (+tab-bar-update-persp-indicator)
+                       (force-mode-line-update t))))
+
+  (defun +tab-bar-persp-menu (event)
+    "Pop up the same menu as displayed by the menu bar.
+Used by `tab-bar-format-menu-bar'."
+    (interactive "e")
+    (let ((menu (make-sparse-keymap (propertize "Menu Bar" 'hide t))))
+      (run-hooks 'activate-menubar-hook 'menu-bar-update-hook)
+      (map-keymap (lambda (key binding)
+                    (when (consp binding)
+                      (define-key-after menu (vector key)
+                        (copy-sequence binding))))
+                  persp-minor-mode-menu)
+      (popup-menu menu event)))
+  (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator tab-bar-format-align-right +tab-bar-persp-indicator meow-indicator))
 
   ;; WORKAROUND: fresh tab-bar for daemon
   (when (daemonp)
     (add-hook 'after-make-frame-functions
-              (lambda (frame) (tab-bar--update-tab-bar-lines (list frame)))))
+              #'(lambda (&rest _) (force-mode-line-update t))))
   )
 
 (setq frame-title-format
-      '((:eval (or buffer-file-truename "%b"))
-        (" · Emacs")))
+	'((:eval (or buffer-file-truename "%b"))
+          (" · Emacs")))

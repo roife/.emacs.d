@@ -9,7 +9,7 @@
   :defines (recentf-exclude)
   :commands (get-current-persp persp-contain-buffer-p)
   :hook ((after-init . persp-mode))
-  :init (setq persp-keymap-prefix (kbd "H-p"))
+  :init (setq persp-keymap-prefix (kbd "C-c p"))
   :config
   (setq
    persp-autokill-buffer-on-remove 'kill-weak
@@ -89,7 +89,13 @@
               (lambda (_)
                 (tab-bar-tabs-set (persp-parameter 'tab-bar-tabs))
                 (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))
-                (tab-bar--update-tab-bar-lines t)))
+                (force-mode-line-update t)))
+
+    (add-hook 'persp-after-load-state-functions
+              (lambda (&rest _)
+                (when (and (persp-parameter 'tab-bar-tabs)
+                           (not tab-bar-mode))
+                  (tab-bar-mode 1))))
     )
 
   ;; Filter frame parameters
@@ -120,27 +126,23 @@
   (with-eval-after-load 'winner
     (add-to-list 'window-persistent-parameters '(winner-ring . t))
 
-  (add-hook 'persp-before-deactivate-functions
-            (lambda (_)
-              (when (get-current-persp)
-                (set-persp-parameter
-                 'winner-ring (list winner-currents
-                                    winner-ring-alist
-                                    winner-pending-undo-ring)))))
+    (add-hook 'persp-before-deactivate-functions
+              (lambda (_)
+                (when (get-current-persp)
+                  (set-persp-parameter
+                   'winner-ring (list winner-currents
+                                      winner-ring-alist
+                                      winner-pending-undo-ring)))))
 
-  (add-hook 'persp-activated-functions
-            (lambda (_)
-              (cl-destructuring-bind
+    (add-hook 'persp-activated-functions
+              (lambda (_)
+                (cl-destructuring-bind
                     (currents alist pending-undo-ring)
                     (or (persp-parameter 'winner-ring) (list nil nil nil))
                   (setq winner-undo-frame nil
                         winner-currents currents
                         winner-ring-alist alist
                         winner-pending-undo-ring pending-undo-ring))))
-
-  (add-hook 'persp-before-save-state-to-file-functions
-            (lambda (&rest _)
-              (delete-persp-parameter 'winner-ring)))
     )
 
   ;; Don't try to persist dead/remote buffers. They cause errors.
@@ -152,4 +154,8 @@
 
   ;; Visual selection surviving workspace changes
   (add-hook 'persp-before-deactivate-functions #'deactivate-mark)
+
+
+  ;; WORKAROUND: ace-window
+  (add-hook 'persp-activated-functions #'(lambda (&rest _) (aw-update)))
   )

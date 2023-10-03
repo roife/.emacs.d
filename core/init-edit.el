@@ -146,7 +146,7 @@
 (use-package hideshow
   :hook ((prog-mode conf-mode yaml-mode) . hs-minor-mode)
   :bind (("C-c h TAB" . hs-toggle-hiding)
-         ("C-c h ~" . hs-toggle-all))
+         ("C-c h `'" . hs-toggle-all))
   :config
   ;; More functions
   ;; @see https://karthinks.com/software/simple-folding-with-hideshow/
@@ -440,4 +440,12 @@ begin and end of the block surrounding point."
   :straight t
   :bind ("C-." . embrace-commander)
   :hook (org-mode . embrace-org-mode-hook)
+  )
+
+
+;; [imenu] Jump to function definitions
+(use-package imenu
+  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . imenu-add-menubar-index)
+  :config
+  (setq imenu-auto-rescan t)
   )

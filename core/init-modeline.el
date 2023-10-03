@@ -44,10 +44,10 @@
   "The face for line number on the mode-line of an active window."
   :group '+modeline)
 
-;; (defface +modeline-vc-mode-active-face
-;;   '((t (:inherit (font-lock-constant-face))))
-;;   "The face for vc-mode on the mode-line of an active window."
-;;   :group '+modeline)
+(defface +modeline-vc-mode-inactive-face
+  '((t (:inherit (mode-line-inactive))))
+  "The face for vc-mode on the mode-line of an active window."
+  :group '+modeline)
 
 (defface +modeline-meta-active-face
   '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
@@ -197,7 +197,7 @@
 (advice-add #'after-insert-file-set-coding :after #'+modeline-update-encoding)
 (advice-add #'set-buffer-file-coding-system :after #'+modeline-update-encoding)
 
-(defsubst +mode-line-active-long ()
+(defsubst +mode-line-active ()
   "Formatting active-long modeline."
   (let* ((lhs `((:propertize ,(+modeline-get-window-name)
                              face +modeline-meta-active-face)
@@ -208,18 +208,20 @@
                                         (+modeline-use-region-indicator)
                                         (+modeline-overwrite-indicator)))
                              face +modeline-meta-active-face)
-                (:propertize " %*" face +modeline-modification-active-face)
-                " %I "
-                (:propertize "%b" face +modeline-buffer-name-active-face)
+                " %* "
+                (:eval (breadcrumb--header-line))
+                ;; (:propertize "%b" face +modeline-buffer-name-active-face)
                 (:propertize +modeline-remote-host-name
                              face +modeline-host-name-active-face)
                 ))
-         (rhs '((:propertize mode-name
+         (rhs '((:eval +modeline-vcs-info)
+                " "
+                (:propertize mode-name
                              face +modeline-buffer-name-active-face)
                 (:eval +modeline-flymake-indicator)
                 " "
                 (:eval +modeline-encoding)
-                (:propertize " %l:%C "
+                (:propertize " %l "
                              face +modeline-line-number-active-face)
                 " "
                 (-3 "%p")
@@ -231,16 +233,20 @@
       ,rhs-str)))
 
 
-(defsubst +mode-line-inactive-long ()
+(defsubst +mode-line-inactive ()
   "Formatting active-long modeline."
   (let* ((lhs `((:propertize ,(+modeline-get-window-name)
                              face +modeline-meta-inactive-face)
-                "%* %I "
-                (:propertize "%b" face +modeline-buffer-name-active-face)))
-         (rhs '((:eval mode-name)
+                "%* "
+                (:eval (breadcrumb--header-line))))
+         ;; (:propertize "%b" face +modeline-buffer-name-active-face)))
+         (rhs `((:propertize +modeline-vcs-info
+                             face +modeline-vc-mode-inactive-face)
+                " "
+                (:eval mode-name)
                 " "
                 (:eval +modeline-encoding)
-                "%l:%C "
+                "%l "
                 (-3 "%p")
                 "%%"))
          (rhs-str (format-mode-line rhs))
@@ -251,8 +257,8 @@
 
 (setq-default mode-line-format
               '((:eval (if (+modeline-window-active-p)
-                           (+mode-line-active-long)
-                         (+mode-line-inactive-long)))))
+                           (+mode-line-active)
+                         (+mode-line-inactive)))))
 
 
 ;;; Header Line
@@ -263,15 +269,15 @@
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
-  (setq breadcrumb-imenu-crumb-separator "·"
-        breadcrumb-idle-time 10))
+  (setq breadcrumb-imenu-crumb-separator "·"))
 
 
 ;; Cache vc info
-(defconst +vc-header-line-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [header-line down-mouse-1] vc-menu-entry)
-    map))
+;; (defconst +vc-header-line-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (define-key map [header-line down-mouse-1] vc-menu-entry)
+;;     map))
+
 (defvar-local +modeline-vcs-info nil)
 (defsubst +mode-line-update-vcs-info ()
   (when (and vc-mode buffer-file-name)
@@ -299,26 +305,24 @@
                                      ((stringp state) (concat "#" state ":"))
                                      ((t " ")))))
             (concat " "
-                    (propertize (concat "(" rev state-symbol ")")
+                    (propertize (concat rev state-symbol)
                                 'face face
                                 'help-echo (get-text-property 1 'help-echo vc-mode)
-                                'local-map +vc-header-line-map
+                                'local-map vc-mode-line-map
                                 'mouse-face 'mode-line-highlight))))))
 (add-hook 'find-file-hook #'+mode-line-update-vcs-info)
 (add-hook 'after-save-hook #'+mode-line-update-vcs-info)
 (advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
 
 
-(setq-default header-line-format nil)
+;; (setq-default header-line-format nil)
+;;
+;; (defsubst +header-line-update ()
+;;   (setq-local header-line-format
+;;               (when (and buffer-file-name (vc-backend buffer-file-name))
+;;                 '(" "
+;;                   )))
+;; )
 
-(defsubst +header-line-update ()
-  (setq-local header-line-format
-              (when (and buffer-file-name (vc-backend buffer-file-name))
-                '((:eval +modeline-vcs-info)
-                  " "
-                  (:eval (breadcrumb--header-line)))))
-  )
-
-(add-hook 'find-file-hook #'+header-line-update)
-(add-hook 'after-change-major-mode-hook #'+header-line-update)
-
+;; (add-hook 'find-file-hook #'+header-line-update)
+;; (add-hook 'after-change-major-mode-hook #'+header-line-update)
