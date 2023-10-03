@@ -64,16 +64,6 @@
   "The face for modification indicator on the mode-line of an active window."
   :group '+modeline)
 
-;; (defface +modeline-project-name-active-face
-;;   '((t (:inherit (bold font-lock-variable-name-face))))
-;;   "The face for project name on the mode-line of an active window."
-;;   :group '+modeline)
-;;
-;; (defface +modeline-project-name-inactive-face
-;;   '((t (:inherit (mode-line-inactive))))
-;;   "The face for project name on the mode-line of an inactive window."
-;;   :group '+modeline)
-
 (defface +modeline-buffer-name-active-face
   '((t (:inherit (font-lock-function-name-face bold))))
   "The face for buffer name on the mode-line of an active window."
@@ -272,12 +262,7 @@
   (setq breadcrumb-imenu-crumb-separator "·"))
 
 
-;; Cache vc info
-;; (defconst +vc-header-line-map
-;;   (let ((map (make-sparse-keymap)))
-;;     (define-key map [header-line down-mouse-1] vc-menu-entry)
-;;     map))
-
+;; [vcs-info] cache for vcs
 (defvar-local +modeline-vcs-info nil)
 (defsubst +mode-line-update-vcs-info ()
   (when (and vc-mode buffer-file-name)
@@ -305,7 +290,7 @@
                                      ((stringp state) (concat "#" state ":"))
                                      ((t " ")))))
             (concat " "
-                    (propertize (concat rev state-symbol)
+                    (propertize (concat "(" rev state-symbol ")")
                                 'face face
                                 'help-echo (get-text-property 1 'help-echo vc-mode)
                                 'local-map vc-mode-line-map
@@ -314,15 +299,4 @@
 (add-hook 'after-save-hook #'+mode-line-update-vcs-info)
 (advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
 
-
-;; (setq-default header-line-format nil)
-;;
-;; (defsubst +header-line-update ()
-;;   (setq-local header-line-format
-;;               (when (and buffer-file-name (vc-backend buffer-file-name))
-;;                 '(" "
-;;                   )))
-;; )
-
-;; (add-hook 'find-file-hook #'+header-line-update)
-;; (add-hook 'after-change-major-mode-hook #'+header-line-update)
+(setq-default header-line-format nil)

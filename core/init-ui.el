@@ -12,7 +12,7 @@
  highlight-nonselected-windows nil
  cursor-in-non-selected-windows nil
 
-					; Font compacting can be terribly expensive, but may increase memory use
+ ;; Font compacting can be terribly expensive, but may increase memory use
  inhibit-compacting-font-caches t)
 
 
@@ -207,45 +207,39 @@
   ;; truncate for [tab name] and add count
   (setq tab-bar-tab-name-function
         (lambda () (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
-			  (count (length (window-list-1 nil 'nomini)))
-			  (truncated-tab-name (if (< (length raw-tab-name)
-                                                     tab-bar-tab-name-truncated-max)
-						  raw-tab-name
-						(truncate-string-to-width raw-tab-name
-									  tab-bar-tab-name-truncated-max
-									  nil nil tab-bar-tab-name-ellipsis))))
-                     (if (> count 1)
-			 (format "%s (%d)" truncated-tab-name count)
-                       truncated-tab-name))))
+                     (count (length (window-list-1 nil 'nomini)))
+                     (truncated-tab-name (if (< (length raw-tab-name)
+                                                tab-bar-tab-name-truncated-max)
+                                             raw-tab-name
+                                           (truncate-string-to-width raw-tab-name
+                                                                     tab-bar-tab-name-truncated-max
+                                                                     nil nil tab-bar-tab-name-ellipsis))))
+                (if (> count 1)
+                    (format "%s (%d)" truncated-tab-name count)
+                  truncated-tab-name))))
 
   ;; Add spaces for tab-name
   (setq tab-bar-tab-name-format-function
         (lambda (tab i) (propertize
-			 (format " %d %s " i (alist-get 'name tab))
-			 'face (funcall tab-bar-tab-face-function tab))))
+                    (format " %d %s " i (alist-get 'name tab))
+                    'face (funcall tab-bar-tab-face-function tab))))
 
   ;; cache for persp indicator
   ;; add [persp-name] and [meow-indicator] on tab-bar
   (defvar +tab-bar-persp-indicator-cache nil)
   (defun +tab-bar-update-persp-indicator (&rest _)
     (setq +tab-bar-persp-indicator-cache
-	  (when-let* ((persp-list (and (bound-and-true-p persp-mode)
+          (when-let* ((persp-list (and (bound-and-true-p persp-mode)
                                        (persp-names-current-frame-fast-ordered)))
-                      (cur-persp-name (safe-persp-name (get-current-persp)))
-                      (prefix-length (cl-loop for persp in persp-list
-                                              for index from 1
-                                              while (not (string= persp cur-persp-name))
-                                              sum (length persp) into length-sum
-                                              finally (return (+ length-sum index))))
-                      (propertized-text (propertize (concat " " (string-join persp-list " ") " ")
-						    'face '(:inherit font-lock-variable-name-face :inverse-video t))))
-	    (add-face-text-property prefix-length (+ prefix-length (length cur-persp-name)) '(:underline t) t propertized-text)
-	    `((persp-indicator
-           menu-item
-           ,propertized-text
-           +tab-bar-persp-menu
-           :help "Perp-mode indicator\nmouse-1: popup menu"))))
-    )
+                      (cur-persp (safe-persp-name (get-current-persp)))
+                      (persp-list-text (concat " " (string-join (cl-substitute (concat "@" cur-persp) cur-persp persp-list :count 1) " ") " "))
+                      (propertized-text (propertize persp-list-text
+                                                    'face '(:inherit font-lock-variable-name-face :inverse-video t))))
+            `((persp-indicator
+               menu-item
+               ,propertized-text
+               +tab-bar-persp-menu
+               :help "Perp-mode indicator\nmouse-1: popup menu")))))
   (defun +tab-bar-persp-indicator ()
     (or +tab-bar-persp-indicator-cache (+tab-bar-update-persp-indicator)))
 
@@ -279,5 +273,5 @@ Used by `tab-bar-format-menu-bar'."
   )
 
 (setq frame-title-format
-	'((:eval (or buffer-file-truename "%b"))
-          (" · Emacs")))
+      '((:eval (or buffer-file-truename "%b"))
+        (" · Emacs")))
