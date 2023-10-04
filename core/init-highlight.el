@@ -44,6 +44,19 @@
   )
 
 
+;; [highlight-parentheses] Highlight surrounding parentheses
+(use-package highlight-parentheses
+  :straight t
+  :hook ((minibuffer-setup . highlight-parentheses-minibuffer-setup)
+         (prog-mode . highlight-parentheses-mode))
+  :config
+  (setq highlight-parentheses-colors '("SpringGreen3" "IndianRed1" "IndianRed3" "IndianRed4")
+        highlight-parentheses-attributes '((:underline t :weight bold)
+                                           (:underline t :weight bold)
+                                           (:underline t :weight bold))
+        highlight-parentheses-delay 0.2))
+
+
 ;; [rainbow-mode] Colorize color names in buffers
 (use-package rainbow-mode
   :straight t
@@ -54,21 +67,6 @@
   :config
   ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
   ;; @see https://emacs.stackexchange.com/questions/36420
-  ;; (defun +rainbow-colorize-match (color &optional match)
-  ;;   (let* ((match (or match 0))
-  ;;          (ov (make-overlay (match-beginning match) (match-end match))))
-  ;;     (overlay-put ov 'ov-rainbow t)
-  ;;     (overlay-put ov 'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
-  ;;                                               "white"
-  ;;                                             "black"))
-  ;;                             (:background ,color)))))
-  ;; (advice-add #'rainbow-colorize-match :override #'+rainbow-colorize-match)
-  ;;
-  ;; ;; Clear overlays when exit
-  ;; (defun +rainbow-clear-overlays ()
-  ;;   "Clear all rainbow overlays."
-  ;;   (remove-overlays (point-min) (point-max) 'ov-rainbow t))
-  ;; (advice-add #'rainbow-turn-off :after #'+rainbow-clear-overlays)
   )
 
 

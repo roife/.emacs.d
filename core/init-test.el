@@ -33,4 +33,6 @@
           symbol-overlay-put
           meow-insert
           meow-insert-exit
+          mouse-drag-region
+          mouse-set-point
           )))

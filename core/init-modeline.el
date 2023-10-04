@@ -8,7 +8,7 @@
 ;; show VC tools name for Git
 (defvar +mode-line-show-common-vc-tools-name nil)
 
-;;; Get current window
+;;; get current window
 (defvar +mode-line-current-window nil)
 (defun +mode-line-set-selected-window (&rest _)
   "Set `+mode-line-current-window' appropriately."
@@ -24,17 +24,20 @@
   (eq (frame-selected-window) +mode-line-current-window))
 
 ;;; Check whether `window-total-width' is larger than the limit
-;; (defconst +mode-line-window-width-limit 90)
-;; (defvar-local +mode-line-large-width-p nil)
-;; (defun +mode-line-window-size-change-function (&rest _)
-;;   "Function for `window-size-change-functions'."
-;;   (setq +mode-line-large-width-p
-;;         (> (window-total-width) +mode-line-window-width-limit)))
-;; (add-hook 'after-revert-hook #'+mode-line-window-size-change-function)
-;; (add-hook 'buffer-list-update-hook #'+mode-line-window-size-change-function)
-;; (add-hook 'window-size-change-functions #'+mode-line-window-size-change-function)
+(defconst +mode-line-window-width-limit 90)
+(defvar-local +mode-line-enough-width-p nil)
+(defun +mode-line-window-size-change-function (&rest _)
+  "Function for `window-size-change-functions'."
+  (setq +mode-line-enough-width-p
+        (> (window-total-width) +mode-line-window-width-limit)))
+(add-hook 'after-revert-hook #'+mode-line-window-size-change-function)
+(add-hook 'buffer-list-update-hook #'+mode-line-window-size-change-function)
+(add-hook 'window-size-change-functions #'+mode-line-window-size-change-function)
 
 ;;; face
+(custom-set-faces '(mode-line ((t (:inherit 'mode-line :box nil)))))
+(custom-set-faces '(mode-line-inactive ((t (:inherit 'mode-line-inactive :box nil)))))
+
 (defgroup +mode-line nil
   "Mode-Line faces."
   :group 'faces)
@@ -138,7 +141,7 @@
 
 ;;; Cache flymake report
 (defvar-local +mode-line-flymake-indicator nil)
-(defun +mode-line-flymake-update (&rest _)
+(defun +mode-line-update-flymake (&rest _)
   "Display flymake info for current buffer."
   (setq +mode-line-flymake-indicator
         (when (and flymake-mode (flymake-running-backends))
@@ -146,12 +149,11 @@
                  (warning-count (cadadr (flymake--mode-line-counter :warning)))
                  (note-count (cadadr (flymake--mode-line-counter :note)))
                  (err (when err-count (propertize err-count 'face '(:inherit compilation-error))))
-                 (warning (when warning-count (propertize (concat " " warning-count) 'face '(:inherit compilation-warning))))
-                 (note (when note-count (propertize (concat " " note-count) 'face '(:inherit compilation-info)))))
-            (concat " [" err warning note "]"))))
-  )
-(advice-add #'flymake--handle-report :after #'+mode-line-flymake-update)
-(add-hook 'flymake-mode-hook #'+mode-line-flymake-update)
+                 (warning (when warning-count (concat "/" (propertize warning-count 'face '(:inherit compilation-warning)))))
+                 (note (when note-count (concat "/" (propertize note-count 'face '(:inherit compilation-info))))))
+            (concat " " err warning note)))))
+(advice-add #'flymake--handle-report :after #'+mode-line-update-flymake)
+(add-hook 'flymake-mode-hook #'+mode-line-update-flymake)
 
 ;;; Cache encoding info
 (defvar-local +mode-line-encoding nil)
@@ -183,7 +185,9 @@
                                         (+mode-line-overwrite-indicator)))
                              face +mode-line-meta-active-face)
                 " %* "
-                (:eval (breadcrumb--header-line))
+                (:eval (if +mode-line-enough-width-p
+                           (breadcrumb--header-line)
+                         (breadcrumb-project-crumbs)))
                 ;; (:propertize "%b" face +mode-line-buffer-name-active-face)
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
@@ -212,7 +216,9 @@
   (let* ((lhs `((:propertize ,(+mode-line-get-window-name)
                              face +mode-line-meta-inactive-face)
                 "%* "
-                (:eval (breadcrumb--header-line))))
+                (:eval (if +mode-line-enough-width-p
+                           (breadcrumb--header-line)
+                         (breadcrumb-project-crumbs)))))
          ;; (:propertize "%b" face +mode-line-buffer-name-active-face)))
          (rhs `((:propertize +mode-line-vcs-info
                              face +mode-line-vc-mode-inactive-face)
@@ -243,7 +249,9 @@
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
-  (setq breadcrumb-imenu-crumb-separator "·"))
+  (setq breadcrumb-imenu-crumb-separator "·"
+        breadcrumb-project-max-length 0.2
+        breadcrumb-imenu-max-length 0.2))
 
 
 ;; [vcs-info] cache for vcs
@@ -253,9 +261,9 @@
     (setq +mode-line-vcs-info
           (let* ((backend (vc-backend buffer-file-name))
                  (state   (vc-state buffer-file-name backend))
-                 (rev     (if vc-display-status
-                              (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))
-                            ""))
+                 (rev     (if +mode-line-show-common-vc-tools-name
+                              (substring-no-properties vc-mode 1)
+                            (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))))
                  (face (cond ((eq state 'up-to-date) '(vc-dir-status-up-to-date))
                              ((eq state 'ignored) '(vc-dir-status-ignored))
                              ((memq state '(needs-update needs-merge conflict missing)) '(vc-dir-status-warning))

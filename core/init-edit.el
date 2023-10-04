@@ -349,22 +349,6 @@ begin and end of the block surrounding point."
   :straight t)
 
 
-;; [multiple-cursors] Multi-cursor
-(use-package multiple-cursors
-  :straight t
-  :bind (("C-c m l"       . mc/edit-lines)
-         ("C-c m n"       . mc/mark-next-like-this)
-         ("C-c m p"       . mc/mark-previous-like-this)
-         ("C-c m A"       . mc/mark-all-like-this)
-         ("C-c m N"       . mc/skip-to-next-like-this)
-         ("C-c m P"       . mc/skip-to-previous-like-this)
-         ("s-S-<mouse-1>" . mc/add-cursor-on-click))
-  :config
-  (setq mc/cmds-to-run-for-all '(mwim-beginning-of-code-or-line
-                                 mwim-end-of-code-or-line))
-  )
-
-
 ;; [vundo] Undo tree
 (use-package vundo
   :straight t
@@ -449,3 +433,8 @@ begin and end of the block surrounding point."
   :config
   (setq imenu-auto-rescan t)
   )
+
+
+;; translate [C-SPC] to [M-SPC] for mark
+(define-key key-translation-map (kbd "C-'") (kbd "C-SPC"))
+(bind-key "C-\"" #'pop-global-mark)

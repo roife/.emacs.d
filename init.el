@@ -46,8 +46,8 @@
                      'init-test
                      'init-modal
                      'init-modeline
+                     'init-tabbar
                      'init-bib
-                     'init-emms
                      ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))
