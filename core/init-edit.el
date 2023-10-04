@@ -103,7 +103,7 @@
 
 ;; [elec-pair] Automatic parenthesis pairing
 (use-package elec-pair
-  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-mode) . electric-pair-mode)
+  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-mode minibuffer-setup) . electric-pair-mode)
   :config
   (setq electric-pair-inhibit-predicate 'electric-pair-default-inhibit)
   )

@@ -117,6 +117,12 @@
 	  ))
 
   :config
+  ;; mode-line indicator
+  (with-eval-after-load 'popper
+    (setq popper-mode-line
+          '(:propertize " POP |"
+                        face +mode-line-meta-active-face)))
+
   ;; Enable indicator in minibuffer
   (popper-echo-mode 1)
 

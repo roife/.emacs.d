@@ -224,18 +224,12 @@
   (defvar +tab-bar-persp-indicator-cache nil)
   (defun +tab-bar-update-persp-indicator (&rest _)
     (setq +tab-bar-persp-indicator-cache
-          (when-let* ((persp-list (and (bound-and-true-p persp-mode)
-                                       (persp-names-current-frame-fast-ordered)))
-                      (cur-persp (safe-persp-name (get-current-persp)))
-                      (subst-persp-list (cl-substitute (concat "@" cur-persp) cur-persp persp-list :count 1))
-                      (persp-list-text (concat " " (string-join subst-persp-list " "))))
-            (propertize persp-list-text 'face '(:inherit font-lock-variable-name-face))
-            ;; `((persp-indicator
-            ;;    menu-item
-            ;;    ,propertized-text
-            ;;    +tab-bar-persp-menu
-            ;;    :help "Perp-mode indicator\nmouse-1: popup menu"))
-            )))
+          (when (bound-and-true-p persp-mode)
+            (let* ((persp-list (persp-names-current-frame-fast-ordered))
+                   (cur-persp (safe-persp-name (get-current-persp)))
+                   (subst-persp-list (cl-substitute (concat "[" cur-persp "]") cur-persp persp-list :count 1))
+                   (persp-list-text (concat " " (string-join subst-persp-list " "))))
+              (propertize persp-list-text 'face '(:inherit font-lock-variable-name-face))))))
   (defun +tab-bar-persp-indicator ()
     (or +tab-bar-persp-indicator-cache (+tab-bar-update-persp-indicator)))
 
@@ -268,6 +262,8 @@
   (when (daemonp)
     (add-hook 'after-make-frame-functions
               #'(lambda (&rest _) (force-mode-line-update))))
+
+  (force-mode-line-update)
   )
 
 (setq frame-title-format
