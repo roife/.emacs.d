@@ -42,16 +42,6 @@
   "Mode-Line faces."
   :group 'faces)
 
-(defface +mode-line-line-number-active-face
-  '((t (:inherit (mode-line-inactive) :inverse-video t)))
-  "The face for line number on the mode-line of an active window."
-  :group '+mode-line)
-
-(defface +mode-line-vc-mode-inactive-face
-  '((t (:inherit (mode-line-inactive))))
-  "The face for vc-mode on the mode-line of an active window."
-  :group '+mode-line)
-
 (defface +mode-line-meta-active-face
   '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
   "Face used for meta panel on the mode-line of an active window."
@@ -62,14 +52,24 @@
   "The face for meta panel on the mode-line of an inactive window."
   :group '+mode-line)
 
-(defface +mode-line-buffer-name-active-face
-  '((t (:inherit (font-lock-function-name-face bold))))
+(defface +mode-line-mode-name-active-face
+  '((t (:inherit (font-lock-function-name-face))))
   "The face for buffer name on the mode-line of an active window."
   :group '+mode-line)
 
 (defface +mode-line-host-name-active-face
   '((t (:inherit (font-lock-function-name-face bold italic))))
   "The face for host name on the mode-line of an active window."
+  :group '+mode-line)
+
+(defface +mode-line-vc-mode-inactive-face
+  '((t (:inherit (mode-line-inactive))))
+  "The face for vc-mode on the mode-line of an active window."
+  :group '+mode-line)
+
+(defface +mode-line-line-number-active-face
+  '((t (:inherit (mode-line-inactive) :inverse-video t)))
+  "The face for line number on the mode-line of an active window."
   :group '+mode-line)
 
 ;;; Indicators
@@ -113,19 +113,6 @@
                   (+ count 1)
                   (+ count (length after)))))))
 
-
-;;; Cache project name
-;; (defvar-local +mode-line-project-name nil)
-;; (defsubst +mode-line-update-project-name ()
-;;   "Get project name for current buffer."
-;;   (setq +mode-line-project-name
-;;         (when (buffer-file-name)
-;;           (when-let ((project (project-current)))
-;;             (concat " "
-;;                     (file-name-nondirectory
-;;                      (directory-file-name (project-root project))))))))
-;; (add-hook 'find-file-hook #'+mode-line-update-project-name)
-;; (add-hook 'after-change-major-mode-hook #'+mode-line-update-project-name)
 
 ;;; Cache remote host name
 (defvar-local +mode-line-remote-host-name nil)
@@ -188,14 +175,13 @@
                 (:eval (if +mode-line-enough-width-p
                            (breadcrumb--header-line)
                          (breadcrumb-project-crumbs)))
-                ;; (:propertize "%b" face +mode-line-buffer-name-active-face)
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))
          (rhs '((:eval +mode-line-vcs-info)
                 " "
                 (:propertize mode-name
-                             face +mode-line-buffer-name-active-face)
+                             face +mode-line-mode-name-active-face)
                 (:eval +mode-line-flymake-indicator)
                 " "
                 (:eval +mode-line-encoding)
@@ -219,7 +205,6 @@
                 (:eval (if +mode-line-enough-width-p
                            (breadcrumb--header-line)
                          (breadcrumb-project-crumbs)))))
-         ;; (:propertize "%b" face +mode-line-buffer-name-active-face)))
          (rhs `((:propertize +mode-line-vcs-info
                              face +mode-line-vc-mode-inactive-face)
                 " "
@@ -245,7 +230,9 @@
 
 ;; [breadcrumb] Add breadcrumb navigation in header-line
 (use-package breadcrumb
-  :custom-face (breadcrumb-project-base-face ((t (:inherit breadcrumb-project-crumbs-face :bold t))))
+  :custom-face
+  (breadcrumb-project-base-face ((t (:inherit breadcrumb-project-crumbs-face :bold t))))
+  (breadcrumb-project-leaf-face ((t (:inherit font-lock-function-name-face :bold t))))
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
