@@ -16,6 +16,7 @@
    persp-reset-windows-on-nil-window-conf nil
    persp-set-last-persp-for-new-frames t
    persp-remove-buffers-from-nil-persp-behaviour nil
+   persp-nil-name "⊥"
    ;; Do not auto load
    persp-auto-resume-time 0)
 

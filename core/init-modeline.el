@@ -237,7 +237,7 @@
   :commands breadcrumb--header-line
   :config
   (setq breadcrumb-imenu-crumb-separator "·"
-        breadcrumb-project-max-length 0.2
+        breadcrumb-project-max-length 0.3
         breadcrumb-imenu-max-length 0.2))
 
 

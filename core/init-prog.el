@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
 (use-package prog-mode
-  :hook ((prog-mode . global-prettify-symbols-mode)))
+  :hook ((prog-mode . prettify-symbols-mode)))
 
 
 ;; [comint]
