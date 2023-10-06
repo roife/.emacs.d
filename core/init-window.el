@@ -31,7 +31,7 @@
         (message "No specified window: %d" number))))
 
   (dotimes (n 9)
-    (bind-key (format "M-%d" (1+ n))
+    (bind-key (concat "M-" (number-to-string (1+ n)))
               (lambda ()
                 (interactive)
                 (+aw--select-window (1+ n)))))

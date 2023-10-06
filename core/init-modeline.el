@@ -99,18 +99,12 @@
   (cond (defining-kbd-macro "| MacroDef ")
         (executing-kbd-macro "| MacroExc ")))
 
-(defsubst +mode-line-multiple-cursors-indicator ()
-  "Display the number of multiple cursors."
-  (when (bound-and-true-p multiple-cursors-mode)
-    (format "| %d cursors " (mc/num-cursors))))
-
 (defsubst +mode-line-use-region-indicator ()
   "Display selected region in current buffer."
   (when (use-region-p)
-    (format "| L%d W%d C%d "
-            (count-lines (region-beginning) (region-end))
-            (count-words (region-beginning) (region-end))
-            (abs (- (mark t) (point))))))
+    (concat "| L" (number-to-string (count-lines (region-beginning) (region-end)))
+            " W" (number-to-string (count-words (region-beginning) (region-end)))
+            " C" (number-to-string (abs (- (mark t) (point)))) " ")))
 
 (defsubst +mode-line-overwrite-indicator ()
   "Display whether it is in overwrite mode."
@@ -130,9 +124,10 @@
            (after (symbol-overlay-get-list 1 symbol))
            (count (length before)))
       (if (symbol-overlay-assoc symbol)
-          (format (concat  "| %d/%d sym " (and (cadr keyword) "in scope "))
-                  (+ count 1)
-                  (+ count (length after)))))))
+          (concat  "| " (number-to-string (+ count 1))
+                   "/" (number-to-string (+ count (length after)))
+                   " sym "
+                   (and (cadr keyword) "in scope "))))))
 
 
 ;;; Cache remote host name
@@ -143,7 +138,7 @@
         (when-let ((hostname (and default-directory
                                   (file-remote-p default-directory 'host))))
           (when (not (string-equal hostname "localhost"))
-            (format "@%s" hostname)))
+            (concat "@" hostname)))
         ))
 (add-hook 'find-file-hook #'+mode-line-update-remote-host-name)
 
@@ -191,7 +186,6 @@
                              face ,meta-face)
                 (:propertize ,(when (+mode-line-window-active-p)
                                 (concat (+mode-line-macro-indicator)
-                                        (+mode-line-multiple-cursors-indicator)
                                         (+mode-line-symbol-overlay-indicator)
                                         (+mode-line-use-region-indicator)))
                              face ,meta-face)

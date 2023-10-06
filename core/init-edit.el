@@ -186,13 +186,11 @@
     "Display line counts when hiding codes."
     (when (eq 'code (overlay-get ov 'hs))
       (overlay-put ov 'display
-                   (concat
-                    " "
-                    (propertize
-                     (format "... [%d lines]"
-                             (count-lines (overlay-start ov) (overlay-end ov)))
-                     'face '(:inherit shadow :height 0.8))
-                    " "))))
+                   (let ((lines (number-to-string (count-lines (overlay-start ov) (overlay-end ov)))))
+                     (concat " "
+                             (propertize (concat " ... L" lines " ") 'face '(:inherit shadow :height 0.8 :box t))
+                             " "))
+                   )))
   (setq hs-set-up-overlay #'+hs-display-code-line-counts)
 
   ;; hide-show by indentation

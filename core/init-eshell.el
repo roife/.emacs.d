@@ -14,11 +14,11 @@
 
   (setq
    eshell-banner-message
-   '(format "%s %s\n"
-            (propertize (format " %s " (string-trim (buffer-name)))
+   '(concat (propertize (concat " " (string-trim (buffer-name)) " ")
                         'face 'mode-line-highlight)
-            (propertize (current-time-string)
-                        'face 'font-lock-keyword-face))
+            " "
+            (propertize (current-time-string) 'face 'font-lock-keyword-face)
+            "\n")
    ;; scrolling
    eshell-scroll-to-bottom-on-input 'all
    eshell-scroll-to-bottom-on-output 'all
@@ -135,7 +135,7 @@
     "Change eshell buffer name by directory change."
     (when (equal major-mode 'eshell-mode)
       (rename-buffer
-       (format "Esh: %s" (abbreviate-file-name default-directory))
+       (concat "Esh: " (abbreviate-file-name default-directory))
        t)))
 
   (add-hook 'eshell-directory-change-hook #'+eshell-sync-dir-buffer-name)
