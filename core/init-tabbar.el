@@ -28,7 +28,7 @@
                                                                      tab-bar-tab-name-truncated-max
                                                                      nil nil tab-bar-tab-name-ellipsis))))
                 (if (> count 1)
-                    (format "%s (%d)" truncated-tab-name count)
+                    (concat truncated-tab-name "(" (number-to-string count) ")")
                   truncated-tab-name))))
 
   ;; Add spaces for tab-name
@@ -37,8 +37,8 @@
           (let ((face (funcall tab-bar-tab-face-function tab)))
             (concat
              (propertize " " 'face face)
-             (propertize (format "%d" i) 'face `(:inherit ,face :weight ultra-bold))
-             (propertize (format " %s " (alist-get 'name tab)) 'face face)))))
+             (propertize (number-to-string i) 'face `(:inherit ,face :weight ultra-bold :underline t))
+             (propertize (concat " " (alist-get 'name tab) " ") 'face face)))))
 
   ;; cache for persp indicator
   ;; add [persp-name] and [meow-indicator] on tab-bar

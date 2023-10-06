@@ -133,10 +133,10 @@
         mouse-wheel-progressive-speed nil))
 
 ;; Load theme
-(use-package modus-themes
+(use-package doom-themes
   :straight t)
-(defvar +light-theme 'modus-operandi-tinted)
-(defvar +dark-theme 'modus-vivendi-tinted)
+(defvar +light-theme 'doom-nord-light)
+(defvar +dark-theme 'doom-spacegrey)
 (defun +load-theme (&optional theme)
   (unless theme
     (setq theme (if (and (display-graphic-p)

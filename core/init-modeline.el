@@ -35,9 +35,6 @@
 (add-hook 'window-size-change-functions #'+mode-line-window-size-change-function)
 
 ;;; face
-(custom-set-faces '(mode-line ((t (:inherit 'mode-line :box nil)))))
-(custom-set-faces '(mode-line-inactive ((t (:inherit 'mode-line-inactive :box nil)))))
-
 (defgroup +mode-line nil
   "Mode-Line faces."
   :group 'faces)
