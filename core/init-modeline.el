@@ -288,7 +288,7 @@
                                      ((eq state 'ignored) "-")
                                      ((eq state 'unregistered) "+")
                                      ((stringp state) (concat "#" state ":"))
-                                     ((t " ")))))
+                                     (t " "))))
             (concat " "
                     (propertize (concat rev state-symbol)
                                 'face face
