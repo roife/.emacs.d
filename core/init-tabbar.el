@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 
-;; show encodings for UTF-8:LF
+;; Show persp list when only one persp exists
 (defvar +tab-bar-shows-single-empty-persp nil)
 
 ;; [tab-bar] Tab bar
@@ -8,7 +8,7 @@
   ;; Turn on tab-bar-mode in early-init to speed-up
   ;; :hook (window-setup . tab-bar-mode)
   :config
-  (setq tab-bar-separator " "
+  (setq tab-bar-separator ""
         tab-bar-new-tab-choice "*scratch*"
         tab-bar-tab-name-truncated-max 20
         tab-bar-auto-width nil
@@ -33,9 +33,12 @@
 
   ;; Add spaces for tab-name
   (setq tab-bar-tab-name-format-function
-        (lambda (tab i) (propertize
-                    (format " %d %s " i (alist-get 'name tab))
-                    'face (funcall tab-bar-tab-face-function tab))))
+        (lambda (tab i)
+          (let ((face (funcall tab-bar-tab-face-function tab)))
+            (concat
+             (propertize " " 'face face)
+             (propertize (format "%d" i) 'face `(:inherit ,face :weight ultra-bold))
+             (propertize (format " %s " (alist-get 'name tab)) 'face face)))))
 
   ;; cache for persp indicator
   ;; add [persp-name] and [meow-indicator] on tab-bar
@@ -44,12 +47,23 @@
     (setq +tab-bar-persp-indicator-cache
           (when-let* ((persp-list (and (bound-and-true-p persp-mode)
                                        (persp-names-current-frame-fast-ordered)))
-                      (cur-persp (and (or +tab-bar-shows-single-empty-persp
-                                          (> (length persp-list) 1))
-                                      (safe-persp-name (get-current-persp))))
-                      (subst-persp-list (cl-substitute (concat "[" cur-persp "]") cur-persp persp-list :count 1))
-                      (persp-list-text (concat " " (string-join subst-persp-list " "))))
-            (propertize persp-list-text 'face '(:inherit font-lock-variable-name-face)))))
+                      (len (length persp-list))
+                      (check-len (or (> len 1) +tab-bar-shows-single-empty-persp))
+                      (cur-persp-name (and (safe-persp-name (get-current-persp))))
+                      (triple (car (cl-loop for (prev cur next) on (cons nil persp-list)
+                                            when (eq cur cur-persp-name)
+                                            collect (list
+                                                     (if (and (null prev) persp-switch-wrap (> len 2)) (car (last persp-list)) prev)
+                                                     cur
+                                                     (if (and (null next) persp-switch-wrap (> len 2)) (car persp-list) next))))))
+            (cl-destructuring-bind (prev cur next) triple
+              (concat
+               " "
+               (when prev (concat (propertize prev 'face 'mode-line-inactive) "◂"))
+               cur
+               (when next (concat "▸" (propertize next 'face 'mode-line-inactive)))
+               " ")))
+          ))
 
   (defun +tab-bar-persp-indicator ()
     (or +tab-bar-persp-indicator-cache (+tab-bar-update-persp-indicator)))
@@ -63,7 +77,6 @@
     (add-hook hook #'(lambda (&rest _)
                        (+tab-bar-update-persp-indicator)
                        (force-mode-line-update t))))
-
 
   (setq tab-bar-format '(meow-indicator +tab-bar-persp-indicator tab-bar-format-tabs tab-bar-separator))
 

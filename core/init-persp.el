@@ -9,6 +9,8 @@
   :defines (recentf-exclude)
   :commands (get-current-persp persp-contain-buffer-p)
   :hook ((after-init . persp-mode))
+  :bind (:map persp-key-map
+              ("RET" . persp-switch))
   :init (setq persp-keymap-prefix (kbd "C-c p"))
   :config
   (setq
