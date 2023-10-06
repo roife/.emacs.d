@@ -43,17 +43,17 @@
   :group 'faces)
 
 (defface +mode-line-meta-active-unchanged-face
-  '((t (:inherit (success bold) :inverse-video t)))
+  '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
   "Face used for meta panel on the mode-line of an active window."
   :group '+mode-line)
 
 (defface +mode-line-meta-active-modified-face
-  '((t (:inherit (error bold) :inverse-video t)))
+  '((t (:inherit (font-lock-keyword-face bold) :inverse-video t)))
   "Face used for meta panel on the mode-line of an active window."
   :group '+mode-line)
 
 (defface +mode-line-meta-active-autosaved-face
-  '((t (:inherit (warning bold) :inverse-video t)))
+  '((t (:inherit (font-lock-doc-face bold) :inverse-video t)))
   "Face used for meta panel on the mode-line of an active window."
   :group '+mode-line)
 
@@ -117,7 +117,7 @@
 
 (defsubst +mode-line-overwrite-indicator ()
   "Display whether it is in overwrite mode."
-  (when overwrite-mode "| Ovr "))
+  (when overwrite-mode "| Ov "))
 
 (defsubst +mode-line-readonly-indicator ()
   "Display whether it is in overwrite mode."

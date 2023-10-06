@@ -6,7 +6,6 @@
   :custom-face
   (aw-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
   (aw-minibuffer-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 1.0))))
-  ;; (aw-mode-line-face ((t (:inherit mode-line-emphasis :bold t))))
   :hook ((window-configuration-change . aw-update)) ;; For modeline
   :config
   (setq aw-scope 'frame
@@ -120,8 +119,10 @@
   ;; mode-line indicator
   (with-eval-after-load 'popper
     (setq popper-mode-line
-          '(:propertize " POP |"
-                        face +mode-line-meta-active-face)))
+          '(:eval `(:propertize " POP |"
+                                face ,(if (+mode-line-window-active-p)
+                                          (+mode-line-get-window-name-face)
+                                        '+mode-line-meta-inactive-face)))))
 
   ;; Enable indicator in minibuffer
   (popper-echo-mode 1)

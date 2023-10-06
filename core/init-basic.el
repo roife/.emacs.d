@@ -18,7 +18,7 @@
  ;; [auto-save]
  auto-save-default t
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
- auto-save-file-name-transforms `((".*" ,(expand-file-name "autosaves/" user-emacs-directory) t))
+ auto-save-list-file-prefix (expand-file-name "autosave/" user-emacs-directory)
  auto-save-file-name-transforms (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
                                             ;; Prefix tramp autosaves to prevent conflicts with local ones
                                             (concat auto-save-list-file-prefix "tramp-\\2") t)
