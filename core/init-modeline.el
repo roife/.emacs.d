@@ -185,9 +185,7 @@
                 (:eval +mode-line-flymake-indicator)
                 " "
                 (:eval +mode-line-encoding)
-                (:propertize " %l "
-                             face +mode-line-line-number-active-face)
-                " "
+                "%l "
                 (-3 "%p")
                 "%%"))
          (rhs-str (format-mode-line rhs))
