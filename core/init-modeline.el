@@ -92,10 +92,10 @@
   (let ((modified (buffer-modified-p)))
     (cond ((eq modified t)
            '+mode-line-meta-active-modified-face)
-          ((eq modified 'autosaved)
-           '+mode-line-meta-active-autosaved-face)
           ((eq modified nil)
-           '+mode-line-meta-active-unchanged-face))))
+           '+mode-line-meta-active-unchanged-face)
+          ((eq modified 'autosaved)
+           '+mode-line-meta-active-autosaved-face))))
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
@@ -200,8 +200,9 @@
                              face ,meta-face)
                 " "
                 (:eval (breadcrumb-project-crumbs))
-                (:eval (when +mode-line-enough-width-p
-                         (concat ": " (breadcrumb-imenu-crumbs))))
+                (:eval (when-let ((imenu (and +mode-line-enough-width-p
+                                              (breadcrumb-imenu-crumbs))))
+                         (concat ": " imenu)))
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))
@@ -230,8 +231,9 @@
                                       (+mode-line-readonly-indicator))
                              face +mode-line-meta-inactive-face)
                 (:eval (breadcrumb-project-crumbs))
-                (:eval (when +mode-line-enough-width-p
-                         (concat ": " (breadcrumb-imenu-crumbs))))))
+                (:eval (when-let ((imenu (and +mode-line-enough-width-p
+                                              (breadcrumb-imenu-crumbs))))
+                         (concat ": " imenu)))))
          (rhs `((:propertize +mode-line-vcs-info
                              face +mode-line-vc-mode-inactive-face)
                 " "
