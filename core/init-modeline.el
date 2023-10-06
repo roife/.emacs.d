@@ -42,8 +42,18 @@
   "Mode-Line faces."
   :group 'faces)
 
-(defface +mode-line-meta-active-face
-  '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
+(defface +mode-line-meta-active-unchanged-face
+  '((t (:inherit (success bold) :inverse-video t)))
+  "Face used for meta panel on the mode-line of an active window."
+  :group '+mode-line)
+
+(defface +mode-line-meta-active-modified-face
+  '((t (:inherit (error bold) :inverse-video t)))
+  "Face used for meta panel on the mode-line of an active window."
+  :group '+mode-line)
+
+(defface +mode-line-meta-active-autosaved-face
+  '((t (:inherit (warning bold) :inverse-video t)))
   "Face used for meta panel on the mode-line of an active window."
   :group '+mode-line)
 
@@ -77,6 +87,16 @@
   "Get window name for current window."
   (concat " " (window-parameter (selected-window) 'ace-window-path) " "))
 
+(defsubst +mode-line-get-window-name-face ()
+  "Get face of window name for current window."
+  (let ((modified (buffer-modified-p)))
+    (cond ((eq modified t)
+           '+mode-line-meta-active-modified-face)
+          ((eq modified 'autosaved)
+           '+mode-line-meta-active-autosaved-face)
+          ((eq modified nil)
+           '+mode-line-meta-active-unchanged-face))))
+
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
   (cond (defining-kbd-macro "| MacroDef ")
@@ -98,6 +118,10 @@
 (defsubst +mode-line-overwrite-indicator ()
   "Display whether it is in overwrite mode."
   (when overwrite-mode "| Ovr "))
+
+(defsubst +mode-line-readonly-indicator ()
+  "Display whether it is in overwrite mode."
+  (when buffer-read-only "| RO "))
 
 (defsubst +mode-line-symbol-overlay-indicator ()
   "Display the number of matches for symbol overlay."
@@ -162,16 +186,19 @@
 
 (defsubst +mode-line-active ()
   "Formatting active-long mode-line."
-  (let* ((lhs `((:propertize ,(+mode-line-get-window-name)
-                             face +mode-line-meta-active-face)
+  (let* ((meta-face (+mode-line-get-window-name-face))
+         (lhs `((:propertize ,(+mode-line-get-window-name)
+                             face ,meta-face)
+                (:propertize ,(concat (+mode-line-overwrite-indicator)
+                                      (+mode-line-readonly-indicator))
+                             face ,meta-face)
                 (:propertize ,(when (+mode-line-window-active-p)
                                 (concat (+mode-line-macro-indicator)
                                         (+mode-line-multiple-cursors-indicator)
                                         (+mode-line-symbol-overlay-indicator)
-                                        (+mode-line-use-region-indicator)
-                                        (+mode-line-overwrite-indicator)))
-                             face +mode-line-meta-active-face)
-                " %* "
+                                        (+mode-line-use-region-indicator)))
+                             face ,meta-face)
+                " "
                 (:eval (breadcrumb-project-crumbs))
                 (:eval (when +mode-line-enough-width-p
                          (concat ": " (breadcrumb-imenu-crumbs))))
@@ -199,7 +226,9 @@
   "Formatting active-long mode-line."
   (let* ((lhs `((:propertize ,(+mode-line-get-window-name)
                              face +mode-line-meta-inactive-face)
-                "%* "
+                (:propertize ,(concat (+mode-line-overwrite-indicator)
+                                      (+mode-line-readonly-indicator))
+                             face +mode-line-meta-inactive-face)
                 (:eval (breadcrumb-project-crumbs))
                 (:eval (when +mode-line-enough-width-p
                          (concat ": " (breadcrumb-imenu-crumbs))))))
@@ -231,7 +260,7 @@
   :custom-face
   (breadcrumb-project-base-face ((t (:inherit breadcrumb-project-crumbs-face :bold t))))
   (breadcrumb-project-leaf-face ((t (:inherit font-lock-function-name-face :bold t))))
-  (breadcrumb-imenu-leaf-face ((t (:inherit font-lock-function-name-face :foreground nil))))
+  (breadcrumb-imenu-leaf-face ((t (:inherit font-lock-function-name-face :foreground unspecified))))
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
