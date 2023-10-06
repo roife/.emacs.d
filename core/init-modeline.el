@@ -172,9 +172,9 @@
                                         (+mode-line-overwrite-indicator)))
                              face +mode-line-meta-active-face)
                 " %* "
-                (:eval (if +mode-line-enough-width-p
-                           (breadcrumb--header-line)
-                         (breadcrumb-project-crumbs)))
+                (:eval (breadcrumb-project-crumbs))
+                (:eval (when +mode-line-enough-width-p
+                         (concat ": " (breadcrumb-imenu-crumbs))))
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))
@@ -200,9 +200,9 @@
   (let* ((lhs `((:propertize ,(+mode-line-get-window-name)
                              face +mode-line-meta-inactive-face)
                 "%* "
-                (:eval (if +mode-line-enough-width-p
-                           (breadcrumb--header-line)
-                         (breadcrumb-project-crumbs)))))
+                (:eval (breadcrumb-project-crumbs))
+                (:eval (when +mode-line-enough-width-p
+                         (concat ": " (breadcrumb-imenu-crumbs))))))
          (rhs `((:propertize +mode-line-vcs-info
                              face +mode-line-vc-mode-inactive-face)
                 " "
@@ -231,6 +231,7 @@
   :custom-face
   (breadcrumb-project-base-face ((t (:inherit breadcrumb-project-crumbs-face :bold t))))
   (breadcrumb-project-leaf-face ((t (:inherit font-lock-function-name-face :bold t))))
+  (breadcrumb-imenu-leaf-face ((t (:inherit font-lock-function-name-face :foreground nil))))
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
@@ -267,7 +268,7 @@
                                      ((stringp state) (concat "#" state ":"))
                                      ((t " ")))))
             (concat " "
-                    (propertize (concat "(" rev state-symbol ")")
+                    (propertize (concat rev state-symbol)
                                 'face face
                                 'help-echo (get-text-property 1 'help-echo vc-mode)
                                 'local-map vc-mode-line-map
