@@ -138,7 +138,7 @@
            (after (symbol-overlay-get-list 1 symbol))
            (count (length before)))
       (if (symbol-overlay-assoc symbol)
-          (concat  "| " (number-to-string (+ count 1))
+          (concat  "| " (number-to-string (1+ count))
                    "/" (number-to-string (+ count (length after)))
                    " sym "
                    (and (cadr keyword) "in scope "))))))
@@ -210,6 +210,7 @@
                              face +mode-line-host-name-active-face)
                 ))
          (rhs '((:eval +mode-line-vcs-info)
+                " "
                 (:propertize mode-name
                              face +mode-line-mode-name-active-face)
                 (:eval +mode-line-flymake-indicator)
