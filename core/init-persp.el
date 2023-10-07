@@ -146,6 +146,12 @@
                         winner-currents currents
                         winner-ring-alist alist
                         winner-pending-undo-ring pending-undo-ring))))
+
+    ;; HACK: `pp' is slow, replace it with prin1
+    (advice-add #'persp-save-state-to-file :around
+                (lambda (fn &rest args)
+                  (cl-letf (((symbol-function #'pp-to-string) #'prin1-to-string))
+                    (apply fn args))))
     )
 
   ;; Don't try to persist dead/remote buffers. They cause errors.

@@ -16,8 +16,6 @@
 
 ;; [show-paren-mode] Highlight matching parens
 (use-package paren
-  ;; after emacs 27, show-paren-mode is enabled by default
-  ;; :hook ((prog-mode conf-mode yaml-mode) . show-paren-mode)
   :custom-face (show-paren-match ((t (:underline t))))
   :config
   (setq show-paren-when-point-inside-paren t
