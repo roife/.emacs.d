@@ -115,11 +115,15 @@
 
 ;; Font: Same width and height for emoji, chinese and english characters
 (defvar +font-en-size (if (eq system-type 'darwin) 15 26))
+(defvar +font-han-size (if (eq system-type 'darwin) 16 28))
 (defvar +font-emoji-size (if (eq system-type 'darwin) 12 22))
 
 (defun +setup-fonts ()
   "Setup fonts."
-  (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-en-size))
+  (set-face-attribute 'default nil :font (font-spec :family "Iosevka" :size 15))
+
+  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size +font-han-size))
+  (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
 
   (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
   (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append))
@@ -136,7 +140,14 @@
 
 ;; Load theme
 (use-package doom-themes
-  :straight t)
+  :straight t
+  :config
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config)
+  )
 (defvar +light-theme 'doom-nord-light)
 (defvar +dark-theme 'doom-spacegrey)
 (defun +load-theme (&optional theme)
