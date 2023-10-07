@@ -115,12 +115,12 @@
 
 ;; Font: Same width and height for emoji, chinese and english characters
 (defvar +font-en-size (if (eq system-type 'darwin) 15 26))
-(defvar +font-han-size (if (eq system-type 'darwin) 16 28))
+(defvar +font-han-size (if (eq system-type 'darwin) 16 26))
 (defvar +font-emoji-size (if (eq system-type 'darwin) 12 22))
 
 (defun +setup-fonts ()
   "Setup fonts."
-  (set-face-attribute 'default nil :font (font-spec :family "Iosevka" :size 15))
+  (set-face-attribute 'default nil :font (font-spec :family "Iosevka" :size +font-en-size))
 
   (set-fontset-font t 'han (font-spec :family "PingFang SC" :size +font-han-size))
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
