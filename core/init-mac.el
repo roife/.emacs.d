@@ -2,7 +2,7 @@
 
 (setq mac-option-modifier 'meta
       mac-command-modifier 'super
-      mac-right-command-modifier 'hyper)
+      mac-right-command-modifier 'left)
 
 
 (define-key global-map [?\s-a] #'mark-whole-buffer)
@@ -25,7 +25,4 @@
 
 
 ;; Automatically switch theme based on the theme of macOS
-(add-hook 'mac-effective-appearance-change-hook #'(lambda () (+load-theme)))
-
-;; Selects the most-recently-used ASCII-capable keyboard input source when in chineses input mode
-(mac-auto-ascii-mode)
+(add-to-list 'ns-system-appearance-change-functions #'(lambda (_) (+load-theme)))
