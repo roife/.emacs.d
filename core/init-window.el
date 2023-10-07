@@ -120,9 +120,7 @@
   (with-eval-after-load 'popper
     (setq popper-mode-line
           '(:eval `(:propertize " POP |"
-                                face ,(if (+mode-line-window-active-p)
-                                          (+mode-line-get-window-name-face)
-                                        '+mode-line-meta-inactive-face)))))
+                                face ,(+mode-line-get-window-name-face (+mode-line-window-active-p))))))
 
   ;; Enable indicator in minibuffer
   (popper-echo-mode 1)

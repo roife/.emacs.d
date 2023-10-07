@@ -54,9 +54,19 @@
   "Face used for meta panel on the mode-line of an active window."
   :group '+mode-line)
 
-(defface +mode-line-meta-inactive-face
-  '((t (:inherit (bold font-lock-function-name-face))))
+(defface +mode-line-meta-inactive-unchanged-face
+  '((t (:inherit (font-lock-function-name-face bold))))
   "The face for meta panel on the mode-line of an inactive window."
+  :group '+mode-line)
+
+(defface +mode-line-meta-inactive-modified-face
+  '((t (:inherit (font-lock-keyword-face bold))))
+  "Face used for meta panel on the mode-line of an active window."
+  :group '+mode-line)
+
+(defface +mode-line-meta-inactive-autosaved-face
+  '((t (:inherit (font-lock-doc-face bold))))
+  "Face used for meta panel on the mode-line of an active window."
   :group '+mode-line)
 
 (defface +mode-line-mode-name-active-face
@@ -82,17 +92,23 @@
 ;;; Indicators
 (defsubst +mode-line-get-window-name ()
   "Get window name for current window."
-  (concat " " (window-parameter (selected-window) 'ace-window-path) " "))
+  (concat " " (window-parameter (selected-window) 'ace-window-path)))
 
-(defsubst +mode-line-get-window-name-face ()
+(defsubst +mode-line-get-window-name-face (is-active)
   "Get face of window name for current window."
   (let ((modified (buffer-modified-p)))
     (cond ((eq modified t)
-           '+mode-line-meta-active-modified-face)
+           (if is-active
+               '+mode-line-meta-active-modified-face
+             '+mode-line-meta-inactive-modified-face))
           ((eq modified nil)
-           '+mode-line-meta-active-unchanged-face)
+           (if is-active
+               '+mode-line-meta-active-unchanged-face
+             '+mode-line-meta-inactive-unchanged-face))
           ((eq modified 'autosaved)
-           '+mode-line-meta-active-autosaved-face))))
+           (if is-active
+               '+mode-line-meta-active-autosaved-face
+             '+mode-line-meta-inactive-autosaved-face)))))
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
@@ -106,13 +122,11 @@
             " W" (number-to-string (count-words (region-beginning) (region-end)))
             " C" (number-to-string (abs (- (mark t) (point)))) " ")))
 
-(defsubst +mode-line-overwrite-indicator ()
-  "Display whether it is in overwrite mode."
-  (when overwrite-mode "| Ov "))
-
-(defsubst +mode-line-readonly-indicator ()
-  "Display whether it is in overwrite mode."
-  (when buffer-read-only "| RO "))
+(defsubst +mode-line-overwrite-readonly-indicator ()
+  "Display whether it is in overwrite mode or read-only buffer."
+  (let ((ov (when overwrite-mode " OW"))
+        (ro (when buffer-read-only " RO")))
+    (concat ov ro " ")))
 
 (defsubst +mode-line-symbol-overlay-indicator ()
   "Display the number of matches for symbol overlay."
@@ -178,12 +192,10 @@
 
 (defsubst +mode-line-active ()
   "Formatting active-long mode-line."
-  (let* ((meta-face (+mode-line-get-window-name-face))
+  (let* ((meta-face (+mode-line-get-window-name-face t))
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,meta-face)
-                (:propertize ,(concat (+mode-line-overwrite-indicator)
-                                      (+mode-line-readonly-indicator))
-                             face ,meta-face)
+                (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,meta-face)
                 (:propertize ,(when (+mode-line-window-active-p)
                                 (concat (+mode-line-macro-indicator)
                                         (+mode-line-symbol-overlay-indicator)
@@ -216,11 +228,10 @@
 
 (defsubst +mode-line-inactive ()
   "Formatting active-long mode-line."
-  (let* ((lhs `((:propertize ,(+mode-line-get-window-name)
-                             face +mode-line-meta-inactive-face)
-                (:propertize ,(concat (+mode-line-overwrite-indicator)
-                                      (+mode-line-readonly-indicator))
-                             face +mode-line-meta-inactive-face)
+  (let* ((meta-face (+mode-line-get-window-name-face nil))
+         (lhs `((:propertize ,(+mode-line-get-window-name)
+                             face ,meta-face)
+                (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,meta-face)
                 (:eval (breadcrumb-project-crumbs))
                 (:eval (when-let ((imenu (and +mode-line-enough-width-p
                                               (breadcrumb-imenu-crumbs))))
