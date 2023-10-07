@@ -124,9 +124,9 @@
 
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display whether it is in overwrite mode or read-only buffer."
-  (let ((ov (when overwrite-mode " OW"))
-        (ro (when buffer-read-only " RO")))
-    (concat ov ro " ")))
+  (let ((ro (when buffer-read-only " %%"))
+        (ov (when overwrite-mode " #")))
+    (concat ro ov " ")))
 
 (defsubst +mode-line-symbol-overlay-indicator ()
   "Display the number of matches for symbol overlay."
@@ -210,7 +210,6 @@
                              face +mode-line-host-name-active-face)
                 ))
          (rhs '((:eval +mode-line-vcs-info)
-                " "
                 (:propertize mode-name
                              face +mode-line-mode-name-active-face)
                 (:eval +mode-line-flymake-indicator)
