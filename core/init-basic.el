@@ -18,7 +18,7 @@
  ;; [auto-save]
  auto-save-default t
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
- auto-save-list-file-prefix (expand-file-name "autosave/" user-emacs-directory)
+ auto-save-list-file-prefix (expand-file-name "autosaves/" user-emacs-directory)
  auto-save-file-name-transforms (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
                                             ;; Prefix tramp autosaves to prevent conflicts with local ones
                                             (concat auto-save-list-file-prefix "tramp-\\2") t)
@@ -187,15 +187,19 @@
 
 ;; [Scrolling keybinding]
 (defvar +scrolling-lines 5)
+(defun +scroll-other-window-up () (interactive) (scroll-other-window (- +scrolling-lines)))
+(defun +scroll-other-window-down () (interactive) (scroll-other-window +scrolling-lines))
+(defun +this-window-up () (interactive) (scroll-down +scrolling-lines))
+(defun +this-window-down () (interactive) (scroll-down (- +scrolling-lines)))
 (bind-keys*
- ("C-M-v" . (lambda () (interactive) (scroll-other-window +scrolling-lines)))
- ("M-<down>" . (lambda () (interactive) (scroll-other-window +scrolling-lines)))
+ ("C-M-v" . +scroll-other-window-down)
+ ("M-<down>" . +scroll-other-window-down)
 
- ("C-M-S-v" . (lambda () (interactive) (scroll-other-window (- +scrolling-lines))))
- ("M-<up>" . (lambda () (interactive) (scroll-other-window (- +scrolling-lines))))
+ ("C-M-S-v" . +scroll-other-window-up)
+ ("M-<up>" . +scroll-other-window-up)
 
- ("C-v" . (lambda () (interactive) (scroll-up +scrolling-lines)))
- ("M-v" . (lambda () (interactive) (scroll-up (- +scrolling-lines)))))
+ ("C-v" . +this-window-down)
+ ("M-v" . +this-window-up))
 
 
 ;; [gcmh] Optimize GC
