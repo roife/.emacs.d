@@ -34,6 +34,8 @@
  hscroll-step 0
  hscroll-margin 2)
 
+(pixel-scroll-precision-mode)
+
 
 ;; [Cursor] disable blinking
 (blink-cursor-mode -1)
@@ -115,18 +117,13 @@
 
 ;; Font: Same width and height for emoji, chinese and english characters
 (defvar +font-en-size (if (eq system-type 'darwin) 15 26))
-(defvar +font-han-size (if (eq system-type 'darwin) 16 26))
 (defvar +font-emoji-size (if (eq system-type 'darwin) 12 22))
 
 (defun +setup-fonts ()
   "Setup fonts."
-  (set-face-attribute 'default nil :font (font-spec :family "Iosevka" :size +font-en-size))
+  (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-en-size))
 
-  (set-fontset-font t 'han (font-spec :family "PingFang SC" :size +font-han-size))
-  (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
-
-  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
-  (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append))
+  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size)))
 
 (+setup-fonts)
 ;; (add-hook 'window-setup-hook #'+setup-fonts)

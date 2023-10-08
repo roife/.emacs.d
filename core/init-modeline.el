@@ -205,7 +205,7 @@
                 (:eval (breadcrumb-project-crumbs))
                 (:eval (when-let ((imenu (and +mode-line-enough-width-p
                                               (breadcrumb-imenu-crumbs))))
-                         (concat ": " imenu)))
+                         (concat "▸" imenu)))
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))
@@ -235,7 +235,7 @@
                 (:eval (breadcrumb-project-crumbs))
                 (:eval (when-let ((imenu (and +mode-line-enough-width-p
                                               (breadcrumb-imenu-crumbs))))
-                         (concat ": " imenu)))))
+                         (concat "▸" imenu)))))
          (rhs `((:propertize +mode-line-vcs-info
                              face +mode-line-vc-mode-inactive-face)
                 " "
@@ -268,7 +268,7 @@
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
-  (setq breadcrumb-imenu-crumb-separator "·"
+  (setq breadcrumb-imenu-crumb-separator "▸"
         breadcrumb-project-max-length 0.3
         breadcrumb-imenu-max-length 0.2))
 
