@@ -132,7 +132,7 @@ Assume point is at first MARK."
   ;; Org Latex Preview
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil)
-  ;; (plist-put org-format-latex-options :scale 1.5)
+  (plist-put org-format-latex-options :scale 1.5)
 
   (setq
    ;; Edit settings
@@ -205,43 +205,77 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
   )
 
 
-;; [org-tree-slide]
+;; [org-tree-slide] Presentation with org-mode!
 (use-package org-tree-slide
   :straight t
-  :init
+  :after org
+  :commands (+org-slide-start +org-slides-stop)
+  :config
   (defun +org-slide-start ()
     (interactive)
 
-    (setq org-hide-emphasis-markers t)
-    (org-mode-restart)
-    (set-face-attribute 'org-meta-line nil :foreground (face-attribute 'default :background))
-    (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'org-block :background))
-    (set-face-attribute 'org-block-end-line nil :foreground (face-attribute 'org-block :background))
-    (org-latex-preview '(16))
+    (when (eq major-mode 'org-mode)
+      ;; hide emephasis marks
+      (setq org-hide-emphasis-markers t)
+      ;; restart emacs to apply new settings above
+      (org-mode-restart)
 
-    ;; must be set after restarting org-mode
-    (setq header-line-format nil
-          mode-line-format nil)
-    (+hide-tab-bar)
-    (text-scale-increase 3)
-    (visual-line-mode)
-    (org-tree-slide-mode)
-    )
+      ;; set faces for better presentation
+      (set-face-attribute 'org-meta-line nil :foreground (face-attribute 'default :background))
+      (set-face-attribute 'org-tree-slide-header-overlay-face nil :foreground (face-attribute 'default :background))
+      (set-face-attribute 'org-block-begin-line nil :background (face-attribute 'default :background))
+      (set-face-attribute 'org-block-end-line nil :background (face-attribute 'default :background))
+      (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'default :background))
+      (set-face-attribute 'org-block-end-line nil :foreground (face-attribute 'default :background))
+      (set-face-attribute 'org-quote nil :foreground (face-attribute 'default :foreground))
+
+      ;; render biiiiiig latex fomulars
+      ;; (make-variable-buffer-local 'org-format-latex-options)
+      (setq-local org-format-latex-options (copy-sequence org-format-latex-options))
+      (plist-put org-format-latex-options :scale 3.0)
+      (org-latex-preview '(16))
+
+      ;; the following settings must be set after restarting org-mode
+      (setq-local header-line-format nil
+                  mode-line-format nil
+                  line-spacing 10)
+      (+hide-tab-bar)
+      (text-scale-increase 3)
+      (visual-line-mode)
+      (show-paren-local-mode -1)
+      (hl-line-mode -1)
+      (org-tree-slide-mode)
+      ))
 
   (defun +org-slide-stop ()
     (interactive)
 
-    (setq org-hide-emphasis-markers nil)
-    (set-face-attribute 'org-meta-line nil :foreground nil)
-    (set-face-attribute 'org-block-begin-line nil :foreground nil)
-    (set-face-attribute 'org-block-end-line nil :foreground nil)
-    (+show-tab-bar)
+    (when (eq major-mode 'org-mode)
+      ;; reset
+      (setq org-hide-emphasis-markers nil)
+      (set-face-attribute 'org-meta-line nil :foreground nil)
+      (set-face-attribute 'org-tree-slide-header-overlay-face nil :foreground nil)
+      (set-face-attribute 'org-block-begin-line nil :background nil)
+      (set-face-attribute 'org-block-end-line nil :background nil)
+      (set-face-attribute 'org-block-begin-line nil :foreground nil)
+      (set-face-attribute 'org-block-end-line nil :foreground nil)
+      (set-face-attribute 'org-quote nil :foreground nil)
+      (+show-tab-bar)
 
-    ;; using `org-mode-restart' will clear all local variables,
-    ;; so there is no need to set back
-    (org-mode-restart)
-    (org-tree-slide-mode -1)
+      ;; remove local settings
+      (kill-local-variable 'org-format-latex-options)
+
+      (org-tree-slide-mode -1)
+
+      ;; `org-mode-restart' will clear all local variables,
+      ;; so there is no need to reset them manually
+      (org-mode-restart)
+
+      ;; remove biiiiiig latex formulars
+      (org-latex-preview '(64))
+      )
     )
-  :config
-  (setq org-tree-slide-heading-emphasis t)
+  (setq org-tree-slide-heading-emphasis t
+        org-tree-slide-content-margin-top 1
+        org-tree-slide-slide-in-effect nil)
   )
