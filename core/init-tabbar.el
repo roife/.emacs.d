@@ -78,7 +78,16 @@
                        (+tab-bar-update-persp-indicator)
                        (force-mode-line-update t))))
 
-  (setq tab-bar-format '(meow-indicator +tab-bar-persp-indicator tab-bar-format-tabs tab-bar-separator))
+  (defun +hide-tab-bar ()
+    (interactive)
+    (setq tab-bar-format nil))
+
+  (defun +show-tab-bar ()
+    (interactive)
+    (setq tab-bar-format '(meow-indicator +tab-bar-persp-indicator tab-bar-format-tabs tab-bar-separator))
+    (tab-bar--update-tab-bar-lines))
+
+  (+show-tab-bar)
 
   ;; WORKAROUND: fresh tab-bar for daemon
   (when (daemonp)

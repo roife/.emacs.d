@@ -122,8 +122,12 @@
 (defun +setup-fonts ()
   "Setup fonts."
   (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-en-size))
+  (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
+  (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
 
-  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size)))
+  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
+  (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append)
+  )
 
 (+setup-fonts)
 ;; (add-hook 'window-setup-hook #'+setup-fonts)

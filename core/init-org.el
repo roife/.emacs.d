@@ -114,11 +114,11 @@ Assume point is at first MARK."
                                    :contents-end contents-end)))))))))))))
   (advice-add #'org-element--parse-generic-emphasis :override #'+org-element--parse-generic-emphasis)
 
-  ;; Use {} for sub- or super- scripts
-  (setq org-use-sub-superscripts "{}")
-
-  ;; Highlight quote and verse blocks
-  (setq org-fontify-quote-and-verse-blocks t)
+  (setq
+   ;; Use {} for sub- or super- scripts
+   org-use-sub-superscripts "{}"
+   ;; Highlight quote and verse blocks
+   org-fontify-quote-and-verse-blocks t)
 
   (defun +org-custom-link-img-follow (path)
     (org-open-file
@@ -132,7 +132,7 @@ Assume point is at first MARK."
   ;; Org Latex Preview
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil)
-  (plist-put org-format-latex-options :scale 1.5)
+  ;; (plist-put org-format-latex-options :scale 1.5)
 
   (setq
    ;; Edit settings
@@ -147,14 +147,10 @@ Assume point is at first MARK."
    org-pretty-entities-include-sub-superscripts nil
    org-ellipsis "…"
 
-   org-imenu-depth 4)
+   org-imenu-depth 4
+
+   org-startup-indented t)
   )
-
-
-;; ;; [org-indent]
-(use-package org-indent
-  :after org
-  :hook (org-mode . org-indent-mode))
 
 ;; [ox]
 (use-package ox
@@ -206,4 +202,46 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
               (message "[ox-hugo/export-all file %d/%d] Exporting %s" cnt num-files org-file)
               (org-hugo-export-wim-to-md :all-subtrees)
               (cl-incf cnt)))))))
+  )
+
+
+;; [org-tree-slide]
+(use-package org-tree-slide
+  :straight t
+  :init
+  (defun +org-slide-start ()
+    (interactive)
+
+    (setq org-hide-emphasis-markers t)
+    (org-mode-restart)
+    (set-face-attribute 'org-meta-line nil :foreground (face-attribute 'default :background))
+    (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'org-block :background))
+    (set-face-attribute 'org-block-end-line nil :foreground (face-attribute 'org-block :background))
+    (org-latex-preview '(16))
+
+    ;; must be set after restarting org-mode
+    (setq header-line-format nil
+          mode-line-format nil)
+    (+hide-tab-bar)
+    (text-scale-increase 3)
+    (visual-line-mode)
+    (org-tree-slide-mode)
+    )
+
+  (defun +org-slide-stop ()
+    (interactive)
+
+    (setq org-hide-emphasis-markers nil)
+    (set-face-attribute 'org-meta-line nil :foreground nil)
+    (set-face-attribute 'org-block-begin-line nil :foreground nil)
+    (set-face-attribute 'org-block-end-line nil :foreground nil)
+    (+show-tab-bar)
+
+    ;; using `org-mode-restart' will clear all local variables,
+    ;; so there is no need to set back
+    (org-mode-restart)
+    (org-tree-slide-mode -1)
+    )
+  :config
+  (setq org-tree-slide-heading-emphasis t)
   )
