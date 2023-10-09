@@ -23,6 +23,7 @@
   :bind (("C-c d i" . osx-dictionary-search-input)
          ("C-c d d" . osx-dictionary-search-pointer)))
 
+(add-hook 'mac-effective-appearance-change-hook #'(lambda () (+load-theme)))
 
-;; Automatically switch theme based on the theme of macOS
-(add-to-list 'ns-system-appearance-change-functions #'(lambda (_) (+load-theme)))
+;; Selects the most-recently-used ASCII-capable keyboard input source when in chineses input mode
+(mac-auto-ascii-mode)

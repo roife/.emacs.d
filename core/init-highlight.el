@@ -150,33 +150,50 @@
 
 
 ;; [highlight-indent-guides] Highlight indentions
-(use-package highlight-indent-guides
-  :straight t
-  :functions (macrostep-collapse macrostep-expand)
-  :hook ((prog-mode yaml-mode) . (lambda () (unless (> (car (buffer-line-statistics)) 3000) (highlight-indent-guides-mode 1))))
+;; (use-package highlight-indent-guides
+;;   :straight t
+;;   :functions (macrostep-collapse macrostep-expand)
+;;   :hook ((prog-mode yaml-mode) . (lambda () (unless (> (car (buffer-line-statistics)) 3000) (highlight-indent-guides-mode 1))))
+;;   :config
+;;   (setq highlight-indent-guides-method 'character
+;;               highlight-indent-guides-responsive 'top
+;;               highlight-indent-guides-suppress-auto-error t
+;;               highlight-indent-guides-delay 0.3)
+;;
+;;   ;; Don't display first level of indentation
+;;   (defun +indent-guides-for-all-but-first-column (level responsive display)
+;;     (unless (< level 1)
+;;       (highlight-indent-guides--highlighter-default level responsive display)))
+;;   (setq highlight-indent-guides-highlighter-function
+;;         #'+indent-guides-for-all-but-first-column)
+;;
+;;
+;;   ;; HACK: `highlight-indent-guides' acalculates its faces from the current theme,
+;;   ;; but is unable to do so properly in terminal Emacs
+;;   (defun +highligh-indent-guides-auto-set-faces (&rest _)
+;;     (when (display-graphic-p)
+;;             (highlight-indent-guides-auto-set-faces)))
+;;   (if (daemonp)
+;;       (add-hook 'server-after-make-frame-hook
+;;                 #'+highligh-indent-guides-auto-set-faces)
+;;     (advice-add #'enable-theme :after #'+highligh-indent-guides-auto-set-faces))
+;;   )
+
+
+;; [indent-bars] Highlight indentions effectively
+(use-package indent-bars
+  :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
+  :hook (prog-mode . indent-bars-mode)
   :config
-  (setq highlight-indent-guides-method 'character
-              highlight-indent-guides-responsive 'top
-              highlight-indent-guides-suppress-auto-error t
-              highlight-indent-guides-delay 0.3)
+  (setq indent-bars-display-on-blank-lines nil
+        indent-bars-width-frac 0.2)
 
-  ;; Don't display first level of indentation
-  (defun +indent-guides-for-all-but-first-column (level responsive display)
-    (unless (< level 1)
-      (highlight-indent-guides--highlighter-default level responsive display)))
-  (setq highlight-indent-guides-highlighter-function
-        #'+indent-guides-for-all-but-first-column)
-
-
-  ;; HACK: `highlight-indent-guides' acalculates its faces from the current theme,
+  ;; HACK: `indent-bars' calculates its faces from the current theme,
   ;; but is unable to do so properly in terminal Emacs
-  (defun +highligh-indent-guides-auto-set-faces (&rest _)
-    (when (display-graphic-p)
-            (highlight-indent-guides-auto-set-faces)))
-  (if (daemonp)
-      (add-hook 'server-after-make-frame-hook
-                #'+highligh-indent-guides-auto-set-faces)
-    (advice-add #'enable-theme :after #'+highligh-indent-guides-auto-set-faces))
+  (defun +indent-bars-auto-set-faces (&rest _)
+    (when indent-bars-mode
+      (indent-bars-reset)))
+  (advice-add #'enable-theme :after #'+indent-bars-auto-set-faces)
   )
 
 
