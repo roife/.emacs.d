@@ -153,9 +153,13 @@
   :hook (after-init . savehist-mode)
   :config
   (setq savehist-additional-variables '(mark-ring global-mark-ring
-                                                  search-ring regexp-search-ring
+                                                  search-ring
+                                                  regexp-search-ring
                                                   kill-ring)
         savehist-autosave-interval 300)
+
+  (with-eval-after-load 'vertico
+    (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
 
   ;; HACK: Remove text properties from `kill-ring' to reduce savehist cache size.
   (add-hook 'savehist-save-hook

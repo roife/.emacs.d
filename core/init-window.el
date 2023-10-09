@@ -78,13 +78,14 @@
           bookmark-bmenu-mode
           comint-mode
           compilation-mode
-          help-mode helpful-mode
+          ibuffer-mode
+          help-mode
           tabulated-list-mode
           Buffer-menu-mode
 
           gnus-article-mode devdocs-mode
           grep-mode occur-mode rg-mode ag-mode pt-mode
-          youdao-dictionary-mode osx-dictionary-mode fanyi-mode
+          osx-dictionary-mode
 
           "^\\*Process List\\*" process-menu-mode
           list-environment-mode cargo-process-mode
@@ -108,11 +109,12 @@
           "^\\*macro expansion\\**"
 
           "\\*Agenda Commands\\*" "\\*Org Select\\*" "\\*Capture\\*" "^CAPTURE-.*\\.org*"
-          "\\*Gofmt Errors\\*$" "\\*Go Test\\*$" godoc-mode
           "\\*docker-.+\\*"
           "\\*prolog\\*" inferior-python-mode inf-ruby-mode swift-repl-mode
           "\\*rustfmt\\*$" rustic-compilation-mode rustic-cargo-clippy-mode
           rustic-cargo-outdated-mode rustic-cargo-test-mode
+
+          chatgpt-shell-mode
 	  ))
 
   :config

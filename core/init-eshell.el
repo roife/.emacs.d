@@ -30,7 +30,11 @@
 
    ;; em-glob
    eshell-glob-case-insensitive t
-   eshell-error-if-no-glob t)
+   eshell-error-if-no-glob t
+
+   ;; prefer eshell functions
+   eshell-prefer-lisp-functions t
+   )
 
   ;; [UI]
   (add-hook 'eshell-mode-hook
