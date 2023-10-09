@@ -48,6 +48,7 @@
                      'init-modeline
                      'init-tabbar
                      'init-bib
+                     'init-ai
                      ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))
