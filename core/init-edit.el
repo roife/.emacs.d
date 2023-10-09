@@ -46,14 +46,14 @@
 (use-package ace-pinyin
   :straight t
   :after avy
-  )
+  :init (ace-pinyin-global-mode t))
 
 
 ;; [avy-link] Avy support for links
 (use-package ace-link
   :straight t
   :after avy
-  :bind (("C-, j" . ace-link-addr))
+  :bind (("C-, j" . ace-link))
   :init
   (ace-link-setup-default (kbd "C-, j"))
   )
