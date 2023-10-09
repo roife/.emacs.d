@@ -222,7 +222,6 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
 
       ;; set faces for better presentation
       (set-face-attribute 'org-meta-line nil :foreground (face-attribute 'default :background))
-      (set-face-attribute 'org-tree-slide-header-overlay-face nil :foreground (face-attribute 'default :background))
       (set-face-attribute 'org-block-begin-line nil :background (face-attribute 'default :background))
       (set-face-attribute 'org-block-end-line nil :background (face-attribute 'default :background))
       (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'default :background))
@@ -230,7 +229,6 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
       (set-face-attribute 'org-quote nil :foreground (face-attribute 'default :foreground))
 
       ;; render biiiiiig latex fomulars
-      ;; (make-variable-buffer-local 'org-format-latex-options)
       (setq-local org-format-latex-options (copy-sequence org-format-latex-options))
       (plist-put org-format-latex-options :scale 3.0)
       (org-latex-preview '(16))
@@ -245,6 +243,10 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
       (show-paren-local-mode -1)
       (hl-line-mode -1)
       (org-tree-slide-mode)
+      (setq-local org-tree-slide-date " "
+                  org-tree-slide-title " "
+                  org-tree-slide-author nil
+                  org-tree-slide-email nil)
       ))
 
   (defun +org-slide-stop ()
@@ -254,10 +256,9 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
       ;; reset
       (setq org-hide-emphasis-markers nil)
       (set-face-attribute 'org-meta-line nil :foreground nil)
-      (set-face-attribute 'org-tree-slide-header-overlay-face nil :foreground nil)
       (set-face-attribute 'org-block-begin-line nil :background nil)
-      (set-face-attribute 'org-block-end-line nil :background nil)
       (set-face-attribute 'org-block-begin-line nil :foreground nil)
+      (set-face-attribute 'org-block-end-line nil :background nil)
       (set-face-attribute 'org-block-end-line nil :foreground nil)
       (set-face-attribute 'org-quote nil :foreground nil)
       (+show-tab-bar)
@@ -277,5 +278,5 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
     )
   (setq org-tree-slide-heading-emphasis t
         org-tree-slide-content-margin-top 1
-        org-tree-slide-slide-in-effect nil)
+        org-tree-slide-slide-in-effect t)
   )
