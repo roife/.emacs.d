@@ -17,6 +17,7 @@
     "Activate ibuffer-project"
     (interactive)
     (let ((starred-name-filter '(starred-name . ""))
+          (scratch-filter '(name . "^\\*scratch\\(.*\\)\\*$"))
           (ebib-filter '(or (mode . ebib-entry-mode)
                             (mode . ebib-index-mode)
                             (mode . ebib-log-mode)
@@ -39,6 +40,7 @@
                     (ibuffer-project-generate-filter-groups)))
       ;; ChatGPT buffer should be added first to avoid being grouped into projects
       (add-to-list 'ibuffer-filter-groups (list "Telega" telega-filter))
+      (add-to-list 'ibuffer-filter-groups (list "Scratch" scratch-filter))
       (add-to-list 'ibuffer-filter-groups (list "ChatGPT" chatgpt-filter))
       (add-to-list 'ibuffer-filter-groups (list "Eww" eww-filter))
       (add-to-list 'ibuffer-filter-groups (list "Ebib" ebib-filter))

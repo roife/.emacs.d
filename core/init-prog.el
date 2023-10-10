@@ -218,8 +218,16 @@
         verilog-tab-to-comment t))
 
 
+;; [yaml]
 (use-package yaml-mode
   :straight t)
+
+
+;; [graphviz-dot]
+(use-package graphviz-dot-mode
+  :straight t
+  :config
+  (setq graphviz-dot-indent-width 4))
 
 
 ;; [Proof General] Proof General is a generic front-end for proof assistants
