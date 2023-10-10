@@ -119,7 +119,7 @@
   ;; Make fringes look better
   (setq diff-hl-fringe-bmp-function
         (lambda (&rest _)
-          (define-fringe-bitmap 'my-diff-hl-bmp
+          (define-fringe-bitmap '+diff-hl-bmp
             (vector #b00000000)
             1 8
             '(center t))))
@@ -149,12 +149,11 @@
 
 ;; [beacon] Highlight line at cursor after switching window
 (use-package pulse
-  :ensure nil
   :custom-face
   (pulse-highlight-start-face ((t (:inherit region :background unspecified))))
   (pulse-highlight-face ((t (:inherit region :background unspecified :extend t))))
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
-         ((bookmark-after-jump magit-diff-visit-file next-error) . my-recenter-and-pulse-line))
+         ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
   :init
   (defun +pulse-momentary-line (&rest _)
     "Pulse the current line."
