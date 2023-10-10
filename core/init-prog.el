@@ -319,6 +319,11 @@
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :hook ((prog-mode . copilot-mode))
   :config
+  (defun +copilot-open-ignoring-temp-buffer ()
+    (interactive)
+    (when (not (+is-temp-buffer-p (current-buffer)))
+      (copilot-mode)))
+
   (defun +copilot-complete ()
     (interactive)
     (or (copilot-accept-completion)
