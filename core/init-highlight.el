@@ -106,8 +106,8 @@
          (lambda ()
            (diff-hl-update-once)
            (unless (display-graphic-p) (diff-hl-margin-local-mode 1))))
-  :hook ((focus-in . diff-hl-update-once))
   :config
+  (add-function :after after-focus-change-function #'diff-hl-update-once)
   (setq
    diff-hl-draw-borders nil
    ;; Reduce load on remote
@@ -143,10 +143,16 @@
 ;; [goggles] Highlight modified region
 (use-package goggles
   :straight t
-  :hook ((prog-mode conf-mode yaml-mode text-mode) . goggles-mode)
+  :hook (after-init . goggles-mode)
   :config
   (setq-default goggles-pulse nil)
   )
+
+
+;; [beacon] Highlight line at cursor after switching window
+(use-package beacon
+  :straight t
+  :hook (after-init . beacon-mode))
 
 
 ;; [highlight-indent-guides] Highlight indentions
