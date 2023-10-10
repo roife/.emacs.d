@@ -7,6 +7,6 @@ This command does the inverse of `fill-region'."
   (let ((fill-column most-positive-fixnum))
     (fill-region start end)))
 
-(defun +is-temp-buffer-p (buffer)
+(defun +temp-buffer-p (buffer)
   "Return t if BUFFER is temporary."
   (string-match-p "^ " (buffer-name buffer)))

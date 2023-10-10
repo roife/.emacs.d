@@ -26,6 +26,7 @@
                      'init-straight
                      'init-ui
                      'init-basic
+                     'init-util
                      (when (eq system-type 'darwin) 'init-mac)
                      'init-highlight
                      'init-edit
@@ -42,7 +43,6 @@
                      'init-dict
                      'init-elfeed
                      'init-ibuffer
-                     'init-util
                      'init-test
                      'init-modal
                      'init-modeline

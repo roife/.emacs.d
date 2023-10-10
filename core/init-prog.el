@@ -317,11 +317,12 @@
 (use-package copilot
   :when (executable-find "node")
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook ((prog-mode . copilot-mode))
+  :hook ((first-change . +copilot-check-and-auto-activate))
   :config
-  (defun +copilot-open-ignoring-temp-buffer ()
+  (defun +copilot-check-and-auto-activate ()
     (interactive)
-    (when (not (+is-temp-buffer-p (current-buffer)))
+    (when (and (not (+temp-buffer-p (current-buffer)))
+               (derived-mode-p 'prog-mode))
       (copilot-mode)))
 
   (defun +copilot-complete ()
