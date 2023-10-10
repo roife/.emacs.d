@@ -215,20 +215,20 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
   )
 
 
+;; [org-modern] A modern org-mode
+(use-package org-modern
+  :straight t
+  :after org
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda-mode)))
+
+
 ;; [org-tree-slide] Presentation with org-mode!
 (use-package org-tree-slide
   :straight t
   :after org
   :commands (+org-slide-start +org-slides-stop)
   :config
-  (defun +org-slide-edit ()
-    (when org-tree-slide-mode
-      (read-only-mode -1)))
-
-  (defun +org-slide-readonly ()
-    (when org-tree-slide-mode
-      (read-only-mode)))
-
   (defun +org-slide-start ()
     (interactive)
 
@@ -240,11 +240,6 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
 
       ;; set faces for better presentation
       (set-face-attribute 'org-meta-line nil :foreground (face-attribute 'default :background))
-      ;; (set-face-attribute 'org-block-begin-line nil :background (face-attribute 'default :background))
-      ;; (set-face-attribute 'org-block-end-line nil :background (face-attribute 'default :background))
-      ;; (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'default :background))
-      ;; (set-face-attribute 'org-block-end-line nil :foreground (face-attribute 'default :background))
-      ;; (set-face-attribute 'org-quote nil :foreground (face-attribute 'default :foreground))
 
       ;; the following settings must be set after restarting org-mode
       ;; render biiiiiig latex fomulars
@@ -273,8 +268,8 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
                   org-tree-slide-author nil
                   org-tree-slide-email nil)
 
-      (add-hook 'meow-insert-enter-hook '+org-slide-edit nil t)
-      (add-hook 'meow-insert-exit-hook '+org-slide-readonly nil t)
+      (add-hook 'meow-insert-enter-hook #'(lambda (&rest _) (read-only-mode -1)) nil t)
+      (add-hook 'meow-insert-exit-hook #'read-only-mode nil t)
       ))
 
   (defun +org-slide-stop ()
@@ -284,11 +279,7 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
       ;; reset
       (setq org-hide-emphasis-markers nil)
       (set-face-attribute 'org-meta-line nil :foreground nil)
-      ;; (set-face-attribute 'org-block-begin-line nil :background nil)
-      ;; (set-face-attribute 'org-block-begin-line nil :foreground nil)
-      ;; (set-face-attribute 'org-block-end-line nil :background nil)
-      ;; (set-face-attribute 'org-block-end-line nil :foreground nil)
-      ;; (set-face-attribute 'org-quote nil :foreground nil)
+
       (+show-tab-bar)
 
       ;; remove local settings
