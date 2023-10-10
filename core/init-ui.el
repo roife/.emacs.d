@@ -16,27 +16,6 @@
  inhibit-compacting-font-caches t)
 
 
-;; [Scrolling]
-(setq
- ;; Performant and rapid scrolling
- fast-but-imprecise-scrolling t
-
- ;; Keep 5 lines when scrolling
- scroll-step 0
- scroll-margin 5
- scroll-conservatively 101
- ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines.
- auto-window-vscroll nil
-
- ;; [hscroll]
- ;; hscroll only for current line
- auto-hscroll-mode t
- hscroll-step 0
- hscroll-margin 2)
-
-(pixel-scroll-precision-mode)
-
-
 ;; [Cursor] disable blinking
 (blink-cursor-mode -1)
 
@@ -155,7 +134,7 @@
   (unless theme
     (setq theme (if (and (display-graphic-p)
                          (cond ((eq system-type 'darwin)
-				(string= (plist-get (mac-application-state) ':appearance)
+                                (string= (plist-get (mac-application-state) ':appearance)
                          "NSAppearanceNameAqua"))
                                (t t)))
                     +light-theme

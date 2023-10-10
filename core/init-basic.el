@@ -189,7 +189,27 @@
   :hook (text-mode . visual-line-mode))
 
 
-;; [Scrolling keybinding]
+;; [Scrolling]
+(setq
+ ;; Performant and rapid scrolling
+ fast-but-imprecise-scrolling t
+
+ ;; Keep 5 lines when scrolling
+ scroll-step 0
+ scroll-margin 3
+ scroll-up-aggressively 0.01 ; less jumpy
+ scroll-down-aggressively 0.01
+ scroll-conservatively 101
+ ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines.
+ auto-window-vscroll nil
+
+ ;; [hscroll]
+ auto-hscroll-mode t
+ hscroll-step 0
+ hscroll-margin 2)
+
+(pixel-scroll-precision-mode)
+
 (defvar +scrolling-lines 5)
 (defun +scroll-other-window-up () (interactive) (scroll-other-window (- +scrolling-lines)))
 (defun +scroll-other-window-down () (interactive) (scroll-other-window +scrolling-lines))

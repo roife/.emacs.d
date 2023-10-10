@@ -22,51 +22,51 @@
   (defun org-do-emphasis-faces (limit)
     "Run through the buffer and emphasize strings."
     (let ((quick-re (format "\\([%s]\\|^\\)\\([~=*/_+]\\).*?[~=*/_+]"
-    		                (car org-emphasis-regexp-components))))
+                            (car org-emphasis-regexp-components))))
       (catch :exit
         (while (re-search-forward quick-re limit t)
           (let* ((marker (match-string 2))
                  (verbatim? (member marker '("~" "="))))
             (when (save-excursion
-    	            (goto-char (match-beginning 0))
-    	            (and
-    	             ;; Do not match table hlines.
-    	             (not (and (equal marker "+")
-    		                   (org-match-line
-    		                    "[ \t]*\\(|[-+]+|?\\|\\+[-+]+\\+\\)[ \t]*$")))
-    	             ;; Do not match headline stars.  Do not consider
-    	             ;; stars of a headline as closing marker for bold
-    	             ;; markup either.
-    	             (not (and (equal marker "*")
-    		                   (save-excursion
-    		                     (forward-char)
-    		                     (skip-chars-backward "*")
-    		                     (looking-at-p org-outline-regexp-bol))))
-    	             ;; Match full emphasis markup regexp.
-    	             (looking-at (if verbatim? org-verbatim-re org-emph-re))
-    	             ;; Do not span over paragraph boundaries.
-    	             (not (string-match-p org-element-paragraph-separate
-    				                      (match-string 2)))
-    	             ;; Do not span over cells in table rows.
-    	             (not (and (save-match-data (org-match-line "[ \t]*|"))
-    		                   (string-match-p "|" (match-string 4))))))
+                    (goto-char (match-beginning 0))
+                    (and
+                     ;; Do not match table hlines.
+                     (not (and (equal marker "+")
+                               (org-match-line
+                                "[ \t]*\\(|[-+]+|?\\|\\+[-+]+\\+\\)[ \t]*$")))
+                     ;; Do not match headline stars.  Do not consider
+                     ;; stars of a headline as closing marker for bold
+                     ;; markup either.
+                     (not (and (equal marker "*")
+                               (save-excursion
+                                 (forward-char)
+                                 (skip-chars-backward "*")
+                                 (looking-at-p org-outline-regexp-bol))))
+                     ;; Match full emphasis markup regexp.
+                     (looking-at (if verbatim? org-verbatim-re org-emph-re))
+                     ;; Do not span over paragraph boundaries.
+                     (not (string-match-p org-element-paragraph-separate
+                                          (match-string 2)))
+                     ;; Do not span over cells in table rows.
+                     (not (and (save-match-data (org-match-line "[ \t]*|"))
+                               (string-match-p "|" (match-string 4))))))
               (pcase-let ((`(,_ ,face ,_) (assoc marker org-emphasis-alist))
-    		              (m (if org-hide-emphasis-markers 4 2)))
+                          (m (if org-hide-emphasis-markers 4 2)))
                 (font-lock-prepend-text-property
                  (match-beginning m) (match-end m) 'face face)
                 (when verbatim?
-    	          (org-remove-flyspell-overlays-in
-    	           (match-beginning 0) (match-end 0))
-    	          (remove-text-properties (match-beginning 2) (match-end 2)
-    				                      '(display t invisible t intangible t)))
+                  (org-remove-flyspell-overlays-in
+                   (match-beginning 0) (match-end 0))
+                  (remove-text-properties (match-beginning 2) (match-end 2)
+                                          '(display t invisible t intangible t)))
                 (add-text-properties (match-beginning 2) (match-end 2)
-    			                     '(font-lock-multiline t org-emphasis t))
+                                     '(font-lock-multiline t org-emphasis t))
                 (when (and org-hide-emphasis-markers
-    		               (not (org-at-comment-p)))
-    	          (add-text-properties (match-end 4) (match-beginning 5)
-    			                       '(invisible t))
-    	          (add-text-properties (match-beginning 3) (match-end 3)
-    			                       '(invisible t)))
+                           (not (org-at-comment-p)))
+                  (add-text-properties (match-end 4) (match-beginning 5)
+                                       '(invisible t))
+                  (add-text-properties (match-beginning 3) (match-end 3)
+                                       '(invisible t)))
                 (throw :exit t))))))))
   (defun +org-element--parse-generic-emphasis (mark type)
     "Parse emphasis object at point, if any.
@@ -211,6 +211,14 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
   :after org
   :commands (+org-slide-start +org-slides-stop)
   :config
+  (defun +org-slide-edit ()
+    (when org-tree-slide-mode
+      (read-only-mode -1)))
+
+  (defun +org-slide-readonly ()
+    (when org-tree-slide-mode
+      (read-only-mode)))
+
   (defun +org-slide-start ()
     (interactive)
 
@@ -222,31 +230,41 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
 
       ;; set faces for better presentation
       (set-face-attribute 'org-meta-line nil :foreground (face-attribute 'default :background))
-      (set-face-attribute 'org-block-begin-line nil :background (face-attribute 'default :background))
-      (set-face-attribute 'org-block-end-line nil :background (face-attribute 'default :background))
-      (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'default :background))
-      (set-face-attribute 'org-block-end-line nil :foreground (face-attribute 'default :background))
-      (set-face-attribute 'org-quote nil :foreground (face-attribute 'default :foreground))
+      ;; (set-face-attribute 'org-block-begin-line nil :background (face-attribute 'default :background))
+      ;; (set-face-attribute 'org-block-end-line nil :background (face-attribute 'default :background))
+      ;; (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'default :background))
+      ;; (set-face-attribute 'org-block-end-line nil :foreground (face-attribute 'default :background))
+      ;; (set-face-attribute 'org-quote nil :foreground (face-attribute 'default :foreground))
 
+      ;; the following settings must be set after restarting org-mode
       ;; render biiiiiig latex fomulars
       (setq-local org-format-latex-options (copy-sequence org-format-latex-options))
       (plist-put org-format-latex-options :scale 3.0)
       (org-latex-preview '(16))
 
-      ;; the following settings must be set after restarting org-mode
       (setq-local header-line-format nil
                   mode-line-format nil
-                  line-spacing 10)
+                  line-spacing 10
+                  cursor-type 'hollow
+                  meow-cursor-type-normal 'hollow)
+      (meow-normal-define-key
+       '("n" . org-tree-slide-move-next-tree)
+       '("p" . org-tree-slide-move-previous-tree))
       (+hide-tab-bar)
       (text-scale-increase 3)
       (visual-line-mode)
       (show-paren-local-mode -1)
       (hl-line-mode -1)
+
       (org-tree-slide-mode)
+      ;; the following settings must be set after enabling org-tree-slide-mode
       (setq-local org-tree-slide-date " "
                   org-tree-slide-title " "
                   org-tree-slide-author nil
                   org-tree-slide-email nil)
+
+      (add-hook 'meow-insert-enter-hook '+org-slide-edit nil t)
+      (add-hook 'meow-insert-exit-hook '+org-slide-readonly nil t)
       ))
 
   (defun +org-slide-stop ()
@@ -256,17 +274,19 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
       ;; reset
       (setq org-hide-emphasis-markers nil)
       (set-face-attribute 'org-meta-line nil :foreground nil)
-      (set-face-attribute 'org-block-begin-line nil :background nil)
-      (set-face-attribute 'org-block-begin-line nil :foreground nil)
-      (set-face-attribute 'org-block-end-line nil :background nil)
-      (set-face-attribute 'org-block-end-line nil :foreground nil)
-      (set-face-attribute 'org-quote nil :foreground nil)
+      ;; (set-face-attribute 'org-block-begin-line nil :background nil)
+      ;; (set-face-attribute 'org-block-begin-line nil :foreground nil)
+      ;; (set-face-attribute 'org-block-end-line nil :background nil)
+      ;; (set-face-attribute 'org-block-end-line nil :foreground nil)
+      ;; (set-face-attribute 'org-quote nil :foreground nil)
       (+show-tab-bar)
 
       ;; remove local settings
       (kill-local-variable 'org-format-latex-options)
 
       (org-tree-slide-mode -1)
+
+      (read-only-mode -1)
 
       ;; `org-mode-restart' will clear all local variables,
       ;; so there is no need to reset them manually
@@ -278,5 +298,5 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
     )
   (setq org-tree-slide-heading-emphasis t
         org-tree-slide-content-margin-top 1
-        org-tree-slide-slide-in-effect t)
+        org-tree-slide-slide-in-effect nil)
   )
