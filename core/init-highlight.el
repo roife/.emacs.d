@@ -135,6 +135,9 @@
 
   ;; WORKAROUND: Integration with ws-butler
   (advice-add #'ws-butler-after-save :after #'diff-hl-update-once)
+
+  ;; HACK: Update after vc-state refreshed
+  (advice-add #'vc-refresh-state :after #'diff-hl-update)
   )
 
 
