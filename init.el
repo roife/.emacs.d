@@ -49,7 +49,8 @@
                      'init-tabbar
                      'init-bib
                      'init-ai
-                     'init-telega
+                     'init-chat
+                     'init-webservice
                      ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))

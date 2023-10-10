@@ -79,7 +79,8 @@
                        (force-mode-line-update t))))
 
   (defun +tab-bar-telega-notifications ()
-    (when-let ((indicator (telega-mode-line-unread-unmuted)))
+    (when-let ((indicator (and (boundp 'telega-mode-line-unread-unmuted)
+                               telega-mode-line-unread-unmuted)))
       (concat
        indicator
        (propertize "✈ " 'face 'telega-unread-unmuted-modeline))))

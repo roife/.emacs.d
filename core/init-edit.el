@@ -146,7 +146,7 @@
 (use-package hideshow
   :hook ((prog-mode conf-mode yaml-mode) . hs-minor-mode)
   :bind (("C-c h TAB" . hs-toggle-hiding)
-         ("C-c h `'" . hs-toggle-all))
+         ("C-c h `" . hs-toggle-all))
   :config
   ;; More functions
   ;; @see https://karthinks.com/software/simple-folding-with-hideshow/

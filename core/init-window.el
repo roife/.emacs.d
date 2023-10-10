@@ -82,6 +82,7 @@
           help-mode
           tabulated-list-mode
           Buffer-menu-mode
+          flymake-diagnostics-buffer-mode
 
           gnus-article-mode devdocs-mode
           grep-mode occur-mode rg-mode ag-mode pt-mode
@@ -113,7 +114,9 @@
           "\\*Graphviz Preview: .*\\*"
 
           chatgpt-shell-mode
-	  ))
+
+          "\\*reddigg-main\\*" "\\*reddigg-comments\\*"
+          ))
 
   :config
   ;; mode-line indicator
@@ -141,7 +144,8 @@
 
 ;; [zoom] Managing the window sizes automatically
 (use-package zoom
-  :straight t)
+  :straight t
+  :hook (window-setup . zoom-mode))
 
 
 ;; [transient for window operations]
