@@ -2,9 +2,7 @@
 
 ;; [hl-line] Highlight current line
 (use-package hl-line
-  :hook ((prog-mode text-mode
-                    yaml-mode conf-mode
-                    special-mode org-agenda-mode dired-mode) . hl-line-mode)
+  :hook (after-init . global-hl-line-mode)
   :config
   (setq hl-line-sticky-flag nil)
   ;; Highlight EOF
