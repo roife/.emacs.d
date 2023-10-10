@@ -96,7 +96,7 @@
 
 ;; Font: Same width and height for emoji, chinese and english characters
 (defvar +font-en-size (if (eq system-type 'darwin) 15 26))
-(defvar +font-emoji-size (if (eq system-type 'darwin) 12 22))
+(defvar +font-emoji-size (if (eq system-type 'darwin) 11 22))
 
 (defun +setup-fonts ()
   "Setup fonts."
