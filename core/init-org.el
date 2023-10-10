@@ -118,7 +118,9 @@ Assume point is at first MARK."
    ;; Use {} for sub- or super- scripts
    org-use-sub-superscripts "{}"
    ;; Highlight quote and verse blocks
-   org-fontify-quote-and-verse-blocks t)
+   org-fontify-quote-and-verse-blocks t
+   ;; Highlight the whole line for headings
+   org-fontify-whole-heading-line t)
 
   (defun +org-custom-link-img-follow (path)
     (org-open-file
@@ -143,6 +145,8 @@ Assume point is at first MARK."
 
    ;; better keybindings
    org-special-ctrl-a/e t
+   org-special-ctrl-k t
+   org-special-ctrl-o t
    org-support-shift-select t
 
    ;; pretty entities
