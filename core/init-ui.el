@@ -19,7 +19,6 @@
 ;; [Cursor] disable blinking
 (blink-cursor-mode -1)
 
-
 ;; [Fringes] Reduce the clutter in the fringes
 (setq indicate-buffer-boundaries nil
       indicate-empty-lines nil)

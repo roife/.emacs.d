@@ -91,7 +91,6 @@
   (advice-add #'enable-theme :after #'+hl-update-keyword-faces)
   )
 
-
 ;; ;; [diff-hl] Highlight uncommitted changes using VC
 (use-package diff-hl
   :straight t
@@ -103,9 +102,11 @@
   :hook ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) .
          (lambda ()
            (diff-hl-update-once)
-           (unless (display-graphic-p) (diff-hl-margin-local-mode 1))))
+           (diff-hl-show-hunk-mouse-mode)
+           (if (display-graphic-p)
+               (diff-hl-margin-local-mode -1)
+             (diff-hl-margin-local-mode))))
   :config
-  (add-function :after after-focus-change-function #'diff-hl-update-once)
   (setq
    diff-hl-draw-borders nil
    ;; Reduce load on remote
@@ -117,12 +118,11 @@
   (setq-default fringes-outside-margins t)
 
   ;; Make fringes look better
+  (define-fringe-bitmap '+diff-hl-bmp
+    (vector #b11100000)
+    1 8 '(center t))
   (setq diff-hl-fringe-bmp-function
-        (lambda (&rest _)
-          (define-fringe-bitmap '+diff-hl-bmp
-            (vector #b00000000)
-            1 8
-            '(center t))))
+        #'(lambda (&rest _) '+diff-hl-bmp))
 
   ;; Integration with magit
   (with-eval-after-load 'magit
@@ -138,6 +138,9 @@
 
   ;; HACK: Update after vc-state refreshed
   (advice-add #'vc-refresh-state :after #'diff-hl-update)
+
+  ;; Update after focus change
+  (add-function :after after-focus-change-function #'diff-hl-update-once)
   )
 
 
