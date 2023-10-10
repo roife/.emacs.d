@@ -78,13 +78,19 @@
                        (+tab-bar-update-persp-indicator)
                        (force-mode-line-update t))))
 
+  (defun +tab-bar-telega-notifications ()
+    (when-let ((indicator (telega-mode-line-unread-unmuted)))
+      (concat
+       indicator
+       (propertize "✈ " 'face 'telega-unread-unmuted-modeline))))
+
   (defun +hide-tab-bar ()
     (interactive)
     (setq tab-bar-format nil))
 
   (defun +show-tab-bar ()
     (interactive)
-    (setq tab-bar-format '(meow-indicator +tab-bar-persp-indicator tab-bar-format-tabs tab-bar-separator))
+    (setq tab-bar-format '(+tab-bar-telega-notifications meow-indicator +tab-bar-persp-indicator tab-bar-format-tabs tab-bar-separator))
     (tab-bar--update-tab-bar-lines))
 
   (+show-tab-bar)
