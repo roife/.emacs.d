@@ -150,9 +150,47 @@
 
 
 ;; [beacon] Highlight line at cursor after switching window
-(use-package beacon
-  :straight t
-  :hook (after-init . beacon-mode))
+(use-package pulse
+  :ensure nil
+  :custom-face
+  (pulse-highlight-start-face ((t (:inherit region :background unspecified))))
+  (pulse-highlight-face ((t (:inherit region :background unspecified :extend t))))
+  :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
+         ((bookmark-after-jump magit-diff-visit-file next-error) . my-recenter-and-pulse-line))
+  :init
+  (defun +pulse-momentary-line (&rest _)
+    "Pulse the current line."
+    (pulse-momentary-highlight-one-line (point)))
+
+  (defun +pulse-momentary (&rest _)
+    "Pulse the region or the current line."
+    (if (fboundp 'xref-pulse-momentarily)
+        (xref-pulse-momentarily)
+      (+pulse-momentary-line)))
+
+  (defun +recenter-and-pulse(&rest _)
+    "Recenter and pulse the region or the current line."
+    (recenter)
+    (+pulse-momentary))
+
+  (defun my-recenter-and-pulse-line (&rest _)
+    "Recenter and pulse the current line."
+    (recenter)
+    (+pulse-momentary-line))
+
+  (dolist (cmd '(recenter-top-bottom
+                 other-window switch-to-buffer
+                 aw-select toggle-window-split
+                 windmove-do-window-select
+                 pager-page-down pager-page-up
+                 treemacs-select-window
+                 symbol-overlay-basic-jump))
+    (advice-add cmd :after #'+pulse-momentary-line))
+
+  (dolist (cmd '(pop-to-mark-command
+                 pop-global-mark
+                 goto-last-change))
+    (advice-add cmd :after #'+recenter-and-pulse)))
 
 
 ;; [highlight-indent-guides] Highlight indentions
