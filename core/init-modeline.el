@@ -207,10 +207,8 @@
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))
-         (rhs '((:eval +mode-line-vcs-info)
-                " "
-                (:propertize mode-name
-                             face +mode-line-mode-name-active-face)
+         (rhs '((:propertize mode-name face +mode-line-mode-name-active-face)
+                (:eval +mode-line-vcs-info)
                 (:eval +mode-line-flymake-indicator)
                 " "
                 (:eval +mode-line-encoding)
@@ -235,10 +233,9 @@
          ;; (:eval (when-let ((imenu (and +mode-line-enough-width-p
          ;;                               (breadcrumb-imenu-crumbs))))
          ;;          (concat "▸" imenu)))))
-         (rhs `((:propertize +mode-line-vcs-info
+         (rhs `((:eval mode-name)
+                (:propertize +mode-line-vcs-info
                              face +mode-line-vc-mode-inactive-face)
-                " "
-                (:eval mode-name)
                 " "
                 (:eval +mode-line-encoding)
                 "%l "
