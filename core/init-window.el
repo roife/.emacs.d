@@ -96,23 +96,21 @@
           "^\\*vterm.*\\*.*$"  vterm-mode
           "^\\*eldoc.*\\*.*$" eldoc-mode
 
-          "\\*Flycheck errors\\*$" " \\*Flycheck checker\\*$"
-          "\\*Paradox Report\\*$" "\\*package update results\\*$" "\\*Package-Lint\\*$"
+          "\\*package update results\\*$" "\\*Package-Lint\\*$"
           "\\*[Wo]*Man.*\\*$"
           "\\*ert\\*$" overseer-buffer-mode
           "\\*gud-debug\\*$"
-          "\\*lsp-help\\*$" "\\*lsp session\\*$"
           "\\*quickrun\\*$"
           "\\*tldr\\*$"
           "\\*vc-.*\\*$"
           "^\\*elfeed-entry\\*$"
           "^\\*macro expansion\\**"
+          reb-mode
 
           "\\*Agenda Commands\\*" "\\*Org Select\\*" "\\*Capture\\*" "^CAPTURE-.*\\.org*"
-          "\\*docker-.+\\*"
-          "\\*prolog\\*" inferior-python-mode inf-ruby-mode swift-repl-mode
           "\\*rustfmt\\*$" rustic-compilation-mode rustic-cargo-clippy-mode
           rustic-cargo-outdated-mode rustic-cargo-test-mode
+          "\\*Graphviz Preview: .*\\*"
 
           chatgpt-shell-mode
 	  ))
@@ -122,7 +120,8 @@
   (with-eval-after-load 'popper
     (setq popper-mode-line
           '(:eval `(:propertize " POP |"
-                                face ,(+mode-line-get-window-name-face (+mode-line-window-active-p))))))
+                                face (:inherit ,(+mode-line-get-window-name-face)
+                                               :inverse-video ,(+mode-line-window-active-p))))))
 
   ;; Enable indicator in minibuffer
   (popper-echo-mode 1)

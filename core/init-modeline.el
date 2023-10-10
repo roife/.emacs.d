@@ -39,20 +39,20 @@
   "Mode-Line faces."
   :group 'faces)
 
-(defface +mode-line-meta-active-unchanged-face
-  '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
-  "Face used for meta panel on the mode-line of an active window."
-  :group '+mode-line)
-
-(defface +mode-line-meta-active-modified-face
-  '((t (:inherit (font-lock-keyword-face bold) :inverse-video t)))
-  "Face used for meta panel on the mode-line of an active window."
-  :group '+mode-line)
-
-(defface +mode-line-meta-active-autosaved-face
-  '((t (:inherit (font-lock-doc-face bold) :inverse-video t)))
-  "Face used for meta panel on the mode-line of an active window."
-  :group '+mode-line)
+;; (defface +mode-line-meta-active-unchanged-face
+;;   '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
+;;   "Face used for meta panel on the mode-line of an active window."
+;;   :group '+mode-line)
+;;
+;; (defface +mode-line-meta-active-modified-face
+;;   '((t (:inherit (font-lock-keyword-face bold) :inverse-video t)))
+;;   "Face used for meta panel on the mode-line of an active window."
+;;   :group '+mode-line)
+;;
+;; (defface +mode-line-meta-active-autosaved-face
+;;   '((t (:inherit (font-lock-doc-face bold) :inverse-video t)))
+;;   "Face used for meta panel on the mode-line of an active window."
+;;   :group '+mode-line)
 
 (defface +mode-line-meta-inactive-unchanged-face
   '((t (:inherit (font-lock-function-name-face bold))))
@@ -94,21 +94,15 @@
   "Get window name for current window."
   (concat " " (window-parameter (selected-window) 'ace-window-path)))
 
-(defsubst +mode-line-get-window-name-face (is-active)
+(defsubst +mode-line-get-window-name-face ()
   "Get face of window name for current window."
   (let ((modified (buffer-modified-p)))
     (cond ((eq modified t)
-           (if is-active
-               '+mode-line-meta-active-modified-face
-             '+mode-line-meta-inactive-modified-face))
+           '+mode-line-meta-inactive-modified-face)
           ((eq modified nil)
-           (if is-active
-               '+mode-line-meta-active-unchanged-face
-             '+mode-line-meta-inactive-unchanged-face))
+           '+mode-line-meta-inactive-unchanged-face)
           ((eq modified 'autosaved)
-           (if is-active
-               '+mode-line-meta-active-autosaved-face
-             '+mode-line-meta-inactive-autosaved-face)))))
+           '+mode-line-meta-inactive-autosaved-face))))
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
@@ -190,19 +184,22 @@
 (advice-add #'after-insert-file-set-coding :after #'+mode-line-update-encoding)
 (advice-add #'set-buffer-file-coding-system :after #'+mode-line-update-encoding)
 
+
 (defsubst +mode-line-active ()
   "Formatting active-long mode-line."
-  (let* ((meta-face (+mode-line-get-window-name-face t))
+  (let* ((meta-face (+mode-line-get-window-name-face))
+         (panel-face `(:inherit ,meta-face :inverse-video t))
          (lhs `((:propertize ,(+mode-line-get-window-name)
-                             face ,meta-face)
-                (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,meta-face)
+                             face ,panel-face)
+                (:propertize ,(+mode-line-overwrite-readonly-indicator)
+                             face ,panel-face)
                 (:propertize ,(when (+mode-line-window-active-p)
                                 (concat (+mode-line-macro-indicator)
                                         (+mode-line-symbol-overlay-indicator)
                                         (+mode-line-use-region-indicator)))
-                             face ,meta-face)
+                             face ,panel-face)
                 " "
-                (:propertize "%b" face ,(+mode-line-get-window-name-face nil))
+                (:propertize "%b" face ,meta-face)
                 ;; (:eval (breadcrumb-project-crumbs))
                 ;; (:eval (when-let ((imenu (and +mode-line-enough-width-p
                 ;;                               (breadcrumb-imenu-crumbs))))
@@ -229,7 +226,7 @@
 
 (defsubst +mode-line-inactive ()
   "Formatting active-long mode-line."
-  (let* ((meta-face (+mode-line-get-window-name-face nil))
+  (let* ((meta-face (+mode-line-get-window-name-face))
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,meta-face)
                 (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,meta-face)
