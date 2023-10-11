@@ -319,9 +319,12 @@
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :hook ((first-change . +copilot-check-and-auto-activate))
   :config
+  (setq copilot-indent-warning-suppress t)
+
   (defun +copilot-check-and-auto-activate ()
     (interactive)
-    (when (and (not (+temp-buffer-p (current-buffer)))
+    (when (and (not copilot-mode)
+               (not (+temp-buffer-p (current-buffer)))
                (derived-mode-p 'prog-mode))
       (copilot-mode)))
 

@@ -7,7 +7,7 @@
 (use-package persp-mode
   :straight t
   :defines (recentf-exclude)
-  :commands (get-current-persp persp-contain-buffer-p)
+  :commands (get-current-persp persp-contain-buffer-p persp-update-names-cache)
   :hook ((after-init . persp-mode))
   :bind (:map persp-key-map
               ("RET" . persp-switch))
@@ -91,8 +91,7 @@
     (add-hook 'persp-activated-functions
               (lambda (_)
                 (tab-bar-tabs-set (persp-parameter 'tab-bar-tabs))
-                (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))
-                (force-mode-line-update t)))
+                (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))))
 
     (add-hook 'persp-after-load-state-functions
               (lambda (&rest _)

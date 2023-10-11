@@ -48,36 +48,30 @@
           (when-let* ((persp-list (and (bound-and-true-p persp-mode)
                                        (persp-names-current-frame-fast-ordered)))
                       (len (length persp-list))
-                      (check-len (or (> len 1) +tab-bar-shows-single-empty-persp))
-                      (cur-persp-name (and (safe-persp-name (get-current-persp))))
-                      (triple (car (cl-loop for (prev cur next) on (cons nil persp-list)
-                                            when (eq cur cur-persp-name)
-                                            collect (list
-                                                     (if (and (null prev) persp-switch-wrap (> len 2)) (car (last persp-list)) prev)
-                                                     cur
-                                                     (if (and (null next) persp-switch-wrap (> len 2)) (car persp-list) next))))))
-            (cl-destructuring-bind (prev cur next) triple
-              (concat
-               " "
-               (when prev (concat (propertize prev 'face 'mode-line-inactive) "◂"))
-               cur
-               (when next (concat "▸" (propertize next 'face 'mode-line-inactive)))
-               " ")))
-          ))
+                      (check-len (or (> len 1) +tab-bar-shows-single-empty-persp)))
+            (let* ((cur-persp-name (safe-persp-name (get-current-persp)))
+                   (cur-pos (cl-position cur-persp-name persp-list))
+                   (before (seq-subseq persp-list 0 cur-pos))
+                   (before-joined (concat (string-join before " ") " "))
+                   (after (seq-subseq persp-list (1+ cur-pos)))
+                   (after-joined (concat " " (string-join after " ")))
+                   (face '(:inherit font-lock-type-face :inverse-video t)))
+              (concat (propertize (concat " " (when before before-joined) "·") 'face face)
+                      (propertize (concat cur-persp-name) 'face (append face '(:weight ultra-bold :underline t)))
+                      (propertize (concat (when after after-joined) " ") 'face face))))
+          )
+    )
 
   (defun +tab-bar-persp-indicator ()
-    (or +tab-bar-persp-indicator-cache (+tab-bar-update-persp-indicator)))
+    (or +tab-bar-persp-indicator-cache
+        (+tab-bar-update-persp-indicator)))
 
   ;; TODO: KILL
-  (dolist (hook '(persp-created-functions
-                  persp-renamed-functions
-                  persp-activated-functions
-                  persp-after-load-state-functions
-                  persp-before-kill-functions))
+  (dolist (hook '(persp-activated-functions persp-update-names-cache))
     (add-hook hook #'(lambda (&rest _)
-                       (+tab-bar-update-persp-indicator)
-                       (force-mode-line-update t))))
+                       (+tab-bar-update-persp-indicator))))
 
+  ;; [telega]
   (defun +tab-bar-telega-icon ()
     (when (and (fboundp 'telega-server-live-p)
                (telega-server-live-p))
@@ -85,15 +79,12 @@
              (online-p (and me-user (telega-user-online-p me-user)))
              (unread-count (and (boundp 'telega--unread-chat-count)
                                 (plist-get telega--unread-chat-count :unread_unmuted_count)))
-             (face `(:inherit ,(if online-p 'success 'warning)
-                              :inverse-video t))
-             (text ))
-        (propertize (concat " ✈"
-                                       (when (and unread-count
-                                                  (not (zerop unread-count)))
-                                         (concat " " (number-to-string unread-count)))
-                                       " ")
-                               'face face))))
+             (face `(:inherit ,(if online-p 'success 'warning) :inverse-video t)))
+        (propertize (concat " ⯈" ;; telegram
+                            (when (and unread-count (not (zerop unread-count)))
+                              (concat " " (number-to-string unread-count)))
+                            " ")
+                    'face face))))
 
   (defun +hide-tab-bar ()
     (interactive)
@@ -114,5 +105,5 @@
     (add-hook 'after-make-frame-functions
               #'(lambda (&rest _) (force-mode-line-update))))
 
-  (force-mode-line-update)
+  ;; (force-mode-line-update)
   )
