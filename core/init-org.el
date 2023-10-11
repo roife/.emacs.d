@@ -301,3 +301,20 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
         org-tree-slide-content-margin-top 1
         org-tree-slide-slide-in-effect nil)
   )
+
+(use-package org-visual-outline
+  :straight (:host github :repo "legalnonsense/org-visual-outline" :files ("*.el"))
+  :after org
+  :hook ((org-mode . org-visual-indent-mode))
+  :init
+  (with-eval-after-load 'org-visual-indent
+    (setq org-visual-indent-color-indent
+          (cl-loop for x from 1 to 8
+                   with color = nil
+                   do (setq color (or (face-foreground
+                                       (intern (concat "org-level-" (number-to-string x))) nil t)
+                                      (face-foreground 'org-level-1)))
+                   collect `(,x ,(list :background color
+                                       :foreground color
+                                       :height .1)))))
+  )
