@@ -78,12 +78,22 @@
                        (+tab-bar-update-persp-indicator)
                        (force-mode-line-update t))))
 
-  (defun +tab-bar-telega-notifications ()
-    (when-let ((indicator (and (boundp 'telega-mode-line-unread-unmuted)
-                               telega-mode-line-unread-unmuted)))
-      (concat
-       indicator
-       (propertize "✈ " 'face 'telega-unread-unmuted-modeline))))
+  (defun +tab-bar-telega-icon ()
+    (when (and (fboundp 'telega-server-live-p)
+               (telega-server-live-p))
+      (let* ((me-user (telega-user-me 'locally))
+             (online-p (and me-user (telega-user-online-p me-user)))
+             (unread-count (and (boundp 'telega--unread-chat-count)
+                                (plist-get telega--unread-chat-count :unread_unmuted_count)))
+             (face `(:inherit ,(if online-p 'success 'warning)
+                              :inverse-video t))
+             (text ))
+        (propertize (concat " ✈"
+                                       (when (and unread-count
+                                                  (not (zerop unread-count)))
+                                         (concat " " (number-to-string unread-count)))
+                                       " ")
+                               'face face))))
 
   (defun +hide-tab-bar ()
     (interactive)
@@ -91,7 +101,10 @@
 
   (defun +show-tab-bar ()
     (interactive)
-    (setq tab-bar-format '(+tab-bar-telega-notifications meow-indicator +tab-bar-persp-indicator tab-bar-format-tabs tab-bar-separator))
+    (setq tab-bar-format '(+tab-bar-telega-icon
+                           meow-indicator
+                           +tab-bar-persp-indicator
+                           tab-bar-format-tabs tab-bar-separator))
     (tab-bar--update-tab-bar-lines))
 
   (+show-tab-bar)

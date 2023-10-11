@@ -50,7 +50,7 @@
                      'init-bib
                      'init-ai
                      'init-chat
-                     'init-webservice
+                     ;; 'init-webservice
                      ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))
