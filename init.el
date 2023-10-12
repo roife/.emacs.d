@@ -51,6 +51,7 @@
                      'init-ai
                      'init-chat
                      'init-pdf
+                     'init-gnus
                      ;; 'init-webservice
                      ))
 
