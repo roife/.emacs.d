@@ -6,12 +6,11 @@
   :functions eshell/alias
   :hook ((eshell-mode . +eshell/define-alias)
          (eshell-mode . compilation-shell-minor-mode))
+  :bind (("C-`" . +eshell-toggle)
+         :map eshell-mode-map
+              ("C-l" . eshell/clear)
+              ("M-s" . consult-history))
   :config
-  (bind-keys
-   :map eshell-mode-map
-   ("C-l" . eshell/clear)
-   ("M-s" . consult-history))
-
   (setq
    eshell-banner-message
    '(concat (propertize (concat " " (string-trim (buffer-name)) " ")
@@ -35,6 +34,23 @@
    ;; prefer eshell functions
    eshell-prefer-lisp-functions t
    )
+
+  (defun +eshell-toggle ()
+    "Toggle a persistent eshell popup window.
+If popup is visible but unselected, select it.
+If popup is focused, kill it."
+    (interactive)
+    (require 'eshell)
+    (if-let ((win (get-buffer-window "*eshell-popup*")))
+        ;; If users attempt to delete the sole ordinary window. silence it.
+        (if (eq (selected-window) win)
+            (delete-window win)
+          (select-window win))
+      (let ((display-comint-buffer-action '(display-buffer-at-bottom
+                                            (inhibit-same-window . nil)))
+            (eshell-buffer-name "*eshell-popup*"))
+        (with-current-buffer (eshell)
+          (add-hook 'eshell-exit-hook 'shell-delete-window nil t)))))
 
   ;; [UI]
   (add-hook 'eshell-mode-hook
@@ -137,7 +153,9 @@
   ;; Sync buffer name
   (defun +eshell-sync-dir-buffer-name ()
     "Change eshell buffer name by directory change."
-    (when (equal major-mode 'eshell-mode)
+    (when (and (equal major-mode 'eshell-mode)
+               ;; avoid renaming buffer name when in `eshell-popup'
+               (not (string-equal (buffer-name) "*eshell-popup*")))
       (rename-buffer
        (concat "Esh: " (abbreviate-file-name default-directory))
        t)))

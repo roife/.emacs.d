@@ -164,6 +164,19 @@ Assume point is at first MARK."
    org-confirm-elisp-link-function nil)
   )
 
+;; [org-entities]
+(use-package org-entities
+  :config
+  (setq org-entities-user
+        '(("vdash" "\\vdash" t "&vdash;" "⊢" "⊢" "⊢")
+          ("vDash" "\\vDash" t "&vDash;" "⊨" "⊨" "⊨")
+          ("Vdash" "\\Vdash" t "&Vdash;" "⊩" "⊩" "⊩")
+          ("Vvdash" "\\Vvdash" t "&Vvdash;" "⊪" "⊪" "⊪")
+          ("nvdash" "\\nvdash" t "&nvdash;" "⊬" "⊬" "⊬")
+          ("nvDash" "\\nvDash" t "&nvDash;" "⊭" "⊭" "⊭")
+          ("nVdash" "\\nVdash" t "&nVdash;" "⊮" "⊮" "⊮")
+          ("nVDash" "\\nVDash" t "&nVDash;" "⊯" "⊯" "⊯"))))
+
 ;; [ox]
 (use-package ox
   :config

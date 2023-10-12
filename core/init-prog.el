@@ -296,7 +296,8 @@
   :config
   (setq eldoc-echo-area-display-truncation-message nil
         eldoc-echo-area-prefer-doc-buffer t
-        eldoc-echo-area-use-multiline-p nil))
+        eldoc-echo-area-use-multiline-p nil
+        eglot-extend-to-xref t))
 
 
 ;; [eldoc-box] Eldoc with childframe

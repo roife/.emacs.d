@@ -33,6 +33,7 @@
                            (mode . eww-buffers-mode)
                            (mode . eww-search-annotations-mode)))
           (chatgpt-filter '(mode . chatgpt-shell-mode))
+          (eshell-popup-filter '(name . "^\\*eshell-popup\\*$"))
           (telega-filter '(or (mode . telega-chat-mode)
                               (mode . telega-root-mode)
                               (mode . telega-image-mode)
@@ -49,6 +50,7 @@
       (add-to-list 'ibuffer-filter-groups (list "Xwidget" xwidget-filter))
       (add-to-list 'ibuffer-filter-groups (list "Ebib" ebib-filter))
       (add-to-list 'ibuffer-filter-groups (list "Elfeed" elfeed-filter))
+      (add-to-list 'ibuffer-filter-groups (list "Eshell (popup)" eshell-popup-filter))
       (add-to-list 'ibuffer-filter-groups (list "Temporary buffers" starred-name-filter) :append)
       )
 
