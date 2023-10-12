@@ -36,7 +36,8 @@
           (telega-filter '(or (mode . telega-chat-mode)
                               (mode . telega-root-mode)
                               (mode . telega-image-mode)
-                              (mode . telega-webpage-mode))))
+                              (mode . telega-webpage-mode)))
+          (xwidget-filter '(mode . xwidget-webkit-mode)))
       (setq ibuffer-filter-groups
             (mapcar (lambda (p) (cons (car p) `((and ,(car (cdr p)) (not ,starred-name-filter)))))
                     (ibuffer-project-generate-filter-groups)))
@@ -45,6 +46,7 @@
       (add-to-list 'ibuffer-filter-groups (list "Scratch" scratch-filter))
       (add-to-list 'ibuffer-filter-groups (list "ChatGPT" chatgpt-filter))
       (add-to-list 'ibuffer-filter-groups (list "Eww" eww-filter))
+      (add-to-list 'ibuffer-filter-groups (list "Xwidget" xwidget-filter))
       (add-to-list 'ibuffer-filter-groups (list "Ebib" ebib-filter))
       (add-to-list 'ibuffer-filter-groups (list "Elfeed" elfeed-filter))
       (add-to-list 'ibuffer-filter-groups (list "Temporary buffers" starred-name-filter) :append)

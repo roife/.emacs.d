@@ -39,7 +39,7 @@
                      'init-writing
                      'init-org
                      'init-vcs
-                     'init-eww
+                     'init-browser
                      'init-dict
                      'init-elfeed
                      'init-ibuffer
@@ -50,6 +50,7 @@
                      'init-bib
                      'init-ai
                      'init-chat
+                     'init-pdf
                      ;; 'init-webservice
                      ))
 

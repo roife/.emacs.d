@@ -20,6 +20,7 @@
                        ("https://karthinks.com/index.xml" karthinks-emacs)
                        ("https://matklad.github.io/feed.xml" matklad)
                        ("https://rust-analyzer.github.io/feed.xml" rust-analyzer)
+                       ("https://egh0bww1.com/rss.xml" includeyy-emacs)
                        ;; ytb
                        ("https://www.youtube.com/feeds/videos.xml?channel_id=UCz0ONCn6eRcDJGsUzupc3TA" ytb-links)
                        ("https://www.youtube.com/feeds/videos.xml?channel_id=UCVTifvD7WFz1Z-AnEzUoUUA" ytb-fansuki)
@@ -30,6 +31,8 @@
                        ("https://www.youtube.com/feeds/videos.xml?channel_id=UCMZZNUTkXjuWlYyB_RwxNKA" ytb-wsf-xmm)
                        ("https://www.youtube.com/feeds/videos.xml?channel_id=UCMZZNUTkXjuWlYyB_RwxNKA" ytb-foodie-gao))
         elfeed-enclosure-default-dir +elfeed-enclosure-dir
+        elfeed-show-entry-switch #'pop-to-buffer
+        elfeed-show-entry-delete #'delete-window
         elfeed-search-filter "@4-months-ago +"
         elfeed-search-clipboard-type 'CLIPBOARD
         elfeed-search-title-max-width 100
@@ -39,4 +42,6 @@
         elfeed-show-unique-buffers t
         ;; elfeed-search-date-format '("%F %R" 16 :left)
         )
+  ;; Ignore db directory in recentf
+  (push elfeed-db-directory recentf-exclude)
   )

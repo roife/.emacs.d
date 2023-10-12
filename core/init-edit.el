@@ -22,7 +22,7 @@
   :bind (("C-, o" . browse-url-at-point)
          ("C-, e" . browse-url-emacs))
   :config
-  (setq browse-url-browser-function 'eww)
+  (setq browse-url-browser-function 'xwidget-webkit-browse-url)
   )
 
 
