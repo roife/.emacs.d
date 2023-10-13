@@ -66,25 +66,33 @@
     (or +tab-bar-persp-indicator-cache
         (+tab-bar-update-persp-indicator)))
 
-  ;; TODO: KILL
   (dolist (hook '(persp-activated-functions persp-update-names-cache))
     (add-hook hook #'(lambda (&rest _)
                        (+tab-bar-update-persp-indicator))))
 
   ;; [telega]
+  (defvar +tab-bar-telega-indicator-cache nil)
+  (defun +tab-bar-telega-icon-update (&rest rest)
+    (setq +tab-bar-telega-indicator-cache
+          (when (and (fboundp 'telega-server-live-p)
+                     (telega-server-live-p)
+                     (buffer-live-p telega-server--buffer))
+            (let* ((me-user (telega-user-me 'locally))
+                   (online-p (and me-user (telega-user-online-p me-user)))
+                   (unread-count (and (boundp 'telega--unread-chat-count)
+                                      (plist-get telega--unread-chat-count :unread_unmuted_count))))
+              (propertize (concat " "
+                                  (if online-p "▶" "▷")
+                                  (when (and unread-count (not (zerop unread-count)))
+                                    (concat " " (number-to-string unread-count)))
+                                  " ")
+                          'face `(:inherit ,(if online-p 'success 'warning) :inverse-video t))))))
   (defun +tab-bar-telega-icon ()
-    (when (and (fboundp 'telega-server-live-p)
-               (telega-server-live-p))
-      (let* ((me-user (telega-user-me 'locally))
-             (online-p (and me-user (telega-user-online-p me-user)))
-             (unread-count (and (boundp 'telega--unread-chat-count)
-                                (plist-get telega--unread-chat-count :unread_unmuted_count)))
-             (face `(:inherit ,(if online-p 'success 'warning) :inverse-video t)))
-        (propertize (concat " ⯈" ;; telegram
-                            (when (and unread-count (not (zerop unread-count)))
-                              (concat " " (number-to-string unread-count)))
-                            " ")
-                    'face face))))
+    (or +tab-bar-telega-indicator-cache
+          (+tab-bar-telega-icon-update)))
+  (add-hook 'telega-connection-state-hook #'+tab-bar-telega-icon-update)
+  (add-hook 'telega-kill-hook #'+tab-bar-telega-icon-update)
+  (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
 
   (defun +hide-tab-bar ()
     (interactive)

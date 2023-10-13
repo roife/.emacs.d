@@ -12,6 +12,7 @@
         telega-chat-input-markups '("org")
         telega-chat-prompt-format "> "
         telega-completing-read-function completing-read-function)
+
   (if (eq system-type 'darwin)
       (setq telega-proxies '((:server "127.0.0.1" :port 7890 :enable t :type (:@type "proxyTypeSocks5"))))
     (setq telega-server-libs-prefix "/usr"
