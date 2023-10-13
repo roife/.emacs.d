@@ -148,6 +148,20 @@
   :hook (window-setup . zoom-mode))
 
 
+;; [auto-dim-other-buffers] Dim non-active buffers
+(use-package auto-dim-other-buffers
+  :straight t
+  :hook (after-init . auto-dim-other-buffers-mode)
+  :config
+  (setq auto-dim-other-buffers-dim-on-focus-out nil
+        auto-dim-other-buffers-dim-on-switch-to-minibuffer nil)
+
+  (defun +auto-dim-other-buffers-auto-set-face (&rest _)
+    (set-face-background 'auto-dim-other-buffers-face (face-background 'mode-line)))
+  (advice-add #'enable-theme :after #'+auto-dim-other-buffers-auto-set-face)
+  (+auto-dim-other-buffers-auto-set-face)
+  )
+
 ;; [transient for window operations]
 ;; (transient-define-prefix +frame-window-management ()
 ;;   "Frame Window Management"

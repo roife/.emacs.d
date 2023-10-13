@@ -59,7 +59,7 @@ If popup is focused, kill it."
                                             (inhibit-same-window . nil)))
             (eshell-buffer-name "*eshell-popup*"))
         (with-current-buffer (eshell)
-          (add-hook 'eshell-exit-hook '(lambda () (ignore-errors (delete-window win))) nil t)))))
+          (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t)))))
 
   ;; [UI]
   (add-hook 'eshell-mode-hook
@@ -85,11 +85,11 @@ If popup is focused, kill it."
     (defalias 'eshell-vim 'find-file)
     (defalias 'eshell-vi 'find-file)
     ;; Git
-    (eshell/alias "git" "git -P $*")
-    (eshell/alias "gst" "git status -P $*")
-    (eshell/alias "ga" "git add -P $*")
-    (eshell/alias "gc" "git commit -P $*")
-    (eshell/alias "gp" "git push -P $*")
+    (eshell/alias "git" "git $*")
+    (eshell/alias "gst" "git status $*")
+    (eshell/alias "ga" "git add $*")
+    (eshell/alias "gc" "git commit $*")
+    (eshell/alias "gp" "git push $*")
     (eshell/alias "gb" "git branch $*")
     (eshell/alias "gch" "git checkout $*")
     (eshell/alias "gcb" "git checkout -b $*")

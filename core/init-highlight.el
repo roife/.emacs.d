@@ -29,7 +29,7 @@
   :config
   (setq
    ;; only show bad whitespace
-   whitespace-style '(face trailing empty indentation space-before-tab space-after-tab)))
+   whitespace-style '(face trailing empty indentation space-before-tab space-after-tab lines-tail)))
 
 
 ;; [rainbow-delimiters] Highlight brackets according to their depth
@@ -109,6 +109,8 @@
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
   :init
+  (setq pulse-delay 0.02)
+
   (defun +pulse-momentary-line (&rest _)
     "Pulse the current line."
     (pulse-momentary-highlight-one-line (point)))

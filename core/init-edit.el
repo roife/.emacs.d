@@ -126,7 +126,7 @@
 ;; [expand-region] Select a region quickly
 (use-package expand-region
   :straight t
-  :bind ("C-+" . er/expand-region))
+  :bind ("C-=" . er/expand-region))
 
 
 ;; Alternatives to [hungry-delete]

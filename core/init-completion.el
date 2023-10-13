@@ -105,7 +105,7 @@
                  "Unholy mix of Orderless and Basic."))
 
   ;; configuration
-  (setq completion-styles '(orderless+basic)
+  (setq completion-styles '(orderless+basic flex)
         completion-category-defaults nil
         completion-ignore-case t
         ;; despite override in the name, orderless can still be used in find-file etc.

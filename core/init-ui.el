@@ -94,6 +94,10 @@
 (defun +setup-fonts ()
   "Setup fonts."
   (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-en-size))
+  (set-face-font 'fixed-pitch "Sarasa Term SC")
+  (set-face-font 'fixed-pitch-serif "Sarasa Term Slab SC")
+  (set-face-font 'variable-pitch "Sarasa UI SC")
+
   (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
   (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
 
