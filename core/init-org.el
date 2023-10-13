@@ -306,8 +306,8 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
       (org-indent-mode)
 
       (add-hook! 'meow-insert-enter-hook
-                 (defun +org-tree-slide-make-readonly (&rest _)
-                     (read-only-mode -1)) nil t)
+        (defun +org-tree-slide-make-readonly (&rest _)
+          (read-only-mode -1)) nil t)
       (add-hook 'meow-insert-exit-hook #'read-only-mode nil t)
       ))
 

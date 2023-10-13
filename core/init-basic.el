@@ -175,8 +175,8 @@
 
   ;; Add dired directories to recentf file list.
   (add-hook! 'dired-mode-hook
-             (defun +dired--add-to-recentf-h ()
-               (recentf-add-file default-directory)))
+    (defun +dired--add-to-recentf-h ()
+      (recentf-add-file default-directory)))
   )
 
 
@@ -195,13 +195,13 @@
 
   ;; HACK: Remove text properties from variables to reduce savehist cache size.
   (add-hook! 'savehist-save-hook
-             (defun +savehist--remove-string-properties-h ()
-               (setq kill-ring (mapcar #'substring-no-properties
-                                       (cl-remove-if-not #'stringp kill-ring))
-                     register-alist (cl-loop for (reg . item) in register-alist
-                                             if (stringp item)
-                                             collect (cons reg (substring-no-properties item))
-                                             else collect (cons reg item)))))
+    (defun +savehist--remove-string-properties-h ()
+      (setq kill-ring (mapcar #'substring-no-properties
+                              (cl-remove-if-not #'stringp kill-ring))
+            register-alist (cl-loop for (reg . item) in register-alist
+                                    if (stringp item)
+                                    collect (cons reg (substring-no-properties item))
+                                    else collect (cons reg item)))))
   )
 
 

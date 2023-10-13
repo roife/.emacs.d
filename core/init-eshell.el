@@ -7,8 +7,8 @@
   :hook ((eshell-mode . compilation-shell-minor-mode))
   :bind (("C-`" . +eshell-toggle)
          :map eshell-mode-map
-              ("C-l" . eshell/clear)
-              ("M-s" . consult-history))
+         ("C-l" . eshell/clear)
+         ("M-s" . consult-history))
   :config
   (setq
    ;; banner
@@ -190,12 +190,12 @@ If popup is focused, kill it."
 
   ;; Sync buffer name
   (add-hook! (eshell-directory-change-hook eshell-mode-hook)
-             (defun +eshell-sync-dir-buffer-name ()
-               "Change eshell buffer name by directory change."
-               (when (and (equal major-mode 'eshell-mode)
-                          ;; avoid renaming buffer name when in `eshell-popup'
-                          (not (string-equal (buffer-name) "*eshell-popup*")))
-                 (rename-buffer (concat "Esh: " (abbreviate-file-name default-directory)) t))))
+    (defun +eshell-sync-dir-buffer-name ()
+      "Change eshell buffer name by directory change."
+      (when (and (equal major-mode 'eshell-mode)
+                 ;; avoid renaming buffer name when in `eshell-popup'
+                 (not (string-equal (buffer-name) "*eshell-popup*")))
+        (rename-buffer (concat "Esh: " (abbreviate-file-name default-directory)) t))))
   )
 
 

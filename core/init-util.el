@@ -18,6 +18,7 @@ This macro accepts, in order:
      implicitly be wrapped in a lambda).
 
 \(fn HOOKS [:append :local [:depth N] :remove :call-immediately] FUNCTIONS-OR-FORMS...)"
+  (declare (indent defun))
   (let* ((hook-forms hooks)
          (func-forms ())
          (defn-forms ())
@@ -62,7 +63,8 @@ ARGLIST is as in `defun'. WHERE is a keyword as passed to `advice-add', and
 PLACE is the function to which to add the advice, like in `advice-add'.
 DOCSTRING and BODY are as in `defun'.
 
-\(fn SYMBOL ARGLIST &optional DOCSTRING &rest [WHERE PLACES...] BODY\)"
+\(fn SYMBOL ARGLIST &rest [WHERE PLACES...] BODY\)"
+  (declare (indent defun))
   (let (where-alist)
     (while (keywordp (car body))
       (push `(cons ,(pop body) (ensure-list ,(pop body)))
@@ -73,12 +75,6 @@ DOCSTRING and BODY are as in `defun'.
          (dolist (target (cdr targets))
            (advice-add target (car targets) #',symbol))))))
 
-(defun +call-fn-with-pp-to-prin1 (fn &rest args)
-  "Call FN with ARGS, map `pp' to `prin1' when called."
-  (cl-letf (((symbol-function #'pp) #'prin1)
-            ((symbol-function #'pp-to-string) #'prin1-to-string))
-    (apply fn args)))
-
 (defmacro +advice-pp-to-prin1! (&rest body)
   "Define an advice called SYMBOL that map `pp' to `prin1' when called.
 PLACE is the function to which to add the advice, like in `advice-add'.
@@ -87,6 +83,33 @@ PLACE is the function to which to add the advice, like in `advice-add'.
   `(progn
      (dolist (target (list ,@body))
        (advice-add target :around #'+call-fn-with-pp-to-prin1))))
+
+(defmacro defun-call! (symbol args &rest body)
+  "Define a function and optionally apply it with specified arguments.
+
+\(fn SYMBOL ARGS &optional [DOCSTRING] &optional [:call-with APPLY_ARGS] BODY\)"
+  (declare (indent defun))
+  (let* ((docstring (if (stringp (car body)) (pop body)))
+         (apply-body (if (eq :call-with (car body))
+                         (progn
+                           (cl-assert (eq (pop body) :call-with))
+                           (pop body))
+                       nil)))
+    `(progn
+       (defun ,symbol ,args
+         ,@(if docstring
+               (cons docstring body)
+             body))
+       (apply ',symbol
+              ,(if (listp apply-body)
+                   `(list ,@apply-body)
+                 `(list ,apply-body))))))
+
+(defun +call-fn-with-pp-to-prin1 (fn &rest args)
+  "Call FN with ARGS, map `pp' to `prin1' when called."
+  (cl-letf (((symbol-function #'pp) #'prin1)
+            ((symbol-function #'pp-to-string) #'prin1-to-string))
+    (apply fn args)))
 
 (defun +unfill-region (start end)
   "Replace newline chars in region from START to END by single spaces.

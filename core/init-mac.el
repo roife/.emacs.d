@@ -24,8 +24,8 @@
          ("C-c d d" . osx-dictionary-search-pointer)))
 
 (add-hook! 'mac-effective-appearance-change-hook
-           (defun +mac-auto-change-theme-with-system ()
-             (+load-theme)))
+  (defun +mac-auto-change-theme-with-system ()
+    (+load-theme)))
 
 ;; Selects the most-recently-used ASCII-capable keyboard input source when in chineses input mode
 (mac-auto-ascii-mode)

@@ -91,23 +91,19 @@
 (defvar +font-en-size (if (eq system-type 'darwin) 15 26))
 (defvar +font-emoji-size (if (eq system-type 'darwin) 11 22))
 
-(defun +setup-fonts ()
-  "Setup fonts."
-  (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-en-size))
-  (set-face-font 'fixed-pitch "Sarasa Term SC")
-  (set-face-font 'fixed-pitch-serif "Sarasa Term Slab SC")
-  (set-face-font 'variable-pitch "Sarasa UI SC")
+(add-hook! 'server-after-make-frame-hook :call-immediately
+  (defun +setup-fonts ()
+    "Setup fonts."
+    (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-en-size))
+    (set-face-font 'fixed-pitch "Sarasa Term SC")
+    (set-face-font 'fixed-pitch-serif "Sarasa Term Slab SC")
+    (set-face-font 'variable-pitch "Sarasa UI SC")
 
-  (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
-  (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
+    (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
+    (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
 
-  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
-  (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append)
-  )
-
-(+setup-fonts)
-;; (add-hook 'window-setup-hook #'+setup-fonts)
-(add-hook 'server-after-make-frame-hook #'+setup-fonts)
+    (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
+    (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append)))
 
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)
@@ -127,12 +123,12 @@
 
 (defvar +light-theme 'doom-nord-light)
 (defvar +dark-theme 'doom-spacegrey)
-(defun +load-theme (&optional theme)
+(defun-call! +load-theme (&optional theme)
   (unless theme
     (setq theme (if (and (display-graphic-p)
                          (cond ((eq system-type 'darwin)
                                 (string= (plist-get (mac-application-state) ':appearance)
-                         "NSAppearanceNameAqua"))
+                                         "NSAppearanceNameAqua"))
                                (t t)))
                     +light-theme
                   +dark-theme)))
@@ -140,7 +136,6 @@
     (mapc #'disable-theme custom-enabled-themes)
     (load-theme theme t)))
 
-(+load-theme)
 
 ;; [window-divider] Display window divider
 (setq window-divider-default-places t

@@ -128,15 +128,14 @@
   (popper-echo-mode 1)
 
   ;; HACK: close popper with `C-g'
-  (defun +popper-close-window-hack (&rest _)
-    "Close popper window via `C-g'."
+  (defadvice! +popper-close-window-hack (&rest _)
+    :before #'keyboard-quit
     (when (and (called-interactively-p 'interactive)
                (not (region-active-p))
                popper-open-popup-alist)
       (let ((window (caar popper-open-popup-alist)))
         (when (window-live-p window)
           (delete-window window)))))
-  (advice-add #'keyboard-quit :before #'+popper-close-window-hack)
 
   ;; TODO: when switch normal buffer in side-window, disable side-window parameter
   )
@@ -151,15 +150,15 @@
 ;; [auto-dim-other-buffers] Dim non-active buffers
 (use-package auto-dim-other-buffers
   :straight t
-  :hook (after-init . auto-dim-other-buffers-mode)
+  :hook ((after-init . auto-dim-other-buffers-mode)
+         (auto-dim-other-buffers-mode . +auto-dim-other-buffers-auto-set-face))
   :config
   (setq auto-dim-other-buffers-dim-on-focus-out nil
         auto-dim-other-buffers-dim-on-switch-to-minibuffer nil)
 
-  (defun +auto-dim-other-buffers-auto-set-face (&rest _)
+  (defadvice! +auto-dim-other-buffers-auto-set-face (&rest _)
+    :after #'enable-theme
     (set-face-background 'auto-dim-other-buffers-face (face-background 'mode-line)))
-  (advice-add #'enable-theme :after #'+auto-dim-other-buffers-auto-set-face)
-  (+auto-dim-other-buffers-auto-set-face)
   )
 
 ;; [transient for window operations]

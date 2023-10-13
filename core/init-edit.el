@@ -12,7 +12,7 @@
 (use-package autorevert
   :hook (after-init . global-auto-revert-mode)
   :config
-  ; Only prompts for confirmation when buffer is unsaved.
+                                        ; Only prompts for confirmation when buffer is unsaved.
   (setq revert-without-query (list "."))
   )
 

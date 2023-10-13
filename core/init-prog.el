@@ -33,8 +33,8 @@
    xref-history-storage 'xref-window-local-history)
 
   (defadvice! +xref--push-marker-stack-a (&rest rest)
-              :before '(find-function consult-imenu consult-ripgrep citre-jump)
-              (xref-push-marker-stack (point-marker)))
+    :before '(find-function consult-imenu consult-ripgrep citre-jump)
+    (xref-push-marker-stack (point-marker)))
   )
 
 
@@ -148,16 +148,16 @@
 
   ;; Use Citre xref backend as a [fallback]
   (defadvice! +citre--xref-fallback-a (fn &rest args)
-              :around #'xref--create-fetcher
-              (let ((fetcher (apply fn args))
-                    (citre-fetcher
-                     (let ((xref-backend-functions '(citre-xref-backend t)))
-                       (ignore xref-backend-functions)
-                       (apply fn args))))
-                (lambda ()
-                  (or (with-demoted-errors "%s, fallback to citre"
-                        (funcall fetcher))
-                      (funcall citre-fetcher)))))
+    :around #'xref--create-fetcher
+    (let ((fetcher (apply fn args))
+          (citre-fetcher
+           (let ((xref-backend-functions '(citre-xref-backend t)))
+             (ignore xref-backend-functions)
+             (apply fn args))))
+      (lambda ()
+        (or (with-demoted-errors "%s, fallback to citre"
+              (funcall fetcher))
+            (funcall citre-fetcher)))))
   )
 
 
@@ -344,4 +344,4 @@
   :when (executable-find "agda-mode")
   :init
   (load-file (let ((coding-system-for-read 'utf-8))
-             (shell-command-to-string "agda-mode locate"))))
+               (shell-command-to-string "agda-mode locate"))))

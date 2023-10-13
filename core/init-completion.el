@@ -14,13 +14,13 @@
         vertico-count 15)
 
   (defadvice! +vertico--set-crm-separator-a (args)
-              :filter-args #'completing-read-multiple
-              (cons (concat "[CRM"
-                            (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                                                      crm-separator)
-                            "] "
-                            (car args))
-                    (cdr args)))
+    :filter-args #'completing-read-multiple
+    (cons (concat "[CRM"
+                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                                            crm-separator)
+                  "] "
+                  (car args))
+          (cdr args)))
 
   ;; WORKAROUND: https://github.com/minad/vertico#problematic-completion-commands
   (setq org-refile-use-outline-path 'file
@@ -152,14 +152,14 @@
     (require 'wgrep)
     (let* ((edit-command
             (pcase-let ((`(,type . ,candidates)
-                        (run-hook-with-args-until-success 'embark-candidate-collectors)))
+                         (run-hook-with-args-until-success 'embark-candidate-collectors)))
               (pcase type
                 ('consult-grep #'wgrep-change-to-wgrep-mode)
                 ('consult-ripgrep #'wgrep-change-to-wgrep-mode)
                 ('file #'wdired-change-to-wdired-mode)
                 ('consult-location #'occur-edit-mode)
                 (x (user-error "embark category %S doesn't support writable export" x)))))
-          (embark-after-export-hook `(,@embark-after-export-hook ,edit-command)))
+           (embark-after-export-hook `(,@embark-after-export-hook ,edit-command)))
       (embark-export)))
   )
 
@@ -270,7 +270,7 @@
     (let ((completion-extra-properties corfu--extra)
           completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
-
+  
   ;; Completing in the minibuffer
   (defun corfu-enable-in-minibuffer ()
     "Enable Corfu in the minibuffer if `completion-at-point' is bound."

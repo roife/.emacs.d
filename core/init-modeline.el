@@ -11,13 +11,13 @@
 ;;; get current window
 (defvar +mode-line-current-window nil)
 (add-hook! 'pre-redisplay-functions
-           (defun +mode-line-set-selected-window (&rest _)
-             "Set `+mode-line-current-window' appropriately."
-             (let ((win (frame-selected-window)))
-               (setq +mode-line-current-window
-                     (if (minibuffer-window-active-p win)
-                         (minibuffer-selected-window)
-                       win)))))
+  (defun +mode-line-set-selected-window (&rest _)
+    "Set `+mode-line-current-window' appropriately."
+    (let ((win (frame-selected-window)))
+      (setq +mode-line-current-window
+            (if (minibuffer-window-active-p win)
+                (minibuffer-selected-window)
+              win)))))
 
 (defsubst +mode-line-window-active-p ()
   "Whether is an active window."
@@ -139,46 +139,46 @@
 ;;; Cache remote host name
 (defvar-local +mode-line-remote-host-name nil)
 (add-hook! 'find-file-hook
-           (defun +mode-line-update-remote-host-name ()
-             "Hostname for remote buffers."
-             (setq +mode-line-remote-host-name
-                   (when-let ((hostname (and default-directory
-                                             (file-remote-p default-directory 'host))))
-                     (when (not (string-equal hostname "localhost"))
-                       (concat "@" hostname)))
-                   )))
+  (defun +mode-line-update-remote-host-name ()
+    "Hostname for remote buffers."
+    (setq +mode-line-remote-host-name
+          (when-let ((hostname (and default-directory
+                                    (file-remote-p default-directory 'host))))
+            (when (not (string-equal hostname "localhost"))
+              (concat "@" hostname)))
+          )))
 
 ;;; Cache flymake report
 (defvar-local +mode-line-flymake-indicator nil)
 (add-hook! 'flymake-mode-hook
-           (defun +mode-line-update-flymake (&rest _)
-             "Display flymake info for current buffer."
-             (setq +mode-line-flymake-indicator
-                   (when (and flymake-mode (flymake-running-backends))
-                     (let* ((err-count (cadadr (flymake--mode-line-counter :error)))
-                            (warning-count (cadadr (flymake--mode-line-counter :warning)))
-                            (note-count (cadadr (flymake--mode-line-counter :note)))
-                            (err (when err-count (propertize err-count 'face '(:inherit compilation-error))))
-                            (warning (when warning-count (concat "/" (propertize warning-count 'face '(:inherit compilation-warning)))))
-                            (note (when note-count (concat "/" (propertize note-count 'face '(:inherit compilation-info))))))
-                       (concat " " err warning note))))))
+  (defun +mode-line-update-flymake (&rest _)
+    "Display flymake info for current buffer."
+    (setq +mode-line-flymake-indicator
+          (when (and flymake-mode (flymake-running-backends))
+            (let* ((err-count (cadadr (flymake--mode-line-counter :error)))
+                   (warning-count (cadadr (flymake--mode-line-counter :warning)))
+                   (note-count (cadadr (flymake--mode-line-counter :note)))
+                   (err (when err-count (propertize err-count 'face '(:inherit compilation-error))))
+                   (warning (when warning-count (concat "/" (propertize warning-count 'face '(:inherit compilation-warning)))))
+                   (note (when note-count (concat "/" (propertize note-count 'face '(:inherit compilation-info))))))
+              (concat " " err warning note))))))
 (advice-add #'flymake--handle-report :after #'+mode-line-update-flymake)
 
 ;;; Cache encoding info
 (defvar-local +mode-line-encoding nil)
 (add-hook! 'find-file-hook
-           (defun +mode-line-update-encoding (&rest _)
-             "Get encoding and EOL type of current buffer."
-             (setq +mode-line-encoding
-                   `(,(if (memq (coding-system-category buffer-file-coding-system)
-                                '(coding-category-undecided coding-category-utf-8))
-                          (when +mode-line-show-common-encodings "UTF-8")
-                        (upcase (symbol-name (coding-system-get buffer-file-coding-system :name))))
-                     ,(pcase (coding-system-eol-type buffer-file-coding-system)
-                        (0 (when +mode-line-show-common-encodings ":LF "))
-                        (1 ":CRLF ")
-                        (2 ":CR ")
-                        (_ " "))))))
+  (defun +mode-line-update-encoding (&rest _)
+    "Get encoding and EOL type of current buffer."
+    (setq +mode-line-encoding
+          `(,(if (memq (coding-system-category buffer-file-coding-system)
+                       '(coding-category-undecided coding-category-utf-8))
+                 (when +mode-line-show-common-encodings "UTF-8")
+               (upcase (symbol-name (coding-system-get buffer-file-coding-system :name))))
+            ,(pcase (coding-system-eol-type buffer-file-coding-system)
+               (0 (when +mode-line-show-common-encodings ":LF "))
+               (1 ":CRLF ")
+               (2 ":CR ")
+               (_ " "))))))
 (advice-add #'after-insert-file-set-coding :after #'+mode-line-update-encoding)
 (advice-add #'set-buffer-file-coding-system :after #'+mode-line-update-encoding)
 
@@ -272,37 +272,37 @@
 ;; [vcs-info] cache for vcs
 (defvar-local +mode-line-vcs-info nil)
 (add-hook! (find-file-hook after-save-hook)
-           (defsubst +mode-line-update-vcs-info ()
-             (when (and vc-mode buffer-file-name)
-               (setq +mode-line-vcs-info
-                     (let* ((backend (vc-backend buffer-file-name))
-                            (state   (vc-state buffer-file-name backend))
-                            (rev     (if +mode-line-show-common-vc-tools-name
-                                         (substring-no-properties vc-mode 1)
-                                       (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))))
-                            (face (cond ((eq state 'up-to-date) '(vc-dir-status-up-to-date))
-                                        ((eq state 'ignored) '(vc-dir-status-ignored))
-                                        ((memq state '(needs-update needs-merge conflict missing)) '(vc-dir-status-warning))
-                                        (t '(vc-dir-status-edited))))
-                            (state-symbol (cond ((eq state 'up-to-date) "√")
-                                                ((eq state 'edited) "*")
-                                                ((eq state 'added) "@")
-                                                ((eq state 'needs-update) "￬")
-                                                ((eq state 'needs-merge) "&")
-                                                ((eq state 'unlocked-changes) "")
-                                                ((eq state 'removed) "×")
-                                                ((eq state 'conflict) "!")
-                                                ((eq state 'missing) "?")
-                                                ((eq state 'ignored) "-")
-                                                ((eq state 'unregistered) "+")
-                                                ((stringp state) (concat "#" state ":"))
-                                                (t " "))))
-                       (concat " "
-                               (propertize (concat rev state-symbol)
-                                           'face face
-                                           'help-echo (get-text-property 1 'help-echo vc-mode)
-                                           'local-map vc-mode-line-map
-                                           'mouse-face 'mode-line-highlight)))))))
+  (defsubst +mode-line-update-vcs-info ()
+    (when (and vc-mode buffer-file-name)
+      (setq +mode-line-vcs-info
+            (let* ((backend (vc-backend buffer-file-name))
+                   (state   (vc-state buffer-file-name backend))
+                   (rev     (if +mode-line-show-common-vc-tools-name
+                                (substring-no-properties vc-mode 1)
+                              (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))))
+                   (face (cond ((eq state 'up-to-date) '(vc-dir-status-up-to-date))
+                               ((eq state 'ignored) '(vc-dir-status-ignored))
+                               ((memq state '(needs-update needs-merge conflict missing)) '(vc-dir-status-warning))
+                               (t '(vc-dir-status-edited))))
+                   (state-symbol (cond ((eq state 'up-to-date) "√")
+                                       ((eq state 'edited) "*")
+                                       ((eq state 'added) "@")
+                                       ((eq state 'needs-update) "￬")
+                                       ((eq state 'needs-merge) "&")
+                                       ((eq state 'unlocked-changes) "")
+                                       ((eq state 'removed) "×")
+                                       ((eq state 'conflict) "!")
+                                       ((eq state 'missing) "?")
+                                       ((eq state 'ignored) "-")
+                                       ((eq state 'unregistered) "+")
+                                       ((stringp state) (concat "#" state ":"))
+                                       (t " "))))
+              (concat " "
+                      (propertize (concat rev state-symbol)
+                                  'face face
+                                  'help-echo (get-text-property 1 'help-echo vc-mode)
+                                  'local-map vc-mode-line-map
+                                  'mouse-face 'mode-line-highlight)))))))
 (advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
 
 (setq-default header-line-format nil)

@@ -6,10 +6,8 @@
   :config
   (setq hl-line-sticky-flag nil)
   ;; Highlight starts from EOL, to avoid conflicts with other overlays
-  (setq hl-line-range-function (lambda ()
-                               (cons
-                                (line-end-position)
-                                (line-beginning-position 2))))
+  (setq hl-line-range-function (lambda () (cons (line-end-position)
+                                           (line-beginning-position 2))))
   )
 
 
@@ -92,9 +90,9 @@
 
   ;; HACK: `hl-todo' won't update face when changing theme, so we must add a hook for it
   (add-hook! '+theme-changed-hook :call-immediately
-             (defun +hl-update-keyword-faces ()
-               (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
-               (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning))))
+    (defun +hl-update-keyword-faces ()
+      (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
+      (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning))))
   )
 
 
@@ -201,8 +199,8 @@
   ;; HACK: `indent-bars' calculates its faces from the current theme,
   ;; but is unable to do so properly in terminal Emacs
   (add-hook! '+theme-changed-hook
-             (defun +indent-bars-auto-set-faces ()
-               (when indent-bars-mode (indent-bars-reset))))
+    (defun +indent-bars-auto-set-faces ()
+      (when indent-bars-mode (indent-bars-reset))))
   )
 
 

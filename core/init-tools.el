@@ -115,7 +115,7 @@
       ('hs-toggle-all
        (save-excursion (hs-show-all))
        (setq this-command 'hs-global-show))
-        (_ (hs-hide-all))))
+      (_ (hs-hide-all))))
 
   ;; Display line counts
   (defun +hs-display-code-line-counts (ov)
@@ -131,7 +131,7 @@
 
   ;; hide-show by indentation
   (defun +fold--hideshow-empty-line-p (_)
-  (string= "" (string-trim (thing-at-point 'line 'no-props))))
+    (string= "" (string-trim (thing-at-point 'line 'no-props))))
 
   (defun +fold--hideshow-geq-or-empty-p (base-indent)
     (or (+fold--hideshow-empty-line-p base-indent)
@@ -294,9 +294,9 @@ begin and end of the block surrounding point."
   :ensure nil
   :commands re-builder
   :bind (:map reb-mode-map
-         ("C-c C-k" . reb-quit)
-         ("C-c C-p" . reb-prev-match)
-         ("C-c C-n" . reb-next-match))
+              ("C-c C-k" . reb-quit)
+              ("C-c C-p" . reb-prev-match)
+              ("C-c C-n" . reb-next-match))
   :config
   (setq reb-re-syntax 'string))
 
