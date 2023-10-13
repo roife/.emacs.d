@@ -84,7 +84,7 @@
           Buffer-menu-mode
           flymake-diagnostics-buffer-mode
 
-          gnus-article-mode devdocs-mode
+          gnus-article-mode
           grep-mode occur-mode rg-mode ag-mode pt-mode
           osx-dictionary-mode
 
@@ -114,8 +114,6 @@
           "\\*Graphviz Preview: .*\\*"
 
           chatgpt-shell-mode
-
-          "\\*reddigg-main\\*" "\\*reddigg-comments\\*"
           ))
 
   :config
@@ -139,6 +137,8 @@
         (when (window-live-p window)
           (delete-window window)))))
   (advice-add #'keyboard-quit :before #'+popper-close-window-hack)
+
+  ;; TODO: when switch normal buffer in side-window, disable side-window parameter
   )
 
 

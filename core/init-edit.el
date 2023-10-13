@@ -1,10 +1,12 @@
 ;;; -*- lexical-binding: t -*-
 
-;; Do not add the duplicates that the same as the last one to kill-ring
-(setq kill-do-not-save-duplicates t)
-
-;; Save clipboard contents into kill-ring before replace them
-(setq save-interprogram-paste-before-kill t)
+;; [kill-ring]
+(setq
+ ;; Do not add the duplicates that the same as the last one to kill-ring
+ kill-do-not-save-duplicates t
+ ;; Save clipboard contents into kill-ring before replace them
+ save-interprogram-paste-before-kill t
+ )
 
 
 ;; [autorevert] TODO: Add hooks as what doom has done?
@@ -78,9 +80,7 @@
 (use-package ediff
   :hook ((ediff-before-setup . +ediff-save-window-config)
          ((ediff-quit ediff-suspend) . +ediff-restore-window-config))
-  :functions (outline-show-all)
   :config
-
   ;; unfold outlines when using ediff
   (with-eval-after-load 'outline
     (add-hook 'ediff-prepare-buffer-hook #'outline-show-all))
@@ -96,6 +96,7 @@
   (setq ediff-window-setup-function 'ediff-setup-windows-plain
         ediff-split-window-function 'split-window-horizontally
         ediff-merge-split-window-function 'split-window-horizontally
+        ediff-highlight-all-diffs t
         ;; turn off whitespace checking
         ediff-diff-options "-w")
   )
@@ -103,7 +104,7 @@
 
 ;; [elec-pair] Automatic parenthesis pairing
 (use-package elec-pair
-  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-mode minibuffer-setup) . electric-pair-mode)
+  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-mode) . electric-pair-mode)
   :config
   (setq electric-pair-inhibit-predicate 'electric-pair-default-inhibit)
   )
@@ -431,6 +432,18 @@ begin and end of the block surrounding point."
   :config
   (setq imenu-auto-rescan t)
   )
+
+
+;; [re-builder]
+(use-package re-builder
+  :ensure nil
+  :commands re-builder
+  :bind (:map reb-mode-map
+         ("C-c C-k" . reb-quit)
+         ("C-c C-p" . reb-prev-match)
+         ("C-c C-n" . reb-next-match))
+  :config
+  (setq reb-re-syntax 'string))
 
 
 ;; translate [C-SPC] to [M-SPC] for mark

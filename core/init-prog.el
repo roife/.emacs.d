@@ -4,13 +4,6 @@
   :hook ((prog-mode . prettify-symbols-mode)))
 
 
-;; [comint]
-(use-package comint
-  :config
-  (setq comint-prompt-read-only t
-        comint-buffer-maximum-size 2048))
-
-
 ;; [compile]
 (use-package compile
   :config
@@ -36,23 +29,108 @@
   (setq
    xref-search-program 'ripgrep
    xref-show-definitions-function #'xref-show-definitions-completing-read
-   xref-show-xrefs-function #'xref-show-definitions-completing-read)
+   xref-show-xrefs-function #'xref-show-definitions-completing-read
+   xref-history-storage 'xref-window-local-history)
+
+  (defadvice! +xref--push-marker-stack-a (&rest rest)
+              :before '(find-function consult-imenu consult-ripgrep citre-jump)
+              (xref-push-marker-stack (point-marker)))
   )
 
 
-;; [dumb-jump] Jump to definition (integrated with xref)
+;; [Eglot] LSP support
+(use-package eglot
+  :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
+  :config
+  (setq eglot-events-buffer-size 0
+        eglot-connect-timeout 10
+        eglot-autoshutdown t
+        ;; use global completion styles
+        completion-category-defaults nil)
+  )
+
+
+;; [Eldoc]
+(use-package eldoc
+  :config
+  (setq eldoc-echo-area-display-truncation-message nil
+        eldoc-echo-area-prefer-doc-buffer t
+        eldoc-echo-area-use-multiline-p nil
+        eglot-extend-to-xref t))
+
+
+;; [eldoc-box] Eldoc with childframe
+(use-package eldoc-box
+  :straight t
+  :hook (eldoc-mode . eldoc-box-hover-mode)
+ )
+
+
+;; [consult-eglot] Eglot support for consult
+(use-package consult-eglot
+  :after consult eglot
+  :straight t
+  :bind (:map eglot-mode-map
+              ([remap xref-find-apropos] . consult-eglot-symbols)))
+
+
+;; [copilot]
+(use-package copilot
+  :when (executable-find "node")
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :hook ((first-change . +copilot-check-and-auto-activate))
+  :config
+  (setq copilot-indent-warning-suppress t)
+
+  (defun +copilot-check-and-auto-activate ()
+    (interactive)
+    (when (and (not copilot-mode)
+               (not (+temp-buffer-p (current-buffer)))
+               (derived-mode-p 'prog-mode))
+      (copilot-mode)))
+
+  (defun +copilot-complete ()
+    (interactive)
+    (or (copilot-accept-completion)
+        (mwim-end-of-code-or-line)))
+
+  (with-eval-after-load 'copilot
+    (define-key copilot-mode-map (kbd "C-e") #'+copilot-complete))
+
+  (defun +copilot-complete-word ()
+    (interactive)
+    (or (copilot-accept-completion-by-word 1)
+        (forward-word)))
+
+  (with-eval-after-load 'copilot
+    (define-key copilot-mode-map (kbd "M-f") #'+copilot-complete-word))
+  )
+
+
+;; [separedit]
+(use-package separedit
+  :straight t
+  :bind (:map prog-mode-map
+              ("C-c '" . separedit))
+  :config
+  (setq separedit-default-mode 'markdown-mode))
+
+
+;; [dumb-jump] Jump to definition (integrated with xref, a fallback of lsp)
 (use-package dumb-jump
   :straight t
   :init
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   :config
   (setq dumb-jump-prefer-searcher 'rg
-        dumb-jump-selector 'ido
-        dumb-jump-aggressive nil
-        dumb-jump-default-project user-emacs-directory)
+        dumb-jump-selector 'completing-read
+        dumb-jump-aggressive t
+        dumb-jump-default-project user-emacs-directory
+        )
   )
 
 
+;; [citre] Ctags-infra
 (use-package citre
   :straight t
   :bind (:map prog-mode-map
@@ -67,7 +145,8 @@
   (setq citre-auto-enable-citre-mode-modes '(prog-mode)
         citre-default-create-tags-file-location 'global-cache
         citre-use-project-root-when-creating-tags t
-        citre-prompt-language-for-ctags-command t)
+        citre-prompt-language-for-ctags-command t
+        citre-enable-capf-integration t)
 
   (defun +citre-jump ()
     "Jump to the definition of the symbol at point. Fallback to `xref-find-definitions'."
@@ -84,31 +163,26 @@
       (error (call-interactively #'xref-go-back))))
 
   ;; Use Citre xref backend as a [fallback]
-  (define-advice xref--create-fetcher (:around (fn &rest args) fallback)
-    (let ((fetcher (apply fn args))
-          (citre-fetcher
-           (let ((xref-backend-functions '(citre-xref-backend t)))
-             (ignore xref-backend-functions)
-             (apply fn args))))
-      (lambda ()
-        (or (with-demoted-errors "%s, fallback to citre"
-              (funcall fetcher))
-            (funcall citre-fetcher)))))
-
-  (require 'xref)
-  (dolist (func '(find-function
-                  consult-imenu
-                  consult-ripgrep
-                  citre-jump))
-    (advice-add func :before
-                (lambda (&rest r) (xref-push-marker-stack (point-marker)))))
+  (defadvice! +citre--xref-fallback-a (fn &rest args)
+              :around #'xref--create-fetcher
+              (let ((fetcher (apply fn args))
+                    (citre-fetcher
+                     (let ((xref-backend-functions '(citre-xref-backend t)))
+                       (ignore xref-backend-functions)
+                       (apply fn args))))
+                (lambda ()
+                  (or (with-demoted-errors "%s, fallback to citre"
+                        (funcall fetcher))
+                      (funcall citre-fetcher)))))
   )
 
 
 ;; [quickrun] Run commands quickly
 (use-package quickrun
   :straight t
-  :bind (("C-c r"  . quickrun)))
+  :bind (("C-c r"  . quickrun))
+  :config
+  (setq quickrun-focus-p nil))
 
 
 ;; [flymake] On-the-fly syntax checker
@@ -278,82 +352,6 @@
 (use-package typescript-mode
   :straight t
   :mode ("\\.ts[x]\\'" . typescript-mode))
-
-
-;; [Eglot] LSP support
-(use-package eglot
-  :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
-  :config
-  (setq eglot-events-buffer-size 0
-        eglot-connect-timeout 10
-        eglot-autoshutdown t
-        ;; use global completion styles
-        completion-category-defaults nil)
-  )
-
-;; [Eldoc]
-(use-package eldoc
-  :config
-  (setq eldoc-echo-area-display-truncation-message nil
-        eldoc-echo-area-prefer-doc-buffer t
-        eldoc-echo-area-use-multiline-p nil
-        eglot-extend-to-xref t))
-
-
-;; [eldoc-box] Eldoc with childframe
-(use-package eldoc-box
-  :straight t
-  :hook (eldoc-mode . eldoc-box-hover-mode)
- )
-
-
-;; [consult-eglot] Eglot support for consult
-(use-package consult-eglot
-  :after consult eglot
-  :straight t
-  :bind (:map eglot-mode-map
-              ([remap xref-find-apropos] . consult-eglot-symbols)))
-
-;; [copilot]
-(use-package copilot
-  :when (executable-find "node")
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook ((first-change . +copilot-check-and-auto-activate))
-  :config
-  (setq copilot-indent-warning-suppress t)
-
-  (defun +copilot-check-and-auto-activate ()
-    (interactive)
-    (when (and (not copilot-mode)
-               (not (+temp-buffer-p (current-buffer)))
-               (derived-mode-p 'prog-mode))
-      (copilot-mode)))
-
-  (defun +copilot-complete ()
-    (interactive)
-    (or (copilot-accept-completion)
-        (mwim-end-of-code-or-line)))
-
-  (with-eval-after-load 'copilot
-    (define-key copilot-mode-map (kbd "C-e") #'+copilot-complete))
-
-  (defun +copilot-complete-word ()
-    (interactive)
-    (or (copilot-accept-completion-by-word 1)
-        (forward-word)))
-
-  (with-eval-after-load 'copilot
-    (define-key copilot-mode-map (kbd "M-f") #'+copilot-complete-word))
-  )
-
-
-;; [separedit]
-(use-package separedit
-  :straight t
-  :bind (:map prog-mode-map
-              ("C-c '" . separedit))
-  :config
-  (setq separedit-default-mode 'markdown-mode))
 
 
 ;; [agda]

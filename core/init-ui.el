@@ -65,8 +65,8 @@
 
 
 ;; Allow [resize] by pixels.
-(setq frame-resize-pixelwise t)
-
+(setq frame-resize-pixelwise t
+      window-resize-pixelwise t)
 
 ;; Suppress GUI features for consistency
 (setq use-file-dialog nil
@@ -86,12 +86,6 @@
 ;; Allow emacs to query passphrase through minibuffer
 (setq epg-pinentry-mode 'loopback)
 
-
-;; Load theme
-(add-hook 'server-after-make-frame-hook
-          (lambda ()
-            (select-frame-set-input-focus (selected-frame))
-            (+load-theme)))
 
 ;; Font: Same width and height for emoji, chinese and english characters
 (defvar +font-en-size (if (eq system-type 'darwin) 15 26))
@@ -125,8 +119,8 @@
         doom-themes-enable-italic t)
 
   (doom-themes-visual-bell-config)
-  (doom-themes-org-config)
-  )
+  (doom-themes-org-config))
+
 (defvar +light-theme 'doom-nord-light)
 (defvar +dark-theme 'doom-spacegrey)
 (defun +load-theme (&optional theme)

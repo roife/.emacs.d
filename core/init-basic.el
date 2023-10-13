@@ -9,12 +9,13 @@
  create-lockfiles nil
  ;; [backup] Use auto-save, which maintains a copy when a buffer is unsaved
  make-backup-files nil
+ ;; [version-control]
  ;; In case I enable it later
- ;;; version-control t
- ;;; backup-by-copying t
- ;;; delete-old-versions t
- ;;; kept-new-versions 5
- ;;; tramp-backup-directory-alist backup-directory-alist
+ ;; version-control t
+ ;; backup-by-copying t
+ ;; delete-old-versions t
+ ;; kept-new-versions 5
+ ;; tramp-backup-directory-alist backup-directory-alist
  ;; [auto-save]
  auto-save-default t
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
@@ -58,6 +59,7 @@
 
  ;; Disable copy region blink
  copy-region-blink-delay 0
+ delete-pair-blink-delay 0
 
  ;; set [fill column] indicator to 80
  fill-column 80
@@ -70,12 +72,15 @@
  tab-always-indent t
  tab-width 4
 
- ;; [sentence end]
+ ;; Sentence end
  sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*"
  sentence-end-double-space nil
 
  ;; Use y-or-n to replace yes-or-no
  use-short-answers t
+ ;; Inhibit switching out from `y-or-n-p' and `read-char-choice'
+ y-or-n-p-use-read-key t
+ read-char-choice-use-read-key t
 
  ;; Don't ping things that look like domain names.
  ffap-machine-p-known 'reject
@@ -86,7 +91,7 @@
  ;; POSIX standard [newline]
  require-final-newline t
 
- ;;Don't prompt for confirmation when creating a new file or buffer
+ ;; Don't prompt for confirmation when creating a new file or buffer
  confirm-nonexistent-file-or-buffer nil
 
  ;; Show path/name if names are same
@@ -94,15 +99,42 @@
 
  ;; Fix alignment problem
  truncate-string-ellipsis "..."
+
+ ;; Shell command
+ shell-command-prompt-show-cwd t
+
+ ;; What-cursor-position
+ what-cursor-show-names t
+
+ ;; List only applicable commands
+ read-extended-command-predicate #'command-completion-default-include-p
  )
+
+;; Enable [disabled cmds]
+;; Enable the disabled narrow commands
+(put 'narrow-to-defun  'disabled nil)
+(put 'narrow-to-page   'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+
+;; Enable the disabled dired commands
+(put 'dired-find-alternate-file 'disabled nil)
+
+;; Enable the disabled `list-timers', `list-threads' commands
+(put 'list-timers 'disabled nil)
+(put 'list-threads 'disabled nil)
+
+;; Quick editing in `describe-variable'
+(with-eval-after-load 'help-fns
+  (put 'help-fns-edit-variable 'disabled nil))
 
 
 ;; [autosave]
 ;; TRICK: If a file has autosaved data, `after-find-file' will pause for 1 second to
 ;; tell about it, which is very annoying. Just disable it.
-(advice-add #'after-find-file :around
-            (lambda (fn &rest args) (cl-letf (((symbol-function #'sit-for) #'ignore))
-                                 (apply fn args))))
+(defadvice! +disable-autosave-notification-a (fn &rest args)
+  :around #'after-find-file
+  (cl-letf (((symbol-function #'sit-for) #'ignore))
+    (apply fn args)))
 
 
 ;; Encoding
@@ -115,11 +147,9 @@
 (use-package saveplace
   :hook (after-init . save-place-mode)
   :config
-  ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its cache, which is expensive and useless.
-  ;; replace it with `prin1'
-  (advice-add #'save-place-alist-to-file :around
-              (lambda (fn) (cl-letf (((symbol-function #'pp) #'prin1))
-                        (funcall fn))))
+  ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its
+  ;; cache, which is expensive and useless. replace it with `prin1'
+  (advice-pp-to-prin1! 'save-place-alist-to-file)
   )
 
 
@@ -130,12 +160,12 @@
   :config
   (setq recentf-auto-cleanup 'never
         recentf-max-saved-items 200
-        recentf-exclude '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-                          "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                          "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
-                          (lambda (file) (file-in-directory-p file package-user-dir)))
+        recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+                              "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                              "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                              (lambda (file) (file-in-directory-p file package-user-dir))
+                              (expand-file-name recentf-save-file))
         recentf-keep nil)
-  (push (expand-file-name recentf-save-file) recentf-exclude)
 
   (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
 
@@ -144,7 +174,9 @@
   (add-to-list 'recentf-filename-handlers #'substring-no-properties)
 
   ;; Add dired directories to recentf file list.
-  (add-hook 'dired-mode-hook (lambda () (recentf-add-file default-directory)))
+  (add-hook! 'dired-mode-hook
+             (defun +dired--add-to-recentf-h ()
+               (recentf-add-file default-directory)))
   )
 
 
@@ -161,16 +193,15 @@
   (with-eval-after-load 'vertico
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
 
-  ;; HACK: Remove text properties from `kill-ring' to reduce savehist cache size.
-  (add-hook 'savehist-save-hook
-            (lambda () (setq kill-ring
-                        (mapcar #'substring-no-properties
-                                (cl-remove-if-not #'stringp kill-ring))
-                        register-alist
-                        (cl-loop for (reg . item) in register-alist
-                                 if (stringp item)
-                                 collect (cons reg (substring-no-properties item))
-                                 else collect (cons reg item)))))
+  ;; HACK: Remove text properties from variables to reduce savehist cache size.
+  (add-hook! 'savehist-save-hook
+             (defun +savehist--remove-string-properties-h ()
+               (setq kill-ring (mapcar #'substring-no-properties
+                                       (cl-remove-if-not #'stringp kill-ring))
+                     register-alist (cl-loop for (reg . item) in register-alist
+                                             if (stringp item)
+                                             collect (cons reg (substring-no-properties item))
+                                             else collect (cons reg item)))))
   )
 
 
@@ -213,8 +244,8 @@
 (defvar +scrolling-lines 5)
 (defun +scroll-other-window-up () (interactive) (scroll-other-window (- +scrolling-lines)))
 (defun +scroll-other-window-down () (interactive) (scroll-other-window +scrolling-lines))
-(defun +this-window-up () (interactive) (scroll-down +scrolling-lines))
-(defun +this-window-down () (interactive) (scroll-down (- +scrolling-lines)))
+(defun +window-up () (interactive) (scroll-down +scrolling-lines))
+(defun +window-down () (interactive) (scroll-down (- +scrolling-lines)))
 (bind-keys*
  ("C-M-v" . +scroll-other-window-down)
  ("M-<down>" . +scroll-other-window-down)
@@ -222,8 +253,8 @@
  ("C-M-S-v" . +scroll-other-window-up)
  ("M-<up>" . +scroll-other-window-up)
 
- ("C-v" . +this-window-down)
- ("M-v" . +this-window-up))
+ ("C-v" . +window-down)
+ ("M-v" . +window-up))
 
 
 ;; [gcmh] Optimize GC
@@ -245,3 +276,28 @@
         tramp-backup-directory-alist backup-directory-alist
         remote-file-name-inhibit-cache 60)
   )
+
+
+;; [minibuffer]
+(use-package minibuffer
+  :config
+  (setq minibuffer-depth-indicate-mode t
+        minibuffer-default-prompt-format " [%s]" ; shorten " (default %s)" => " [%s]"
+        minibuffer-electric-default-mode t
+        minibuffer-follows-selected-frame nil ; One frame one minibuffer.
+        )
+  )
+
+
+;; [comint] Command interpreter
+(use-package comint
+  :config
+  (setq comint-prompt-read-only t
+        comint-buffer-maximum-size 2048
+
+        ;; No paging, `eshell' and `shell' will honoring.
+        comint-pager "cat"
+
+        ;; better history search
+        comint-history-isearch 'dwim
+        ))

@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
 ;; [eshell] Emacs command shell
-(use-package esh-mode
+(use-package eshell-mode
   :defines eshell-prompt-function
   :functions eshell/alias
   :hook ((eshell-mode . +eshell/define-alias)
@@ -12,16 +12,17 @@
               ("M-s" . consult-history))
   :config
   (setq
+   ;; banner
    eshell-banner-message
-   '(concat (propertize (concat " " (string-trim (buffer-name)) " ")
-                        'face 'mode-line-highlight)
-            " "
-            (propertize (current-time-string) 'face 'font-lock-keyword-face)
-            "\n")
+   '(concat (propertize (concat " " (buffer-name) " ") 'face 'mode-line-highlight)
+           " "
+           (propertize (current-time-string) 'face 'font-lock-keyword-face)
+           "\n")
    ;; scrolling
    eshell-scroll-to-bottom-on-input 'all
    eshell-scroll-to-bottom-on-output 'all
 
+   ;; exit
    eshell-kill-processes-on-exit t
    eshell-hist-ignoredups t
 
@@ -33,6 +34,14 @@
 
    ;; prefer eshell functions
    eshell-prefer-lisp-functions t
+
+   ;; Visual commands require a proper terminal. Eshell can't handle that
+   eshell-visual-commands '("top" "htop" "less" "more" "bat" "talnet")
+   eshell-visual-subcommands '(("git" "help" "lg" "log" "diff" "show"))
+
+   ;; Completion like bash
+   eshell-cmpl-ignore-case t
+   eshell-cmpl-cycle-completions nil
    )
 
   (defun +eshell-toggle ()
@@ -42,15 +51,15 @@ If popup is focused, kill it."
     (interactive)
     (require 'eshell)
     (if-let ((win (get-buffer-window "*eshell-popup*")))
-        ;; If users attempt to delete the sole ordinary window. silence it.
         (if (eq (selected-window) win)
-            (delete-window win)
+            ;; If users attempt to delete the sole ordinary window. silence it.
+            (ignore-errors (delete-window win))
           (select-window win))
       (let ((display-comint-buffer-action '(display-buffer-at-bottom
                                             (inhibit-same-window . nil)))
             (eshell-buffer-name "*eshell-popup*"))
         (with-current-buffer (eshell)
-          (add-hook 'eshell-exit-hook 'shell-delete-window nil t)))))
+          (add-hook 'eshell-exit-hook '(lambda () (ignore-errors (delete-window win))) nil t)))))
 
   ;; [UI]
   (add-hook 'eshell-mode-hook
@@ -60,22 +69,22 @@ If popup is focused, kill it."
               (visual-line-mode +1)
               (set-display-table-slot standard-display-table 0 ?\ )))
 
-  (setq
-   ;; Visual commands require a proper terminal. Eshell can't handle that
-   eshell-visual-commands '("top" "htop" "less" "more" "bat" "vim"))
 
   (defun +eshell/define-alias ()
     "Define alias for eshell"
     ;; Aliases
-    (eshell/alias "f" "find-file $1")
-    (eshell/alias "fo" "find-file-other-window $1")
-    (eshell/alias "d" "dired $1")
+    (defalias 'eshell-f 'find-file)
+    (defalias 'eshell-fo 'find-file-other-window)
+    (defalias 'eshell-d 'dired)
     (eshell/alias "l" "ls -lah $*")
     (eshell/alias "ll" "ls -laG $*")
-    (eshell/alias "q" "exit")
+    (defalias 'eshell-q 'eshell/exit)
     (eshell/alias "rg" "rg --color=always $*")
-    (eshell/alias "clear" "clear-scrollback")
-    ;; git related
+    (defalias 'eshell-clear 'eshell/clear-scrollback)
+    ;; Vim
+    (defalias 'eshell-vim 'find-file)
+    (defalias 'eshell-vi 'find-file)
+    ;; Git
     (eshell/alias "git" "git -P $*")
     (eshell/alias "gst" "git status -P $*")
     (eshell/alias "ga" "git add -P $*")
@@ -177,16 +186,15 @@ If popup is focused, kill it."
 (use-package esh-help
   :straight t
   :after eshell
-  :init
-  (setup-esh-help-eldoc)
+  :hook (eshell-mode . esh-help-eldoc-setup)
   )
 
 
 ;; [eshell-z] `cd' to frequent directory in `eshell'
 (use-package eshell-z
   :straight t
-  :commands (eshell/z)
   :after eshell
+  :commands (eshell/z)
   )
 
 
@@ -196,8 +204,8 @@ If popup is focused, kill it."
   :after eshell
   :commands (eshell-up eshell-up-peek)
   :config
-  (eshell/alias "up" "eshell-up")
-  (eshell/alias "pk" "eshell-up-peek")
+  (defalias 'eshell-up 'eshell-up)
+  (defalias 'eshell-pk 'eshell-up-peek)
   )
 
 

@@ -1,9 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
 (use-package ibuffer
-  :bind (("C-x C-b" . ibuffer)
-         :map ibuffer-mode-map
-         ("RET" . ibuffer-visit-buffer-other-window))
+  :bind (("C-x C-b" . ibuffer))
   :config
   (setq ibuffer-show-empty-filter-groups nil
         ibuffer-use-other-window t)
