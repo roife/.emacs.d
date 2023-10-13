@@ -210,7 +210,8 @@ If popup is focused, kill it."
 (use-package esh-help
   :straight t
   :after eshell
-  :hook (eshell-mode . esh-help-eldoc-setup))
+
+  :hook (eshell-mode . setup-esh-help-eldoc))
 
 
 ;; [eshell-z] `cd' to frequent directory in `eshell'
