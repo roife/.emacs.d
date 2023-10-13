@@ -12,11 +12,12 @@
   :config
   (setq
    ;; banner
-   eshell-banner-message
-   '(concat (propertize (concat " " (buffer-name) " ") 'face 'mode-line-highlight)
-           " "
-           (propertize (current-time-string) 'face 'font-lock-keyword-face)
-           "\n")
+   eshell-banner-message '(concat (propertize (concat " " (buffer-name) " ")
+                                              'face '(:inherit mode-line-highlight
+                                                               :weight bold))
+                                  " "
+                                  (propertize (current-time-string) 'face 'font-lock-keyword-face)
+                                  "\n\n")
    ;; scrolling
    eshell-scroll-to-bottom-on-input 'all
    eshell-scroll-to-bottom-on-output 'all
@@ -62,7 +63,7 @@ If popup is focused, kill it."
 
   ;; [UI]
   (add-hook 'eshell-mode-hook
-            (lambda ()
+            (defun +eshell--set-window-ui-h ()
               (set-window-fringes nil 0 0)
               (set-window-margins nil 1 nil)
               (visual-line-mode +1)
@@ -154,9 +155,7 @@ If popup is focused, kill it."
     (with-temp-buffer
       (insert-file-contents file)
       (let ((buffer-file-name file))
-        (delay-mode-hooks
-          (set-auto-mode)
-          (font-lock-ensure)))
+        (delay-mode-hooks (set-auto-mode) (font-lock-ensure)))
       (buffer-string)))
 
   ;; [bd]

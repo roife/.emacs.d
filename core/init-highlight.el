@@ -5,11 +5,12 @@
   :hook (after-init . global-hl-line-mode)
   :config
   (setq hl-line-sticky-flag nil)
-  ;; Highlight EOF
+  ;; Highlight starts from EOL, to avoid conflicts with other overlays
   (setq hl-line-range-function (lambda ()
                                (cons
                                 (line-end-position)
-                                (line-beginning-position 2)))))
+                                (line-beginning-position 2))))
+  )
 
 
 ;; [show-paren-mode] Highlight matching parens
@@ -27,9 +28,9 @@
   :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
   :init
   :config
-  (setq
-   ;; only show bad whitespace
-   whitespace-style '(face trailing empty indentation space-before-tab space-after-tab)))
+  ;; only show bad whitespace
+  (setq whitespace-style
+        '(face trailing empty indentation space-before-tab space-after-tab)))
 
 
 ;; [display-fill-column-indicator] Show a line at 80 char
@@ -56,7 +57,8 @@
         highlight-parentheses-attributes '((:underline t :weight bold)
                                            (:underline t :weight bold)
                                            (:underline t :weight bold))
-        highlight-parentheses-delay 0.2))
+        highlight-parentheses-delay 0.2)
+  )
 
 
 ;; [rainbow-mode] Colorize color names in buffers
@@ -67,7 +69,7 @@
               ("r" . rainbow-mode))
   :hook ((html-mode css-mode) . rainbow-mode)
   :config
-  ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
+  ;; removedHACK: Use overlay instead of text properties to override `hl-line' faces.
   ;; @see https://emacs.stackexchange.com/questions/36420
   )
 
@@ -89,11 +91,10 @@
         (push `(,keyword . ,color) hl-todo-keyword-faces))))
 
   ;; HACK: `hl-todo' won't update face when changing theme, so we must add a hook for it
-  (defun +hl-update-keyword-faces (&rest _)
-    (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
-    (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning)))
-  (+hl-update-keyword-faces)
-  (advice-add #'enable-theme :after #'+hl-update-keyword-faces)
+  (add-hook! '+theme-changed-hook :call-immediately
+             (defun +hl-update-keyword-faces ()
+               (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
+               (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning))))
   )
 
 
@@ -199,10 +200,9 @@
 
   ;; HACK: `indent-bars' calculates its faces from the current theme,
   ;; but is unable to do so properly in terminal Emacs
-  (defun +indent-bars-auto-set-faces (&rest _)
-    (when indent-bars-mode
-      (indent-bars-reset)))
-  (advice-add #'enable-theme :after #'+indent-bars-auto-set-faces)
+  (add-hook! '+theme-changed-hook
+             (defun +indent-bars-auto-set-faces ()
+               (when indent-bars-mode (indent-bars-reset))))
   )
 
 
@@ -217,11 +217,10 @@
          ;; conflits with `meow'
          ("h" . nil)
          ("q" . nil)
+         ("i" . nil)
          ("R" . symbol-overlay-query-replace)
          ("?" . symbol-overlay-map-help)
          ("c" . symbol-overlay-put)
-         ("C" . symbol-overlay-remove-all)
-         ("i" . nil)
-         )
+         ("C" . symbol-overlay-remove-all))
   :hook (((prog-mode yaml-mode) . symbol-overlay-mode))
   )

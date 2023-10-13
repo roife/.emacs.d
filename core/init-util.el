@@ -6,20 +6,6 @@
 (defvar +elfeed-enclosure-dir (expand-file-name "~/Downloads/"))
 
 ;; Thanks to DOOM Emacs
-(defun doom--resolve-hook-forms (hooks)
-  "Converts a list of modes into a list of hook symbols.
-
-If a mode is quoted, it is left as is. If the entire HOOKS list is quoted, the
-list is returned as-is."
-  (declare (pure t) (side-effect-free t))
-  (let ((hook-list (ensure-list (doom-unquote hooks))))
-    (if (eq (car-safe hooks) 'quote)
-        hook-list
-      (cl-loop for hook in hook-list
-               if (eq (car-safe hook) 'quote)
-               collect (cadr hook)
-               else collect (intern (format "%s-hook" (symbol-name hook)))))))
-
 (defmacro add-hook! (hooks &rest rest)
   "A convenience macro for adding N functions to M hooks.
 
@@ -31,7 +17,7 @@ This macro accepts, in order:
      thereof, a list of `defun' or `cl-defun' forms, or arbitrary forms (will
      implicitly be wrapped in a lambda).
 
-\(fn HOOKS [:append :local [:depth N]] FUNCTIONS-OR-FORMS...)"
+\(fn HOOKS [:append :local [:depth N] :remove :call-immediately] FUNCTIONS-OR-FORMS...)"
   (let* ((hook-forms hooks)
          (func-forms ())
          (defn-forms ())
@@ -93,7 +79,7 @@ DOCSTRING and BODY are as in `defun'.
             ((symbol-function #'pp-to-string) #'prin1-to-string))
     (apply fn args)))
 
-(defmacro advice-pp-to-prin1! (&rest body)
+(defmacro +advice-pp-to-prin1! (&rest body)
   "Define an advice called SYMBOL that map `pp' to `prin1' when called.
 PLACE is the function to which to add the advice, like in `advice-add'.
 
@@ -112,3 +98,10 @@ This command does the inverse of `fill-region'."
 (defun +temp-buffer-p (buffer)
   "Return t if BUFFER is temporary."
   (string-match-p "^ " (buffer-name buffer)))
+
+;; theme changed hook
+(defvar +theme-changed-hook nil
+  "Hook run after the theme is changed.")
+(defadvice! +run-theme-changed-hook-a (&rest _)
+  :after #'enable-theme
+  (run-hooks '+theme-changed-hook))

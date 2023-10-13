@@ -149,7 +149,7 @@
   :config
   ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its
   ;; cache, which is expensive and useless. replace it with `prin1'
-  (advice-pp-to-prin1! 'save-place-alist-to-file)
+  (+advice-pp-to-prin1! 'save-place-alist-to-file)
   )
 
 
@@ -299,5 +299,4 @@
         comint-pager "cat"
 
         ;; better history search
-        comint-history-isearch 'dwim
-        ))
+        comint-history-isearch 'dwim))

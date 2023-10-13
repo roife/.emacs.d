@@ -8,4 +8,4 @@
 
 (use-package xwidget
   :config
-  (setq xwidget-webkit-buffer-name-format "*xwidget: %T*"))
+  (setq xwidget-webkit-buffer-name-format "*XWidget: %T*"))

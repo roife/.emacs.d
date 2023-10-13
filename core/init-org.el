@@ -302,7 +302,12 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
                   org-tree-slide-author nil
                   org-tree-slide-email nil)
 
-      (add-hook 'meow-insert-enter-hook #'(lambda (&rest _) (read-only-mode -1)) nil t)
+      (org-visual-indent-mode -1)
+      (org-indent-mode)
+
+      (add-hook! 'meow-insert-enter-hook
+                 (defun +org-tree-slide-make-readonly (&rest _)
+                     (read-only-mode -1)) nil t)
       (add-hook 'meow-insert-exit-hook #'read-only-mode nil t)
       ))
 

@@ -13,12 +13,14 @@
         vertico-resize nil
         vertico-count 15)
 
-  (advice-add #'completing-read-multiple :filter-args
-              (lambda (args)
-                (cons (format "[CRM%s] %s"
-                              (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""  crm-separator)
-                              (car args))
-                      (cdr args))))
+  (defadvice! +vertico--set-crm-separator-a (args)
+              :filter-args #'completing-read-multiple
+              (cons (concat "[CRM"
+                            (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                                                      crm-separator)
+                            "] "
+                            (car args))
+                    (cdr args)))
 
   ;; WORKAROUND: https://github.com/minad/vertico#problematic-completion-commands
   (setq org-refile-use-outline-path 'file
@@ -33,7 +35,8 @@
               ("RET" . vertico-directory-enter)
               ("DEL" . vertico-directory-delete-char)
               ("M-DEL" . vertico-directory-delete-word))
-  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy) ; Cleans up path when moving directories with shadowed paths syntax
+  :hook (;; Cleans up path when moving directories with shadowed paths syntax
+         (rfn-eshadow-update-overlay . vertico-directory-tidy))
   )
 
 
@@ -100,7 +103,7 @@
                  "Unholy mix of Orderless and Basic."))
 
   ;; configuration
-  (setq completion-styles '(orderless+basic flex)
+  (setq completion-styles '(orderless+basic)
         completion-category-defaults nil
         completion-ignore-case t
         ;; despite override in the name, orderless can still be used in find-file etc.
@@ -118,8 +121,7 @@
 (use-package embark-consult
   :straight t
   :after (embark consult)
-  :hook (embark-collect-mode . consult-preview-at-point-mode)
-  )
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 
 (use-package embark
