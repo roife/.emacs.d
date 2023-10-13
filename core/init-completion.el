@@ -22,12 +22,7 @@
 
   ;; WORKAROUND: https://github.com/minad/vertico#problematic-completion-commands
   (setq org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps t)
-  (advice-add #'org-olpath-completing-read :around
-              (lambda (&rest args)
-                (minibuffer-with-setup-hook
-                    (lambda () (setq-local completion-styles '(basic)))
-                  (apply args))))
+        org-outline-path-complete-in-steps nil)
   )
 
 

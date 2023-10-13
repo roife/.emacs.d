@@ -22,10 +22,12 @@
                      'init-straight
                      'init-ui
                      'init-basic
+                     'init-completion
                      (when (eq system-type 'darwin) 'init-mac)
+                     'init-tools
                      'init-highlight
                      'init-edit
-                     'init-completion
+                     'init-spell
                      'init-persp
                      'init-window
                      'init-dired

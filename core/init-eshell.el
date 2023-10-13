@@ -1,11 +1,10 @@
 ;;; -*- lexical-binding: t -*-
 
 ;; [eshell] Emacs command shell
-(use-package eshell-mode
+(use-package esh-mode
   :defines eshell-prompt-function
   :functions eshell/alias
-  :hook ((eshell-mode . +eshell/define-alias)
-         (eshell-mode . compilation-shell-minor-mode))
+  :hook ((eshell-mode . compilation-shell-minor-mode))
   :bind (("C-`" . +eshell-toggle)
          :map eshell-mode-map
               ("C-l" . eshell/clear)
@@ -94,9 +93,12 @@ If popup is focused, kill it."
     (eshell/alias "gch" "git checkout $*")
     (eshell/alias "gcb" "git checkout -b $*")
     )
+  (add-hook 'eshell-first-time-mode-hook #'+eshell/define-alias)
   ;; Don't auto-write our aliases! Let us manage our own `eshell-aliases-file' via elisp
   (advice-add #'eshell-write-aliases-list :override #'ignore)
 
+  ;;; A bunch of eshell functions
+  ;; [clear]
   (defun eshell/clear ()
     "Clear the eshell buffer."
     (interactive)
@@ -104,6 +106,7 @@ If popup is focused, kill it."
       (erase-buffer)
       (eshell-send-input)))
 
+  ;; [emacs, e, ec, ecc]
   (defun eshell/emacs (&rest args)
     "Open a file (ARGS) in Emacs."
     (if (null args)
@@ -115,7 +118,9 @@ If popup is focused, kill it."
       (mapc #'find-file (mapcar #'expand-file-name (flatten-tree (reverse args))))))
   (defalias 'eshell/e #'eshell/emacs)
   (defalias 'eshell/ec #'eshell/emacs)
+  (defalias 'eshell/ecc #'eshell/emacs)
 
+  ;; [ebc]
   (defun eshell/ebc (&rest args)
     "Compile a file (ARGS) in Emacs. Use `compile' to do background make."
     (if (eshell-interactive-output-p)
@@ -130,6 +135,43 @@ If popup is focused, kill it."
                (eshell-parse-command (car l) (cdr l))))))
   (put 'eshell/ebc 'eshell-no-numeric-conversions t)
 
+  ;; [less, more]
+  (defun eshell/less (&rest args)
+    "Invoke `view-file' on a file (ARGS).
+\"less +42 foo\" will go to line 42 in the buffer for foo."
+    (while args
+      (if (string-match "\\`\\+\\([0-9]+\\)\\'" (car args))
+          (let* ((line (string-to-number (match-string 1 (pop args))))
+                 (file (pop args)))
+            (+eshell-view-file file)
+            (forward-line line))
+        (+eshell-view-file (pop args)))))
+  (defalias 'eshell/more #'eshell/less)
+
+  ;; [bat]
+  (defun eshell/bat (file)
+    "cat FILE with syntax highlight."
+    (with-temp-buffer
+      (insert-file-contents file)
+      (let ((buffer-file-name file))
+        (delay-mode-hooks
+          (set-auto-mode)
+          (font-lock-ensure)))
+      (buffer-string)))
+
+  ;; [bd]
+  (defun eshell/bd ()
+    "cd to parent directory with completions."
+    (let ((dir default-directory)
+          dirs)
+      (while (not (string-empty-p dir))
+        (push (file-name-directory dir) dirs)
+        (setq dir (substring dir 0 -1)))
+      (let ((dir (completing-read "Directory: " dirs nil t)))
+        (eshell/cd dir))))
+
+
+  ;; view file
   (defun +eshell-view-file (file)
     "View FILE.  A version of `view-file' which properly rets the eshell prompt."
     (interactive "fView file: ")
@@ -147,30 +189,14 @@ If popup is focused, kill it."
           (view-mode-enter (cons (selected-window) (cons nil undo-window))
                            'kill-buffer)))))
 
-  (defun eshell/less (&rest args)
-    "Invoke `view-file' on a file (ARGS).
-\"less +42 foo\" will go to line 42 in the buffer for foo."
-    (while args
-      (if (string-match "\\`\\+\\([0-9]+\\)\\'" (car args))
-          (let* ((line (string-to-number (match-string 1 (pop args))))
-                 (file (pop args)))
-            (+eshell-view-file file)
-            (forward-line line))
-        (+eshell-view-file (pop args)))))
-  (defalias 'eshell/more #'eshell/less)
-
   ;; Sync buffer name
-  (defun +eshell-sync-dir-buffer-name ()
-    "Change eshell buffer name by directory change."
-    (when (and (equal major-mode 'eshell-mode)
-               ;; avoid renaming buffer name when in `eshell-popup'
-               (not (string-equal (buffer-name) "*eshell-popup*")))
-      (rename-buffer
-       (concat "Esh: " (abbreviate-file-name default-directory))
-       t)))
-
-  (add-hook 'eshell-directory-change-hook #'+eshell-sync-dir-buffer-name)
-  (add-hook 'eshell-mode-hook #'+eshell-sync-dir-buffer-name)
+  (add-hook! (eshell-directory-change-hook eshell-mode-hook)
+             (defun +eshell-sync-dir-buffer-name ()
+               "Change eshell buffer name by directory change."
+               (when (and (equal major-mode 'eshell-mode)
+                          ;; avoid renaming buffer name when in `eshell-popup'
+                          (not (string-equal (buffer-name) "*eshell-popup*")))
+                 (rename-buffer (concat "Esh: " (abbreviate-file-name default-directory)) t))))
   )
 
 
@@ -178,24 +204,21 @@ If popup is focused, kill it."
 (use-package eshell-syntax-highlighting
   :straight t
   :after eshell
-  :hook (eshell-mode . eshell-syntax-highlighting-mode)
-  )
+  :hook (eshell-mode . eshell-syntax-highlighting-mode))
 
 
 ;; [esh-help] `eldoc' support
 (use-package esh-help
   :straight t
   :after eshell
-  :hook (eshell-mode . esh-help-eldoc-setup)
-  )
+  :hook (eshell-mode . esh-help-eldoc-setup))
 
 
 ;; [eshell-z] `cd' to frequent directory in `eshell'
 (use-package eshell-z
   :straight t
   :after eshell
-  :commands (eshell/z)
-  )
+  :commands (eshell/z))
 
 
 ;; [eshell-up] Quickly navigating to a specific parent directory in eshell
@@ -205,8 +228,7 @@ If popup is focused, kill it."
   :commands (eshell-up eshell-up-peek)
   :config
   (defalias 'eshell-up 'eshell-up)
-  (defalias 'eshell-pk 'eshell-up-peek)
-  )
+  (defalias 'eshell-pk 'eshell-up-peek))
 
 
 ;; [esh-autosuggest]
@@ -214,5 +236,4 @@ If popup is focused, kill it."
   :straight t
   :hook (eshell-mode . esh-autosuggest-mode)
   :bind (:map esh-autosuggest-active-map
-              ("C-e" . 'company-complete-selection))
-  )
+              ("C-e" . 'company-complete-selection)))

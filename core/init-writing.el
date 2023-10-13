@@ -28,6 +28,7 @@
   (setq markdown-enable-math t
         markdown-enable-wiki-links t
         markdown-italic-underscore t
+        markdown-header-scaling t
         markdown-asymmetric-header t
         markdown-nested-imenu-heading-index t
         markdown-fontify-code-blocks-natively t)

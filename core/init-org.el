@@ -10,6 +10,51 @@
   :custom-face (org-quote ((t (:inherit org-block-begin-line))))
   :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
   :config
+  (setq
+   ;; subscription: Use {} for sub- or super- scripts
+   org-use-sub-superscripts "{}"
+
+   ;; prettify
+   org-startup-indented t
+   org-pretty-entities t
+   org-pretty-entities-include-sub-superscripts nil
+   org-ellipsis "…"
+   ;; Highlight quote and verse blocks
+   org-fontify-quote-and-verse-blocks t
+   ;; Highlight the whole line for headings
+   org-fontify-whole-heading-line t
+
+   ;; Edit settings
+   org-auto-align-tags nil
+   org-tags-column 0
+   org-catch-invisible-edits 'show-and-error
+   org-insert-heading-respect-content t
+
+   ;; better keybindings
+   org-special-ctrl-a/e t
+   org-special-ctrl-k t
+   org-special-ctrl-o t
+   org-support-shift-select t
+   org-ctrl-k-protect-subtree 'error
+   org-fold-catch-invisible-edits 'show-and-error
+
+   org-imenu-depth 4)
+
+  ;; custom link
+  (defun +org-custom-link-img-follow (path)
+    (org-open-file
+     (format "%s/static/%s" (project-root (project-current)) path)))
+  (defun +org-custom-link-img-export (path desc format)
+    (cond
+     ((eq format 'html)
+      (format "<img src=\"/images/%s\" alt=\"%s\"/>" path desc))))
+  (org-link-set-parameters "img" :follow '+org-custom-link-img-follow :export '+org-custom-link-img-export)
+
+  ;; Better Org Latex Preview
+  (setq org-latex-create-formula-image-program 'dvisvgm
+        org-startup-with-latex-preview nil)
+  (plist-put org-format-latex-options :scale 1.5)
+
   ;; HACK: inline highlight for CJK
   (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:][:alpha:]"
                                          "-[:space:].,:!?;'\")}\\[[:nonascii:][:alpha:]"
@@ -19,7 +64,8 @@
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
   (org-element-update-syntax)
   (org-element--set-regexps)
-  (defun org-do-emphasis-faces (limit)
+
+  (defun +org-do-emphasis-faces (limit)
     "Run through the buffer and emphasize strings."
     (let ((quick-re (format "\\([%s]\\|^\\)\\([~=*/_+]\\).*?[~=*/_+]"
                             (car org-emphasis-regexp-components))))
@@ -70,6 +116,7 @@
                   (add-text-properties (match-beginning 3) (match-end 3)
                                        '(invisible t)))
                 (throw :exit t))))))))
+  (advice-add #'org-do-emphasis-faces :override #'+org-do-emphasis-faces)
   (defun +org-element--parse-generic-emphasis (mark type)
     "Parse emphasis object at point, if any.
 
@@ -115,54 +162,8 @@ Assume point is at first MARK."
                              (list :contents-begin contents-begin
                                    :contents-end contents-end)))))))))))))
   (advice-add #'org-element--parse-generic-emphasis :override #'+org-element--parse-generic-emphasis)
-
-  (setq
-   ;; Use {} for sub- or super- scripts
-   org-use-sub-superscripts "{}"
-   ;; Highlight quote and verse blocks
-   org-fontify-quote-and-verse-blocks t
-   ;; Highlight the whole line for headings
-   org-fontify-whole-heading-line t)
-
-  (defun +org-custom-link-img-follow (path)
-    (org-open-file
-     (format "%s/static/%s" (project-root (project-current)) path)))
-  (defun +org-custom-link-img-export (path desc format)
-    (cond
-     ((eq format 'html)
-      (format "<img src=\"/images/%s\" alt=\"%s\"/>" path desc))))
-  (org-link-set-parameters "img" :follow '+org-custom-link-img-follow :export '+org-custom-link-img-export)
-
-  ;; Org Latex Preview
-  (setq org-latex-create-formula-image-program 'dvisvgm
-        org-startup-with-latex-preview nil)
-  (plist-put org-format-latex-options :scale 1.5)
-
-  (setq
-   ;; Edit settings
-   org-auto-align-tags nil
-   org-tags-column 0
-   org-catch-invisible-edits 'show-and-error
-   org-insert-heading-respect-content t
-
-   ;; better keybindings
-   org-special-ctrl-a/e t
-   org-special-ctrl-k t
-   org-special-ctrl-o t
-   org-support-shift-select t
-
-   ;; pretty entities
-   org-pretty-entities t
-   org-pretty-entities-include-sub-superscripts nil
-   org-ellipsis "…"
-
-   org-imenu-depth 4
-
-   org-startup-indented t
-
-   ;; open link
-   org-confirm-elisp-link-function nil)
   )
+
 
 ;; [org-entities]
 (use-package org-entities
@@ -177,6 +178,31 @@ Assume point is at first MARK."
           ("nVdash" "\\nVdash" t "&nVdash;" "⊮" "⊮" "⊮")
           ("nVDash" "\\nVDash" t "&nVDash;" "⊯" "⊯" "⊯"))))
 
+
+;; [org-visual-outline] Add guide lines for org outline
+(use-package org-visual-outline
+  :straight (:host github :repo "legalnonsense/org-visual-outline" :files ("*.el"))
+  :after org
+  :hook ((org-mode . org-visual-indent-mode))
+  :init
+  (with-eval-after-load 'org-visual-indent
+    (setq org-visual-indent-color-indent
+          (cl-loop for x from 1 to 8
+                   with color = nil
+                   do (setq color (or (face-foreground (intern (concat "org-level-" (number-to-string x))) nil t)
+                                      (face-foreground 'org-level-1)))
+                   collect `(,x ,(list :background color :foreground color :height .1)))))
+  )
+
+
+;; [org-modern] A modern org-mode
+(use-package org-modern
+  :straight t
+  :after org
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda-mode)))
+
+
 ;; [ox]
 (use-package ox
   :config
@@ -184,6 +210,7 @@ Assume point is at first MARK."
         org-html-validation-link nil
         org-latex-prefer-user-labels t
         org-export-with-latex t))
+
 
 ;; [ox-hugo]
 (use-package ox-hugo
@@ -228,14 +255,6 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
               (org-hugo-export-wim-to-md :all-subtrees)
               (cl-incf cnt)))))))
   )
-
-
-;; [org-modern] A modern org-mode
-(use-package org-modern
-  :straight t
-  :after org
-  :hook ((org-mode . org-modern-mode)
-         (org-agenda-finalize . org-modern-agenda-mode)))
 
 
 ;; [org-tree-slide] Presentation with org-mode!
@@ -315,21 +334,4 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
   (setq org-tree-slide-heading-emphasis t
         org-tree-slide-content-margin-top 1
         org-tree-slide-slide-in-effect nil)
-  )
-
-(use-package org-visual-outline
-  :straight (:host github :repo "legalnonsense/org-visual-outline" :files ("*.el"))
-  :after org
-  :hook ((org-mode . org-visual-indent-mode))
-  :init
-  (with-eval-after-load 'org-visual-indent
-    (setq org-visual-indent-color-indent
-          (cl-loop for x from 1 to 8
-                   with color = nil
-                   do (setq color (or (face-foreground
-                                       (intern (concat "org-level-" (number-to-string x))) nil t)
-                                      (face-foreground 'org-level-1)))
-                   collect `(,x ,(list :background color
-                                       :foreground color
-                                       :height .1)))))
   )

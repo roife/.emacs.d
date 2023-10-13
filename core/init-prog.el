@@ -107,15 +107,6 @@
   )
 
 
-;; [separedit]
-(use-package separedit
-  :straight t
-  :bind (:map prog-mode-map
-              ("C-c '" . separedit))
-  :config
-  (setq separedit-default-mode 'markdown-mode))
-
-
 ;; [dumb-jump] Jump to definition (integrated with xref, a fallback of lsp)
 (use-package dumb-jump
   :straight t

@@ -29,7 +29,12 @@
   :config
   (setq
    ;; only show bad whitespace
-   whitespace-style '(face trailing empty indentation space-before-tab space-after-tab lines-tail)))
+   whitespace-style '(face trailing empty indentation space-before-tab space-after-tab)))
+
+
+;; [display-fill-column-indicator] Show a line at 80 char
+(use-package display-fill-column-indicator
+  :hook (prog-mode . display-fill-column-indicator-mode))
 
 
 ;; [rainbow-delimiters] Highlight brackets according to their depth
