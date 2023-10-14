@@ -233,9 +233,7 @@
          ((prog-mode text-mode) . tempel-abbrev-mode))
   :config
   (defun +tempel-setup-capf ()
-    (setq-local completion-at-point-functions
-                (cons #'tempel-expand
-                      completion-at-point-functions)))
+    (push #'tempel-complete completion-at-point-functions))
 
   (setq tempel-trigger-prefix "\\"
         tempel-path (expand-file-name "tempel-templates" user-emacs-directory))

@@ -99,11 +99,12 @@
     (set-face-font 'fixed-pitch-serif "Sarasa Term Slab SC")
     (set-face-font 'variable-pitch "Sarasa UI SC")
 
-    (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
-    (set-fontset-font t 'han (font-spec :script 'han) nil 'append)
+    ;; font for emoji, set as unicode to cover more chars
+    (set-fontset-font t 'unicode (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
+    (set-fontset-font t 'unicode (font-spec :script 'unicode) nil 'append)
 
-    (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
-    (set-fontset-font t 'emoji (font-spec :script 'emoji) nil 'append)))
+    (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
+    (set-fontset-font t 'han (font-spec :script 'han) nil 'append)))
 
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)

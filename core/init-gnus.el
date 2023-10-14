@@ -55,6 +55,7 @@
                                                 (nnimap-server-port 993)
                                                 (nnimap-stream ssl)
                                                 (nnimap-expunge 'never))
+                                        (nntp "gwene.io.github.matklad")
                                         ))
   )
 

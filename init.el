@@ -49,7 +49,7 @@
                      'init-ai
                      'init-chat
                      'init-pdf
-                     'init-gnus
+                     ;; 'init-gnus
                      ;; 'init-webservice
                      ))
 
