@@ -36,6 +36,10 @@
 
    ;; Display more MINE stuff
    gnus-mime-display-multipart-related-as-mixed t
+
+   ;; no more confirmations
+   gnus-novice-user nil
+   gnus-expert-user t
    )
 
   (setq gnus-select-method '(nnnil "")

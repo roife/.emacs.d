@@ -234,7 +234,7 @@
   :config
   (defun +tempel-setup-capf ()
     (setq-local completion-at-point-functions
-                (cons #'tempel-complete
+                (cons #'tempel-expand
                       completion-at-point-functions)))
 
   (setq tempel-trigger-prefix "\\"
