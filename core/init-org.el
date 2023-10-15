@@ -176,23 +176,59 @@ Assume point is at first MARK."
           ("nvdash" "\\nvdash" t "&nvdash;" "⊬" "⊬" "⊬")
           ("nvDash" "\\nvDash" t "&nvDash;" "⊭" "⊭" "⊭")
           ("nVdash" "\\nVdash" t "&nVdash;" "⊮" "⊮" "⊮")
-          ("nVDash" "\\nVDash" t "&nVDash;" "⊯" "⊯" "⊯"))))
+          ("nVDash" "\\nVDash" t "&nVDash;" "⊯" "⊯" "⊯")
+          ("subseteq" "\\subseteq" t "&subseteq;" "⊆" "⊆" "⊆")
+          ("supseteq" "\\supseteq" t "&supseteq;" "⊇" "⊇" "⊇")
+          ("subsetneq" "\\subsetneq" t "&subsetneq;" "⊊" "⊊" "⊊")
+          ("supsetneq" "\\supsetneq" t "&supsetneq;" "⊋" "⊋" "⊋")
+          ("nsubseteq" "\\nsubseteq" t "&nsubseteq;" "⊈" "⊈" "⊈")
+          ("nsupseteq" "\\nsupseteq" t "&nsupseteq;" "⊉" "⊉" "⊉")
+          ("nsubseteqq" "\\nsubseteqq" t "&nsubseteqq;" "⊈" "⊈" "⊈")
+          ("nsupseteqq" "\\nsupseteqq" t "&nsupseteqq;" "⊉" "⊉" "⊉")
+          ("subsetneqq" "\\subsetneqq" t "&subsetneqq;" "⊊" "⊊" "⊊")
+          ("supsetneqq" "\\supsetneqq" t "&supsetneqq;" "⊋" "⊋" "⊋")
+          ("nsubset" "\\nsubset" t "&nsubset;" "⊄" "⊄" "⊄")
+          ("nsupset" "\\nsupset" t "&nsupset;" "⊅" "⊅" "⊅")
+          ("nsubseteq" "\\nsubseteq" t "&nsubseteq;" "⊈" "⊈" "⊈")
+          ("nsupseteq" "\\nsupseteq" t "&nsupseteq;" "⊉" "⊉" "⊉"))))
 
 
 ;; [org-visual-outline] Add guide lines for org outline
 (use-package org-visual-outline
-  :straight (:host github :repo "legalnonsense/org-visual-outline" :files ("*.el"))
   :after org
-  :hook ((org-mode . org-visual-indent-mode))
+  :straight (:host github :repo "legalnonsense/org-visual-outline" :files ("*.el"))
   :init
-  (with-eval-after-load 'org-visual-indent
-    (setq org-visual-indent-color-indent
-          (cl-loop for x from 1 to 8
-                   with color = nil
-                   do (setq color (or (face-foreground (intern (concat "org-level-" (number-to-string x))) nil t)
-                                      (face-foreground 'org-level-1)))
-                   collect `(,x ,(list :background color :foreground color :height .1)))))
-  )
+  (use-package org-visual-indent
+    :after org
+    :hook ((org-mode . org-visual-indent-mode))
+    :config
+    ;; HACK: `org-visual-indent' calculates its faces from the current theme,
+    ;; but it could be wrong after switching theme.
+    (add-hook! '+theme-changed-hook :call-immediately
+      (defun +org-visual-outline-indent-color-update ()
+        (let (bufs)
+          (dolist (buf (buffer-list))
+            (with-current-buffer buf
+              (when org-visual-indent-mode
+                (push buf bufs)
+                (org-visual-indent-mode -1))))
+          (setq org-visual-indent-color-indent
+                (cl-loop for x from 1 to 8
+                         with color = nil
+                         do (setq color (or (face-foreground (intern (concat "org-level-" (number-to-string x))) nil t)
+                                            (face-foreground 'org-level-1)))
+                         collect `(,x ,(list :background color :foreground color :height .1))))
+          (set-face-attribute 'org-visual-indent-pipe-face nil
+                              :foreground (face-attribute 'default :foreground)
+                              :background (face-attribute 'default :foreground))
+          (set-face-attribute 'org-visual-indent-blank-pipe-face nil
+                              :foreground (face-attribute 'default :background)
+                              :background (face-attribute 'default :background))
+          (dolist (buf bufs)
+            (with-current-buffer buf
+              (org-visual-indent-mode t))))
+        ))
+    ))
 
 
 ;; [org-modern] A modern org-mode

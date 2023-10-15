@@ -71,7 +71,7 @@
 (use-package copilot
   :when (executable-find "node")
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook ((first-change . +copilot-check-and-auto-activate))
+  ;; :hook ((first-change . +copilot-check-and-auto-activate))
   :config
   (setq copilot-indent-warning-suppress t)
 
@@ -109,8 +109,7 @@
   (setq dumb-jump-prefer-searcher 'rg
         dumb-jump-selector 'completing-read
         dumb-jump-aggressive t
-        dumb-jump-default-project user-emacs-directory
-        )
+        dumb-jump-default-project user-emacs-directory)
   )
 
 

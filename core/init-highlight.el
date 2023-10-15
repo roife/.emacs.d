@@ -197,7 +197,7 @@
         indent-bars-pattern ".")
 
   ;; HACK: `indent-bars' calculates its faces from the current theme,
-  ;; but is unable to do so properly in terminal Emacs
+  ;; but it could be wrong after switching theme.
   (add-hook! '+theme-changed-hook
     (defun +indent-bars-auto-set-faces ()
       (when indent-bars-mode (indent-bars-reset))))

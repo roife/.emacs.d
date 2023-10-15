@@ -39,7 +39,7 @@
                      'init-vcs
                      'init-browser
                      'init-dict
-                     'init-elfeed
+                     ;; 'init-elfeed
                      'init-ibuffer
                      'init-test
                      'init-modal

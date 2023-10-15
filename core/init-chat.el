@@ -10,7 +10,7 @@
         telega-chat-fill-column 58
         telega-translate-to-language-by-default "zh"
         telega-chat-input-markups '("org")
-        telega-chat-prompt-format "> "
+        telega-chat-prompt-format "▶ "
         telega-completing-read-function completing-read-function)
 
   (if (eq system-type 'darwin)
