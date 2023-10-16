@@ -55,7 +55,7 @@
                      (before-joined (concat (string-join before " ") " "))
                      (after (seq-subseq persp-list (1+ cur-pos)))
                      (after-joined (concat " " (string-join after " ")))
-                     (face '(:inherit font-lock-type-face :inverse-video t))
+                     (face '(:inherit font-lock-constant-face :inverse-video t))
                      (text (concat (propertize (concat " " (when before before-joined) "") 'face face)
                                    (propertize (concat cur-persp-name)
                                                'face (append face '(:weight ultra-bold :underline t)))
@@ -66,8 +66,6 @@
                    ignore
                    :help ,(concat "Current persp: " cur-persp-name)))
                 )))
-      (force-mode-line-update t)
-      +tab-bar-persp-indicator-cache
       ))
 
   (defun +tab-bar-persp-indicator ()
@@ -76,7 +74,7 @@
 
   ;; cache for telega indicator
   (defvar +tab-bar-telega-indicator-cache nil)
-  (add-hook! (telega-connection-state-hook telega-kill-hook)
+  (add-hook! (telega-connection-state-hook telega-kill-hook telega-online-status-hook)
     (defun +tab-bar-telega-icon-update (&rest rest)
       (setq +tab-bar-telega-indicator-cache
             (when (and (fboundp 'telega-server-live-p)
@@ -97,7 +95,7 @@
                      ;; tot
                      ;; (tot-count (+ true-unmuted-count mentioned-count reactions-count))
                      )
-                (propertize (concat " ▶ "
+                (propertize (concat " " (if online-p "▶" "▷") " "
                                     (when (and true-unmuted-count (not (zerop true-unmuted-count)))
                                       (concat "●" (number-to-string true-unmuted-count) " "))
                                     (when (and mentioned-count (not (zerop mentioned-count)))
@@ -109,6 +107,7 @@
   (defun +tab-bar-telega-icon ()
     (or +tab-bar-telega-indicator-cache
         (+tab-bar-telega-icon-update)))
+  (advice-add 'telega--on-updateUserStatus :after #'+tab-bar-telega-icon-update)
   (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
   (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
   (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update)

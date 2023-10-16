@@ -24,13 +24,13 @@
   (eq (frame-selected-window) +mode-line-current-window))
 
 ;;; Check whether `window-total-width' is larger than the limit
-;; (defconst +mode-line-window-width-limit 90)
-;; (defvar-local +mode-line-enough-width-p nil)
-;; (add-hook! (after-revert-hook buffer-list-update-hook window-size-change-functions)
-;;            (defun +mode-line-window-size-change-function (&rest _)
-;;              "Function for `window-size-change-functions'."
-;;              (setq +mode-line-enough-width-p
-;;                    (> (window-total-width) +mode-line-window-width-limit))))
+(defconst +mode-line-window-width-limit 90)
+(defvar-local +mode-line-enough-width-p nil)
+(add-hook! (after-revert-hook buffer-list-update-hook window-size-change-functions)
+           (defun +mode-line-window-size-change-function (&rest _)
+             "Function for `window-size-change-functions'."
+             (setq +mode-line-enough-width-p
+                   (> (window-total-width) +mode-line-window-width-limit))))
 
 ;;; face
 (defgroup +mode-line nil
@@ -197,11 +197,11 @@
                                         (+mode-line-use-region-indicator)))
                              face ,panel-face)
                 " "
-                (:propertize "%b" face ,meta-face)
-                ;; (:eval (breadcrumb-project-crumbs))
-                ;; (:eval (when-let ((imenu (and +mode-line-enough-width-p
-                ;;                               (breadcrumb-imenu-crumbs))))
-                ;;          (concat "▸" imenu)))
+                ;; (:propertize "%b" face ,meta-face)
+                (:eval (breadcrumb-project-crumbs))
+                (:eval (when-let ((imenu (and +mode-line-enough-width-p
+                                              (breadcrumb-imenu-crumbs))))
+                         (concat "▸" imenu)))
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))
@@ -226,11 +226,11 @@
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,meta-face)
                 (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,meta-face)
-                (:propertize "%b" face ,meta-face)))
-         ;; (:eval (breadcrumb-project-crumbs))
-         ;; (:eval (when-let ((imenu (and +mode-line-enough-width-p
-         ;;                               (breadcrumb-imenu-crumbs))))
-         ;;          (concat "▸" imenu)))))
+                ;; (:propertize "%b" face ,meta-face)
+                (:eval (breadcrumb-project-crumbs))
+                (:eval (when-let ((imenu (and +mode-line-enough-width-p
+                                              (breadcrumb-imenu-crumbs))))
+                         (concat "▸" imenu)))))
          (rhs `((:eval mode-name)
                 (:propertize +mode-line-vcs-info
                              face +mode-line-vc-mode-inactive-face)
@@ -256,17 +256,17 @@
 ;; TODO: The performance of bc is a little bad, so I disable it for now.
 ;;      Maybe I will solve the problem in the future.
 ;; [breadcrumb] Add breadcrumb navigation in header-line
-;; (use-package breadcrumb
-;;   :custom-face
-;;   (breadcrumb-project-base-face ((t (:inherit breadcrumb-project-crumbs-face :bold t))))
-;;   (breadcrumb-project-leaf-face ((t (:inherit font-lock-function-name-face :bold t))))
-;;   (breadcrumb-imenu-leaf-face ((t (:inherit font-lock-function-name-face :foreground unspecified))))
-;;   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
-;;   :commands breadcrumb--header-line
-;;   :config
-;;   (setq breadcrumb-imenu-crumb-separator "▸"
-;;         breadcrumb-project-max-length 0.3
-;;         breadcrumb-imenu-max-length 0.2))
+(use-package breadcrumb
+  :custom-face
+  (breadcrumb-project-base-face ((t (:inherit breadcrumb-project-crumbs-face :bold t))))
+  (breadcrumb-project-leaf-face ((t (:inherit font-lock-function-name-face :bold t))))
+  (breadcrumb-imenu-leaf-face ((t (:inherit font-lock-function-name-face :foreground unspecified))))
+  :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
+  :commands breadcrumb--header-line
+  :config
+  (setq breadcrumb-imenu-crumb-separator "▸"
+        breadcrumb-project-max-length 0.3
+        breadcrumb-imenu-max-length 0.2))
 
 
 ;; [vcs-info] cache for vcs

@@ -1,5 +1,9 @@
 (use-package telega
   :straight t
+  :custom-face
+  (telega-msg-heading ((t (:inherit hl-line :background nil))))
+  (telega-msg-inline-reply ((t (:inherit (hl-line font-lock-function-name-face)))))
+  (telega-msg-inline-forward ((t (:inherit (hl-line font-lock-type-face)))))
   :hook ((telega-chat-mode . visual-line-mode))
   :bind (:map telega-chat-button-map
               ("h" . nil))
@@ -11,7 +15,7 @@
         telega-translate-to-language-by-default "zh"
         telega-chat-input-markups '(nil "org")
         telega-chat-prompt-format "▶ "
-        telega-completing-read-function completing-read-function)
+        telega-completing-read-function completing-read-function
         ;; avoid emoji display problem
         telega-emoji-use-images nil)
 

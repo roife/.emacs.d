@@ -78,8 +78,9 @@
   (defun +copilot-check-and-auto-activate ()
     (interactive)
     (when (and (not copilot-mode)
+               (derived-mode-p 'prog-mode)
                (not (+temp-buffer-p (current-buffer)))
-               (derived-mode-p 'prog-mode))
+               (project-current))
       (copilot-mode)))
 
   (defun +copilot-complete ()
