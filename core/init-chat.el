@@ -9,7 +9,7 @@
         telega-root-show-avatars nil
         telega-chat-fill-column 58
         telega-translate-to-language-by-default "zh"
-        telega-chat-input-markups '("org")
+        telega-chat-input-markups '(nil "org")
         telega-chat-prompt-format "▶ "
         telega-completing-read-function completing-read-function)
 

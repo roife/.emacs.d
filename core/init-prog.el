@@ -100,6 +100,16 @@
   )
 
 
+;; [webpaste] Web Pastebin
+(use-package webpaste
+  :straight t
+  :commands webpaste-paste-buffer-or-region
+  :config
+  (setq webpaste-paste-confirmation t
+        webpaste-add-to-killring t
+        webpaste-provider-priority '("paste.mozilla.org" "dpaste.org" "ix.io")))
+
+
 ;; [dumb-jump] Jump to definition (integrated with xref, a fallback of lsp)
 (use-package dumb-jump
   :straight t
