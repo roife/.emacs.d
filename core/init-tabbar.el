@@ -41,9 +41,8 @@
              (propertize (concat " " (alist-get 'name tab) " ") 'face face)))))
 
   ;; cache for persp indicator
-  ;; add [persp-name] and [meow-indicator] on tab-bar
   (defvar +tab-bar-persp-indicator-cache nil)
-  (add-hook! (persp-activated-functions persp-update-names-cache)
+  (add-hook! (persp-activated-functions persp-names-cache-changed-functions)
     (defun +tab-bar-update-persp-indicator (&rest _)
       (setq +tab-bar-persp-indicator-cache
             (when-let* ((persp-list (and (bound-and-true-p persp-mode)
@@ -56,18 +55,25 @@
                      (before-joined (concat (string-join before " ") " "))
                      (after (seq-subseq persp-list (1+ cur-pos)))
                      (after-joined (concat " " (string-join after " ")))
-                     (face '(:inherit font-lock-type-face :inverse-video t)))
-                (concat (propertize (concat " " (when before before-joined) "·") 'face face)
-                        (propertize (concat cur-persp-name) 'face (append face '(:weight ultra-bold :underline t)))
-                        (propertize (concat (when after after-joined) " ") 'face face))))
-            )
+                     (face '(:inherit font-lock-type-face :inverse-video t))
+                     (text (concat (propertize (concat " " (when before before-joined) "") 'face face)
+                                   (propertize (concat cur-persp-name) 'face (append face '(:weight ultra-bold :underline t)))
+                                   (propertize (concat (when after after-joined) " ") 'face face))))
+                `((tab-bar-persp
+                   menu-item
+                   ,text
+                   ignore
+                   :help ,(concat "Current persp: " cur-persp-name)))
+                )))
+      (force-mode-line-update t)
+      +tab-bar-persp-indicator-cache
       ))
 
   (defun +tab-bar-persp-indicator ()
     (or +tab-bar-persp-indicator-cache
         (+tab-bar-update-persp-indicator)))
 
-  ;; [telega]
+  ;; cache for telega indicator
   (defvar +tab-bar-telega-indicator-cache nil)
   (add-hook! (telega-connection-state-hook telega-kill-hook)
     (defun +tab-bar-telega-icon-update (&rest rest)
@@ -91,6 +97,7 @@
     (or +tab-bar-telega-indicator-cache
         (+tab-bar-telega-icon-update)))
   (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
+  (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
 
   (defun +hide-tab-bar ()
     (interactive)
