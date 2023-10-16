@@ -12,6 +12,8 @@
         telega-chat-input-markups '(nil "org")
         telega-chat-prompt-format "▶ "
         telega-completing-read-function completing-read-function)
+        ;; avoid emoji display problem
+        telega-emoji-use-images nil)
 
   (if (eq system-type 'darwin)
       (setq telega-proxies '((:server "127.0.0.1" :port 7890 :enable t :type (:@type "proxyTypeSocks5"))))
