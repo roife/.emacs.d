@@ -17,7 +17,8 @@
   :config
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t
-        show-paren-context-when-offscreen t)
+        show-paren-context-when-offscreen t
+        show-paren-delay 0.2)
   )
 
 
@@ -113,8 +114,6 @@
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
   :init
-  (setq pulse-delay 0.02)
-
   (defun +pulse-momentary-line (&rest _)
     "Pulse the current line."
     (pulse-momentary-highlight-one-line (point)))
