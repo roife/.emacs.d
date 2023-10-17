@@ -41,6 +41,7 @@
 ;; [Eglot] LSP support
 (use-package eglot
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
+  :bind (("M-<return>" . eglot-code-actions))
   :config
   (setq eglot-events-buffer-size 0
         eglot-connect-timeout 10
