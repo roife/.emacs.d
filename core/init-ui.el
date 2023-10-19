@@ -88,20 +88,19 @@
 
 
 ;; Font: Same width and height for emoji, chinese and english characters
-(defvar +font-en-size (if (eq system-type 'darwin) 15 26))
-(defvar +font-emoji-size (if (eq system-type 'darwin) 11 22))
+(defvar +font-size (if (eq system-type 'darwin) 15 26))
 
 (add-hook! 'server-after-make-frame-hook :call-immediately
   (defun +setup-fonts ()
     "Setup fonts."
-    (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-en-size))
+    (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-size))
     (set-face-font 'fixed-pitch "Sarasa Term SC")
     (set-face-font 'fixed-pitch-serif "Sarasa Term Slab SC")
     (set-face-font 'variable-pitch "Sarasa UI SC")
 
     ;; font for emoji, set as unicode to cover more chars
-    (set-fontset-font t 'unicode (font-spec :family "Apple Color Emoji" :size +font-emoji-size))
-    (set-fontset-font t 'unicode (font-spec :script 'unicode) nil 'append)
+    (set-fontset-font t 'unicode (font-spec :family "Apple Color Emoji") nil 'prepend)
+    (setq face-font-rescale-alist '(("Apple Color Emoji" . 0.79)))
 
     (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
     (set-fontset-font t 'han (font-spec :script 'han) nil 'append)))

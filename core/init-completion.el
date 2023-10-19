@@ -183,6 +183,7 @@
          ([remap yank-pop]                      . consult-yank-pop)
          ("C-c d r"                             . consult-ripgrep)
          ("C-c d f"                             . consult-fd))
+  ;; :hook ((completion-list-mode . consult-preview-at-point-mode))
   :config
   (setq consult-narrow-key "<"
         consult-async-min-input 2)

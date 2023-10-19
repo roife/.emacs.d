@@ -83,14 +83,14 @@
               (let* ((me-user (telega-user-me 'locally))
                      (online-p (and me-user (telega-user-online-p me-user)))
                      ;; reactions
-                     (reactions-chats (telega-filter-chats telega--ordered-chats '(unread-reactions)))
+                     (reactions-chats (telega-filter-chats telega--ordered-chats '(and is-known unread-reactions)))
                      (reactions-count (apply '+ (mapcar (telega--tl-prop :unread_reaction_count) reactions-chats)))
                      ;; mentioned
                      (mentioned-chats (telega-filter-chats telega--ordered-chats '(mention)))
                      (mentioned-count (apply '+ (mapcar (telega--tl-prop :unread_mention_count) mentioned-chats)))
                      ;; unread
                      (unmuted-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
-                     (mentioned-unmuted-chats (telega-filter-chats telega--ordered-chats '(and (mention) (unmuted))))
+                     (mentioned-unmuted-chats (telega-filter-chats telega--ordered-chats '(and mention unmuted)))
                      (true-unmuted-count (- unmuted-count (length mentioned-unmuted-chats)))
                      ;; tot
                      ;; (tot-count (+ true-unmuted-count mentioned-count reactions-count))
