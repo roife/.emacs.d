@@ -172,26 +172,40 @@
     (setq +mode-line-encoding
           `(,(if (memq (coding-system-category buffer-file-coding-system)
                        '(coding-category-undecided coding-category-utf-8))
-                 (when +mode-line-show-common-encodings "UTF-8")
-               (upcase (symbol-name (coding-system-get buffer-file-coding-system :name))))
+                 (when +mode-line-show-common-encodings "UTF-8 ")
+               (concat (upcase (symbol-name (coding-system-get buffer-file-coding-system :name)))
+                       " "))
             ,(pcase (coding-system-eol-type buffer-file-coding-system)
-               (0 (when +mode-line-show-common-encodings ":LF "))
-               (1 ":CRLF ")
-               (2 ":CR ")
+               (0 (when +mode-line-show-common-encodings "LF "))
+               (1 "CRLF ")
+               (2 "CR ")
                (_ " "))))))
 (advice-add #'after-insert-file-set-coding :after #'+mode-line-update-encoding)
 (advice-add #'set-buffer-file-coding-system :after #'+mode-line-update-encoding)
+
+;;; Cache pdf-tools info
+(defvar-local +mode-line-pdf-pages nil)
+(defun +mode-line-update-pdf-pages ()
+  "Update PDF pages."
+  (when (eq major-mode 'pdf-view-mode)
+    (setq +mode-line-pdf-pages
+          (format " p%d/%d "
+                  (or (eval `(pdf-view-current-page)) 0)
+                  (pdf-cache-number-of-pages)))))
+(add-hook 'pdf-view-change-page-hook #'+mode-line-update-pdf-pages)
 
 
 (defsubst +mode-line-active ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
-         (panel-face `(:inherit ,meta-face :inverse-video t))
+         (active-p (+mode-line-window-active-p))
+         (panel-face `(:inherit ,meta-face
+                                :inverse-video ,active-p))
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,panel-face)
                 (:propertize ,(+mode-line-overwrite-readonly-indicator)
                              face ,panel-face)
-                (:propertize ,(when (+mode-line-window-active-p)
+                (:propertize ,(when active-p
                                 (concat (+mode-line-macro-indicator)
                                         (+mode-line-symbol-overlay-indicator)
                                         (+mode-line-use-region-indicator)))
@@ -199,46 +213,20 @@
                 " "
                 ;; (:propertize "%b" face ,meta-face)
                 (:eval (breadcrumb-project-crumbs))
+                (:propertize +mode-line-remote-host-name
+                             face +mode-line-host-name-active-face)
                 (:eval (when-let ((imenu (and +mode-line-enough-width-p
                                               (breadcrumb-imenu-crumbs))))
                          (concat "▸" imenu)))
-                (:propertize +mode-line-remote-host-name
-                             face +mode-line-host-name-active-face)
                 ))
-         (rhs '((:propertize mode-name face +mode-line-mode-name-active-face)
-                (:eval +mode-line-vcs-info)
-                (:eval +mode-line-flymake-indicator)
-                " "
-                (:eval +mode-line-encoding)
-                "%l "
-                (-3 "%p")
-                "%%"))
-         (rhs-str (format-mode-line rhs))
-         (rhs-w (string-width rhs-str)))
-    `(,lhs
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
-      ,rhs-str)))
-
-
-(defsubst +mode-line-inactive ()
-  "Formatting active-long mode-line."
-  (let* ((meta-face (+mode-line-get-window-name-face))
-         (lhs `((:propertize ,(+mode-line-get-window-name)
-                             face ,meta-face)
-                (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,meta-face)
-                ;; (:propertize "%b" face ,meta-face)
-                (:eval (breadcrumb-project-crumbs))
-                (:eval (when-let ((imenu (and +mode-line-enough-width-p
-                                              (breadcrumb-imenu-crumbs))))
-                         (concat "▸" imenu)))))
-         (rhs `((:eval mode-name)
+         (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
                 (:propertize +mode-line-vcs-info
-                             face +mode-line-vc-mode-inactive-face)
+                             face ,(unless active-p '+mode-line-vc-mode-inactive-face))
+                (:eval (when active-p +mode-line-flymake-indicator))
                 " "
                 (:eval +mode-line-encoding)
-                "%l "
-                (-3 "%p")
-                "%%"))
+                ,(or +mode-line-pdf-pages
+                     (list "%l " '(-3 "%p") "%%"))))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
     `(,lhs
@@ -246,9 +234,7 @@
       ,rhs-str)))
 
 (setq-default mode-line-format
-              '((:eval (if (+mode-line-window-active-p)
-                           (+mode-line-active)
-                         (+mode-line-inactive)))))
+              '((:eval (+mode-line-active))))
 
 
 ;;; Header Line
