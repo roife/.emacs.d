@@ -254,7 +254,7 @@ Assume point is at first MARK."
   :after ox
   :init (require 'ox-hugo)
   :config
-  (setq org-hugo-default-section-directory "posts"
+  (setq org-hugo-section "posts"
         org-hugo-base-dir +blog-dir
         org-hugo-external-file-extensions-allowed-for-copying nil)
 
