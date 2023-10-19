@@ -8,27 +8,11 @@
 ;; show VC tools name for Git
 (defvar +mode-line-show-common-vc-tools-name nil)
 
-;;; get current window
-(defvar +mode-line-current-window nil)
-(add-hook! 'pre-redisplay-functions
-  (defun +mode-line-set-selected-window (&rest _)
-    "Set `+mode-line-current-window' appropriately."
-    (let ((win (frame-selected-window)))
-      (setq +mode-line-current-window
-            (if (minibuffer-window-active-p win)
-                (minibuffer-selected-window)
-              win)))))
-
-(defsubst +mode-line-window-active-p ()
-  "Whether is an active window."
-  (eq (frame-selected-window) +mode-line-current-window))
-
 ;;; Check whether `window-total-width' is larger than the limit
 (defconst +mode-line-window-width-limit 90)
 (defvar-local +mode-line-enough-width-p nil)
 (add-hook! (after-revert-hook buffer-list-update-hook window-size-change-functions)
            (defun +mode-line-window-size-change-function (&rest _)
-             "Function for `window-size-change-functions'."
              (setq +mode-line-enough-width-p
                    (> (window-total-width) +mode-line-window-width-limit))))
 
@@ -36,21 +20,6 @@
 (defgroup +mode-line nil
   "Mode-Line faces."
   :group 'faces)
-
-;; (defface +mode-line-meta-active-unchanged-face
-;;   '((t (:inherit (font-lock-function-name-face bold) :inverse-video t)))
-;;   "Face used for meta panel on the mode-line of an active window."
-;;   :group '+mode-line)
-;;
-;; (defface +mode-line-meta-active-modified-face
-;;   '((t (:inherit (font-lock-keyword-face bold) :inverse-video t)))
-;;   "Face used for meta panel on the mode-line of an active window."
-;;   :group '+mode-line)
-;;
-;; (defface +mode-line-meta-active-autosaved-face
-;;   '((t (:inherit (font-lock-doc-face bold) :inverse-video t)))
-;;   "Face used for meta panel on the mode-line of an active window."
-;;   :group '+mode-line)
 
 (defface +mode-line-meta-inactive-unchanged-face
   '((t (:inherit (font-lock-function-name-face bold))))
@@ -173,13 +142,14 @@
           `(,(if (memq (coding-system-category buffer-file-coding-system)
                        '(coding-category-undecided coding-category-utf-8))
                  (when +mode-line-show-common-encodings "UTF-8 ")
-               (concat (upcase (symbol-name (coding-system-get buffer-file-coding-system :name)))
-                       " "))
+               (let ((name (coding-system-get buffer-file-coding-system :name)))
+                 (concat (if (eq name 'no-conversion) "NO-CONV" (upcase (symbol-name name)))
+                         " ")))
             ,(pcase (coding-system-eol-type buffer-file-coding-system)
                (0 (when +mode-line-show-common-encodings "LF "))
                (1 "CRLF ")
                (2 "CR ")
-               (_ " "))))))
+               (_ "UNK "))))))
 (advice-add #'after-insert-file-set-coding :after #'+mode-line-update-encoding)
 (advice-add #'set-buffer-file-coding-system :after #'+mode-line-update-encoding)
 
@@ -189,18 +159,17 @@
   "Update PDF pages."
   (when (eq major-mode 'pdf-view-mode)
     (setq +mode-line-pdf-pages
-          (format " p%d/%d "
+          (format "p%d/%d "
                   (or (eval `(pdf-view-current-page)) 0)
                   (pdf-cache-number-of-pages)))))
 (add-hook 'pdf-view-change-page-hook #'+mode-line-update-pdf-pages)
 
 
-(defsubst +mode-line-active ()
+(defsubst +mode-line-compute ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
-         (active-p (+mode-line-window-active-p))
-         (panel-face `(:inherit ,meta-face
-                                :inverse-video ,active-p))
+         (active-p (mode-line-window-selected-p))
+         (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,panel-face)
                 (:propertize ,(+mode-line-overwrite-readonly-indicator)
@@ -220,9 +189,8 @@
                          (concat "▸" imenu)))
                 ))
          (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
-                (:propertize +mode-line-vcs-info
-                             face ,(unless active-p '+mode-line-vc-mode-inactive-face))
-                (:eval (when active-p +mode-line-flymake-indicator))
+                (:eval +mode-line-vcs-info)
+                (:eval (when ,active-p +mode-line-flymake-indicator))
                 " "
                 (:eval +mode-line-encoding)
                 ,(or +mode-line-pdf-pages
@@ -234,7 +202,7 @@
       ,rhs-str)))
 
 (setq-default mode-line-format
-              '((:eval (+mode-line-active))))
+              '((:eval (+mode-line-compute))))
 
 
 ;;; Header Line
@@ -252,7 +220,8 @@
   :config
   (setq breadcrumb-imenu-crumb-separator "▸"
         breadcrumb-project-max-length 0.3
-        breadcrumb-imenu-max-length 0.2))
+        breadcrumb-imenu-max-length 0.2
+        breadcrumb-idle-time 10))
 
 
 ;; [vcs-info] cache for vcs
@@ -266,7 +235,8 @@
                    (rev     (if +mode-line-show-common-vc-tools-name
                                 (substring-no-properties vc-mode 1)
                               (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))))
-                   (face (cond ((eq state 'up-to-date) '(vc-dir-status-up-to-date))
+                   (face (cond ((mode-line-window-selected-p) '+mode-line-vc-mode-inactive-face)
+                               ((eq state 'up-to-date) '(vc-dir-status-up-to-date))
                                ((eq state 'ignored) '(vc-dir-status-ignored))
                                ((memq state '(needs-update needs-merge conflict missing)) '(vc-dir-status-warning))
                                (t '(vc-dir-status-edited))))
