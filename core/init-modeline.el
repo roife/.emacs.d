@@ -46,16 +46,6 @@
   "The face for host name on the mode-line of an active window."
   :group '+mode-line)
 
-(defface +mode-line-vc-mode-inactive-face
-  '((t (:inherit (mode-line-inactive))))
-  "The face for vc-mode on the mode-line of an active window."
-  :group '+mode-line)
-
-(defface +mode-line-line-number-active-face
-  '((t (:inherit (mode-line-inactive) :inverse-video t)))
-  "The face for line number on the mode-line of an active window."
-  :group '+mode-line)
-
 ;;; Indicators
 (defsubst +mode-line-get-window-name ()
   "Get window name for current window."
@@ -170,31 +160,36 @@
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
+         (meow (meow-indicator))
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,panel-face)
                 (:propertize ,(+mode-line-overwrite-readonly-indicator)
                              face ,panel-face)
-                (:propertize ,(when active-p
-                                (concat (+mode-line-macro-indicator)
-                                        (+mode-line-symbol-overlay-indicator)
-                                        (+mode-line-use-region-indicator)))
-                             face ,panel-face)
+                (,active-p (:propertize
+                            ,(concat (+mode-line-macro-indicator)
+                                     (+mode-line-symbol-overlay-indicator)
+                                     (+mode-line-use-region-indicator))
+                            face ,panel-face))
                 " "
                 ;; (:propertize "%b" face ,meta-face)
                 (:eval (breadcrumb-project-crumbs))
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
-                (:eval (when-let ((imenu (and +mode-line-enough-width-p
-                                              (breadcrumb-imenu-crumbs))))
+                (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
+                                               (breadcrumb-imenu-crumbs))))
                          (concat "▸" imenu)))
                 ))
-         (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
-                (:eval +mode-line-vcs-info)
-                (:eval (when ,active-p +mode-line-flymake-indicator))
+         (rhs `((,active-p ,meow
+                           (:propertize ,meow face nil))
+                (:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
+                (,active-p ,+mode-line-vcs-info
+                           (:propertize ,+mode-line-vcs-info face nil))
+                (,active-p ,+mode-line-flymake-indicator)
                 " "
                 (:eval +mode-line-encoding)
                 ,(or +mode-line-pdf-pages
-                     (list "%l " '(-3 "%p") "%%"))))
+                     (list "%l " '(-3 "%p") "%%"))
+                ))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
     `(,lhs
@@ -206,7 +201,6 @@
 
 
 ;;; Header Line
-
 ;; TODO: The performance of bc is a little bad, so I disable it for now.
 ;;      Maybe I will solve the problem in the future.
 ;; [breadcrumb] Add breadcrumb navigation in header-line
@@ -235,11 +229,10 @@
                    (rev     (if +mode-line-show-common-vc-tools-name
                                 (substring-no-properties vc-mode 1)
                               (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))))
-                   (face (cond ((mode-line-window-selected-p) '+mode-line-vc-mode-inactive-face)
-                               ((eq state 'up-to-date) '(vc-dir-status-up-to-date))
-                               ((eq state 'ignored) '(vc-dir-status-ignored))
-                               ((memq state '(needs-update needs-merge conflict missing)) '(vc-dir-status-warning))
-                               (t '(vc-dir-status-edited))))
+                   (face (cond ((eq state 'up-to-date) 'vc-dir-status-up-to-date)
+                               ((eq state 'ignored) 'vc-dir-status-ignored)
+                               ((memq state '(needs-update needs-merge conflict missing)) 'vc-dir-status-warning)
+                               (t 'vc-dir-status-edited)))
                    (state-symbol (cond ((eq state 'up-to-date) "√")
                                        ((eq state 'edited) "*")
                                        ((eq state 'added) "@")

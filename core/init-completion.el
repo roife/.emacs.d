@@ -295,7 +295,9 @@
 
 (use-package corfu-popupinfo
   :straight nil
-  :after corfu)
+  :after corfu
+  :init
+  (corfu-popupinfo-mode 1))
 
 
 (use-package cape

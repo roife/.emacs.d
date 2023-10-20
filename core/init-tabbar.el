@@ -116,64 +116,63 @@
                                       (when (> reactions-count 0)
                                         (concat "❤" (number-to-string reactions-count) " ")))
                               'face `(:inherit font-lock-keyword-face :inverse-video ,online-p))))
-            (force-mode-line-update t)
-            +tab-bar-telega-indicator-cache))
-        ))
-
-    (advice-add 'telega--on-updateUserStatus :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update))
-
-  (defun +tab-bar-telega-icon ()
-    (when (and (fboundp 'telega-server-live-p)
-               (telega-server-live-p))
-      (or +tab-bar-telega-indicator-cache
-          (+tab-bar-telega-icon-update))))
-
-  ;; cache for org-pomodoro
-  (with-eval-after-load 'org-pomodoro
-    (defvar +tab-bar-org-pomodoro-indicator-cache nil)
-
-    (add-hook! (org-pomodoro-started-hook org-pomodoro-finished-hook org-pomodoro-overtime-hook
-                                          org-pomodoro-killed-hook org-pomodoro-break-finished-hook
-                                          org-pomodoro-long-break-finished-hook org-pomodoro-killed-hook)
-      (defun +tab-bar-org-pomodoro-indicator-update (&rest _)
-        (setq +tab-bar-org-pomodoro-indicator-cache
-                (cl-case org-pomodoro-state
-                  (:none
-                   (propertize " Stop " 'face '(:inherit font-lock-comment-face :inverse-video t)))
-                  (:pomodoro
-                   (propertize " Pomo " 'face '(:inherit org-pomodoro-mode-line :inverse-video t)))
-                  (:overtime
-                   (propertize " Over " 'face '(:inherit org-pomodoro-mode-line-overtime :inverse-video t)))
-                  (:short-break
-                   (propertize " Short break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t)))
-                  (:long-break
-                   (propertize " Long break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t))))))
+          (force-mode-line-update t)
+          +tab-bar-telega-indicator-cache)
       ))
 
-  (defun +tab-bar-org-pomodoro-indicator ()
-    (when (fboundp 'org-pomodoro-active-p)
-      (or +tab-bar-org-pomodoro-indicator-cache
-          (+tab-bar-org-pomodoro-indicator-update))))
+  (advice-add 'telega--on-updateUserStatus :after #'+tab-bar-telega-icon-update)
+  (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
+  (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
+  (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update))
 
-  (defun +hide-tab-bar ()
-    (interactive)
-    (setq tab-bar-format nil))
+(defun +tab-bar-telega-icon ()
+  (when (and (fboundp 'telega-server-live-p)
+             (telega-server-live-p))
+    (or +tab-bar-telega-indicator-cache
+        (+tab-bar-telega-icon-update))))
 
-  (defun-call! +show-tab-bar ()
-    (interactive)
-    (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator
-                           tab-bar-format-align-right
-                           +tab-bar-org-pomodoro-indicator
-                           +tab-bar-telega-icon
-                           +tab-bar-persp-indicator
-                           meow-indicator))
-    (tab-bar--update-tab-bar-lines))
+;; cache for org-pomodoro
+(with-eval-after-load 'org-pomodoro
+  (defvar +tab-bar-org-pomodoro-indicator-cache nil)
 
-  ;; WORKAROUND: fresh tab-bar for daemon
-  (when (daemonp)
-    (add-hook 'after-make-frame-functions
-              #'(lambda (&rest _) (force-mode-line-update))))
-  )
+  (add-hook! (org-pomodoro-started-hook org-pomodoro-finished-hook org-pomodoro-overtime-hook
+                                        org-pomodoro-killed-hook org-pomodoro-break-finished-hook
+                                        org-pomodoro-long-break-finished-hook org-pomodoro-killed-hook)
+    (defun +tab-bar-org-pomodoro-indicator-update (&rest _)
+      (setq +tab-bar-org-pomodoro-indicator-cache
+            (cl-case org-pomodoro-state
+              (:none
+               (propertize " Stop " 'face '(:inherit font-lock-comment-face :inverse-video t)))
+              (:pomodoro
+               (propertize " Pomo " 'face '(:inherit org-pomodoro-mode-line :inverse-video t)))
+              (:overtime
+               (propertize " Over " 'face '(:inherit org-pomodoro-mode-line-overtime :inverse-video t)))
+              (:short-break
+               (propertize " Short break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t)))
+              (:long-break
+               (propertize " Long break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t))))))
+    ))
+
+(defun +tab-bar-org-pomodoro-indicator ()
+  (when (fboundp 'org-pomodoro-active-p)
+    (or +tab-bar-org-pomodoro-indicator-cache
+        (+tab-bar-org-pomodoro-indicator-update))))
+
+(defun +hide-tab-bar ()
+  (interactive)
+  (setq tab-bar-format nil))
+
+(defun-call! +show-tab-bar ()
+  (interactive)
+  (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator
+                                             tab-bar-format-align-right
+                                             +tab-bar-org-pomodoro-indicator
+                                             +tab-bar-telega-icon
+                                             +tab-bar-persp-indicator))
+  (tab-bar--update-tab-bar-lines))
+
+;; WORKAROUND: fresh tab-bar for daemon
+(when (daemonp)
+  (add-hook 'after-make-frame-functions
+            #'(lambda (&rest _) (force-mode-line-update))))
+)

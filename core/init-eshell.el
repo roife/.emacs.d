@@ -234,6 +234,6 @@ If popup is focused, kill it."
 ;; [esh-autosuggest]
 (use-package esh-autosuggest
   :straight t
-  :hook (eshell-mode . esh-autosuggest-mode)
+  :hook ((eshell-mode . esh-autosuggest-mode))
   :bind (:map esh-autosuggest-active-map
               ("C-e" . 'company-complete-selection)))

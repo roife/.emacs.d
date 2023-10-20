@@ -31,19 +31,21 @@
           telega-proxies '((:server "127.0.0.1" :port 7891 :enable t :type (:@type "proxyTypeSocks5")))))
 
   ;; completion
-  (setq telega-emoji-company-backend 'telega-company-emoji)
+  (setq telega-emoji-company-backend #'telega-company-emoji)
 
-  ;; (add-hook! 'telega-chat-mode-hook
-  ;;   (defun +telega-completion-setup ()
-  ;;     (add-to-list 'completion-at-point-functions
-  ;;                  (mapcar #'cape-company-to-capf
-  ;;                          (append (list telega-emoji-company-backend
-  ;;                                        'telega-company-username
-  ;;                                        'telega-company-hashtag
-  ;;                                        'telega-company-markdown-precode)
-  ;;                                  (when (telega-chat-bot-p telega-chatbuf--chat)
-  ;;                                    '(telega-company-botcmd)))))
-  ;;     ))
+  (add-hook! 'telega-chat-mode-hook
+    (defun +telega-completion-setup ()
+      (nconc completion-at-point-functions
+             (mapcar #'cape-company-to-capf
+                     (append (list telega-emoji-company-backend
+                                   #'telega-company-username
+                                   #'telega-company-hashtag
+                                   #'telega-company-markdown-precode)
+                             (when (telega-chat-bot-p telega-chatbuf--chat)
+                               #'(telega-company-botcmd)))))
+      (require 'company)
+      (corfu-mode 1))
+    )
   )
 
 
