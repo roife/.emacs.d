@@ -231,6 +231,14 @@ Assume point is at first MARK."
     ))
 
 
+;; [org-pomodoro] Pomodoro timer for org-mode
+(use-package org-pomodoro
+  :straight t
+  :after org
+  :config
+  (setq org-pomodoro-play-sounds nil))
+
+
 ;; [org-modern] A modern org-mode
 (use-package org-modern
   :straight t

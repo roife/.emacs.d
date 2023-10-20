@@ -41,7 +41,8 @@
 ;; [Eglot] LSP support
 (use-package eglot
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
-  :bind (("M-<return>" . eglot-code-actions))
+  :bind (:map eglot-mode-map
+         ("M-<return>" . eglot-code-actions))
   :config
   (setq eglot-events-buffer-size 0
         eglot-connect-timeout 10
@@ -72,15 +73,13 @@
 (use-package copilot
   :when (executable-find "node")
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  ;; :hook ((first-change . +copilot-check-and-auto-activate))
+  :hook ((prog-mode . +copilot-check-and-auto-activate))
   :config
   (setq copilot-indent-warning-suppress t)
 
   (defun +copilot-check-and-auto-activate ()
     (interactive)
-    (when (and (not copilot-mode)
-               (derived-mode-p 'prog-mode)
-               (not (+temp-buffer-p (current-buffer)))
+    (when (and (not (+temp-buffer-p (current-buffer)))
                (project-current))
       (copilot-mode)))
 

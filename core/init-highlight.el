@@ -186,7 +186,7 @@
 ;; [indent-bars] Highlight indentions effectively
 (use-package indent-bars
   :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
-  :hook (prog-mode . indent-bars-mode)
+  :hook (python-mode . indent-bars-mode)
   :config
   (setq indent-bars-display-on-blank-lines nil
         indent-bars-width-frac 0.2

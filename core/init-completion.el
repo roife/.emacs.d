@@ -5,9 +5,10 @@
   :bind (:map vertico-map
               ("TAB" . minibuffer-complete)
               ("<tab>" . minibuffer-complete)
-              ("C-r" . vertico-repeat-select)
-              ("C-<return>" . vertico-exit-input))
-  :hook ((after-init . vertico-mode))
+              ("C-<return>" . vertico-exit-input)
+              ("C-, ." . vertico-quick-jump))
+  :hook ((after-init . vertico-mode)
+         (vertico-mode . vertico-mouse-mode))
   :defines (crm-separator)
   :config
   (setq vertico-cycle t
@@ -44,7 +45,9 @@
 (use-package vertico-repeat
   :straight nil
   :after vertico
-  :hook (minibuffer-setup . vertico-repeat-save))
+  :hook (minibuffer-setup . vertico-repeat-save)
+  :bind (:map vertico-map
+              ("C-r" . vertico-repeat-select)))
 
 
 (use-package orderless
