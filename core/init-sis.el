@@ -28,6 +28,8 @@
          (after-init . sis-global-inline-mode)
          ;; Enable the context-mode for all buffers
          (after-init . sis-global-context-mode)
+         ;; Auto refresh sis state
+         (after-init . sis-auto-refresh-mode)
          ;; Respect mode
          ;; (after-init . sis-global-respect-mode)
          )
@@ -41,7 +43,7 @@
      "com.apple.keylayout.ABC"
      "com.apple.inputmethod.SCIM.Shuangpin" 'emp))
    ((eq system-type 'gnu/linux)
-    (sis-ism-lazyman-config "1" "2" 'fcitx)))
+    (sis-ism-lazyman-config "1" "2" 'fcitx5)))
 
   ;; Meow
   (add-hook 'meow-leave-insert-mode-hook #'sis-set-english)
