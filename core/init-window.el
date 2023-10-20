@@ -122,7 +122,7 @@
     (setq popper-mode-line
           '(:eval `(:propertize " POP |"
                                 face (:inherit ,(+mode-line-get-window-name-face)
-                                               :inverse-video ,(+mode-line-window-active-p))))))
+                                               :inverse-video ,(mode-line-window-selected-p))))))
 
   ;; Enable indicator in minibuffer
   (popper-echo-mode 1)

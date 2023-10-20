@@ -67,8 +67,8 @@
      ((string-prefix-p "%" pattern) `(char-fold-to-regexp . ,(substring pattern 1)))
      ((string-suffix-p "%" pattern) `(char-fold-to-regexp . ,(substring pattern 0 -1)))
      ;; Initialism matching
-     ((string-prefix-p "`" pattern) `(orderless-initialism . ,(substring pattern 1)))
-     ((string-suffix-p "`" pattern) `(orderless-initialism . ,(substring pattern 0 -1)))
+     ((string-prefix-p "^" pattern) `(orderless-initialism . ,(substring pattern 1)))
+     ((string-suffix-p "^" pattern) `(orderless-initialism . ,(substring pattern 0 -1)))
      ;; Literal matching
      ((string-prefix-p "=" pattern) `(orderless-literal . ,(substring pattern 1)))
      ((string-suffix-p "=" pattern) `(orderless-literal . ,(substring pattern 0 -1)))
@@ -255,9 +255,9 @@
   :straight (:files (:defaults "extensions/*.el"))
   :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
-         (minibuffer-setup . corfu-enable-in-minibuffer))
+         (minibuffer-setup . +corfu-enable-in-minibuffer))
   :bind (:map corfu-map
-              ("s-m" . corfu-move-to-minibuffer)
+              ("s-m" . +corfu-move-to-minibuffer)
               ("RET" . nil))
   :config
   (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
@@ -268,14 +268,14 @@
         corfu-auto-delay 0.1)
 
   ;; Transfer completion to the minibuffer
-  (defun corfu-move-to-minibuffer ()
+  (defun +corfu-move-to-minibuffer ()
     (interactive)
     (let ((completion-extra-properties corfu--extra)
           completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
 
   ;; Completing in the minibuffer
-  (defun corfu-enable-in-minibuffer ()
+  (defun +corfu-enable-in-minibuffer ()
     "Enable Corfu in the minibuffer if `completion-at-point' is bound."
     (when (where-is-internal #'completion-at-point (list (current-local-map)))
       (corfu-mode 1)))
