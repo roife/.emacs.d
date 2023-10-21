@@ -28,4 +28,4 @@
     (+load-theme)))
 
 ;; Selects the most-recently-used ASCII-capable keyboard input source when in chineses input mode
-(mac-auto-ascii-mode)
+;;(mac-auto-ascii-mode)

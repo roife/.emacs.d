@@ -39,7 +39,6 @@
                      'init-vcs
                      'init-browser
                      'init-dict
-                     ;; 'init-elfeed
                      'init-ibuffer
                      'init-test
                      'init-modal
@@ -50,6 +49,8 @@
                      'init-chat
                      'init-pdf
                      'init-sis
+
+                     ;; 'init-elfeed
                      ;; 'init-gnus
                      ;; 'init-webservice
                      ))

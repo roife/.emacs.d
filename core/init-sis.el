@@ -31,12 +31,14 @@
          ;; Auto refresh sis state
          (after-init . sis-auto-refresh-mode)
          ;; Respect mode
-         ;; (after-init . sis-global-respect-mode)
+         (after-init . sis-global-respect-mode)
          )
   :config
   (setq sis-english-source "com.apple.keylayout.ABC"
         sis-inline-tighten-head-rule nil
-        sis-prefix-override-keys (list "C-c" "C-x" "C-h" "M-x"))
+        sis-prefix-override-keys (list "C-c" "C-x" "C-h")
+        ;; remove tail space to input full-width punctuations
+        sis-inline-tighten-tail-rule 'zero)
   (cond
    ((eq system-type 'darwin)
     (sis-ism-lazyman-config
@@ -60,4 +62,9 @@
 
   (add-to-list 'sis-context-detectors #'+sis-switch-to-chinese-detector)
   (advice-add 'org-agenda-todo :before #'sis-set-english)
+
+  ;; WORKAROUND: disable sis in meow normal mode, since it will conflict
+  ;; with keypad mode and it is already in english im yet
+  (add-to-list 'sis-prefix-override-buffer-disable-predicates
+               (lambda () meow-normal-mode))
   )
