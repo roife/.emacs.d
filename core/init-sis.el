@@ -10,15 +10,15 @@
      (if meow-insert-mode 'meow-enter-insert-mode-hook
        'meow-leave-insert-mode-hook))))
 
-(defvar meow-leave-motion-mode-hook nil
-  "Hook to run when leaving meow insert mode.")
-(defvar meow-enter-motion-mode-hook nil
-  "Hook to run when entering meow insert mode.")
-(add-hook! 'meow-motion-mode-hook
-  (defun +meow-motion-mode-run-hook-on-mode ()
-    (run-hooks
-     (if meow-motion-mode 'meow-enter-motion-mode-hook
-       'meow-leave-motion-mode-hook))))
+;; `defmacro' cannot be placed in use-package
+;; (defmacro +sis-add-post-cmd-hook! (modes func)
+;;   "Add post-command-hook to MODES."
+;;   (declare (indent defun))
+;;   (let ((func-name (cadr func)))
+;;     `(add-hook! ,modes
+;;        (defun ,(intern (format "%s-add-post-cmd-hook" func-name)) ()
+;;          (add-hook! 'post-command-hook :local
+;;            ,func)))))
 
 ;; [sis] automatically switch input source
 (use-package sis
@@ -32,39 +32,63 @@
          (after-init . sis-auto-refresh-mode)
          ;; Respect mode
          (after-init . sis-global-respect-mode)
-         )
+         ;; Colored cursor
+         (after-init . sis-global-cursor-color-mode))
   :config
   (setq sis-english-source "com.apple.keylayout.ABC"
         sis-inline-tighten-head-rule nil
-        sis-prefix-override-keys (list "C-c" "C-x" "C-h")
-        ;; remove tail space to input full-width punctuations
-        sis-inline-tighten-tail-rule 'zero)
+        sis-prefix-override-keys (list "C-c" "C-x" "C-h"))
+
+  ;; HACK: Set cursor color automatically
+  (add-hook! '+theme-changed-hook :call-immediately
+    (defun +sis-set-other-cursor-color ()
+      (setq sis-other-cursor-color (face-attribute 'success :foreground))))
+
+  ;; Add IME according to system type
   (cond
    ((eq system-type 'darwin)
     (sis-ism-lazyman-config
      "com.apple.keylayout.ABC"
-     "com.apple.inputmethod.SCIM.Shuangpin" 'emp))
+     "com.apple.inputmethod.SCIM.Shuangpin"
+     'emp))
    ((eq system-type 'gnu/linux)
     (sis-ism-lazyman-config "1" "2" 'fcitx5)))
 
-  ;; Meow
+  ;; context mode
+  ;; Meow: insert
   (add-hook 'meow-leave-insert-mode-hook #'sis-set-english)
   (add-to-list 'sis-context-hooks 'meow-enter-insert-mode-hook)
 
-  (add-hook 'meow-enter-motion-mode-hook #'sis-set-english)
-  (add-to-list 'sis-context-hooks 'meow-leave-motion-mode-hook)
-
-  ;; modes to switch to chinese input source
-  (defun +sis-switch-to-chinese-detector (&rest _)
-    (when (or (eq major-mode 'org-mode)
-              (eq major-mode 'telega-chat-mode))
+  (defun +sis-context-switching (back-detect fore-detect)
+    (when (and meow-insert-mode
+               (or (and (derived-mode-p 'org-mode 'markdown-mode 'text-mode 'fundamental-mode)
+                        (sis--context-other-p back-detect fore-detect))
+                   (and (derived-mode-p 'telega-chat-mode)
+                        (or (and (= (point) telega-chatbuf--input-marker) ; beginning of input
+                                 (eolp))
+                            (sis--context-other-p back-detect fore-detect))
+                        )))
       'other))
 
-  (add-to-list 'sis-context-detectors #'+sis-switch-to-chinese-detector)
-  (advice-add 'org-agenda-todo :before #'sis-set-english)
+  (add-to-list 'sis-context-detectors #'+sis-context-switching)
 
-  ;; WORKAROUND: disable sis in meow normal mode, since it will conflict
-  ;; with keypad mode and it is already in english im yet
-  (add-to-list 'sis-prefix-override-buffer-disable-predicates
-               (lambda () meow-normal-mode))
+  ;; inline-mode
+  (defvar-local +sis-inline-english-last-space-pos nil
+    "The last space position in inline mode.")
+  (add-hook! 'sis-inline-english-deactivated-hook
+    (defun +sis-line-set-last-space-pos ()
+      (setq +sis-inline-english-last-space-pos (point))))
+
+  (add-hook! 'sis-inline-mode-hook
+    (defun +sis-inline-add-post-self-insert-hook ()
+      (add-hook! (post-self-insert-hook) :local
+        (defun +sis-inline-remove-redundant-space ()
+          (save-excursion
+            (when (and (eq +sis-inline-english-last-space-pos (1- (point)))
+                       (looking-back " [，。？！；：]"))
+              (backward-char 2)
+              (delete-char 1)
+              (setq-local +sis-inline-english-last-space-pos nil)))
+          ))
+      ))
   )

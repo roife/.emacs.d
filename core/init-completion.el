@@ -7,8 +7,7 @@
               ("<tab>" . minibuffer-complete)
               ("C-<return>" . vertico-exit-input)
               ("C-, ." . vertico-quick-jump))
-  :hook ((after-init . vertico-mode)
-         (vertico-mode . vertico-mouse-mode))
+  :hook ((after-init . vertico-mode))
   :defines (crm-separator)
   :config
   (setq vertico-cycle t
@@ -48,6 +47,14 @@
   :hook (minibuffer-setup . vertico-repeat-save)
   :bind (:map vertico-map
               ("C-r" . vertico-repeat-select)))
+
+
+(use-package vertico-mouse
+  :straight nil
+  :after vertico
+  :custom-face
+  (vertico-mouse ((t (:inherit hl-line))))
+  :hook (vertico-mode . vertico-mouse-mode))
 
 
 (use-package orderless
@@ -185,7 +192,9 @@
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop)
          ("C-c d r"                             . consult-ripgrep)
-         ("C-c d f"                             . consult-fd))
+         ("C-c d f"                             . consult-fd)
+         :map minibuffer-mode-map
+         ("C-r" . consult-history))
   ;; :hook ((completion-list-mode . consult-preview-at-point-mode))
   :config
   (setq consult-narrow-key "<"
@@ -253,7 +262,7 @@
 ;; [corfu] compleletion frontend
 (use-package corfu
   :straight (:files (:defaults "extensions/*.el"))
-  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode) . corfu-mode)
+  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode org-mode markdown-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . +corfu-enable-in-minibuffer))
   :bind (:map corfu-map
@@ -297,7 +306,9 @@
   :straight nil
   :after corfu
   :init
-  (corfu-popupinfo-mode 1))
+  (corfu-popupinfo-mode 1)
+  :config
+  (setq corfu-popupinfo-delay '(1.0 . 1.0)))
 
 
 (use-package cape

@@ -52,7 +52,7 @@
   :hook ((minibuffer-setup . highlight-parentheses-minibuffer-setup)
          (prog-mode . highlight-parentheses-mode))
   :config
-  (setq highlight-parentheses-colors '("SpringGreen3" "IndianRed1" "IndianRed3" "IndianRed4")
+  (setq highlight-parentheses-colors '("SpringGreen3" "firebrick1" "IndianRed1" "IndianRed3")
         highlight-parentheses-attributes '((:underline t :weight bold)
                                            (:underline t :weight bold)
                                            (:underline t :weight bold))

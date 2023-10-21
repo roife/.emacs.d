@@ -35,14 +35,16 @@
 
   (add-hook! 'telega-chat-mode-hook
     (defun +telega-completion-setup ()
-      (nconc completion-at-point-functions
-             (mapcar #'cape-company-to-capf
-                     (append (list telega-emoji-company-backend
-                                   #'telega-company-username
-                                   #'telega-company-hashtag
-                                   #'telega-company-markdown-precode)
-                             (when (telega-chat-bot-p telega-chatbuf--chat)
-                               #'(telega-company-botcmd)))))
+      (make-variable-buffer-local 'completion-at-point-functions)
+      (setq completion-at-point-functions
+            (append (mapcar #'cape-company-to-capf
+                            (append (list telega-emoji-company-backend
+                                          #'telega-company-username
+                                          #'telega-company-hashtag
+                                          #'telega-company-markdown-precode)
+                                    (when (telega-chat-bot-p telega-chatbuf--chat)
+                                      #'(telega-company-botcmd))))
+                    completion-at-point-functions))
       (require 'company)
       (corfu-mode 1))
     )
