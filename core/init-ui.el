@@ -129,8 +129,7 @@
   (unless theme
     (setq theme (if (and (display-graphic-p)
                          (cond ((eq system-type 'darwin)
-                                (string= (plist-get (mac-application-state) ':appearance)
-                                         "NSAppearanceNameAqua"))
+                                (eq ns-system-appearance 'light))
                                (t t)))
                     +light-theme
                   +dark-theme)))

@@ -1,8 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 
-(setq mac-option-modifier 'meta
-      mac-command-modifier 'super
-      mac-right-command-modifier 'left)
+;; (setq mac-option-modifier 'meta
+;;       mac-command-modifier 'super
+;;       mac-right-command-modifier 'left)
 
 
 (define-key global-map [?\s-a] #'mark-whole-buffer)
@@ -23,12 +23,12 @@
   :bind (("C-c d i" . osx-dictionary-search-input)
          ("C-c d d" . osx-dictionary-search-pointer)))
 
-(add-hook! 'mac-effective-appearance-change-hook
-  (defun +mac-auto-change-theme-with-system ()
+(add-hook! 'ns-system-appearance-change-functions
+  (defun +mac-auto-change-theme-with-system (&rest _)
     (+load-theme)))
 
 ;; Selects the most-recently-used ASCII-capable keyboard input source when in chineses input mode
 ;; (mac-auto-ascii-mode)
 
-(setq mac-pass-control-to-system nil)
-(setq mac-pass-command-to-system nil)
+;; (setq mac-pass-control-to-system nil)
+;; (setq mac-pass-command-to-system nil)

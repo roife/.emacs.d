@@ -184,23 +184,23 @@
 
 
 ;; [indent-bars] Highlight indentions effectively
-(use-package indent-bars
-  :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
-  :hook (python-mode . indent-bars-mode)
-  :config
-  (setq indent-bars-display-on-blank-lines nil
-        indent-bars-width-frac 0.2
-        indent-bars-color '(highlight :face-bg t :blend 0.2)
-        indent-bars-zigzag nil
-        indent-bars-highlight-current-depth nil
-        indent-bars-pattern ".")
-
-  ;; HACK: `indent-bars' calculates its faces from the current theme,
-  ;; but it could be wrong after switching theme.
-  (add-hook! '+theme-changed-hook
-    (defun +indent-bars-auto-set-faces ()
-      (when indent-bars-mode (indent-bars-reset))))
-  )
+;; (use-package indent-bars
+;;   :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
+;;   :hook (python-mode . indent-bars-mode)
+;;   :config
+;;   (setq indent-bars-display-on-blank-lines nil
+;;         indent-bars-width-frac 0.2
+;;         indent-bars-color '(highlight :face-bg t :blend 0.2)
+;;         indent-bars-zigzag nil
+;;         indent-bars-highlight-current-depth nil
+;;         indent-bars-pattern ".")
+;;
+;;   ;; HACK: `indent-bars' calculates its faces from the current theme,
+;;   ;; but it could be wrong after switching theme.
+;;   (add-hook! '+theme-changed-hook
+;;     (defun +indent-bars-auto-set-faces ()
+;;       (when indent-bars-mode (indent-bars-reset))))
+;;   )
 
 
 ;; [symbol-overlay] Highlight symbols

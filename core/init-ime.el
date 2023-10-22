@@ -50,7 +50,7 @@
     (sis-ism-lazyman-config
      "com.apple.keylayout.ABC"
      "com.apple.inputmethod.SCIM.Shuangpin"
-     'emp))
+     'macism))
    ((eq system-type 'gnu/linux)
     (sis-ism-lazyman-config "1" "2" 'fcitx5)))
 
