@@ -125,3 +125,11 @@
 ;; translate [C-SPC] to [M-SPC] for mark
 (define-key key-translation-map (kbd "C-'") (kbd "C-SPC"))
 (bind-key "C-\"" #'pop-global-mark)
+
+
+;; Chinese prunc mapping
+(cl-loop for prefix in '("C-" "M-" "s-" "H-")
+         do
+         (cl-loop for cpunc in '("，" "。" "？" "！" "；" "：" "、" "（" "）" "【" "】" "《" "》")
+                  for epunc in '("," "." "?" "!" ";" ":" "," "(" ")" "[" "]" "<" ">")
+                  do (define-key key-translation-map (kbd (concat prefix cpunc)) (kbd (concat prefix epunc)))))

@@ -48,7 +48,7 @@
                      'init-ai
                      'init-chat
                      'init-pdf
-                     'init-sis
+                     'init-ime
 
                      ;; 'init-elfeed
                      ;; 'init-gnus
