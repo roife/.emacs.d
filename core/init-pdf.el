@@ -16,20 +16,20 @@
   )
 
 
-(use-package pdf-annot
-  :after pdf-tools
-  :init
-  (add-hook! 'kill-buffer-hook :local
-    (defun +pdf-cleanup-annot-windows ()
-      "Kill left-over annotation buffers when the document is killed."
-      (when (buffer-live-p pdf-annot-list-document-buffer)
-        (pdf-info-close pdf-annot-list-document-buffer))
-      (when (buffer-live-p pdf-annot-list-buffer)
-        (kill-buffer pdf-annot-list-buffer))
-      (let ((contents-buffer (get-buffer "*Contents*")))
-        (when (and contents-buffer (buffer-live-p contents-buffer))
-          (kill-buffer contents-buffer)))))
-  )
+;; (use-package pdf-annot
+;;   :after pdf-tools
+;;   :init
+;;   (add-hook! kill-buffer-hook :local
+;;     (defun +pdf-cleanup-annot-windows ()
+;;       "Kill left-over annotation buffers when the document is killed."
+;;       (when (buffer-live-p pdf-annot-list-document-buffer)
+;;         (pdf-info-close pdf-annot-list-document-buffer))
+;;       (when (buffer-live-p pdf-annot-list-buffer)
+;;         (kill-buffer pdf-annot-list-buffer))
+;;       (let ((contents-buffer (get-buffer "*Contents*")))
+;;         (when (and contents-buffer (buffer-live-p contents-buffer))
+;;           (kill-buffer contents-buffer)))))
+;;   )
 
 ;; [saveplace-pdf-view] Recover last viewed position
 (use-package saveplace-pdf-view

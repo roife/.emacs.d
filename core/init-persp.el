@@ -28,13 +28,13 @@
     (persp-load-state-from-file))
 
   ;; Don't save [dead] [temp] [remote]
-  (add-hook! 'persp-filter-save-buffers-functions
+  (add-hook! persp-filter-save-buffers-functions
     (defun +persp-ignore-dead-or-temp-buffers (b)
       "Ignore dead or temp buffers."
       (or (not (buffer-live-p b))
           (string-prefix-p " *" (buffer-name b)))))
 
-  (add-hook! 'persp-filter-save-buffers-functions
+  (add-hook! persp-filter-save-buffers-functions
     (defun +persp-ignore-more-temp-buffers (b)
       "Ignore more temporary buffers."
       (let ((bname (file-name-nondirectory (buffer-name b))))
@@ -46,7 +46,7 @@
             (string-match-p "\\.elc\\|\\.tar\\|\\.gz\\|\\.zip\\'" bname)
             (string-match-p "\\.bin\\|\\.so\\|\\.dll\\|\\.exe\\'" bname)))))
 
-  (add-hook! 'persp-filter-save-buffers-functions
+  (add-hook! persp-filter-save-buffers-functions
     (defun +persp-ignore-remote-buffers (buf)
       "Ignore remote buffers, which cause errors"
       (let ((dir (buffer-local-value 'default-directory buf)))
@@ -89,17 +89,17 @@
   ;; Tab bar integration
   (with-eval-after-load 'tab-bar
     ;; Save the current workspace's tab bar data.
-    (add-hook! 'persp-before-deactivate-functions
+    (add-hook! persp-before-deactivate-functions
       (defun +persp-save-tab-bar-before-switching (_)
         (set-persp-parameter 'tab-bar-tabs (tab-bar-tabs))
         (set-persp-parameter 'tab-bar-closed-tabs tab-bar-closed-tabs)))
     ;; Restores the tab bar data of the workspace we have just switched to.
-    (add-hook! 'persp-activated-functions
+    (add-hook! persp-activated-functions
       (defun +persp-restore-tab-bar-after-switching (_)
         (tab-bar-tabs-set (persp-parameter 'tab-bar-tabs))
         (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))))
 
-    (add-hook! 'persp-after-load-state-functions
+    (add-hook! persp-after-load-state-functions
       (defun +persp-load-tab-bar-config-from-file (&rest _)
         (when (and (persp-parameter 'tab-bar-tabs)
                    (not tab-bar-mode))
@@ -134,7 +134,7 @@
   (with-eval-after-load 'winner
     (add-to-list 'window-persistent-parameters '(winner-ring . t))
 
-    (add-hook! 'persp-before-deactivate-functions
+    (add-hook! persp-before-deactivate-functions
       (defun +persp-save-winner-before-switching (_)
         (when (get-current-persp)
           (set-persp-parameter
@@ -142,7 +142,7 @@
                               winner-ring-alist
                               winner-pending-undo-ring)))))
 
-    (add-hook! 'persp-activated-functions
+    (add-hook! persp-activated-functions
       (defun +persp-restore-winner-after-switching (_)
         (cl-destructuring-bind
             (currents alist pending-undo-ring)
@@ -160,7 +160,7 @@
   (add-hook 'persp-before-deactivate-functions #'deactivate-mark)
 
   ;; WORKAROUND: ace-window
-  (add-hook! 'persp-activated-functions
+  (add-hook! persp-activated-functions
     (defun +persp-update-ace-window-config (&rest _)
       (aw-update)))
   )

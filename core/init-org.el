@@ -204,7 +204,7 @@ Assume point is at first MARK."
     :config
     ;; HACK: `org-visual-indent' calculates its faces from the current theme,
     ;; but it could be wrong after switching theme.
-    (add-hook! '+theme-changed-hook :call-immediately
+    (add-hook! +theme-changed-hook :call-immediately
       (defun +org-visual-outline-indent-color-update ()
         (let (bufs)
           (dolist (buf (buffer-list))
@@ -349,7 +349,7 @@ Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
       (org-visual-indent-mode -1)
       (org-indent-mode)
 
-      (add-hook! 'meow-insert-enter-hook
+      (add-hook! meow-insert-enter-hook
         (defun +org-tree-slide-make-readonly (&rest _)
           (read-only-mode -1)) nil t)
       (add-hook 'meow-insert-exit-hook #'read-only-mode nil t)

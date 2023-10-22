@@ -5,7 +5,7 @@
   "Hook to run when leaving meow insert mode.")
 (defvar meow-enter-insert-mode-hook nil
   "Hook to run when entering meow insert mode.")
-(add-hook! 'meow-insert-mode-hook
+(add-hook! meow-insert-mode-hook
   (defun +meow-insert-mode-run-hook-on-mode ()
     (run-hooks
      (if meow-insert-mode 'meow-enter-insert-mode-hook
@@ -18,7 +18,7 @@
 ;;   (let ((func-name (cadr func)))
 ;;     `(add-hook! ,modes
 ;;        (defun ,(intern (format "%s-add-post-cmd-hook" func-name)) ()
-;;          (add-hook! 'post-command-hook :local
+;;          (add-hook! post-command-hook :local
 ;;            ,func)))))
 
 (use-package sis
@@ -40,7 +40,7 @@
         sis-prefix-override-keys (list "C-c" "C-x" "C-h" "C-,"))
 
   ;; HACK: Set cursor color automatically
-  (add-hook! '+theme-changed-hook :call-immediately
+  (add-hook! +theme-changed-hook :call-immediately
     (defun +sis-set-other-cursor-color ()
       (setq sis-other-cursor-color (face-attribute 'success :foreground))))
 
@@ -59,8 +59,8 @@
   (add-to-list 'sis-context-hooks 'meow-enter-insert-mode-hook)
 
   ;; WORKAROUND: conflicts with keypad
-  (add-hook! 'meow-leave-insert-mode-hook #'sis-prefix-override-buffer-disable)
-  (add-hook! 'meow-enter-insert-mode-hook #'sis-prefix-override-buffer-enable)
+  (add-hook! meow-leave-insert-mode-hook #'sis-prefix-override-buffer-disable)
+  (add-hook! meow-enter-insert-mode-hook #'sis-prefix-override-buffer-enable)
 
   ;; WORKAROUND: conflicts with kbd macro
   (defadvice! +sis-disable-prefix-override (&rest _)
@@ -73,7 +73,7 @@
 
   (defun +sis-context-switching (back-detect fore-detect)
     (when (and meow-insert-mode
-               (or (and (derived-mode-p 'org-mode 'markdown-mode 'text-mode 'fundamental-mode)
+               (or (and (derived-mode-p 'org-mode 'markdown-mode 'text-mode)
                         (sis--context-other-p back-detect fore-detect))
                    (and (derived-mode-p 'telega-chat-mode)
                         (or (and (= (point) telega-chatbuf--input-marker) ; beginning of input
@@ -87,12 +87,12 @@
   ;; Inline-mode
   (defvar-local +sis-inline-english-last-space-pos nil
     "The last space position in inline mode.")
-  (add-hook! 'sis-inline-english-deactivated-hook
+  (add-hook! sis-inline-english-deactivated-hook
     (defun +sis-line-set-last-space-pos ()
       (when (eq (char-before) ?\s)
           (setq +sis-inline-english-last-space-pos (point)))))
 
-  (add-hook! 'sis-inline-mode-hook
+  (add-hook! sis-inline-mode-hook
     (defun +sis-inline-add-post-self-insert-hook ()
       (add-hook! (post-self-insert-hook) :local
         (defun +sis-inline-remove-redundant-space ()

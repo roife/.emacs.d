@@ -90,7 +90,7 @@
         (push `(,keyword . ,color) hl-todo-keyword-faces))))
 
   ;; HACK: `hl-todo' won't update face when changing theme, so we must add a hook for it
-  (add-hook! '+theme-changed-hook :call-immediately
+  (add-hook! +theme-changed-hook :call-immediately
     (defun +hl-update-keyword-faces ()
       (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
       (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning))))
@@ -197,7 +197,7 @@
 ;;
 ;;   ;; HACK: `indent-bars' calculates its faces from the current theme,
 ;;   ;; but it could be wrong after switching theme.
-;;   (add-hook! '+theme-changed-hook
+;;   (add-hook! +theme-changed-hook
 ;;     (defun +indent-bars-auto-set-faces ()
 ;;       (when indent-bars-mode (indent-bars-reset))))
 ;;   )

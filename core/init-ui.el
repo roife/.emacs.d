@@ -92,7 +92,7 @@
 ;; Font: Same width and height for emoji, chinese and english characters
 (defvar +font-size (if (eq system-type 'darwin) 15 26))
 
-(add-hook! 'server-after-make-frame-hook :call-immediately
+(add-hook! server-after-make-frame-hook :call-immediately
   (defun +setup-fonts ()
     "Setup fonts."
     (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-size))

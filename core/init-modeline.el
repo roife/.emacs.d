@@ -97,7 +97,7 @@
 
 ;;; Cache remote host name
 (defvar-local +mode-line-remote-host-name nil)
-(add-hook! 'find-file-hook
+(add-hook! find-file-hook
   (defun +mode-line-update-remote-host-name ()
     "Hostname for remote buffers."
     (setq +mode-line-remote-host-name
@@ -109,7 +109,7 @@
 
 ;;; Cache flymake report
 (defvar-local +mode-line-flymake-indicator nil)
-(add-hook! 'flymake-mode-hook
+(add-hook! flymake-mode-hook
   (defun +mode-line-update-flymake (&rest _)
     "Display flymake info for current buffer."
     (setq +mode-line-flymake-indicator
@@ -125,7 +125,7 @@
 
 ;;; Cache encoding info
 (defvar-local +mode-line-encoding nil)
-(add-hook! 'find-file-hook
+(add-hook! find-file-hook
   (defun +mode-line-update-encoding (&rest _)
     "Get encoding and EOL type of current buffer."
     (setq +mode-line-encoding

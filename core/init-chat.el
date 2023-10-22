@@ -33,7 +33,7 @@
   ;; completion
   (setq telega-emoji-company-backend #'telega-company-emoji)
 
-  (add-hook! 'telega-chat-mode-hook
+  (add-hook! telega-chat-mode-hook
     (defun +telega-completion-setup ()
       (make-variable-buffer-local 'completion-at-point-functions)
       (setq completion-at-point-functions

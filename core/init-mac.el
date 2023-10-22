@@ -23,7 +23,7 @@
   :bind (("C-c d i" . osx-dictionary-search-input)
          ("C-c d d" . osx-dictionary-search-pointer)))
 
-(add-hook! 'ns-system-appearance-change-functions
+(add-hook! ns-system-appearance-change-functions
   (defun +mac-auto-change-theme-with-system (&rest _)
     (+load-theme)))
 

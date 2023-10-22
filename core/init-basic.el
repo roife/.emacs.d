@@ -174,7 +174,7 @@
   (add-to-list 'recentf-filename-handlers #'substring-no-properties)
 
   ;; Add dired directories to recentf file list.
-  (add-hook! 'dired-mode-hook
+  (add-hook! dired-mode-hook
     (defun +dired--add-to-recentf-h ()
       (recentf-add-file default-directory)))
   )
@@ -194,7 +194,7 @@
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
 
   ;; HACK: Remove text properties from variables to reduce savehist cache size.
-  (add-hook! 'savehist-save-hook
+  (add-hook! savehist-save-hook
     (defun +savehist--remove-string-properties-h ()
       (setq kill-ring (mapcar #'substring-no-properties
                               (cl-remove-if-not #'stringp kill-ring))
