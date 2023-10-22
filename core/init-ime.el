@@ -58,6 +58,19 @@
   (add-hook 'meow-leave-insert-mode-hook #'sis-set-english)
   (add-to-list 'sis-context-hooks 'meow-enter-insert-mode-hook)
 
+  ;; WORKAROUND: conflicts with keypad
+  (add-hook! 'meow-leave-insert-mode-hook #'sis-prefix-override-buffer-disable)
+  (add-hook! 'meow-enter-insert-mode-hook #'sis-prefix-override-buffer-enable)
+
+  ;; WORKAROUND: conflicts with kbd macro
+  (defadvice! +sis-disable-prefix-override (&rest _)
+    :before #'start-kbd-macro
+    (sis-prefix-override-buffer-disable))
+  (defadvice! +sis-enable-prefix-override (&rest _)
+    :before #'end-kbd-macro
+    (when (bound-and-true-p meow-insert-mode)
+      (sis-prefix-override-buffer-enable)))
+
   (defun +sis-context-switching (back-detect fore-detect)
     (when (and meow-insert-mode
                (or (and (derived-mode-p 'org-mode 'markdown-mode 'text-mode 'fundamental-mode)

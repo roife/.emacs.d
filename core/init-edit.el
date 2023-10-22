@@ -130,6 +130,6 @@
 ;; Chinese prunc mapping
 (cl-loop for prefix in '("C-" "M-" "s-" "H-")
          do
-         (cl-loop for cpunc in '("，" "。" "？" "！" "；" "：" "、" "（" "）" "【" "】" "《" "》")
-                  for epunc in '("," "." "?" "!" ";" ":" "," "(" ")" "[" "]" "<" ">")
+         (cl-loop for cpunc in '("，" "。" "？" "！" "；" "：" "、" "（" "）" "【" "】" "《" "》" "—")
+                  for epunc in '("," "." "?" "!" ";" ":" "," "(" ")" "[" "]" "<" ">" "_")
                   do (define-key key-translation-map (kbd (concat prefix cpunc)) (kbd (concat prefix epunc)))))
