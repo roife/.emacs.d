@@ -122,8 +122,9 @@
                    (warning (when (and warning-count (not (string= warning-count "0")))
                               (propertize warning-count 'face '(:inherit compilation-warning))))
                    (note (when (and note-count (not (string= note-count "0")))
-                           (propertize note-count 'face '(:inherit compilation-info)))))
-              (concat " " (string-join (remove nil (list err warning note)) "/")))))))
+                           (propertize note-count 'face '(:inherit compilation-info))))
+                   (info (string-join (remove nil (list err warning note)) "/")))
+              (when (not (string-empty-p info)) (concat " !" info)))))))
 (advice-add #'flymake--handle-report :after #'+mode-line-update-flymake)
 
 ;;; Cache encoding info

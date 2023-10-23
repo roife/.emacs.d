@@ -103,6 +103,7 @@
     ;; font for emoji, set as unicode to cover more chars
     (set-fontset-font t 'unicode (font-spec :family "Symbola") nil 'prepend)
     (set-fontset-font t 'unicode (font-spec :family "Apple Color Emoji") nil 'prepend)
+    (set-fontset-font t 'unicode (font-spec :family "Symbola") nil 'prepend)
     (setq face-font-rescale-alist '(("Apple Color Emoji" . 0.79)))
 
     (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
