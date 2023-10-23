@@ -1,7 +1,7 @@
 # Prerequisite
 
 - Font
-  + `Apple Color Emoji`
+  + `Apple Color Emoji` / `Noto Color Emoji`
   + `Sarasa Gothic`
   + `Symbola`
 - `rg`

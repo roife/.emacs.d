@@ -138,12 +138,9 @@
 
 
 ;; Encoding & locale
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
+(set-locale-environment "en_US.UTF-8")
 (setq-default default-input-method nil)
-
+(setq system-time-locale "C")
 
 ;; History
 ;;; [save-place-mode] save place lastly visited
