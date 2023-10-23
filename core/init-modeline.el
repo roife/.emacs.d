@@ -224,12 +224,12 @@
                 " "
                 (:eval +mode-line-encoding)
                 ,(or +mode-line-pdf-pages
-                     (list "%l " '(-3 "%p") "%%"))
+                     (list "%l "))
                 ))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
     `(,lhs
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
+      ,(propertize " " 'display `((space :align-to (- (+ 1 right right-fringe right-margin) ,rhs-w))))
       ,rhs-str)))
 
 (setq-default mode-line-format
@@ -249,7 +249,7 @@
   :commands breadcrumb--header-line
   :config
   (setq breadcrumb-imenu-crumb-separator "▸"
-        breadcrumb-project-max-length 0.3
+        breadcrumb-project-max-length 0.4
         breadcrumb-imenu-max-length 0.3
         breadcrumb-idle-time 10))
 

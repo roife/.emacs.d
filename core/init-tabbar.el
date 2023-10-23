@@ -139,6 +139,10 @@
     (or +tab-bar-telega-indicator-cache
         (+tab-bar-telega-icon-update))))
 
+(defun +tab-bar-copilot-icon ()
+  (when (bound-and-true-p copilot-mode)
+    (propertize " ◦ " 'face '(:inherit font-lock-doc-face :inverse-video t))))
+
 ;; cache for org-pomodoro
 (with-eval-after-load 'org-pomodoro
   (defvar +tab-bar-org-pomodoro-indicator-cache nil)
@@ -175,6 +179,7 @@
   (setq tab-bar-format '(tab-bar-format-tabs tab-bar-separator
                                              tab-bar-format-align-right
                                              +tab-bar-org-pomodoro-indicator
+                                             +tab-bar-copilot-icon
                                              +tab-bar-telega-icon
                                              +tab-bar-persp-indicator
                                              meow-indicator))

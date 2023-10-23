@@ -219,6 +219,7 @@
    consult-bookmark consult-recent-file
    consult--source-recent-file
    consult--source-project-recent-file consult--source-bookmark
+   consult-buffer
    :preview-key "s-p")
   (consult-customize
    consult-theme
