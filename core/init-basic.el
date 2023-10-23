@@ -21,9 +21,9 @@
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
  auto-save-list-file-prefix (expand-file-name "autosaves/" user-emacs-directory)
  auto-save-file-name-transforms (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
-                                            ;; Prefix tramp autosaves to prevent conflicts with local ones
-                                            (concat auto-save-list-file-prefix "tramp-\\2") t)
-                                      (list ".*" auto-save-list-file-prefix t))
+                        ;; Prefix tramp autosaves to prevent conflicts with local ones
+                        (concat auto-save-list-file-prefix "tramp-\\2") t)
+                      (list ".*" auto-save-list-file-prefix t))
 
  ;; Disable [bidirectional text] scanning for a modest performance
  ;; Will improve long line display performance
@@ -137,8 +137,11 @@
     (apply fn args)))
 
 
-;; Encoding
-(set-language-environment "UTF-8")
+;; Encoding & locale
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
 (setq-default default-input-method nil)
 
 
@@ -159,13 +162,13 @@
   :hook (after-init . recentf-mode)
   :config
   (setq recentf-auto-cleanup 'never
-        recentf-max-saved-items 200
-        recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-                              "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                              "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
-                              (lambda (file) (file-in-directory-p file package-user-dir))
-                              (expand-file-name recentf-save-file))
-        recentf-keep nil)
+    recentf-max-saved-items 200
+    recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+                  "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                  "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                  (lambda (file) (file-in-directory-p file package-user-dir))
+                  (expand-file-name recentf-save-file))
+    recentf-keep nil)
 
   (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
 
@@ -185,10 +188,10 @@
   :hook (after-init . savehist-mode)
   :config
   (setq savehist-additional-variables '(mark-ring global-mark-ring
-                                                  search-ring
-                                                  regexp-search-ring
-                                                  kill-ring)
-        savehist-autosave-interval 300)
+                          search-ring
+                          regexp-search-ring
+                          kill-ring)
+    savehist-autosave-interval 300)
 
   (with-eval-after-load 'vertico
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
@@ -197,11 +200,11 @@
   (add-hook! savehist-save-hook
     (defun +savehist--remove-string-properties-h ()
       (setq kill-ring (mapcar #'substring-no-properties
-                              (cl-remove-if-not #'stringp kill-ring))
-            register-alist (cl-loop for (reg . item) in register-alist
-                                    if (stringp item)
-                                    collect (cons reg (substring-no-properties item))
-                                    else collect (cons reg item)))))
+                  (cl-remove-if-not #'stringp kill-ring))
+        register-alist (cl-loop for (reg . item) in register-alist
+                    if (stringp item)
+                    collect (cons reg (substring-no-properties item))
+                    else collect (cons reg item)))))
   )
 
 
@@ -263,8 +266,8 @@
   :hook (emacs-startup . gcmh-mode)
   :config
   (setq gcmh-idle-delay 'auto
-        gcmh-auto-idle-delay-factor 10
-        gcmh-high-cons-threshold #x64000000)
+    gcmh-auto-idle-delay-factor 10
+    gcmh-high-cons-threshold #x64000000)
   )
 
 
@@ -272,9 +275,9 @@
 (use-package tramp
   :config
   (setq tramp-default-method "ssh"
-        tramp-auto-save-directory (expand-file-name "tramp-autosaves/" user-emacs-directory)
-        tramp-backup-directory-alist backup-directory-alist
-        remote-file-name-inhibit-cache 60)
+    tramp-auto-save-directory (expand-file-name "tramp-autosaves/" user-emacs-directory)
+    tramp-backup-directory-alist backup-directory-alist
+    remote-file-name-inhibit-cache 60)
   )
 
 
@@ -282,10 +285,10 @@
 (use-package minibuffer
   :config
   (setq minibuffer-depth-indicate-mode t
-        minibuffer-default-prompt-format " [%s]" ; shorten " (default %s)" => " [%s]"
-        minibuffer-electric-default-mode t
-        minibuffer-follows-selected-frame nil ; One frame one minibuffer.
-        )
+    minibuffer-default-prompt-format " [%s]" ; shorten " (default %s)" => " [%s]"
+    minibuffer-electric-default-mode t
+    minibuffer-follows-selected-frame nil ; One frame one minibuffer.
+    )
   )
 
 
@@ -293,10 +296,10 @@
 (use-package comint
   :config
   (setq comint-prompt-read-only t
-        comint-buffer-maximum-size 2048
+    comint-buffer-maximum-size 2048
 
-        ;; No paging, `eshell' and `shell' will honoring.
-        comint-pager "cat"
+    ;; No paging, `eshell' and `shell' will honoring.
+    comint-pager "cat"
 
-        ;; better history search
-        comint-history-isearch 'dwim))
+    ;; better history search
+    comint-history-isearch 'dwim))
