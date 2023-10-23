@@ -124,7 +124,7 @@
                    (note (when (and note-count (not (string= note-count "0")))
                            (propertize note-count 'face '(:inherit compilation-info))))
                    (info (string-join (remove nil (list err warning note)) "/")))
-              (when (not (string-empty-p info)) (concat " !" info)))))))
+              info)))))
 (advice-add #'flymake--handle-report :after #'+mode-line-update-flymake)
 
 ;;; Cache encoding info
@@ -149,20 +149,20 @@
 
 ;;; Cache pdf-tools info
 (defvar-local +mode-line-pdf-pages nil)
-(defun +mode-line-update-pdf-pages ()
-  "Update PDF pages."
-  (when (eq major-mode 'pdf-view-mode)
-    (setq +mode-line-pdf-pages
-          (format "p%d/%d "
-                  (or (eval `(pdf-view-current-page)) 0)
-                  (pdf-cache-number-of-pages)))))
-(add-hook 'pdf-view-change-page-hook #'+mode-line-update-pdf-pages)
+(add-hook! pdf-view-change-page-hook
+  (defun +mode-line-update-pdf-pages ()
+    "Update PDF pages."
+    (when (eq major-mode 'pdf-view-mode)
+      (setq +mode-line-pdf-pages
+            (format "p%d/%d "
+                    (or (eval `(pdf-view-current-page)) 0)
+                    (pdf-cache-number-of-pages))))))
 
 
 ;;; [vcs-info] cache for vcs
 (defvar-local +mode-line-vcs-info nil)
 (add-hook! (find-file-hook after-save-hook)
-  (defsubst +mode-line-update-vcs-info ()
+  (defun +mode-line-update-vcs-info ()
     (when (and vc-mode buffer-file-name)
       (setq +mode-line-vcs-info
             (let* ((backend (vc-backend buffer-file-name))
@@ -192,6 +192,17 @@
                                   'face face
                                   'help-echo (get-text-property 1 'help-echo vc-mode))))))))
 (advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
+
+
+;; [buffer position]
+(defsubst +mode-line-buffer-position ()
+  (let ((pos (format-mode-line '(-3 "%p"))))
+    (pcase pos
+      ("Top" "⊤")
+      ("Bot" "⊥")
+      ("All" "A")
+      (_ (let ((first-char (substring pos 0 1)))
+           (if (string= first-char " ") "0" first-char))))))
 
 
 (defsubst +mode-line-compute ()
@@ -225,12 +236,13 @@
                 " "
                 (:eval +mode-line-encoding)
                 ,(or +mode-line-pdf-pages
-                     (list "%l "))
+                     (list "%l⋅" '(:eval (+mode-line-buffer-position))))
+                " "
                 ))
          (rhs-str (format-mode-line rhs))
          (rhs-w (string-width rhs-str)))
     `(,lhs
-      ,(propertize " " 'display `((space :align-to (- (+ 1 right right-fringe right-margin) ,rhs-w))))
+      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
       ,rhs-str)))
 
 (setq-default mode-line-format
