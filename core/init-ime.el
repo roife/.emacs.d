@@ -37,7 +37,8 @@
   :config
   (setq sis-english-source "com.apple.keylayout.ABC"
         sis-inline-tighten-head-rule nil
-        sis-prefix-override-keys (list "C-c" "C-x" "C-h" "C-,"))
+        sis-prefix-override-keys (list "C-c" "C-x" "C-h" "C-,")
+        sis-external-ism "im-select")
 
   ;; HACK: Set cursor color automatically
   (add-hook! +theme-changed-hook :call-immediately
@@ -49,8 +50,7 @@
    ((eq system-type 'darwin)
     (sis-ism-lazyman-config
      "com.apple.keylayout.ABC"
-     "com.apple.inputmethod.SCIM.Shuangpin"
-     'macism))
+     "com.apple.inputmethod.SCIM.Shuangpin"))
    ((eq system-type 'gnu/linux)
     (sis-ism-lazyman-config "1" "2" 'fcitx5)))
 

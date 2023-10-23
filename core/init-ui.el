@@ -114,6 +114,10 @@
         mouse-wheel-progressive-speed nil))
 
 ;; Load theme
+;; Don't prompt to confirm theme safety. This avoids problems with
+;; first-time startup on Emacs > 26.3.
+(setq custom-safe-themes t)
+
 (use-package doom-themes
   :straight t
   :config

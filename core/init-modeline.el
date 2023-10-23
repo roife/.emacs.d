@@ -117,10 +117,13 @@
             (let* ((err-count (cadadr (flymake--mode-line-counter :error)))
                    (warning-count (cadadr (flymake--mode-line-counter :warning)))
                    (note-count (cadadr (flymake--mode-line-counter :note)))
-                   (err (when err-count (propertize err-count 'face '(:inherit compilation-error))))
-                   (warning (when warning-count (concat "/" (propertize warning-count 'face '(:inherit compilation-warning)))))
-                   (note (when note-count (concat "/" (propertize note-count 'face '(:inherit compilation-info))))))
-              (concat " " err warning note))))))
+                   (err (when (and err-count (not (string= err-count "0")))
+                          (propertize err-count 'face '(:inherit compilation-error))))
+                   (warning (when (and warning-count (not (string= warning-count "0")))
+                              (propertize warning-count 'face '(:inherit compilation-warning))))
+                   (note (when (and note-count (not (string= note-count "0")))
+                           (propertize note-count 'face '(:inherit compilation-info)))))
+              (concat " " (string-join (remove nil (list err warning note)) "/")))))))
 (advice-add #'flymake--handle-report :after #'+mode-line-update-flymake)
 
 ;;; Cache encoding info
@@ -155,6 +158,41 @@
 (add-hook 'pdf-view-change-page-hook #'+mode-line-update-pdf-pages)
 
 
+;;; [vcs-info] cache for vcs
+(defvar-local +mode-line-vcs-info nil)
+(add-hook! (find-file-hook after-save-hook)
+  (defsubst +mode-line-update-vcs-info ()
+    (when (and vc-mode buffer-file-name)
+      (setq +mode-line-vcs-info
+            (let* ((backend (vc-backend buffer-file-name))
+                   (state   (vc-state buffer-file-name backend))
+                   (rev     (if +mode-line-show-common-vc-tools-name
+                                (substring-no-properties vc-mode 1)
+                              (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))))
+                   (face (cond ((eq state 'up-to-date) 'vc-dir-status-up-to-date)
+                               ((eq state 'ignored) 'vc-dir-status-ignored)
+                               ((memq state '(needs-update needs-merge conflict missing)) 'vc-dir-status-warning)
+                               (t 'vc-dir-status-edited)))
+                   (state-symbol (cond ((eq state 'up-to-date) "√")
+                                       ((eq state 'edited) "*")
+                                       ((eq state 'added) "@")
+                                       ((eq state 'needs-update) "￬")
+                                       ((eq state 'needs-merge) "&")
+                                       ((eq state 'unlocked-changes) "")
+                                       ((eq state 'removed) "×")
+                                       ((eq state 'conflict) "!")
+                                       ((eq state 'missing) "?")
+                                       ((eq state 'ignored) "-")
+                                       ((eq state 'unregistered) "+")
+                                       ((stringp state) (concat "#" state ":"))
+                                       (t " "))))
+              (concat " "
+                      (propertize (concat rev state-symbol)
+                                  'face face
+                                  'help-echo (get-text-property 1 'help-echo vc-mode))))))))
+(advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
+
+
 (defsubst +mode-line-compute ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
@@ -179,9 +217,7 @@
                                                (breadcrumb-imenu-crumbs))))
                          (concat "▸" imenu)))
                 ))
-         (rhs `((,active-p ,meow
-                           (:propertize ,meow face nil))
-                (:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
+         (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
                 (,active-p ,+mode-line-vcs-info
                            (:propertize ,+mode-line-vcs-info face nil))
                 (,active-p ,+mode-line-flymake-indicator)
@@ -214,44 +250,7 @@
   :config
   (setq breadcrumb-imenu-crumb-separator "▸"
         breadcrumb-project-max-length 0.3
-        breadcrumb-imenu-max-length 0.2
+        breadcrumb-imenu-max-length 0.3
         breadcrumb-idle-time 10))
-
-
-;; [vcs-info] cache for vcs
-(defvar-local +mode-line-vcs-info nil)
-(add-hook! (find-file-hook after-save-hook)
-  (defsubst +mode-line-update-vcs-info ()
-    (when (and vc-mode buffer-file-name)
-      (setq +mode-line-vcs-info
-            (let* ((backend (vc-backend buffer-file-name))
-                   (state   (vc-state buffer-file-name backend))
-                   (rev     (if +mode-line-show-common-vc-tools-name
-                                (substring-no-properties vc-mode 1)
-                              (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))))
-                   (face (cond ((eq state 'up-to-date) 'vc-dir-status-up-to-date)
-                               ((eq state 'ignored) 'vc-dir-status-ignored)
-                               ((memq state '(needs-update needs-merge conflict missing)) 'vc-dir-status-warning)
-                               (t 'vc-dir-status-edited)))
-                   (state-symbol (cond ((eq state 'up-to-date) "√")
-                                       ((eq state 'edited) "*")
-                                       ((eq state 'added) "@")
-                                       ((eq state 'needs-update) "￬")
-                                       ((eq state 'needs-merge) "&")
-                                       ((eq state 'unlocked-changes) "")
-                                       ((eq state 'removed) "×")
-                                       ((eq state 'conflict) "!")
-                                       ((eq state 'missing) "?")
-                                       ((eq state 'ignored) "-")
-                                       ((eq state 'unregistered) "+")
-                                       ((stringp state) (concat "#" state ":"))
-                                       (t " "))))
-              (concat " "
-                      (propertize (concat rev state-symbol)
-                                  'face face
-                                  'help-echo (get-text-property 1 'help-echo vc-mode)
-                                  'local-map vc-mode-line-map
-                                  'mouse-face 'mode-line-highlight)))))))
-(advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
 
 (setq-default header-line-format nil)

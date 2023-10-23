@@ -7,17 +7,17 @@
   :hook (after-init . meow-global-mode)
   :demand t
   :custom-face
-  (meow-normal-indicator ((t (:inherit (font-lock-function-name-face bold)))))
-  (meow-insert-indicator ((t (:inherit (font-lock-keyword-face bold)))))
-  (meow-keypad-indicator ((t (:inherit (font-lock-builtin-face bold)))))
-  (meow-beacon-indicator ((t (:inherit (font-lock-type-face bold)))))
-  (meow-motion-indicator ((t (:inherit (font-lock-doc-face bold)))))
+  (meow-normal-indicator ((t (:inherit (font-lock-function-name-face bold :inverse-video t)))))
+  (meow-insert-indicator ((t (:inherit (font-lock-keyword-face bold :inverse-video t)))))
+  (meow-keypad-indicator ((t (:inherit (font-lock-builtin-face bold :inverse-video t)))))
+  (meow-beacon-indicator ((t (:inherit (font-lock-type-face bold :inverse-video t)))))
+  (meow-motion-indicator ((t (:inherit (font-lock-doc-face bold :inverse-video t)))))
   :config
-  (setq-default meow-replace-state-name-list '((normal . "<N>")
-                                               (motion . "<M>")
-                                               (keypad . "<K>")
-                                               (insert . "<I>")
-                                               (beacon . "<B>")))
+  (setq-default meow-replace-state-name-list '((normal . "N")
+                                               (motion . "M")
+                                               (keypad . "K")
+                                               (insert . "I")
+                                               (beacon . "B")))
 
   ;; [motion]
   (meow-motion-overwrite-define-key

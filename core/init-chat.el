@@ -15,11 +15,12 @@
   (setq telega-chat-show-avatars nil
         telega-user-show-avatars nil
         telega-root-show-avatars nil
-        telega-chat-fill-column 58
+        telega-chat-fill-column 55
         telega-translate-to-language-by-default "zh"
         telega-chat-input-markups '(nil "org")
         telega-chat-prompt-format "▶ "
         telega-completing-read-function completing-read-function
+        telega-chat-folder-format nil
         ;; avoid emoji display problem
         telega-emoji-use-images nil
         ;; add double lines before reply box

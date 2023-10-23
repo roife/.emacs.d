@@ -106,19 +106,27 @@
                  ;; unread
                  (unmuted-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
                  (mentioned-unmuted-chats (telega-filter-chats telega--ordered-chats '(and mention unmuted)))
-                 (true-unmuted-count (- unmuted-count (length mentioned-unmuted-chats))))
+                 (true-unmuted-count (- unmuted-count (length mentioned-unmuted-chats)))
+                 (text (propertize (concat " " telega-symbol-telegram " "
+                                           (when (> true-unmuted-count 0)
+                                             (concat "●" (number-to-string true-unmuted-count) " "))
+                                           (when (> mentioned-count 0)
+                                             (concat "@" (number-to-string mentioned-count) " "))
+                                           (when (> reactions-count 0)
+                                             (concat "❤" (number-to-string reactions-count) " ")))
+                                   'face `(:inherit font-lock-keyword-face :inverse-video ,online-p)))
+                 (first-name (plist-get me-user :first_name))
+                 (last-name (plist-get me-user :last_name))
+                 (help-echo (concat "Current User: " first-name " " last-name "\n"
+                                    "Status: " (if online-p "online" "offline"))))
             (setq +tab-bar-telega-indicator-cache
-                  (propertize (concat " " telega-symbol-telegram " "
-                                      (when (> true-unmuted-count 0)
-                                        (concat "●" (number-to-string true-unmuted-count) " "))
-                                      (when (> mentioned-count 0)
-                                        (concat "@" (number-to-string mentioned-count) " "))
-                                      (when (> reactions-count 0)
-                                        (concat "❤" (number-to-string reactions-count) " ")))
-                              'face `(:inherit font-lock-keyword-face :inverse-video ,online-p))))
+                  `((tab-bar-persp menu-item
+                                   ,text
+                                   ignore
+                                   :help ,help-echo))))
           (force-mode-line-update t)
           +tab-bar-telega-indicator-cache)
-      ))
+        ))
 
   (advice-add 'telega--on-updateUserStatus :after #'+tab-bar-telega-icon-update)
   (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
@@ -168,7 +176,8 @@
                                              tab-bar-format-align-right
                                              +tab-bar-org-pomodoro-indicator
                                              +tab-bar-telega-icon
-                                             +tab-bar-persp-indicator))
+                                             +tab-bar-persp-indicator
+                                             meow-indicator))
   (tab-bar--update-tab-bar-lines))
 
 ;; WORKAROUND: fresh tab-bar for daemon
