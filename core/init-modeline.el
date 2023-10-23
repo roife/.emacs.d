@@ -200,7 +200,7 @@
     (pcase pos
       ("Top" "⊤")
       ("Bot" "⊥")
-      ("All" "A")
+      ("All" "∀")
       (_ (let ((first-char (substring pos 0 1)))
            (if (string= first-char " ") "0" first-char))))))
 

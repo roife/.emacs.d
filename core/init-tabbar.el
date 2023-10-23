@@ -141,7 +141,7 @@
 
 (defun +tab-bar-copilot-icon ()
   (when (bound-and-true-p copilot-mode)
-    (propertize " © " 'face '(:inherit font-lock-doc-face :inverse-video t))))
+    (propertize " α " 'face '(:inherit font-lock-doc-face :inverse-video t))))
 
 ;; cache for org-pomodoro
 (with-eval-after-load 'org-pomodoro
