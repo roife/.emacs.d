@@ -9,7 +9,9 @@
   (defun +meow-insert-mode-run-hook-on-mode ()
     (run-hooks
      (if meow-insert-mode 'meow-enter-insert-mode-hook
-       'meow-leave-insert-mode-hook))))
+       'meow-leave-insert-mode-hook))
+    )
+  )
 
 ;; `defmacro' cannot be placed in use-package
 ;; (defmacro +sis-add-post-cmd-hook! (modes func)
@@ -43,7 +45,7 @@
   ;; HACK: Set cursor color automatically
   (add-hook! +theme-changed-hook :call-immediately
     (defun +sis-set-other-cursor-color ()
-      (setq sis-other-cursor-color (face-attribute 'success :foreground))))
+      (setq sis-other-cursor-color (face-foreground 'success nil t))))
 
   ;; Add IME according to system type
   (cond
@@ -77,10 +79,11 @@
       (sis-prefix-override-buffer-enable)))
 
   ;; HACK: Ignore some mode with context mode
-  (defadvice! +sis-context-guess-ignore-modes (_)
+  (defadvice! +sis-context-guess-ignore-modes (fn &rest args)
     :around #'sis--context-guess
-    (when (derived-mode-p 'pdf-view-mode)
-      'english))
+    (if (derived-mode-p 'pdf-view-mode)
+        'english
+      (apply fn args)))
 
   (defun +sis-context-switching-other (back-detect fore-detect)
     (when (and meow-insert-mode

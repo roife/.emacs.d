@@ -313,6 +313,13 @@
   (setq corfu-popupinfo-delay '(1.0 . 1.0)))
 
 
+(use-package corfu-quick
+  :straight nil
+  :after corfu
+  :bind (:map corfu-map
+              ("C-, ," . corfu-quick-complete)))
+
+
 (use-package cape
   :straight t
   :hook ((corfu-mode . +corfu-add-cape-backends)

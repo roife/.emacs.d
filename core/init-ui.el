@@ -100,7 +100,8 @@
     (set-face-font 'fixed-pitch-serif "Sarasa Term Slab SC")
     (set-face-font 'variable-pitch "Sarasa UI SC")
 
-    (set-fontset-font t 'han (font-spec :family "Sarasa Term SC"))
+    (dolist (charset '(han cjk-misc))
+      (set-fontset-font t charset (font-spec :family "Sarasa Term SC")))
 
     ;; font for emoji, set as unicode to cover more chars
     (if (eq system-type 'darwin)
