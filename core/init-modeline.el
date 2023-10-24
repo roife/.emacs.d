@@ -124,7 +124,7 @@
                    (note (when (and note-count (not (string= note-count "0")))
                            (propertize note-count 'face '(:inherit compilation-info))))
                    (info (string-join (remove nil (list err warning note)) "/")))
-              info)))))
+              (when (not (string-empty-p info)) (concat " " info)))))))
 (advice-add #'flymake--handle-report :after #'+mode-line-update-flymake)
 
 ;;; Cache encoding info

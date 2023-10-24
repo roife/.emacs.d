@@ -7,5 +7,5 @@ org-mode markdown-mode
 (brace "\\{" p "\\}")
 (rcd "\\{" p "_{" (s v) "}^{" v " \\in 1 \\dots " p "}" "\\} ")
 (trcd "\\{" p "_{" (s v) "} : " p "_{" v "}^{" v " \\in 1 \\dots " p "}" "\\} ")
-(ifo "\\(" p "\\)")
-(fo "\\[" n p n "\\]")
+(ifo "\\( " p " \\)")
+(fo "\\[ " n p n " \\]")

@@ -61,6 +61,11 @@
   ;; WORKAROUND: conflicts with keypad
   (add-hook! meow-leave-insert-mode-hook #'sis-prefix-override-buffer-disable)
   (add-hook! meow-enter-insert-mode-hook #'sis-prefix-override-buffer-enable)
+  (add-hook! (meow-normal-mode meow-motion-mode)
+    (defun +sis-meow-set-english ()
+      (when (or meow-normal-mode
+                meow-motion-mode)
+        (sis-set-english))))
 
   ;; WORKAROUND: conflicts with kbd macro
   (defadvice! +sis-disable-prefix-override (&rest _)
@@ -71,7 +76,13 @@
     (when (bound-and-true-p meow-insert-mode)
       (sis-prefix-override-buffer-enable)))
 
-  (defun +sis-context-switching (back-detect fore-detect)
+  ;; HACK: Ignore some mode with context mode
+  (defadvice! +sis-context-guess-ignore-modes (_)
+    :around #'sis--context-guess
+    (when (derived-mode-p 'pdf-view-mode)
+      'english))
+
+  (defun +sis-context-switching-other (back-detect fore-detect)
     (when (and meow-insert-mode
                (or (and (derived-mode-p 'org-mode 'markdown-mode 'text-mode)
                         (sis--context-other-p back-detect fore-detect))
@@ -82,7 +93,7 @@
                         )))
       'other))
 
-  (add-to-list 'sis-context-detectors #'+sis-context-switching)
+  (add-to-list 'sis-context-detectors #'+sis-context-switching-other)
 
   ;; Inline-mode
   (defvar-local +sis-inline-english-last-space-pos nil

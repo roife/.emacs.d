@@ -242,8 +242,9 @@
 
 (use-package tempel
   :straight t
-  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-         ("M-*" . tempel-insert))
+  :bind (:map tempel-map
+              ("TAB" . tempel-next)
+              ("S-<tab>" . tempel-previous))
   :hook (((prog-mode text-mode) . +tempel-setup-capf)
          ((prog-mode text-mode) . tempel-abbrev-mode))
   :config
