@@ -1,8 +1,16 @@
 ;;; -*- lexical-binding: t -*-
 
 (use-package ibuffer
-  :bind (("C-x C-b" . ibuffer))
+  :bind (("C-x C-b" . ibuffer)
+         :map ibuffer-mode-map
+         ("RET" . +ibuffer-visit-buffer-in-popper))
   :config
+  (defun +ibuffer-visit-buffer-in-popper ()
+    (interactive)
+    (if (window-parameter nil 'window-side)
+        (ibuffer-visit-buffer-other-window)
+      (ibuffer-visit-buffer)))
+
   (setq ibuffer-show-empty-filter-groups nil
         ibuffer-use-other-window t)
   )
@@ -31,7 +39,7 @@
                            (mode . eww-buffers-mode)
                            (mode . eww-search-annotations-mode)))
           (chatgpt-filter '(mode . chatgpt-shell-mode))
-          (eshell-popup-filter '(name . "^\\*eshell-popup\\*$"))
+          (eshell-pop-filter '(name . "^\\*Eshell-pop\\*$"))
           (telega-filter '(or (mode . telega-chat-mode)
                               (mode . telega-root-mode)
                               (mode . telega-image-mode)
@@ -48,7 +56,7 @@
       (add-to-list 'ibuffer-filter-groups (list "Xwidget" xwidget-filter))
       (add-to-list 'ibuffer-filter-groups (list "Ebib" ebib-filter))
       (add-to-list 'ibuffer-filter-groups (list "Elfeed" elfeed-filter))
-      (add-to-list 'ibuffer-filter-groups (list "Eshell (popup)" eshell-popup-filter))
+      (add-to-list 'ibuffer-filter-groups (list "Eshell-pop" eshell-pop-filter))
       (add-to-list 'ibuffer-filter-groups (list "Temporary buffers" starred-name-filter) :append)
       )
 

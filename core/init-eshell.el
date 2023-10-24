@@ -12,12 +12,8 @@
   :config
   (setq
    ;; banner
-   eshell-banner-message '(concat (propertize (concat " " (buffer-name) " ")
-                                              'face '(:inherit mode-line-highlight
-                                                               :weight bold))
-                                  " "
-                                  (propertize (current-time-string) 'face 'font-lock-keyword-face)
-                                  "\n\n")
+   eshell-banner-message ""
+
    ;; scrolling
    eshell-scroll-to-bottom-on-input 'all
    eshell-scroll-to-bottom-on-output 'all
@@ -50,14 +46,14 @@ If popup is visible but unselected, select it.
 If popup is focused, kill it."
     (interactive)
     (require 'eshell)
-    (if-let ((win (get-buffer-window "*eshell-popup*")))
+    (if-let ((win (get-buffer-window "*Eshell-pop*")))
         (if (eq (selected-window) win)
             ;; If users attempt to delete the sole ordinary window. silence it.
             (ignore-errors (delete-window win))
           (select-window win))
       (let ((display-comint-buffer-action '(display-buffer-at-bottom
                                             (inhibit-same-window . nil)))
-            (eshell-buffer-name "*eshell-popup*"))
+            (eshell-buffer-name "*Eshell-pop*"))
         (with-current-buffer (eshell)
           (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t)))))
 
@@ -194,7 +190,7 @@ If popup is focused, kill it."
       "Change eshell buffer name by directory change."
       (when (and (equal major-mode 'eshell-mode)
                  ;; avoid renaming buffer name when in `eshell-popup'
-                 (not (string-equal (buffer-name) "*eshell-popup*")))
+                 (not (string-equal (buffer-name) "*Eshell-pop*")))
         (rename-buffer (concat "Esh: " (abbreviate-file-name default-directory)) t))))
   )
 
