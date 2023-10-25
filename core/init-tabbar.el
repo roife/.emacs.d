@@ -170,6 +170,17 @@
     (or +tab-bar-org-pomodoro-indicator-cache
         (+tab-bar-org-pomodoro-indicator-update))))
 
+
+(defun +tab-bar-rime-indicator ()
+  (if (and (equal current-input-method "rime")
+           (bound-and-true-p rime-mode))
+      (if (and (rime--should-enable-p)
+               (not (rime--should-inline-ascii-p)))
+          (propertize rime-title 'face '(:inherit rime-indicator-face :inverse-video t))
+        (propertize rime-title 'face '(:inherit rime-indicator-dim-face :inverse-video t)))
+    (propertize " ∅ " 'face '(:inherit rime-indicator-dim-face :inverse-video t))))
+
+
 (defun +hide-tab-bar ()
   (interactive)
   (setq tab-bar-format nil))
@@ -182,7 +193,8 @@
                                              +tab-bar-copilot-icon
                                              +tab-bar-telega-icon
                                              +tab-bar-persp-indicator
-                                             meow-indicator))
+                                             meow-indicator
+                                             +tab-bar-rime-indicator))
   (tab-bar--update-tab-bar-lines))
 
 ;; WORKAROUND: fresh tab-bar for daemon

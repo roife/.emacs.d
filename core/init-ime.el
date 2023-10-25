@@ -13,6 +13,29 @@
     )
   )
 
+
+(use-package rime
+  :straight (rime :type git
+                  :host github
+                  :repo "DogLooksGood/emacs-rime"
+                  :files ("*.el" "Makefile" "lib.c"))
+  :hook ((after-init . toggle-input-method)
+         (kill-emacs . rime-lib-finalize))
+  :custom-face
+  (rime-default-face ((t (:inherit hl-line :background nil))))
+  (rime-preedit-face ((t (:inherit mode-line-active :background nil
+                                   :inverse-video nil :underline t))))
+  :init
+  (setq default-input-method "rime")
+  :config
+  (setq rime-librime-root "~/.emacs.d/librime/dist/"
+        rime-share-data-dir "~/Library/Rime"
+        rime-show-candidate 'posframe
+        rime-show-preedit 'inline
+        rime-title " ℝ "
+        rime-posframe-properties '(:border-width 7))
+  )
+
 ;; `defmacro' cannot be placed in use-package
 ;; (defmacro +sis-add-post-cmd-hook! (modes func)
 ;;   "Add post-command-hook to MODES."
@@ -37,10 +60,8 @@
          ;; Colored cursor
          (after-init . sis-global-cursor-color-mode))
   :config
-  (setq sis-english-source "com.apple.keylayout.ABC"
-        sis-inline-tighten-head-rule nil
-        sis-prefix-override-keys (list "C-c" "C-x" "C-h" "C-,")
-        sis-external-ism "im-select")
+  (setq sis-inline-tighten-head-rule nil
+        sis-prefix-override-keys (list "C-c" "C-x" "C-h" "C-,"))
 
   ;; HACK: Set cursor color automatically
   (add-hook! +theme-changed-hook :call-immediately
@@ -50,9 +71,7 @@
   ;; Add IME according to system type
   (cond
    ((eq system-type 'darwin)
-    (sis-ism-lazyman-config
-     "com.apple.keylayout.ABC"
-     "com.apple.inputmethod.SCIM.Shuangpin"))
+    (sis-ism-lazyman-config nil "rime" 'native))
    ((eq system-type 'gnu/linux)
     (sis-ism-lazyman-config "1" "2" 'fcitx5)))
 
