@@ -28,11 +28,18 @@
   :init
   (setq default-input-method "rime")
   :config
-  (setq rime-librime-root "~/.emacs.d/librime/dist/"
-        rime-share-data-dir "~/Library/Rime"
-        rime-show-candidate 'posframe
+  (when (eq system-type 'darwin)
+    (setq rime-librime-root "~/.emacs.d/librime/dist/"))
+  (when (eq system-type 'gnu/linux)
+    (setq rime-librime-root "~/Library/Rime"))
+
+  (setq rime-share-data-dir
+        (pcase system-type
+          ('darwin "~/Library/Rime")
+          ('gnu/linux "/usr/share/rime-data")))
+
+  (setq rime-show-candidate 'posframe
         rime-show-preedit 'inline
-        rime-title " ℝ "
         rime-posframe-properties '(:border-width 7))
   )
 

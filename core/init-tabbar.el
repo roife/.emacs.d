@@ -73,21 +73,6 @@
       (or +tab-bar-persp-indicator-cache
           (+tab-bar-update-persp-indicator))))
 
-  ;; cache for org-timer
-  ;; (with-eval-after-load 'org-timer
-  ;;   (defvar +tab-bar-org-timer-indicator-cache nil)
-  ;;
-  ;;   (add-hook! (org-timer-set-hook
-  ;;               org-timer-stop-hook
-  ;;               org-timer-start-hook org-timer-continue-hook
-  ;;               org-timer-pause-hook
-  ;;               org-timer-done-hook)
-  ;;     (defun +tab-bar-org-timer-indicator-update (&rest _)
-  ;;       (setq +tab-bar-org-timer-indicator-cache
-  ;;             (when
-  ;;               (propertize (concat " " (org-timer-secs-to-hms (org-timer-pause-elapsed)) " ")
-  ;;                           'face '(:inherit warning :inverse-video t)))))))
-
   ;; cache for telega indicator
   (with-eval-after-load 'telega
     (defvar +tab-bar-telega-indicator-cache nil)
@@ -170,15 +155,22 @@
     (or +tab-bar-org-pomodoro-indicator-cache
         (+tab-bar-org-pomodoro-indicator-update))))
 
-
+;; ime
+(defvar +tab-bar-rime-active-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-face :inverse-video t)))
+(defvar +tab-bar-rime-inactive-hint (propertize " ● " 'face '(:inherit rime-indicator-face :inverse-video t)))
+(defvar +tab-bar-no-ime-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-dim-face :inverse-video t)))
 (defun +tab-bar-rime-indicator ()
-  (if (and (equal current-input-method "rime")
-           (bound-and-true-p rime-mode))
-      (if (and (rime--should-enable-p)
-               (not (rime--should-inline-ascii-p)))
-          (propertize rime-title 'face '(:inherit rime-indicator-face :inverse-video t))
-        (propertize rime-title 'face '(:inherit rime-indicator-dim-face :inverse-video t)))
-    (propertize " ∅ " 'face '(:inherit rime-indicator-dim-face :inverse-video t))))
+  (let ((text-help (if (and (equal current-input-method "rime")
+                            (bound-and-true-p rime-mode))
+                       (if (and (rime--should-enable-p)
+                                (not (rime--should-inline-ascii-p)))
+                           (cons +tab-bar-rime-active-hint "Rime Enabled")
+                         (cons +tab-bar-rime-inactive-hint "Rime Disabled"))
+                     (cons +tab-bar-no-ime-hint "No IME"))))
+    `((tab-bar-rime menu-item
+                    ,(car text-help)
+                    ignore
+                    :help ,(cdr text-help)))))
 
 
 (defun +hide-tab-bar ()
