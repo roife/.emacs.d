@@ -123,8 +123,8 @@
 
 
 ;; translate [C-SPC] to [M-SPC] for mark
-(define-key key-translation-map (kbd "C-'") (kbd "C-SPC"))
-(bind-key "C-\"" #'pop-global-mark)
+;; (define-key key-translation-map (kbd "C-'") (kbd "C-SPC"))
+;; (bind-key "C-\"" #'pop-global-mark)
 
 
 ;; Chinese prunc mapping

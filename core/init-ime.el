@@ -25,6 +25,7 @@
   (rime-default-face ((t (:inherit hl-line :background nil))))
   (rime-preedit-face ((t (:inherit mode-line-active :background nil
                                    :inverse-video nil :underline t))))
+  :bind ("C-'" . toggle-input-method)
   :init
   (setq default-input-method "rime")
   :config

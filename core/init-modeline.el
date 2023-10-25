@@ -210,7 +210,6 @@
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
-         (meow (meow-indicator))
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,panel-face)
                 (:propertize ,(+mode-line-overwrite-readonly-indicator)
@@ -225,9 +224,9 @@
                 (:eval (breadcrumb-project-crumbs))
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
-                (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
-                                               (breadcrumb-imenu-crumbs))))
-                         (concat "▸" imenu)))
+                ;; (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
+                ;;                                (breadcrumb-imenu-crumbs))))
+                ;;          (concat "▸" imenu)))
                 ))
          (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
                 (,active-p ,+mode-line-vcs-info
