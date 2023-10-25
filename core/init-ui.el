@@ -149,7 +149,7 @@
 
 ;; [window-divider] Display window divider
 (setq window-divider-default-places t
-      window-divider-default-bottom-width 0
+      window-divider-default-bottom-width 1
       window-divider-default-right-width 1)
 (add-hook 'window-setup-hook #'window-divider-mode)
 
