@@ -25,19 +25,13 @@
   (rime-default-face ((t (:inherit hl-line :background nil))))
   (rime-preedit-face ((t (:inherit mode-line-active :background nil
                                    :inverse-video nil :underline t))))
-  :bind ("C-'" . toggle-input-method)
+  :bind ("s-SPC" . toggle-input-method)
   :init
   (setq default-input-method "rime")
   :config
   (when (eq system-type 'darwin)
-    (setq rime-librime-root "~/.emacs.d/librime/dist/"))
-  (when (eq system-type 'gnu/linux)
-    (setq rime-librime-root "~/Library/Rime"))
-
-  (setq rime-share-data-dir
-        (pcase system-type
-          ('darwin "~/Library/Rime")
-          ('gnu/linux "/usr/share/rime-data")))
+    (setq rime-librime-root "~/.emacs.d/librime/dist/"
+          rime-share-data-dir "~/Library/Rime"))
 
   (setq rime-show-candidate 'posframe
         rime-show-preedit 'inline
@@ -76,12 +70,8 @@
     (defun +sis-set-other-cursor-color ()
       (setq sis-other-cursor-color (face-foreground 'success nil t))))
 
-  ;; Add IME according to system type
-  (cond
-   ((eq system-type 'darwin)
-    (sis-ism-lazyman-config nil "rime" 'native))
-   ((eq system-type 'gnu/linux)
-    (sis-ism-lazyman-config "1" "2" 'fcitx5)))
+  ;; Use emacs-rime as default
+  (sis-ism-lazyman-config nil "rime" 'native)
 
   ;; Context mode
   (add-hook 'meow-leave-insert-mode-hook #'sis-set-english)

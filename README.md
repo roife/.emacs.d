@@ -8,4 +8,4 @@
 - `fd`
 - `aspell`
 - `readability-cli`
-- for sis on ns-port, you should install `im-select`
+- `rime` / `fcitx5-rime`

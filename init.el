@@ -26,6 +26,7 @@
                      'init-completion
                      (when (eq system-type 'darwin) 'init-mac)
                      'init-tools
+                     'init-keybinding
                      'init-highlight
                      'init-edit
                      'init-spell
