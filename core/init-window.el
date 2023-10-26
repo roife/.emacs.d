@@ -8,7 +8,7 @@
   (aw-minibuffer-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 1.0))))
   :hook ((window-configuration-change . aw-update)) ;; For modeline
   :config
-  (setq aw-scope 'frame
+  (setq aw-scope 'global
         aw-background nil
         aw-ignore-current t)
 

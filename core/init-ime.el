@@ -56,7 +56,7 @@
          ;; Enable the context-mode for all buffers
          (after-init . sis-global-context-mode)
          ;; Auto refresh sis state
-         (after-init . sis-auto-refresh-mode)
+         ;; (after-init . sis-auto-refresh-mode)
          ;; Respect mode
          (after-init . sis-global-respect-mode)
          ;; Colored cursor

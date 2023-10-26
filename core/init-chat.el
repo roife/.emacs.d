@@ -49,6 +49,11 @@
       (require 'company)
       (corfu-mode 1))
     )
+
+  ;; better hl-line settings in telega
+  (add-hook! telega-root-mode-hook
+    (defun +telega-disable-special-hl-line-fn ()
+      (setq-local hl-line-range-function nil)))
   )
 
 
