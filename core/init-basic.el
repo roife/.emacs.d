@@ -31,6 +31,11 @@
  bidi-paragraph-direction 'left-to-right
  bidi-display-reordering 'left-to-right
 
+ ;; smaller threshold to improve long line performance
+ long-line-threshold 1000
+ large-hscroll-threshold 1000
+ syntax-wholeline-max 1000
+
  ;; Larger process output buffer for LSP module
  read-process-output-max (* 3 1024 1024)
 
@@ -207,8 +212,13 @@
 
 ;; [so-long] Workaround for long one-line file
 (use-package so-long
-  :hook (after-init . global-so-long-mode)
+  :hook ((after-init . global-so-long-mode)
+         ((so-long-mode prog-mode fundamental-mode) . +so-long-settings))
   :config
+  ;; improve long line performance
+  (defun +so-long-settings ()
+    (setq bidi-display-reordering nil))
+
   ;; Saveplace should not operate in large/long files
   (add-to-list 'so-long-variable-overrides '(save-place-alist . nil))
   )
