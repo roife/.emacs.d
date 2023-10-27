@@ -21,9 +21,9 @@
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
  auto-save-list-file-prefix (expand-file-name "autosaves/" user-emacs-directory)
  auto-save-file-name-transforms (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
-                        ;; Prefix tramp autosaves to prevent conflicts with local ones
-                        (concat auto-save-list-file-prefix "tramp-\\2") t)
-                      (list ".*" auto-save-list-file-prefix t))
+			;; Prefix tramp autosaves to prevent conflicts with local ones
+			(concat auto-save-list-file-prefix "tramp-\\2") t)
+		      (list ".*" auto-save-list-file-prefix t))
 
  ;; Disable [bidirectional text] scanning for a modest performance
  ;; Will improve long line display performance
@@ -166,10 +166,10 @@
   (setq recentf-auto-cleanup 'never
     recentf-max-saved-items 200
     recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-                  "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                  "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
-                  (lambda (file) (file-in-directory-p file package-user-dir))
-                  (expand-file-name recentf-save-file))
+		  "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+		  "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+		  (lambda (file) (file-in-directory-p file package-user-dir))
+		  (expand-file-name recentf-save-file))
     recentf-keep nil)
 
   (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
@@ -190,9 +190,9 @@
   :hook (after-init . savehist-mode)
   :config
   (setq savehist-additional-variables '(mark-ring global-mark-ring
-                          search-ring
-                          regexp-search-ring
-                          kill-ring)
+			  search-ring
+			  regexp-search-ring
+			  kill-ring)
     savehist-autosave-interval 300)
 
   (with-eval-after-load 'vertico
@@ -202,18 +202,18 @@
   (add-hook! savehist-save-hook
     (defun +savehist--remove-string-properties-h ()
       (setq kill-ring (mapcar #'substring-no-properties
-                  (cl-remove-if-not #'stringp kill-ring))
-        register-alist (cl-loop for (reg . item) in register-alist
-                    if (stringp item)
-                    collect (cons reg (substring-no-properties item))
-                    else collect (cons reg item)))))
+		  (cl-remove-if-not #'stringp kill-ring))
+	register-alist (cl-loop for (reg . item) in register-alist
+		    if (stringp item)
+		    collect (cons reg (substring-no-properties item))
+		    else collect (cons reg item)))))
   )
 
 
 ;; [so-long] Workaround for long one-line file
 (use-package so-long
   :hook ((after-init . global-so-long-mode)
-         ((so-long-mode prog-mode fundamental-mode) . +so-long-settings))
+	 ((so-long-mode prog-mode fundamental-mode) . +so-long-settings))
   :config
   ;; improve long line performance
   (defun +so-long-settings ()
