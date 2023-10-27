@@ -39,8 +39,8 @@
                      'init-org
                      'init-vcs
                      'init-browser
-                     'init-dict
                      'init-ibuffer
+                     'init-dict
                      'init-test
                      'init-modal
                      'init-modeline

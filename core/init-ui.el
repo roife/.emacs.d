@@ -23,7 +23,7 @@
 (setq indicate-buffer-boundaries nil
       indicate-empty-lines nil)
 ;; make left-fringe half
-(fringe-mode '(5 . 8))
+(fringe-mode '(4 . 6))
 ;; Better fringe symbol
 (define-fringe-bitmap 'right-curly-arrow
   [#b00110000
