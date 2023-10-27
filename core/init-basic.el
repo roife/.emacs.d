@@ -40,7 +40,7 @@
  read-process-output-max (* 3 1024 1024)
 
  ;; [Wrapping] words at whitespace, but do not wrap by default
- ;; Wrapp words at whitespace, rather than in the middle of a word.
+ ;; Wrap words at whitespace, rather than in the middle of a word.
  word-wrap t
  ;; don't do any wrapping by default since it's expensive
  truncate-lines t
