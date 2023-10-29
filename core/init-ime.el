@@ -65,7 +65,8 @@
       (setq sis-other-cursor-color (face-foreground 'error nil t))))
 
   (defun +sis-remove-head-space-after-cc-punc (tighten-fore-to)
-    (when (memq (char-before) '(?， ?。 ?？ ?！ ?； ?：))
+    (when (or (memq (char-before) '(?， ?。 ?？ ?！ ?； ?：))
+              (bolp))
       (delete-char 1)))
   (setq sis-inline-tighten-head-rule #'+sis-remove-head-space-after-cc-punc)
 

@@ -21,9 +21,9 @@
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
  auto-save-list-file-prefix (expand-file-name "autosaves/" user-emacs-directory)
  auto-save-file-name-transforms (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
-			;; Prefix tramp autosaves to prevent conflicts with local ones
-			(concat auto-save-list-file-prefix "tramp-\\2") t)
-		      (list ".*" auto-save-list-file-prefix t))
+                                            ;; Prefix tramp autosaves to prevent conflicts with local ones
+                                            (concat auto-save-list-file-prefix "tramp-\\2") t)
+                                      (list ".*" auto-save-list-file-prefix t))
 
  ;; Disable [bidirectional text] scanning for a modest performance
  ;; Will improve long line display performance
@@ -202,11 +202,11 @@
   (add-hook! savehist-save-hook
     (defun +savehist--remove-string-properties-h ()
       (setq kill-ring (mapcar #'substring-no-properties
-		  (cl-remove-if-not #'stringp kill-ring))
-	register-alist (cl-loop for (reg . item) in register-alist
-		    if (stringp item)
-		    collect (cons reg (substring-no-properties item))
-		    else collect (cons reg item)))))
+                              (cl-remove-if-not #'stringp kill-ring))
+            register-alist (cl-loop for (reg . item) in register-alist
+                                    if (stringp item)
+                                    collect (cons reg (substring-no-properties item))
+                                    else collect (cons reg item)))))
   )
 
 
@@ -252,10 +252,10 @@
 (pixel-scroll-precision-mode)
 
 (defvar +scrolling-lines 5)
-(defun +scroll-other-window-up () (interactive) (scroll-other-window (- +scrolling-lines)))
+(defun +scroll-other-window-up () (interactive) (scroll-other-window-down +scrolling-lines))
 (defun +scroll-other-window-down () (interactive) (scroll-other-window +scrolling-lines))
 (defun +window-up () (interactive) (scroll-down +scrolling-lines))
-(defun +window-down () (interactive) (scroll-down (- +scrolling-lines)))
+(defun +window-down () (interactive) (scroll-up +scrolling-lines))
 (bind-keys*
  ("C-M-v" . +scroll-other-window-down)
  ("M-<down>" . +scroll-other-window-down)
