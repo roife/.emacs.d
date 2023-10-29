@@ -32,7 +32,7 @@
     (diff-hl-update-once))
 
   ;; Make fringes look better
-  (define-fringe-bitmap '+diff-hl-bmp (vector #b11100000) 1 8 '(center t))
+  (define-fringe-bitmap '+diff-hl-bmp (vector #b00000000) 1 8 '(center t))
   (setq diff-hl-fringe-bmp-function #'(lambda (&rest _) '+diff-hl-bmp))
 
   ;; Integration with magit

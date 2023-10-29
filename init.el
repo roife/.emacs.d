@@ -60,4 +60,3 @@
   (dolist (file +init-files)
     (when file
       (load-file (concat init-directory (symbol-name file) ".el")))))
-(put 'dired-find-alternate-file 'disabled nil)

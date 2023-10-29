@@ -19,6 +19,7 @@
 ;; [Cursor] disable blinking
 (blink-cursor-mode -1)
 
+
 ;; [Fringes] Reduce the clutter in the fringes
 (setq indicate-buffer-boundaries nil
       indicate-empty-lines nil)
@@ -43,7 +44,6 @@
    #b00000000
    #b00110000
    #b00110000])
-
 (define-fringe-bitmap 'right-arrow
   [#b00000000
    #b00000000
@@ -123,6 +123,9 @@
 ;; first-time startup on Emacs > 26.3.
 (setq custom-safe-themes t)
 
+(use-package modus-themes
+  :straight t)
+
 (use-package doom-themes
   :straight t
   :config
@@ -132,7 +135,7 @@
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
-(defvar +light-theme 'doom-nord-light)
+(defvar +light-theme 'modus-operandi-tinted)
 (defvar +dark-theme 'doom-spacegrey)
 (defun-call! +load-theme (&optional theme)
   (unless theme
