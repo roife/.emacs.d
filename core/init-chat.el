@@ -5,7 +5,7 @@
 (use-package telega
   :straight t
   :custom-face
-  (telega-msg-heading ((t (:inherit hl-line :background nil))))
+  (telega-msg-heading ((t (:inherit hl-line :background unspecified))))
   (telega-msg-inline-reply ((t (:inherit (hl-line font-lock-function-name-face)))))
   (telega-msg-inline-forward ((t (:inherit (hl-line font-lock-type-face)))))
   :hook ((telega-chat-mode . visual-line-mode))

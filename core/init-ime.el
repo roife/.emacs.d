@@ -22,9 +22,9 @@
   :hook ((after-init . toggle-input-method)
          (kill-emacs . rime-lib-finalize))
   :custom-face
-  (rime-default-face ((t (:inherit hl-line :background nil))))
-  (rime-preedit-face ((t (:inherit mode-line-active :background nil
-                                   :inverse-video nil :underline t))))
+  (rime-default-face ((t (:inherit hl-line :background unspecified))))
+  (rime-preedit-face ((t (:inherit mode-line-active :background unspecified
+                                   :inverse-video unspecified :underline t))))
   :bind ("s-SPC" . toggle-input-method)
   :config
   (when (eq system-type 'darwin)
