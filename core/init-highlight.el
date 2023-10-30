@@ -147,7 +147,8 @@
                  goto-last-change))
     (advice-add cmd :after #'+recenter-and-pulse))
 
-  (dolist (cmd '(symbol-overlay-basic-jump))
+  (dolist (cmd '(symbol-overlay-basic-jump
+                 compile-goto-error))
     (advice-add cmd :after #'+recenter-and-pulse-line))
   )
 
