@@ -65,7 +65,7 @@
       (setq sis-other-cursor-color (face-foreground 'error nil t))))
 
   (defun +sis-remove-head-space-after-cc-punc (tighten-fore-to)
-    (when (or (memq (char-before) '(?， ?。 ?？ ?！ ?； ?：))
+    (when (or (memq (char-before) '(?， ?。 ?？ ?！ ?； ?： ?（ ?【 ?「 ?“))
               (bolp))
       (delete-char 1)))
   (setq sis-inline-tighten-head-rule #'+sis-remove-head-space-after-cc-punc)
@@ -107,7 +107,7 @@
       (add-hook! post-self-insert-hook :local
         (defun +sis-inline-remove-redundant-space ()
           (when (and (eq +sis-inline-english-last-space-pos (1- (point)))
-                     (looking-back " [，。？！；：]"))
+                     (looking-back " [，。？！；：（【「“"))
             (save-excursion
               (backward-char 2)
               (delete-char 1)

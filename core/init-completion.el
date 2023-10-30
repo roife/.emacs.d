@@ -118,7 +118,8 @@
         completion-category-defaults nil
         completion-ignore-case t
         ;; despite override in the name, orderless can still be used in find-file etc.
-        completion-category-overrides '((file (styles +vertico-basic-remote orderless+basic)))
+        completion-category-overrides '((file (styles +vertico-basic-remote orderless+basic))
+                                        (eglot (styles orderless)))
         orderless-style-dispatchers '(+vertico-orderless-dispatch)
         orderless-component-separator "[ &]")
   )

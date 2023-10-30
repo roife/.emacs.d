@@ -252,19 +252,19 @@
 (pixel-scroll-precision-mode)
 
 (defvar +scrolling-lines 5)
-(defun +scroll-other-window-up () (interactive) (scroll-other-window-down +scrolling-lines))
-(defun +scroll-other-window-down () (interactive) (scroll-other-window +scrolling-lines))
-(defun +window-up () (interactive) (scroll-down +scrolling-lines))
-(defun +window-down () (interactive) (scroll-up +scrolling-lines))
+(defun +scroll-other-window () (interactive) (scroll-other-window +scrolling-lines))
+(defun +scroll-other-window-down () (interactive) (scroll-other-window-down +scrolling-lines))
+(defun +scroll-window () (interactive) (scroll-up +scrolling-lines))
+(defun +scroll-window-down () (interactive) (scroll-down +scrolling-lines))
 (bind-keys*
- ("C-M-v" . +scroll-other-window-down)
- ("M-<down>" . +scroll-other-window-down)
+ ("C-M-v" . +scroll-other-window)
+ ("M-<down>" . +scroll-other-window)
 
- ("C-M-S-v" . +scroll-other-window-up)
- ("M-<up>" . +scroll-other-window-up)
+ ("C-M-S-v" . +scroll-other-window-down)
+ ("M-<up>" . +scroll-other-window-down)
 
- ("C-v" . +window-down)
- ("M-v" . +window-up))
+ ("C-v" . +scroll-window-down)
+ ("M-v" . +scroll-window))
 
 
 ;; [gcmh] Optimize GC
