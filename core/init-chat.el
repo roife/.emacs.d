@@ -39,12 +39,7 @@
       (make-variable-buffer-local 'completion-at-point-functions)
       (setq completion-at-point-functions
             (append (mapcar #'cape-company-to-capf
-                            (append (list telega-emoji-company-backend
-                                          #'telega-company-username
-                                          #'telega-company-hashtag
-                                          #'telega-company-botcmd
-                                          #'telega-company-markdown-precode)
-                                    ))
+                            telega-company-backends)
                     completion-at-point-functions))
       (require 'company)
       (corfu-mode 1))
