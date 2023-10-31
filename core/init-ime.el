@@ -107,7 +107,7 @@
       (add-hook! post-self-insert-hook :local
         (defun +sis-inline-remove-redundant-space ()
           (when (and (eq +sis-inline-english-last-space-pos (1- (point)))
-                     (looking-back " [，。？！；：（【「“"))
+                     (looking-back " [，。？！；：（【「“]"))
             (save-excursion
               (backward-char 2)
               (delete-char 1)
