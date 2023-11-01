@@ -139,7 +139,8 @@
                  aw-select toggle-window-split
                  windmove-do-window-select
                  pager-page-down pager-page-up
-                 treemacs-select-window))
+                 treemacs-select-window
+                 tab-bar-select-tab))
     (advice-add cmd :after #'+pulse-momentary-line))
 
   (dolist (cmd '(pop-to-mark-command

@@ -11,20 +11,29 @@
   :hook ((telega-chat-mode . visual-line-mode))
   :bind (:map telega-chat-button-map
               ("h" . nil))
+  :init
+  (setq telega-chat-folder-format nil)
   :config
   (setq telega-chat-show-avatars nil
         telega-user-show-avatars nil
         telega-root-show-avatars nil
-        telega-chat-fill-column 58
+        telega-chat-fill-column 60
         telega-translate-to-language-by-default "zh"
         telega-chat-input-markups '(nil "org")
         telega-chat-prompt-format "▶ "
         telega-completing-read-function completing-read-function
-        telega-chat-folder-format nil
         ;; avoid emoji display problem
         telega-emoji-use-images nil
         ;; add double lines before reply box
-        telega-symbol-underline-bar (propertize " " 'face 'telega-webpage-strike-through))
+        telega-symbol-underline-bar (propertize " " 'face 'telega-webpage-strike-through)
+        ;; root page
+        ;; telega-root-default-view-function 'telega-view-folders
+        telega-symbol-folder ""
+        telega-root-fill-column 70
+        telega-root-auto-fill-mode nil
+        ;; filters
+        telega-filters-custom nil
+        telega-filter-custom-show-folders nil)
 
   (if (eq system-type 'darwin)
       (setq telega-proxies '((:server "127.0.0.1" :port 7890 :enable t :type (:@type "proxyTypeSocks5"))))

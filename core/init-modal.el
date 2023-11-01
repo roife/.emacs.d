@@ -107,4 +107,24 @@
    '("z" . meow-pop-selection)
    '("'" . repeat)
    '("<escape>" . ignore))
+
+  (dolist
+      (state
+       '((telega-root-mode . motion)
+         (telega-chat-mode . normal)
+         (View-mode . normal)
+         ;; (compilation-mode . normal)
+         (blink-search-mode . insert)
+         (rcirc-mode . normal)
+         (comint-mode . normal)         ; IELM
+         (fundamental-mode . normal)
+         (message-mode . normal)
+         (emacs-lisp-mode . normal)
+         (eshell-mode . insert)
+         (shell-mode . insert)
+         (term-mode . insert)
+         (vterm-mode . insert)
+         (help-mode . normal)
+         (vundo-mode . motion)))
+    (add-to-list 'meow-mode-state-list state))
   )
