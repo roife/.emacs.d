@@ -84,8 +84,7 @@
           Buffer-menu-mode
           flymake-diagnostics-buffer-mode
 
-          gnus-article-mode
-          grep-mode occur-mode rg-mode ag-mode pt-mode
+          grep-mode occur-mode rg-mode
           osx-dictionary-mode
 
           "^\\*Process List\\*" process-menu-mode
@@ -102,7 +101,6 @@
           "\\*ert\\*$" overseer-buffer-mode
           "\\*gud-debug\\*$"
           "\\*quickrun\\*$"
-          "\\*tldr\\*$"
           "\\*vc-.*\\*$"
           "^\\*elfeed-entry\\*$"
           "^\\*macro expansion\\**"
