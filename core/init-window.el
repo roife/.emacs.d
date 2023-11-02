@@ -30,11 +30,19 @@
           (aw-switch-to-window target-window)
         (message "No specified window: %d" number))))
 
-  (dotimes (n 9)
-    (bind-key (concat "M-" (number-to-string (1+ n)))
-              (lambda ()
-                (interactive)
-                (+aw--select-window (1+ n)))))
+  (defmacro +define-avy-switch-to-window (i)
+    (let ((fn-name (intern (concat "+avy-switch-to-window-" (number-to-string i)))))
+      `(progn
+         (defun ,fn-name ()
+           (interactive)
+           (+aw--select-window ,i))
+         (bind-key (concat "M-" (number-to-string ,i))
+                   #',fn-name)))
+    )
+
+  ;; Select window via `M-1'...`M-9'
+  (cl-loop for i from 1 to 9
+           do (eval `(+define-avy-switch-to-window ,i)))
   )
 
 
