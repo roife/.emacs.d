@@ -119,9 +119,9 @@
 
 ;; [smerge] Highlight all the conflicted regions for git
 (use-package smerge-mode
-  :hook ((find-file . smerge-try-smerge))
+  :hook ((find-file . +smerge-try-smerge))
   :config
-  (defun smerge-try-smerge ()
+  (defun +smerge-try-smerge ()
     (when (and buffer-file-name (vc-backend buffer-file-name))
       (save-excursion
         (goto-char (point-min))

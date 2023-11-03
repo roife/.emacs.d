@@ -69,9 +69,12 @@
 (defsubst +mode-line-use-region-indicator ()
   "Display selected region in current buffer."
   (when (use-region-p)
-    (concat "| L" (number-to-string (count-lines (region-beginning) (region-end)))
-            " W" (number-to-string (count-words (region-beginning) (region-end)))
-            " C" (number-to-string (abs (- (mark t) (point)))) " ")))
+    (let ((beg (region-beginning))
+          (end (region-end)))
+      (concat "| L" (number-to-string (count-lines beg end))
+              " W" (number-to-string (count-words beg end))
+              " C" (number-to-string (abs (- (mark t) (point))))
+              " "))))
 
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display whether it is in overwrite mode or read-only buffer."
@@ -160,6 +163,17 @@
 
 
 ;;; [vcs-info] cache for vcs
+(defvar-local +mode-line-smerge-count nil) ; [smerge] cache for smerge conflict indicator
+(defadvice! +mode-line-update-smerge-count (&rest _)
+  :after '(smerge-auto-leave smerge-mode)
+  (let ((all-matches-count (count-matches smerge-begin-re (point-min) (point-max))))
+    (setq-local +mode-line-smerge-count
+                (if (zerop all-matches-count)
+                    nil
+                  (propertize (concat "[" (number-to-string all-matches-count) "]")
+                              'face 'vc-dir-status-warning)))
+    ))
+
 (defvar-local +mode-line-vcs-info nil)
 (add-hook! (find-file-hook after-save-hook)
   (defun +mode-line-update-vcs-info ()
@@ -229,7 +243,7 @@
                 ;;          (concat "▸" imenu)))
                 ))
          (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
-                (,active-p ,+mode-line-vcs-info
+                (,active-p ,(concat +mode-line-vcs-info +mode-line-smerge-count)
                            (:propertize ,+mode-line-vcs-info face nil))
                 (,active-p ,+mode-line-flymake-indicator)
                 " "
