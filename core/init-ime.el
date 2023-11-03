@@ -23,13 +23,15 @@
          (kill-emacs . rime-lib-finalize))
   :custom-face
   (rime-default-face ((t (:inherit hl-line :background unspecified))))
-  (rime-preedit-face ((t (:inherit mode-line-active :background unspecified
+  (rime-preedit-face ((t (:inherit hl-line :background unspecified
                                    :inverse-video unspecified :underline t))))
   :bind ("s-SPC" . toggle-input-method)
   :config
-  (when (eq system-type 'darwin)
-    (setq rime-librime-root "~/.emacs.d/librime/dist/"
-          rime-share-data-dir "~/Library/Rime"))
+  (cond ((eq system-type 'darwin)
+         (setq rime-librime-root "~/.emacs.d/librime/dist/"
+               rime-share-data-dir "~/Library/Rime"))
+        ((eq system-type 'gnu/linux)
+         (setq rime-librime-root "/usr/lib/")))
 
   (setq rime-show-candidate 'posframe
         rime-show-preedit 'inline

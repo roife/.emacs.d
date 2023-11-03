@@ -103,7 +103,7 @@
  uniquify-buffer-name-style 'forward
 
  ;; Fix alignment problem
- truncate-string-ellipsis "..."
+ truncate-string-ellipsis "…"
 
  ;; Shell command
  shell-command-prompt-show-cwd t

@@ -151,6 +151,8 @@
   (dolist (cmd '(symbol-overlay-basic-jump
                  compile-goto-error))
     (advice-add cmd :after #'+recenter-and-pulse-line))
+  :config
+  (setq pulse-delay 0.02)
   )
 
 
