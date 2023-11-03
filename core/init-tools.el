@@ -28,7 +28,16 @@
    ;; lazy-count
    isearch-lazy-count t
    lazy-highlight-cleanup nil
-   lazy-highlight-buffer t))
+   lazy-highlight-buffer t
+   ;; search-ring
+   search-ring-max 200
+   regexp-search-ring-max 200))
+
+
+;; [isearch-mb] enhance isearch
+(use-package isearch-mb
+  :straight t
+  :hook (after-init . isearch-mb-mode))
 
 
 ;; [goto-addr] Click to open URL
