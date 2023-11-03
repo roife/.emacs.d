@@ -219,7 +219,7 @@
            (if (string= first-char " ") "0" first-char))))))
 
 
-(defsubst +mode-line-compute ()
+(defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
@@ -238,9 +238,9 @@
                 (:eval (breadcrumb-project-crumbs))
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
-                ;; (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
-                ;;                                (breadcrumb-imenu-crumbs))))
-                ;;          (concat "▸" imenu)))
+                (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
+                                               (breadcrumb-imenu-crumbs))))
+                         (concat "▸" imenu)))
                 ))
          (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
                 (,active-p ,(concat +mode-line-vcs-info +mode-line-smerge-count)
@@ -259,7 +259,7 @@
       ,rhs-str)))
 
 (setq-default mode-line-format
-              '((:eval (+mode-line-compute))))
+              '((:eval (+mode-line-normal))))
 
 
 ;;; Header Line
