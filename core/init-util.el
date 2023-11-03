@@ -1,9 +1,9 @@
 ;;; -*- lexical-binding: t -*-
 
 ;; custom directory
-(defvar +blog-dir (expand-file-name "~/source/roife.github.io/"))
-(defvar +ebib-bib-dir (expand-file-name "~/Documents/papers/"))
-(defvar +elfeed-enclosure-dir (expand-file-name "~/Downloads/"))
+(defconst +blog-dir (expand-file-name "~/source/roife.github.io/"))
+(defconst +ebib-bib-dir (expand-file-name "~/Documents/papers/"))
+(defconst +elfeed-enclosure-dir (expand-file-name "~/Downloads/"))
 
 ;; Thanks to DOOM Emacs
 (defmacro add-hook! (hooks &rest rest)

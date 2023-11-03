@@ -9,3 +9,10 @@ org-mode markdown-mode
 (trcd "\\{" p "_{" (s v) "} : " p "_{" v "}^{" v " \\in 1 \\dots " p "}" "\\} ")
 (ifo "\\( " p " \\)")
 (fo "\\[ " n p n " \\]")
+(align "\\begin{align}\n" r> n> "\\end{align}")
+(alignn "\\begin{align*}\n" r> n> "\\end{align*}")
+(gather "\\begin{gather}\n" r> n> "\\end{gather}")
+(gatherr "\\begin{gather*}\n" r> n> "\\end{gather*}")
+(latexbeg "\\begin{" (s env) "}" r> n> "\\end{" (s env) "}")
+(center "\\begin{center}\n" r> n> "\\end{center}")
+
