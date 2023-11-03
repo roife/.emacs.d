@@ -110,7 +110,14 @@
       (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append))
 
     (set-fontset-font t 'unicode (font-spec :family "Symbola") nil 'append)
-  ))
+    ))
+
+
+(defadvice! +mode-line-smaller-font-size-a (&rest _)
+  :after #'enable-theme
+  (set-face-attribute 'mode-line nil :height 0.85)
+  (set-face-attribute 'mode-line-inactive nil :height 0.85))
+
 
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)

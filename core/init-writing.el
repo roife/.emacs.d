@@ -23,7 +23,7 @@
 (use-package markdown-mode
   :straight t
   :custom-face
-  (markdown-code-face ((t (:inherit nil))))
+  (markdown-code-face ((t (:inherit unspecified))))
   :config
   (setq markdown-enable-math t
         markdown-enable-wiki-links t

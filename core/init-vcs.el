@@ -93,7 +93,7 @@
   :straight t
   :after magit
   :custom-face
-  (forge-topic-label ((t (:inherit variable-pitch :height 0.9 :width condensed :weight regular :underline nil))))
+  (forge-topic-label ((t (:inherit variable-pitch :height 0.9 :width condensed :weight regular :underline unspecified))))
   :config
   (setq forge-topic-list-columns
         '(("#" 5 forge-topic-list-sort-by-number (:right-align t) number nil)

@@ -9,7 +9,7 @@
 (defvar +mode-line-show-common-vc-tools-name nil)
 
 ;;; Check whether `window-total-width' is larger than the limit
-(defconst +mode-line-window-width-limit 90)
+(defconst +mode-line-window-width-limit 85)
 (defvar-local +mode-line-enough-width-p nil)
 (add-hook! (after-revert-hook buffer-list-update-hook window-size-change-functions)
            (defun +mode-line-window-size-change-function (&rest _)
@@ -63,17 +63,17 @@
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
-  (cond (defining-kbd-macro "| MacroDef ")
-        (executing-kbd-macro "| MacroExc ")))
+  (cond (defining-kbd-macro "🞄 MacroDef ")
+        (executing-kbd-macro "🞄 MacroExc ")))
 
 (defsubst +mode-line-use-region-indicator ()
   "Display selected region in current buffer."
   (when (use-region-p)
     (let ((beg (region-beginning))
           (end (region-end)))
-      (concat "| L" (number-to-string (count-lines beg end))
-              " W" (number-to-string (count-words beg end))
-              " C" (number-to-string (abs (- (mark t) (point))))
+      (concat "🞄 " (number-to-string (count-lines beg end)) "r"
+              " " (number-to-string (count-words beg end)) "w"
+              " " (number-to-string (abs (- (mark t) (point)))) "c"
               " "))))
 
 (defsubst +mode-line-overwrite-readonly-indicator ()
@@ -92,9 +92,9 @@
            (after (symbol-overlay-get-list 1 symbol))
            (count (length before)))
       (if (symbol-overlay-assoc symbol)
-          (concat  "| " (number-to-string (1+ count))
+          (concat  "🞄 " (number-to-string (1+ count))
                    "/" (number-to-string (+ count (length after)))
-                   " sym "
+                   "s "
                    (and (cadr keyword) "in scope "))))))
 
 
@@ -138,10 +138,10 @@
     (setq +mode-line-encoding
           `(,(if (memq (coding-system-category buffer-file-coding-system)
                        '(coding-category-undecided coding-category-utf-8))
-                 (when +mode-line-show-common-encodings "UTF-8 ")
+                 (when +mode-line-show-common-encodings "U8")
                (let ((name (coding-system-get buffer-file-coding-system :name)))
                  (concat (if (eq name 'no-conversion) "NO-CONV" (upcase (symbol-name name)))
-                         " ")))
+                         "⋅")))
             ,(pcase (coding-system-eol-type buffer-file-coding-system)
                (0 (when +mode-line-show-common-encodings "LF "))
                (1 "CRLF ")
@@ -223,40 +223,34 @@
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
-         (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
-         (lhs `((:propertize ,(+mode-line-get-window-name)
-                             face ,panel-face)
-                (:propertize ,(+mode-line-overwrite-readonly-indicator)
-                             face ,panel-face)
-                (,active-p (:propertize
-                            ,(concat (+mode-line-macro-indicator)
-                                     (+mode-line-symbol-overlay-indicator)
-                                     (+mode-line-use-region-indicator))
-                            face ,panel-face))
-                " "
-                ;; (:propertize "%b" face ,meta-face)
-                (:eval (breadcrumb-project-crumbs))
-                (:propertize +mode-line-remote-host-name
-                             face +mode-line-host-name-active-face)
-                (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
-                                               (breadcrumb-imenu-crumbs))))
-                         (concat "▸" imenu)))
-                ))
-         (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
-                (,active-p ,(concat +mode-line-vcs-info +mode-line-smerge-count)
-                           (:propertize ,+mode-line-vcs-info face nil))
-                (,active-p ,+mode-line-flymake-indicator)
-                " "
-                (:eval +mode-line-encoding)
-                ,(or +mode-line-pdf-pages
-                     (list "%l⋅" '(:eval (+mode-line-buffer-position))))
-                " "
-                ))
-         (rhs-str (format-mode-line rhs))
-         (rhs-w (string-width rhs-str)))
-    `(,lhs
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
-      ,rhs-str)))
+         (panel-face `(:inherit ,meta-face :inverse-video ,active-p)))
+    `((:propertize ,(+mode-line-get-window-name)
+                   face ,panel-face)
+      (:propertize ,(+mode-line-overwrite-readonly-indicator)
+                   face ,panel-face)
+      (,active-p (:propertize
+                  ,(concat (+mode-line-macro-indicator)
+                           (+mode-line-symbol-overlay-indicator)
+                           (+mode-line-use-region-indicator))
+                  face ,panel-face))
+      " "
+      ;; (:propertize "%b" face ,meta-face)
+      (:eval (breadcrumb-project-crumbs))
+      (:propertize +mode-line-remote-host-name
+                   face +mode-line-host-name-active-face)
+      " 🞄"
+      (,active-p ,(concat +mode-line-vcs-info +mode-line-smerge-count)
+                 (:propertize ,+mode-line-vcs-info face nil))
+      (,active-p ,+mode-line-flymake-indicator)
+      " "
+      (:eval +mode-line-encoding)
+      ,(or +mode-line-pdf-pages
+           (list "%l⋅" '(:eval (+mode-line-buffer-position))))
+      " "
+      (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
+                                     (breadcrumb-imenu-crumbs))))
+                (concat "🞄 " imenu)))
+      )))
 
 (setq-default mode-line-format
               '((:eval (+mode-line-normal))))
@@ -274,7 +268,7 @@
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :commands breadcrumb--header-line
   :config
-  (setq breadcrumb-imenu-crumb-separator "▸"
+  (setq breadcrumb-imenu-crumb-separator "⋅"
         breadcrumb-project-max-length 0.4
         breadcrumb-imenu-max-length 0.3
         breadcrumb-idle-time 10))
