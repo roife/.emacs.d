@@ -113,69 +113,69 @@
           +tab-bar-telega-indicator-cache)
         ))
 
-  (advice-add 'telega--on-updateUserStatus :after #'+tab-bar-telega-icon-update)
-  (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
-  (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
-  (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update))
+    (advice-add 'telega--on-updateUserStatus :after #'+tab-bar-telega-icon-update)
+    (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
+    (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
+    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update))
 
-(defun +tab-bar-telega-icon ()
-  (when (and (fboundp 'telega-server-live-p)
-             (telega-server-live-p))
-    (or +tab-bar-telega-indicator-cache
-        (+tab-bar-telega-icon-update))))
+  (defun +tab-bar-telega-icon ()
+    (when (and (fboundp 'telega-server-live-p)
+               (telega-server-live-p))
+      (or +tab-bar-telega-indicator-cache
+          (+tab-bar-telega-icon-update))))
 
-(defun +tab-bar-copilot-icon ()
-  (when (bound-and-true-p copilot-mode)
-    (propertize " α " 'face '(:inherit font-lock-doc-face :inverse-video t))))
+  (defun +tab-bar-copilot-icon ()
+    (when (bound-and-true-p copilot-mode)
+      (propertize " α " 'face '(:inherit font-lock-doc-face :inverse-video t))))
 
-;; cache for org-pomodoro
-(with-eval-after-load 'org-pomodoro
-  (defvar +tab-bar-org-pomodoro-indicator-cache nil)
+  ;; cache for org-pomodoro
+  (with-eval-after-load 'org-pomodoro
+    (defvar +tab-bar-org-pomodoro-indicator-cache nil)
 
-  (add-hook! (org-pomodoro-started-hook org-pomodoro-finished-hook org-pomodoro-overtime-hook
-                                        org-pomodoro-killed-hook org-pomodoro-break-finished-hook
-                                        org-pomodoro-long-break-finished-hook org-pomodoro-killed-hook)
-    (defun +tab-bar-org-pomodoro-indicator-update (&rest _)
-      (setq +tab-bar-org-pomodoro-indicator-cache
-            (cl-case org-pomodoro-state
-              (:none
-               (propertize " Stop " 'face '(:inherit font-lock-comment-face :inverse-video t)))
-              (:pomodoro
-               (propertize " Pomo " 'face '(:inherit org-pomodoro-mode-line :inverse-video t)))
-              (:overtime
-               (propertize " Over " 'face '(:inherit org-pomodoro-mode-line-overtime :inverse-video t)))
-              (:short-break
-               (propertize " Short break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t)))
-              (:long-break
-               (propertize " Long break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t))))))
-    ))
+    (add-hook! (org-pomodoro-started-hook org-pomodoro-finished-hook org-pomodoro-overtime-hook
+                                          org-pomodoro-killed-hook org-pomodoro-break-finished-hook
+                                          org-pomodoro-long-break-finished-hook org-pomodoro-killed-hook)
+      (defun +tab-bar-org-pomodoro-indicator-update (&rest _)
+        (setq +tab-bar-org-pomodoro-indicator-cache
+              (cl-case org-pomodoro-state
+                (:none
+                 (propertize " Stop " 'face '(:inherit font-lock-comment-face :inverse-video t)))
+                (:pomodoro
+                 (propertize " Pomo " 'face '(:inherit org-pomodoro-mode-line :inverse-video t)))
+                (:overtime
+                 (propertize " Over " 'face '(:inherit org-pomodoro-mode-line-overtime :inverse-video t)))
+                (:short-break
+                 (propertize " Short break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t)))
+                (:long-break
+                 (propertize " Long break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t))))))
+      ))
 
-(defun +tab-bar-org-pomodoro-indicator ()
-  (when (fboundp 'org-pomodoro-active-p)
-    (or +tab-bar-org-pomodoro-indicator-cache
-        (+tab-bar-org-pomodoro-indicator-update))))
+  (defun +tab-bar-org-pomodoro-indicator ()
+    (when (fboundp 'org-pomodoro-active-p)
+      (or +tab-bar-org-pomodoro-indicator-cache
+          (+tab-bar-org-pomodoro-indicator-update))))
 
-;; ime
-(defvar +tab-bar-rime-active-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-face :inverse-video t)))
-(defvar +tab-bar-rime-inactive-hint (propertize " ● " 'face '(:inherit rime-indicator-face :inverse-video t)))
-(defvar +tab-bar-no-ime-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-dim-face :inverse-video t)))
-(defun +tab-bar-rime-indicator ()
-  (let ((text-help (if (and (equal current-input-method "rime")
-                            (bound-and-true-p rime-mode))
-                       (if (and (rime--should-enable-p)
-                                (not (rime--should-inline-ascii-p)))
-                           (cons +tab-bar-rime-active-hint "Rime Enabled")
-                         (cons +tab-bar-rime-inactive-hint "Rime Disabled"))
-                     (cons +tab-bar-no-ime-hint "No IME"))))
-    `((tab-bar-rime menu-item
-                    ,(car text-help)
-                    ignore
-                    :help ,(cdr text-help)))))
+  ;; ime
+  (defvar +tab-bar-rime-active-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-face :inverse-video t)))
+  (defvar +tab-bar-rime-inactive-hint (propertize " ● " 'face '(:inherit rime-indicator-face :inverse-video t)))
+  (defvar +tab-bar-no-ime-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-dim-face :inverse-video t)))
+  (defun +tab-bar-rime-indicator ()
+    (let ((text-help (if (and (equal current-input-method "rime")
+                              (bound-and-true-p rime-mode))
+                         (if (and (rime--should-enable-p)
+                                  (not (rime--should-inline-ascii-p)))
+                             (cons +tab-bar-rime-active-hint "Rime Enabled")
+                           (cons +tab-bar-rime-inactive-hint "Rime Disabled"))
+                       (cons +tab-bar-no-ime-hint "No IME"))))
+      `((tab-bar-rime menu-item
+                      ,(car text-help)
+                      ignore
+                      :help ,(cdr text-help)))))
 
 
-(defun +hide-tab-bar ()
-  (interactive)
-  (setq tab-bar-format nil))
+  (defun +hide-tab-bar ()
+    (interactive)
+    (setq tab-bar-format nil))
 
 (defun-call! +show-tab-bar ()
   (interactive)
@@ -184,8 +184,8 @@
                                                  tab-bar-format-tabs))
   (tab-bar--update-tab-bar-lines))
 
-;; WORKAROUND: fresh tab-bar for daemon
-(when (daemonp)
-  (add-hook 'after-make-frame-functions
-            #'(lambda (&rest _) (force-mode-line-update))))
-)
+  ;; WORKAROUND: fresh tab-bar for daemon
+  (when (daemonp)
+    (add-hook 'after-make-frame-functions
+              #'(lambda (&rest _) (force-mode-line-update))))
+  )
