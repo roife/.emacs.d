@@ -160,8 +160,8 @@
   (defvar +tab-bar-rime-inactive-hint (propertize " ● " 'face '(:inherit rime-indicator-face :inverse-video t)))
   (defvar +tab-bar-no-ime-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-dim-face :inverse-video t)))
   (defun +tab-bar-rime-indicator ()
-    (let ((text-help (if (and (equal current-input-method "rime")
-                              (bound-and-true-p rime-mode))
+    (let ((text-help (if (and (bound-and-true-p rime-mode)
+                              (equal current-input-method "rime"))
                          (if (and (rime--should-enable-p)
                                   (not (rime--should-inline-ascii-p)))
                              (cons +tab-bar-rime-active-hint "Rime Enabled")
@@ -177,12 +177,12 @@
     (interactive)
     (setq tab-bar-format nil))
 
-(defun-call! +show-tab-bar ()
-  (interactive)
-  (setq tab-bar-format '(+tab-bar-rime-indicator meow-indicator +tab-bar-telega-icon
-                                                 +tab-bar-copilot-icon +tab-bar-org-pomodoro-indicator +tab-bar-persp-indicator
-                                                 tab-bar-format-tabs))
-  (tab-bar--update-tab-bar-lines))
+  (defun-call! +show-tab-bar ()
+    (interactive)
+    (setq tab-bar-format '(+tab-bar-rime-indicator meow-indicator +tab-bar-telega-icon
+                                                   +tab-bar-copilot-icon +tab-bar-org-pomodoro-indicator +tab-bar-persp-indicator
+                                                   tab-bar-format-tabs))
+    (tab-bar--update-tab-bar-lines))
 
   ;; WORKAROUND: fresh tab-bar for daemon
   (when (daemonp)

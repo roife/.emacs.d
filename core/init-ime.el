@@ -19,12 +19,12 @@
                   :host github
                   :repo "DogLooksGood/emacs-rime"
                   :files ("*.el" "Makefile" "lib.c"))
-  :hook ((after-init . toggle-input-method)
-         (kill-emacs . rime-lib-finalize))
   :custom-face
   (rime-default-face ((t (:inherit hl-line :background unspecified))))
   (rime-preedit-face ((t (:inherit hl-line :background unspecified
                                    :inverse-video unspecified :underline t))))
+  :init
+  (require 'rime)
   :bind ("s-SPC" . toggle-input-method)
   :config
   (cond ((eq system-type 'darwin)
@@ -36,6 +36,10 @@
   (setq rime-show-candidate 'posframe
         rime-show-preedit 'inline
         rime-posframe-properties '(:internal-border-width 7))
+
+  (defadvice! +rime-do-finalize-after-loading-module (&rest _)
+    :after #'rime--load-dynamic-module
+    (add-hook! kill-emacs-hook #'rime-lib-finalize))
   )
 
 ;; `defmacro' cannot be placed in use-package
@@ -47,6 +51,7 @@
 ;;        (defun ,(intern (format "%s-add-post-cmd-hook" func-name)) ()
 ;;          (add-hook! post-command-hook :local
 ;;            ,func)))))
+
 
 (use-package sis
   :straight t

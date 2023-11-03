@@ -22,6 +22,7 @@
                      'init-util
                      'init-straight
                      'init-ui
+                     'init-tabbar
                      'init-basic
                      'init-completion
                      (when (eq system-type 'darwin) 'init-mac)
@@ -41,15 +42,14 @@
                      'init-browser
                      'init-ibuffer
                      'init-dict
-                     'init-test
+                     'init-ime
                      'init-modal
                      'init-modeline
-                     'init-tabbar
                      'init-bib
                      'init-ai
                      'init-chat
                      'init-pdf
-                     'init-ime
+                     'init-test
 
                      ;; 'init-elfeed
                      ;; 'init-gnus
