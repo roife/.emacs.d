@@ -238,7 +238,8 @@
       (:eval (breadcrumb-project-crumbs))
       (:propertize +mode-line-remote-host-name
                    face +mode-line-host-name-active-face)
-      " 🞄"
+      " 🞄 "
+      (:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
       (,active-p ,(concat +mode-line-vcs-info +mode-line-smerge-count)
                  (:propertize ,+mode-line-vcs-info face nil))
       (,active-p ,+mode-line-flymake-indicator)
@@ -246,10 +247,10 @@
       (:eval +mode-line-encoding)
       ,(or +mode-line-pdf-pages
            (list "%l⋅" '(:eval (+mode-line-buffer-position))))
-      " "
-      (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
-                                     (breadcrumb-imenu-crumbs))))
-                (concat "🞄 " imenu)))
+      ;; " "
+      ;; (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
+      ;;                                (breadcrumb-imenu-crumbs))))
+      ;;           (concat "🞄 " imenu)))
       )))
 
 (setq-default mode-line-format

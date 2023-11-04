@@ -179,9 +179,11 @@
 
   (defun-call! +show-tab-bar ()
     (interactive)
-    (setq tab-bar-format '(+tab-bar-rime-indicator meow-indicator +tab-bar-telega-icon
-                                                   +tab-bar-copilot-icon +tab-bar-org-pomodoro-indicator +tab-bar-persp-indicator
-                                                   tab-bar-format-tabs))
+    (setq tab-bar-format '(
+                          ;; +tab-bar-rime-indicator
+                          meow-indicator +tab-bar-telega-icon
+                          +tab-bar-copilot-icon +tab-bar-org-pomodoro-indicator +tab-bar-persp-indicator
+                          tab-bar-format-tabs))
     (tab-bar--update-tab-bar-lines))
 
   ;; WORKAROUND: fresh tab-bar for daemon

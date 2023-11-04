@@ -71,11 +71,17 @@
     (defun +sis-set-other-cursor-color ()
       (setq sis-other-cursor-color (face-foreground 'error nil t))))
 
-  (defun +sis-remove-head-space-after-cc-punc (tighten-fore-to)
+  (defun +sis-remove-head-space-after-cc-punc (_)
     (when (or (memq (char-before) '(?， ?。 ?？ ?！ ?； ?： ?（ ?【 ?「 ?“))
               (bolp))
       (delete-char 1)))
   (setq sis-inline-tighten-head-rule #'+sis-remove-head-space-after-cc-punc)
+
+  (defun +sis-remove-tail-space-before-cc-punc (tighten-back-to)
+    (when (memq (char-after) '(?， ?。 ?？ ?！ ?； ?： ?（ ?【 ?「 ?“))
+      (backward-delete-char 1))
+    (backward-delete-char 1))
+  (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc)
 
   ;; Context mode
   (add-hook 'meow-leave-insert-mode-hook #'sis-set-english)

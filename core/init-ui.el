@@ -24,7 +24,7 @@
 (setq indicate-buffer-boundaries nil
       indicate-empty-lines nil)
 ;; make left-fringe half
-(fringe-mode '(4 . 6))
+(fringe-mode '(5 . 6))
 ;; Better fringe symbol
 (define-fringe-bitmap 'right-curly-arrow
   [#b00110000
@@ -115,8 +115,8 @@
 
 (defadvice! +mode-line-smaller-font-size-a (&rest _)
   :after #'enable-theme
-  (set-face-attribute 'mode-line nil :height 0.85)
-  (set-face-attribute 'mode-line-inactive nil :height 0.85))
+  (set-face-attribute 'mode-line nil :height 0.9)
+  (set-face-attribute 'mode-line-inactive nil :height 0.9))
 
 
 ;; Smooth Scroll (less "jumpy" than defaults)
@@ -142,7 +142,7 @@
   (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
-(defvar +light-theme 'modus-operandi-tinted)
+(defvar +light-theme 'doom-nord-light)
 (defvar +dark-theme 'doom-spacegrey)
 (defun-call! +load-theme (&optional theme)
   (unless theme

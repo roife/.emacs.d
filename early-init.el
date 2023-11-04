@@ -44,7 +44,7 @@
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(internal-border-width . 0) default-frame-alist)
-(push '(undecorated-round . t) default-frame-alist)
+;; (push '(undecorated-round . t) default-frame-alist)
 (when (featurep 'ns)
   (push '(ns-transparent-titlebar . t) default-frame-alist))
 ; Set these to nil so users don't have to toggle the modes twice to reactivate.
