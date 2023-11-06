@@ -71,5 +71,19 @@
 
 (use-package telega-dired-dwim
   :straight nil
-  ;; :hook ((telega-load . global-telega-mnz-mode))
+  )
+
+
+(use-package telega-url-shorten
+  :straight nil
+  :hook ((telega-load . global-telega-url-shorten-mode))
+  :init
+  ;; HACK: we don't use all-the-icons but telega-url-shorten needs it
+  ;; so just make it happy
+  (provide 'all-the-icons)
+  (setq telega-url-shorten-regexps
+        (list `(too-long-link
+                :regexp "^\\(https?://\\)\\(.\\{50\\}\\).*?$"
+                :symbol ""
+                :replace ,(concat "\\1\\2" truncate-string-ellipsis))))
   )

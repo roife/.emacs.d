@@ -20,8 +20,10 @@
                   :repo "DogLooksGood/emacs-rime"
                   :files ("*.el" "Makefile" "lib.c"))
   :custom-face
-  (rime-default-face ((t (:inherit hl-line :background unspecified))))
-  (rime-preedit-face ((t (:inherit hl-line :background unspecified
+  (rime-default-face ((t (:inherit hl-line
+                                   :background unspecified :foreground unspecified))))
+  (rime-preedit-face ((t (:inherit hl-line
+                                   :background unspecified
                                    :inverse-video unspecified :underline t))))
   :init
   (require 'rime)
@@ -77,10 +79,12 @@
       (delete-char 1)))
   (setq sis-inline-tighten-head-rule #'+sis-remove-head-space-after-cc-punc)
 
-  (defun +sis-remove-tail-space-before-cc-punc (tighten-back-to)
-    (when (memq (char-after) '(?， ?。 ?？ ?！ ?； ?： ?（ ?【 ?「 ?“))
-      (backward-delete-char 1))
-    (backward-delete-char 1))
+  (defun +sis-remove-tail-space-before-cc-punc (_)
+    (when (eq (char-before) ? )
+      (backward-delete-char 1)
+      (when (and (eq (char-before) ? )
+                 (memq (char-after) '(?， ?。 ?？ ?！ ?； ?： ?（ ?【 ?「 ?“)))
+                                                                  (backward-delete-char 1))))
   (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc)
 
   ;; Context mode
