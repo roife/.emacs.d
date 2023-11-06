@@ -34,12 +34,6 @@
    regexp-search-ring-max 200))
 
 
-;; [isearch-mb] enhance isearch
-(use-package isearch-mb
-  :straight t
-  :hook (after-init . isearch-mb-mode))
-
-
 ;; [goto-addr] Click to open URL
 (use-package goto-addr
   :hook ((text-mode . goto-address-mode)
