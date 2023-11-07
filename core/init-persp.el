@@ -12,14 +12,15 @@
   :bind (("C-`" . +eshell-toggle-by-persp)
          :map persp-key-map
               ("RET" . persp-switch))
-  :init (setq persp-keymap-prefix (kbd "C-c p"))
+  :init
+  (setq persp-keymap-prefix (kbd "C-c p")
+        persp-nil-name "⊥")
   :config
   (setq
    persp-autokill-buffer-on-remove 'kill-weak
    persp-reset-windows-on-nil-window-conf nil
    persp-set-last-persp-for-new-frames t
    persp-remove-buffers-from-nil-persp-behaviour nil
-   persp-nil-name "⊥"
    ;; Do not auto load
    persp-auto-resume-time 0)
 
