@@ -218,40 +218,45 @@
       (_ (let ((first-char (substring pos 0 1)))
            (if (string= first-char " ") "0" first-char))))))
 
-
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
-         (panel-face `(:inherit ,meta-face :inverse-video ,active-p)))
-    `((:propertize ,(+mode-line-get-window-name)
-                   face ,panel-face)
-      (:propertize ,(+mode-line-overwrite-readonly-indicator)
-                   face ,panel-face)
-      (,active-p (:propertize
-                  ,(concat (+mode-line-macro-indicator)
-                           (+mode-line-symbol-overlay-indicator)
-                           (+mode-line-use-region-indicator))
-                  face ,panel-face))
-      " "
-      ;; (:propertize "%b" face ,meta-face)
-      (:eval (breadcrumb-project-crumbs))
-      (:propertize +mode-line-remote-host-name
-                   face +mode-line-host-name-active-face)
-      " 🞄 "
-      (:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
-      (,active-p ,(concat +mode-line-vcs-info +mode-line-smerge-count)
-                 (:propertize ,+mode-line-vcs-info face nil))
-      (,active-p ,+mode-line-flymake-indicator)
-      " "
-      (:eval +mode-line-encoding)
-      ,(or +mode-line-pdf-pages
-           (list "%l⋅" '(:eval (+mode-line-buffer-position))))
-      ;; " "
-      ;; (:eval ,(when-let ((imenu (and +mode-line-enough-width-p
-      ;;                                (breadcrumb-imenu-crumbs))))
-      ;;           (concat "🞄 " imenu)))
-      )))
+         (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
+         (imenu (and +mode-line-enough-width-p (breadcrumb-imenu-crumbs)))
+         (imenu-text (when imenu (concat "⋅" imenu)))
+         (lhs `((:propertize ,(+mode-line-get-window-name)
+                             face ,panel-face)
+                (:propertize ,(+mode-line-overwrite-readonly-indicator)
+                             face ,panel-face)
+                (,active-p (:propertize
+                            ,(concat (+mode-line-macro-indicator)
+                                     (+mode-line-symbol-overlay-indicator)
+                                     (+mode-line-use-region-indicator))
+                            face ,panel-face))
+                " "
+                ;; (:propertize "%b" face ,meta-face)
+                (:eval (breadcrumb-project-crumbs))
+                (:propertize +mode-line-remote-host-name
+                             face +mode-line-host-name-active-face)
+                (,active-p ,imenu-text (:propertize ,imenu-text face nil))
+                ))
+         (vcs-info (concat +mode-line-vcs-info +mode-line-smerge-count))
+         (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
+                (,active-p ,vcs-info
+                           (:propertize ,vcs-info face nil))
+                (,active-p ,+mode-line-flymake-indicator)
+                " "
+                (:eval +mode-line-encoding)
+                ,(or +mode-line-pdf-pages
+                     (list "%l⋅" '(:eval (+mode-line-buffer-position))))
+                " "
+                ))
+         (rhs-str (format-mode-line rhs))
+         (rhs-w (string-width rhs-str)))
+    `(,lhs
+      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
+      ,rhs-str)))
 
 (setq-default mode-line-format
               '((:eval (+mode-line-normal))))

@@ -113,12 +113,6 @@
     ))
 
 
-(defadvice! +mode-line-smaller-font-size-a (&rest _)
-  :after #'enable-theme
-  (set-face-attribute 'mode-line nil :height 0.9)
-  (set-face-attribute 'mode-line-inactive nil :height 0.9))
-
-
 ;; Smooth Scroll (less "jumpy" than defaults)
 (when (display-graphic-p)
   (setq mouse-wheel-scroll-amount '(2 ((shift) . hscroll) ((control) . nil))
