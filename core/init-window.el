@@ -68,12 +68,11 @@
               ("M-`" . popper-toggle-type))
   :hook (emacs-startup . popper-mode)
   :init
-  (setq popper-reference-buffers
+  (setq +popper-reference-buffers-select
         '("\\*Messages\\*"
           "Output\\*$" "\\*Pp Eval Output\\*$"
           "\\*Compile-Log\\*"
           "\\*Completions\\*"
-          "\\*Warnings\\*"
           "\\*Async Shell Command\\*"
           "\\*Apropos\\*"
           "\\*Backtrace\\*"
@@ -110,7 +109,6 @@
           "\\*gud-debug\\*$"
           "\\*quickrun\\*$"
           "\\*vc-.*\\*$"
-          "^\\*elfeed-entry\\*$"
           "^\\*macro expansion\\**"
           reb-mode
 
@@ -121,7 +119,10 @@
 
           chatgpt-shell-mode
           ))
-
+  (setq +popper-reference-buffer-no-select
+        '("\\*Warnings\\*"))
+  (setq popper-reference-buffers (append +popper-reference-buffers-select
+                                         +popper-reference-buffer-no-select))
   :config
   ;; mode-line indicator
   (with-eval-after-load 'popper
@@ -143,7 +144,38 @@
         (when (window-live-p window)
           (delete-window window)))))
 
-  ;; TODO: when switch normal buffer in side-window, disable side-window parameter
+  ;; HACK: do not select window in `+popper-reference-buffer-no-select'
+  (defvar +popper-unpacked-vars '(popper--reference-names
+                                  popper--reference-modes
+                                  popper--reference-predicates
+                                  popper--suppressed-names
+                                  popper--suppressed-modes
+                                  popper--suppressed-predicates))
+  (defvar +popper-unpacked-vars-no-select '())
+
+  (dolist (var +popper-unpacked-vars)
+    (let ((var-name (intern (concat "+" (symbol-name var) "-no-select"))))
+      (eval
+       `(progn
+          (defvar ,var-name nil)
+          (push ',var-name +popper-unpacked-vars-no-select)))))
+  (setq +popper-unpacked-vars-no-select (reverse +popper-unpacked-vars-no-select))
+
+  (cl-progv `(popper-reference-buffers ,@+popper-unpacked-vars)
+      (list +popper-reference-buffer-no-select)
+    (popper--set-reference-vars)
+    (cl-loop for var in +popper-unpacked-vars
+             for var-no-select in +popper-unpacked-vars-no-select
+             do (eval `(setq ,var-no-select ',(symbol-value var))))
+    )
+
+  (defun +popper-smart-popup-at-bottom (buffer &optional alist)
+    (let ((window (popper-display-popup-at-bottom buffer alist)))
+      (unless (cl-progv +popper-unpacked-vars
+                  (mapcar #'symbol-value +popper-unpacked-vars-no-select)
+                (popper-popup-p buffer))
+        (select-window window))))
+  (setq popper-display-function #'+popper-smart-popup-at-bottom)
   )
 
 

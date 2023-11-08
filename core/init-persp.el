@@ -24,24 +24,26 @@
    ;; Do not auto load
    persp-auto-resume-time 0)
 
-  (defun +eshell-toggle-by-persp ()
+  (defun +eshell-toggle-by-persp (&optional arg)
     "Toggle a persistent eshell popup window.
 If popup is visible but unselected, select it.
 If popup is focused, kill it."
-    (interactive)
-    (require 'eshell)
-    (if-let* ((name (concat "*Eshell-pop* [" persp-last-persp-name "]"))
-              (win (get-buffer-window name)))
-        (if (eq (selected-window) win)
-            ;; If users attempt to delete the sole ordinary window. silence it.
-            (ignore-errors (delete-window win))
-          (select-window win))
-      (let ((display-comint-buffer-action '(display-buffer-at-bottom
-                                            (inhibit-same-window . nil)))
-            (eshell-buffer-name name))
-        (with-current-buffer (eshell)
-          (persp-add-buffer name)
-          (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t)))))
+    (interactive "P")
+    (if arg
+        (chatgpt-shell)
+      (require 'eshell)
+      (if-let* ((name (concat "*Eshell-pop* [" persp-last-persp-name "]"))
+                (win (get-buffer-window name)))
+          (if (eq (selected-window) win)
+              ;; If users attempt to delete the sole ordinary window. silence it.
+              (ignore-errors (delete-window win))
+            (select-window win))
+        (let ((display-comint-buffer-action '(display-buffer-at-bottom
+                                              (inhibit-same-window . nil)))
+              (eshell-buffer-name name))
+          (with-current-buffer (eshell)
+            (persp-add-buffer name)
+            (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t))))))
 
   (defun +load-last-persp ()
     "Load last persp."
