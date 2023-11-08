@@ -98,7 +98,7 @@ If popup is focused, kill it."
 
   ;; Eww integration
   (persp-def-buffer-save/load
-   :mode 'eww-mode :tag-symbol 'def-eww-status-buffer
+   :mode 'eww-mode :tag-symbol 'def-eww-buffer
    :save-vars '(major-mode eww-history eww-data eww-history-position)
    :after-load-function
    #'(lambda (b &rest _)
@@ -108,6 +108,14 @@ If popup is focused, kill it."
              (eww url nil)))
          ;; restore buffer
          (switch-to-buffer cur-buf))))
+
+  ;; Telega integration
+  (persp-def-buffer-save/load
+   :mode 'telega-root-mode :tag-symbol 'def-telega-root-buffer
+   :save-vars '()
+   :load-function
+   #'(lambda (&rest _) (telega '(4)))
+   :after-load-function #'ignore)
 
   ;; Per-workspace [tab-bar]
   (with-eval-after-load 'tab-bar
