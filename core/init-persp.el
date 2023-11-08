@@ -69,11 +69,11 @@ If popup is focused, kill it."
             (string-match-p "\\.elc\\|\\.tar\\|\\.gz\\|\\.zip\\'" bname)
             (string-match-p "\\.bin\\|\\.so\\|\\.dll\\|\\.exe\\'" bname)))))
 
-  (add-hook! persp-filter-save-buffers-functions
-    (defun +persp-ignore-remote-buffers (buf)
-      "Ignore remote buffers, which cause errors"
-      (let ((dir (buffer-local-value 'default-directory buf)))
-        (ignore-errors (file-remote-p dir)))))
+  ;; (add-hook! persp-filter-save-buffers-functions
+  ;;   (defun +persp-ignore-remote-buffers (buf)
+  ;;     "Ignore remote buffers, which cause errors"
+  ;;     (let ((dir (buffer-local-value 'default-directory buf)))
+  ;;       (ignore-errors (file-remote-p dir)))))
 
   ;; Don't save persp configs in `recentf'
   (with-eval-after-load 'recentf
@@ -109,16 +109,16 @@ If popup is focused, kill it."
          ;; restore buffer
          (switch-to-buffer cur-buf))))
 
-  ;; Tab bar integration
+  ;; Per-workspace [tab-bar]
   (with-eval-after-load 'tab-bar
     ;; Save the current workspace's tab bar data.
     (add-hook! persp-before-deactivate-functions
-      (defun +persp-save-tab-bar-before-switching (_)
+      (defun +persp-save-tab-bar-before-switching (&rest _)
         (set-persp-parameter 'tab-bar-tabs (tab-bar-tabs))
         (set-persp-parameter 'tab-bar-closed-tabs tab-bar-closed-tabs)))
     ;; Restores the tab bar data of the workspace we have just switched to.
     (add-hook! persp-activated-functions
-      (defun +persp-restore-tab-bar-after-switching (_)
+      (defun +persp-restore-tab-bar-after-switching (&rest _)
         (tab-bar-tabs-set (persp-parameter 'tab-bar-tabs))
         (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))))
 
@@ -129,36 +129,12 @@ If popup is focused, kill it."
           (tab-bar-mode 1))))
     )
 
-  ;; Filter frame parameters
-  (setq +persp-filter-parameters-on-save
-        '((tab-bar-tabs . (lambda (conf) (frameset-filter-tabs conf nil nil t)))
-          (winner-ring . ignore)))
-
-  (defadvice! +persp--filter-frame-parameters-on-save-a (fn &rest args)
-    :around #'persp-save-state-to-file
-    (let ((all-persp-confs (make-hash-table))
-          (ret-val))
-      (dolist (persp (hash-table-values *persp-hash*))
-        (let ((cur-persp-confs (make-hash-table)))
-          (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
-                   do (let ((old (persp-parameter tag persp)))
-                        (puthash persp old cur-persp-confs)
-                        (set-persp-parameter tag (funcall filter old) persp)))
-          (puthash persp cur-persp-confs all-persp-confs)))
-      (setq ret-val (apply fn args))
-      (dolist (persp (hash-table-values *persp-hash*))
-        (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
-                 do (let* ((cur-persp-confs (gethash persp all-persp-confs))
-                           (old (gethash tag cur-persp-confs)))
-                      (set-persp-parameter tag old persp))))
-      ret-val))
-
   ;; Per-workspace [winner-mode] history
   (with-eval-after-load 'winner
     (add-to-list 'window-persistent-parameters '(winner-ring . t))
 
     (add-hook! persp-before-deactivate-functions
-      (defun +persp-save-winner-before-switching (_)
+      (defun +persp-save-winner-before-switching (&rest _)
         (when (get-current-persp)
           (set-persp-parameter
            'winner-ring (list winner-currents
@@ -166,7 +142,7 @@ If popup is focused, kill it."
                               winner-pending-undo-ring)))))
 
     (add-hook! persp-activated-functions
-      (defun +persp-restore-winner-after-switching (_)
+      (defun +persp-restore-winner-after-switching (&rest _)
         (cl-destructuring-bind
             (currents alist pending-undo-ring)
             (or (persp-parameter 'winner-ring) (list nil nil nil))
@@ -174,10 +150,38 @@ If popup is focused, kill it."
                 winner-currents currents
                 winner-ring-alist alist
                 winner-pending-undo-ring pending-undo-ring))))
-
-    ;; HACK: `pp' is slow, replace it with prin1
-    (+advice-pp-to-prin1! 'persp-save-state-to-file)
     )
+
+  ;; Filter frame parameters
+  ;; HACK: `pp' is slow, replace it with prin1
+  (+advice-pp-to-prin1! 'persp-save-state-to-file)
+
+  (defvar +persp-filter-parameters-on-save
+        '((tab-bar-tabs . (lambda (conf) (frameset-filter-tabs conf nil nil t)))
+          (winner-ring . ignore)))
+
+  (defvar +persp-set-parameter-on-save
+    '(+persp-save-tab-bar-before-switching +persp-save-winner-before-switching))
+
+  (defadvice! +persp--filter-frame-parameters-on-save-a (fn &rest args)
+    :around #'persp-save-state-to-file
+    (mapcar #'funcall +persp-set-parameter-on-save)
+    (let ((all-persp-confs (make-hash-table))
+          (ret-val))
+      (dolist (persp (hash-table-values *persp-hash*))
+        (let ((cur-persp-confs (make-hash-table)))
+          (cl-loop for (tag . filter) in +persp-filter-parameters-on-save
+                   do (let ((old (persp-parameter tag persp)))
+                        (puthash tag old cur-persp-confs)
+                        (set-persp-parameter tag (funcall filter old) persp)))
+          (puthash persp cur-persp-confs all-persp-confs)))
+      (setq ret-val (apply fn args))
+      (dolist (persp (hash-table-values *persp-hash*))
+        (cl-loop for (tag . _) in +persp-filter-parameters-on-save
+                 do (let* ((cur-persp-confs (gethash persp all-persp-confs))
+                           (old (gethash tag cur-persp-confs)))
+                      (set-persp-parameter tag old persp))))
+      ret-val))
 
   ;; Visual selection surviving workspace changes
   (add-hook 'persp-before-deactivate-functions #'deactivate-mark)
