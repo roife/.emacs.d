@@ -74,15 +74,15 @@
 (use-package copilot
   :when (executable-find "node")
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  ;; :hook ((prog-mode . +copilot-check-and-auto-activate))
+  :hook ((prog-mode . +copilot-check-and-auto-activate))
   :config
   (setq copilot-indent-warning-suppress t)
 
-  ;; (defun +copilot-check-and-auto-activate ()
-  ;;   (interactive)
-  ;;   (when (and (not (+temp-buffer-p (current-buffer)))
-  ;;              (project-current))
-  ;;     (copilot-mode)))
+  (defun +copilot-check-and-auto-activate ()
+    (interactive)
+    (when (and (not (+temp-buffer-p (current-buffer)))
+               (project-current))
+      (copilot-mode)))
 
   (defun +copilot-complete ()
     (interactive)

@@ -124,9 +124,9 @@
       (or +tab-bar-telega-indicator-cache
           (+tab-bar-telega-icon-update))))
 
-  (defun +tab-bar-copilot-icon ()
-    (when (bound-and-true-p copilot-mode)
-      (propertize " α " 'face '(:inherit font-lock-doc-face :inverse-video t))))
+  ;; (defun +tab-bar-copilot-icon ()
+  ;;   (when (bound-and-true-p copilot-mode)
+  ;;     (propertize " α " 'face '(:inherit font-lock-doc-face :inverse-video t))))
 
   ;; cache for org-pomodoro
   (with-eval-after-load 'org-pomodoro
@@ -179,11 +179,9 @@
 
   (defun-call! +show-tab-bar ()
     (interactive)
-    (setq tab-bar-format '(
-                          ;; +tab-bar-rime-indicator
-                          meow-indicator +tab-bar-telega-icon
-                          +tab-bar-copilot-icon +tab-bar-org-pomodoro-indicator +tab-bar-persp-indicator
-                          tab-bar-format-tabs))
+    (setq tab-bar-format '(meow-indicator +tab-bar-telega-icon
+                                          +tab-bar-org-pomodoro-indicator +tab-bar-persp-indicator
+                                          tab-bar-format-tabs))
     (tab-bar--update-tab-bar-lines))
 
   ;; WORKAROUND: fresh tab-bar for daemon
