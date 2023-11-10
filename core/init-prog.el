@@ -356,3 +356,17 @@
   :init
   (load-file (let ((coding-system-for-read 'utf-8))
                (shell-command-to-string "agda-mode locate"))))
+
+
+;; [treesit]
+(use-package treesitter
+  :when (treesit-available-p)
+  :init
+  (setq major-mode-remap-alist
+        '((c-mode . c-ts-mode)
+          (c++-mode . c++-ts-mode)
+          (python-mode . python-ts-mode)
+          (javascript-mode . javascript-ts-mode)
+          (typescript-mode . typescript-ts-mode)))
+
+  (setq treesit-font-lock-level 4))
