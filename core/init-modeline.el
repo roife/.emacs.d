@@ -85,7 +85,7 @@
 (defsubst +mode-line-symbol-overlay-indicator ()
   "Display the number of matches for symbol overlay."
   (when (and (bound-and-true-p symbol-overlay-keywords-alist)
-             (not (bound-and-true-p symbol-overlay-temp-symbol)))
+             (not symbol-overlay-temp-symbol))
     (let* ((keyword (symbol-overlay-assoc (symbol-overlay-get-symbol t)))
            (symbol (car keyword))
            (before (symbol-overlay-get-list -1 symbol))
@@ -94,7 +94,7 @@
       (if (symbol-overlay-assoc symbol)
           (concat  "🞄 " (number-to-string (1+ count))
                    "/" (number-to-string (+ count (length after)))
-                   "s "
+                   " sym "
                    (and (cadr keyword) "in scope "))))))
 
 
@@ -261,6 +261,10 @@
 
 (setq-default mode-line-format
               '((:eval (+mode-line-normal))))
+
+(timeout-throttle! 'breadcrumb-project-crumbs 0.3)
+(timeout-throttle! 'breadcrumb-imenu-crumbs 0.3)
+(timeout-throttle! '+mode-line-buffer-position 0.2)
 
 
 ;;; Header Line

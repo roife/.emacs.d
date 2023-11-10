@@ -310,3 +310,8 @@
 
     ;; better history search
     comint-history-isearch 'dwim))
+
+
+;; [timeout]
+(use-package timeout
+  :straight (:host github :repo "karthink/timeout" :branch "master"))
