@@ -303,15 +303,14 @@
 (use-package comint
   :config
   (setq comint-prompt-read-only t
-    comint-buffer-maximum-size 2048
+        comint-buffer-maximum-size 2048
 
-    ;; No paging, `eshell' and `shell' will honoring.
-    comint-pager "cat"
+        ;; No paging, `eshell' and `shell' will honoring.
+        comint-pager "cat"
 
-    ;; better history search
-    comint-history-isearch 'dwim))
+        ;; better history search
+        comint-history-isearch 'dwim))
 
-
-;; [timeout]
+;; [timeout] debounce and throttle
 (use-package timeout
   :straight (:host github :repo "karthink/timeout" :branch "master"))

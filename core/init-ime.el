@@ -27,7 +27,7 @@
                                    :inverse-video unspecified :underline t))))
   :init
   (require 'rime)
-  :bind ("s-SPC" . toggle-input-method)
+  :bind ("C-SPC" . toggle-input-method)
   :config
   (cond ((eq system-type 'darwin)
          (setq rime-librime-root "~/.emacs.d/librime/dist/"

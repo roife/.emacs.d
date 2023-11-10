@@ -66,16 +66,6 @@
   (cond (defining-kbd-macro "🞄 MacroDef ")
         (executing-kbd-macro "🞄 MacroExc ")))
 
-(defsubst +mode-line-use-region-indicator ()
-  "Display selected region in current buffer."
-  (when (use-region-p)
-    (let ((beg (region-beginning))
-          (end (region-end)))
-      (concat "🞄 " (number-to-string (count-lines beg end)) "r"
-              " " (number-to-string (count-words beg end)) "w"
-              " " (number-to-string (abs (- (mark t) (point)))) "c"
-              " "))))
-
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display whether it is in overwrite mode or read-only buffer."
   (let ((ro (when buffer-read-only " %%"))
@@ -218,6 +208,20 @@
       (_ (let ((first-char (substring pos 0 1)))
            (if (string= first-char " ") "0" first-char))))))
 
+
+;; [project-crumb]
+(defvar-local +mode-line-project-crumb nil)
+(defsubst +mode-line-update-project-crumb (&rest _)
+  (or +mode-line-project-crumb
+      (setq +mode-line-project-crumb
+            (breadcrumb-project-crumbs))))
+(add-hook 'find-file-hook #'+mode-line-update-project-crumb)
+(add-hook 'after-save-hook #'+mode-line-update-project-crumb)
+(advice-add #'rename-buffer :after #'+mode-line-update-project-crumb)
+(advice-add #'set-visited-file-name :after #'+mode-line-update-project-crumb)
+(advice-add #'pop-to-buffer :after #'+mode-line-update-project-crumb)
+
+
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
@@ -232,12 +236,13 @@
                              face ,panel-face)
                 (,active-p (:propertize
                             ,(concat (+mode-line-macro-indicator)
-                                     (+mode-line-symbol-overlay-indicator)
-                                     (+mode-line-use-region-indicator))
+                                     (+mode-line-symbol-overlay-indicator))
                             face ,panel-face))
                 " "
                 ;; (:propertize "%b" face ,meta-face)
-                (:eval (breadcrumb-project-crumbs))
+                (,(not +mode-line-project-crumb)
+                 (:propertize "%b" face ,meta-face)
+                 ,+mode-line-project-crumb)
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 (,active-p ,imenu-text (:propertize ,imenu-text face nil))
