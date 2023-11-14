@@ -17,7 +17,7 @@
   (setq telega-chat-show-avatars nil
         telega-user-show-avatars nil
         telega-root-show-avatars nil
-        telega-chat-fill-column 58
+        telega-chat-fill-column 68
         telega-translate-to-language-by-default "zh"
         telega-chat-input-markups '(nil "org")
         telega-chat-prompt-format "▶ "
@@ -33,7 +33,11 @@
         telega-root-auto-fill-mode nil
         ;; filters
         telega-filters-custom nil
-        telega-filter-custom-show-folders nil)
+        telega-filter-custom-show-folders nil
+        ;; symbols
+        telega-sticker--use-thumbnail t
+        ;; telega-use-images nil
+        telega-emoji-use-images nil)
 
   (if (eq system-type 'darwin)
       (setq telega-proxies '((:server "127.0.0.1" :port 7890 :enable t :type (:@type "proxyTypeSocks5"))))
@@ -58,6 +62,20 @@
   (add-hook! telega-root-mode-hook
     (defun +telega-disable-special-hl-line-fn ()
       (setq-local hl-line-range-function nil)))
+
+  (advice-add #'telega-chatbuf--goto-msg :after #'+recenter-and-pulse-line)
+
+  ;; disable some images
+  (defadvice! +telega-disable-image (orig-fn &rest args)
+    :around '(telega-symbol telega-ins--photo
+                            telega-ins--video
+                            telega-ins--input-file
+                            telega-ins--message-media-compact
+                            telega-ins--content-one-line)
+    (let ((telega-use-images nil))
+      (apply orig-fn args)))
+
+  (advice-add 'telega-ins--user-emoji-status :around #'ignore)
   )
 
 
@@ -81,6 +99,7 @@
   ;; HACK: we don't use all-the-icons but telega-url-shorten needs it
   ;; so just make it happy
   (provide 'all-the-icons)
+  (setq telega-url-shorten-use-images nil)
   (setq telega-url-shorten-regexps
         (list `(too-long-link
                 :regexp "^\\(https?://\\)\\(.\\{50\\}\\).*?$"
