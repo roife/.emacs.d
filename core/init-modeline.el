@@ -217,9 +217,13 @@
             (breadcrumb-project-crumbs))))
 (add-hook 'find-file-hook #'+mode-line-update-project-crumb)
 (add-hook 'after-save-hook #'+mode-line-update-project-crumb)
+(add-hook 'clone-indirect-buffer-hook #'+mode-line-update-project-crumb)
+(add-hook 'Info-selection-hook #'+mode-line-update-project-crumb)
 (advice-add #'rename-buffer :after #'+mode-line-update-project-crumb)
 (advice-add #'set-visited-file-name :after #'+mode-line-update-project-crumb)
 (advice-add #'pop-to-buffer :after #'+mode-line-update-project-crumb)
+(advice-add #'popup-create :after #'+mode-line-update-project-crumb)
+(advice-add #'popup-delete :after #'+mode-line-update-project-crumb)
 
 
 (defsubst +mode-line-normal ()

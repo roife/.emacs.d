@@ -7,6 +7,7 @@
 
 ;; [org]
 (use-package org
+  :straight (:type built-in)
   :custom-face (org-quote ((t (:inherit org-block-begin-line))))
   :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
   :config
@@ -197,6 +198,7 @@ Assume point is at first MARK."
 ;; [org-visual-outline] Add guide lines for org outline
 (use-package org-visual-outline
   :after org
+  :no-require t
   :straight (:host github :repo "legalnonsense/org-visual-outline" :files ("*.el"))
   :init
   (use-package org-visual-indent

@@ -69,7 +69,7 @@
   (sis-ism-lazyman-config nil "rime" 'native)
 
   ;; HACK: Set cursor color automatically
-  (add-hook! +theme-changed-hook :call-immediately
+  (add-hook! (+theme-changed-hook server-after-make-frame-hook) :call-immediately
     (defun +sis-set-other-cursor-color ()
       (setq sis-other-cursor-color (face-foreground 'error nil t))))
 

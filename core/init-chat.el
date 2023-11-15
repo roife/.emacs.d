@@ -8,7 +8,6 @@
   (telega-msg-heading ((t (:inherit hl-line :background unspecified))))
   (telega-msg-inline-reply ((t (:inherit (hl-line font-lock-function-name-face)))))
   (telega-msg-inline-forward ((t (:inherit (hl-line font-lock-type-face)))))
-  :hook ((telega-chat-mode . visual-line-mode))
   :bind (:map telega-chat-button-map
               ("h" . nil))
   :init
@@ -63,8 +62,6 @@
     (defun +telega-disable-special-hl-line-fn ()
       (setq-local hl-line-range-function nil)))
 
-  (advice-add #'telega-chatbuf--goto-msg :after #'+recenter-and-pulse-line)
-
   ;; disable some images
   (defadvice! +telega-disable-image (orig-fn &rest args)
     :around '(telega-symbol telega-ins--photo
@@ -76,6 +73,13 @@
       (apply orig-fn args)))
 
   (advice-add 'telega-ins--user-emoji-status :around #'ignore)
+
+  ;; turn on visual-fill-column-mode
+  (add-hook! telega-chat-mode-hook
+    (defun +telega-enable-visual-fill-column-mode ()
+      (visual-line-mode 1)
+      (visual-fill-column-mode 1)
+      (setq-local visual-fill-column-extra-text-width '(0 . 3))))
   )
 
 

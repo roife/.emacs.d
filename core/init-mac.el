@@ -14,7 +14,7 @@
   :straight (:host github :repo "roife/emt")
   :hook (after-init . emt-mode))
 
-(add-hook! ns-system-appearance-change-functions
+(add-hook! (ns-system-appearance-change-functions server-after-make-frame-hook)
   (defun +mac-auto-change-theme-with-system (&rest _)
     (+load-theme)))
 

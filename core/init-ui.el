@@ -77,7 +77,7 @@
 ;; Allow minibuffer commands while in the minibuffer.
 (setq enable-recursive-minibuffers t
       echo-keystrokes 0.02)
-(use-package minibuffer-depth-indicate-mode
+(use-package mb-depth
   :hook ((minibuffer-setup . minibuffer-depth-indicate-mode)))
 ;; Keep the cursor out of the read-only portions of the minibuffer
 (setq minibuffer-prompt-properties '(read-only t

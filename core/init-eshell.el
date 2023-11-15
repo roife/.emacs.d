@@ -222,8 +222,8 @@
   :after eshell
   :commands (eshell-up eshell-up-peek)
   :config
-  (defalias 'eshell-up 'eshell-up)
-  (defalias 'eshell-pk 'eshell-up-peek))
+  (setq eshell-up-ignore-case nil)
+  )
 
 
 ;; [esh-autosuggest]

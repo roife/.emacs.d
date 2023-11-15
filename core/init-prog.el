@@ -49,7 +49,15 @@
         eglot-connect-timeout 10
         eglot-autoshutdown t)
 
-  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  (setq-local eldoc-documentation-strategy ; eglot has it's own strategy by default
+              'eldoc-documentation-compose-eagerly
+              completion-at-point-functions
+              (cl-nsubst
+               (cape-capf-noninterruptible
+                (cape-capf-buster #'eglot-completion-at-point #'string-prefix-p))
+               'eglot-completion-at-point
+               completion-at-point-functions))
   )
 
 
@@ -359,7 +367,7 @@
 
 
 ;; [treesit]
-(use-package treesitter
+(use-package treesit
   :when (treesit-available-p)
   :init
   (setq major-mode-remap-alist
