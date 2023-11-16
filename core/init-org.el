@@ -41,6 +41,11 @@
 
    org-imenu-depth 4)
 
+  (add-hook! 'org-mode-hook
+    (defun +org-enable-sub-superscript ()
+      (require 'tex-mode)
+      (font-lock-add-keywords nil tex-font-lock-keywords-3)))
+
   ;; custom link
   (defun +org-custom-link-img-follow (path)
     (org-open-file

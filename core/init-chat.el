@@ -8,6 +8,7 @@
   (telega-msg-heading ((t (:inherit hl-line :background unspecified))))
   (telega-msg-inline-reply ((t (:inherit (hl-line font-lock-function-name-face)))))
   (telega-msg-inline-forward ((t (:inherit (hl-line font-lock-type-face)))))
+  (telega-msg-user-title ((t (:bold t))))
   :bind (:map telega-chat-button-map
               ("h" . nil))
   :init
@@ -58,7 +59,7 @@
     )
 
   ;; better hl-line settings in telega
-  (add-hook! telega-root-mode-hook
+  (add-hook! (telega-root-mode-hook telega-chat-mode-hook)
     (defun +telega-disable-special-hl-line-fn ()
       (setq-local hl-line-range-function nil)))
 
@@ -68,11 +69,10 @@
                             telega-ins--video
                             telega-ins--input-file
                             telega-ins--message-media-compact
-                            telega-ins--content-one-line)
+                            telega-ins--content-one-line
+                            telega-ins--user-emoji-status)
     (let ((telega-use-images nil))
       (apply orig-fn args)))
-
-  (advice-add 'telega-ins--user-emoji-status :around #'ignore)
 
   ;; turn on visual-fill-column-mode
   (add-hook! telega-chat-mode-hook

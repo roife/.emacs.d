@@ -11,12 +11,17 @@
          ("C-c d d" . osx-dictionary-search-pointer)))
 
 (use-package emt
-  :straight (:host github :repo "roife/emt")
+  :straight (:host github :repo "roife/emt"
+                   :files ("*.el" "module/*" "module"))
   :hook (after-init . emt-mode))
 
 (add-hook! (ns-system-appearance-change-functions server-after-make-frame-hook)
   (defun +mac-auto-change-theme-with-system (&rest _)
     (+load-theme)))
+
+;; Prevent accidental touch
+(unbind-key "C-<wheel-down>")
+(unbind-key "C-<wheel-up>")
 
 ;; Selects the most-recently-used ASCII-capable keyboard input source when in chineses input mode
 ;; (mac-auto-ascii-mode)
