@@ -34,10 +34,12 @@
         ;; filters
         telega-filters-custom nil
         telega-filter-custom-show-folders nil
-        ;; symbols
+        ;; images
         telega-sticker--use-thumbnail t
         ;; telega-use-images nil
-        telega-emoji-use-images nil)
+        telega-emoji-use-images nil
+
+        telega-symbols-emojify nil)
 
   (if (eq system-type 'darwin)
       (setq telega-proxies '((:server "127.0.0.1" :port 7890 :enable t :type (:@type "proxyTypeSocks5"))))
@@ -65,12 +67,11 @@
 
   ;; disable some images
   (defadvice! +telega-disable-image (orig-fn &rest args)
-    :around '(telega-symbol telega-ins--photo
-                            telega-ins--video
-                            telega-ins--input-file
-                            telega-ins--message-media-compact
-                            telega-ins--content-one-line
-                            telega-ins--user-emoji-status)
+    :around '(telega-ins--photo telega-ins--video
+                                telega-ins--input-file
+                                telega-ins--message-media-compact
+                                telega-ins--content-one-line
+                                telega-ins--user-emoji-status)
     (let ((telega-use-images nil))
       (apply orig-fn args)))
 
