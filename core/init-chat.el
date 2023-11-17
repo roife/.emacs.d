@@ -68,7 +68,12 @@
   (advice-add #'telega-ins--user-emoji-status :override #'ignore)
 
   (defadvice! +telega-enable-image-for-stickers (orig-fn &rest args)
-    :around '(telega-sticker--create-image telega-describe-stickerset)
+    :around '(telega-sticker--create-image
+              ;; telega-describe-stickerset
+              telega-ins--sticker-list
+              telega-ins--sticker-image
+              telega-ins--inline-sticker
+              telega-chatbuf-sticker-insert)
     (let ((telega-use-images t))
       (apply orig-fn args)))
 
