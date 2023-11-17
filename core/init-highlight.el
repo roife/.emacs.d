@@ -100,7 +100,7 @@
 ;; [goggles] Highlight modified region
 (use-package goggles
   :straight t
-  :hook (after-init . goggles-mode)
+  :hook ((prog-mode text-mode) . goggles-mode)
   :config
   (setq-default goggles-pulse nil)
   )
@@ -114,6 +114,9 @@
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
   :init
+  (setq pulse-delay 0.08
+        pulse-iterations 2)
+
   (defun +pulse-momentary-line (&rest _)
     "Pulse the current line."
     (pulse-momentary-highlight-one-line (point)))
