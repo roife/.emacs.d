@@ -82,13 +82,19 @@
 (use-package copilot
   :when (executable-find "node")
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook ((prog-mode org-mode markdown-mode) . copilot-mode)
+  :hook ((prog-mode org-mode markdown-mode) . +copilot-activate)
   :bind (:map copilot-mode-map
          ("C-e" . +copilot-complete)
          ("M-f" . +copilot-complete-word))
   :config
   (copilot--start-agent)
+
   (setq copilot-indent-warning-suppress t)
+
+  (defun +copilot-activate ()
+    (interactive)
+    (when (not (+temp-buffer-p (current-buffer)))
+      (copilot-mode)))
 
   (defun +copilot-complete ()
     (interactive)
