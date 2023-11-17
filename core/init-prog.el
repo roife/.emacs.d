@@ -82,31 +82,22 @@
 (use-package copilot
   :when (executable-find "node")
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook ((prog-mode . +copilot-check-and-auto-activate))
+  :hook ((prog-mode org-mode markdown-mode) . copilot-mode)
+  :bind (:map copilot-mode-map
+         ("C-e" . +copilot-complete)
+         ("M-f" . +copilot-complete-word))
   :config
   (setq copilot-indent-warning-suppress t)
-
-  (defun +copilot-check-and-auto-activate ()
-    (interactive)
-    (when (and (not (+temp-buffer-p (current-buffer)))
-               (project-current))
-      (copilot-mode)))
 
   (defun +copilot-complete ()
     (interactive)
     (or (copilot-accept-completion)
         (mwim-end-of-code-or-line)))
 
-  (with-eval-after-load 'copilot
-    (define-key copilot-mode-map (kbd "C-e") #'+copilot-complete))
-
   (defun +copilot-complete-word ()
     (interactive)
     (or (copilot-accept-completion-by-word 1)
         (forward-word)))
-
-  (with-eval-after-load 'copilot
-    (define-key copilot-mode-map (kbd "M-f") #'+copilot-complete-word))
   )
 
 
@@ -224,12 +215,7 @@
   (setq
    scala-indent:align-parameters t
    ;; indent block comments to first asterix, not second
-   scala-indent:use-javadoc-style t)
-  )
-
-
-(use-package firrtl-mode
-  :straight t)
+   scala-indent:use-javadoc-style t))
 
 
 (use-package llvm-mode

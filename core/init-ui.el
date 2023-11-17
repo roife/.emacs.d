@@ -78,7 +78,7 @@
 (setq enable-recursive-minibuffers t
       echo-keystrokes 0.02)
 (use-package mb-depth
-  :hook ((minibuffer-setup . minibuffer-depth-indicate-mode)))
+  :hook (after-init . minibuffer-depth-indicate-mode))
 ;; Keep the cursor out of the read-only portions of the minibuffer
 (setq minibuffer-prompt-properties '(read-only t
                                                intangible t
@@ -138,17 +138,18 @@
 
 (defvar +light-theme 'doom-nord-light)
 (defvar +dark-theme 'doom-spacegrey)
-(defun-call! +load-theme (&optional theme)
-  (unless theme
-    (setq theme (if (and (display-graphic-p)
-                         (cond ((eq system-type 'darwin)
-                                (eq ns-system-appearance 'light))
-                               (t t)))
-                    +light-theme
-                  +dark-theme)))
-  (unless (member theme custom-enabled-themes)
-    (mapc #'disable-theme custom-enabled-themes)
-    (load-theme theme t)))
+(add-hook! server-after-make-frame-hook :call-immediately
+  (defun +load-theme (&optional theme)
+    (unless theme
+      (setq theme (if (and (display-graphic-p)
+                           (cond ((eq system-type 'darwin)
+                                  (eq ns-system-appearance 'light))
+                                 (t t)))
+                      +light-theme
+                    +dark-theme)))
+    (unless (member theme custom-enabled-themes)
+      (mapc #'disable-theme custom-enabled-themes)
+      (load-theme theme t))))
 
 ;; [window-divider] Display window divider
 (setq window-divider-default-places t

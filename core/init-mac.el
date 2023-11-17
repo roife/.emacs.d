@@ -15,7 +15,7 @@
                    :files ("*.el" "module/*" "module"))
   :hook (after-init . emt-mode))
 
-(add-hook! (ns-system-appearance-change-functions server-after-make-frame-hook)
+(add-hook! ns-system-appearance-change-functions
   (defun +mac-auto-change-theme-with-system (&rest _)
     (+load-theme)))
 
