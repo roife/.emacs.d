@@ -87,6 +87,7 @@
          ("C-e" . +copilot-complete)
          ("M-f" . +copilot-complete-word))
   :config
+  (copilot--start-agent)
   (setq copilot-indent-warning-suppress t)
 
   (defun +copilot-complete ()
@@ -195,6 +196,9 @@
   :config
   (setq c-basic-offset 4)
   (c-set-offset 'case-label '+))
+
+
+(use-package elisp-mode)
 
 
 (use-package csv-mode

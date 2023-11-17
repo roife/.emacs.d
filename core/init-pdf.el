@@ -2,10 +2,7 @@
 (use-package pdf-tools
   :straight t
   :defines pdf-annot-activate-created-annotations
-  :hook ((pdf-tools-enabled . pdf-view-auto-slice-minor-mode)
-         (pdf-tools-enabled . pdf-isearch-minor-mode)
-         (pdf-tools-enabled . pdf-occur-global-minor-mode)
-         (pdf-tools-enabled . pdf-outline-minor-mode))
+  :hook ((pdf-tools-enabled . pdf-view-auto-slice-minor-mode))
   :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
   :bind (:map pdf-view-mode-map
          ([remap scroll-up-command] . pdf-view-scroll-up-or-next-page)
@@ -17,6 +14,14 @@
   :config
   (pdf-tools-install t nil t nil)
   )
+
+(use-package pdf-isearch
+  :after pdf-tools
+  :hook (pdf-tools-enabled . pdf-isearch-minor-mode))
+
+(use-package pdf-outline
+  :after pdf-tools
+  :hook (pdf-tools-enabled . pdf-outline-minor-mode))
 
 ;; (use-package pdf-annot
 ;;   :after pdf-tools
