@@ -139,15 +139,15 @@
         (setq +tab-bar-org-pomodoro-indicator-cache
               (cl-case org-pomodoro-state
                 (:none
-                 (propertize " Stop " 'face '(:inherit font-lock-comment-face :inverse-video t)))
+                 (propertize " ◌ " 'face '(:inherit font-lock-comment-face :inverse-video t)))
                 (:pomodoro
-                 (propertize " Pomo " 'face '(:inherit org-pomodoro-mode-line :inverse-video t)))
+                 (propertize " ● " 'face '(:inherit org-pomodoro-mode-line :inverse-video t)))
                 (:overtime
-                 (propertize " Over " 'face '(:inherit org-pomodoro-mode-line-overtime :inverse-video t)))
+                 (propertize " ●● " 'face '(:inherit org-pomodoro-mode-line-overtime :inverse-video t)))
                 (:short-break
-                 (propertize " Short break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t)))
+                 (propertize " ⭘ " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t)))
                 (:long-break
-                 (propertize " Long break " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t))))))
+                 (propertize " ⭘⭘ " 'face '(:inherit org-pomodoro-mode-line-break :inverse-video t))))))
       ))
 
   (defun +tab-bar-org-pomodoro-indicator ()
@@ -156,21 +156,21 @@
           (+tab-bar-org-pomodoro-indicator-update))))
 
   ;; ime
-  (defvar +tab-bar-rime-active-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-face :inverse-video t)))
-  (defvar +tab-bar-rime-inactive-hint (propertize " ● " 'face '(:inherit rime-indicator-face :inverse-video t)))
-  (defvar +tab-bar-no-ime-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-dim-face :inverse-video t)))
-  (defun +tab-bar-rime-indicator ()
-    (let ((text-help (if (and (bound-and-true-p rime-mode)
-                              (equal current-input-method "rime"))
-                         (if (and (rime--should-enable-p)
-                                  (not (rime--should-inline-ascii-p)))
-                             (cons +tab-bar-rime-active-hint "Rime Enabled")
-                           (cons +tab-bar-rime-inactive-hint "Rime Disabled"))
-                       (cons +tab-bar-no-ime-hint "No IME"))))
-      `((tab-bar-rime menu-item
-                      ,(car text-help)
-                      ignore
-                      :help ,(cdr text-help)))))
+  ;; (defvar +tab-bar-rime-active-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-face :inverse-video t)))
+  ;; (defvar +tab-bar-rime-inactive-hint (propertize " ● " 'face '(:inherit rime-indicator-face :inverse-video t)))
+  ;; (defvar +tab-bar-no-ime-hint (propertize " ⭘ " 'face '(:inherit rime-indicator-dim-face :inverse-video t)))
+  ;; (defun +tab-bar-rime-indicator ()
+  ;;   (let ((text-help (if (and (bound-and-true-p rime-mode)
+  ;;                             (equal current-input-method "rime"))
+  ;;                        (if (and (rime--should-enable-p)
+  ;;                                 (not (rime--should-inline-ascii-p)))
+  ;;                            (cons +tab-bar-rime-active-hint "Rime Enabled")
+  ;;                          (cons +tab-bar-rime-inactive-hint "Rime Disabled"))
+  ;;                      (cons +tab-bar-no-ime-hint "No IME"))))
+  ;;     `((tab-bar-rime menu-item
+  ;;                     ,(car text-help)
+  ;;                     ignore
+  ;;                     :help ,(cdr text-help)))))
 
 
   (defun +hide-tab-bar ()
