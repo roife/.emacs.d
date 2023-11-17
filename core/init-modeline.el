@@ -271,10 +271,6 @@
 (setq-default mode-line-format
               '((:eval (+mode-line-normal))))
 
-(timeout-throttle! 'breadcrumb-project-crumbs 0.3)
-(timeout-throttle! 'breadcrumb-imenu-crumbs 0.3)
-(timeout-throttle! '+mode-line-buffer-position 0.2)
-
 
 ;;; Header Line
 ;; TODO: The performance of bc is a little bad, so I disable it for now.
