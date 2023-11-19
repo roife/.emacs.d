@@ -49,14 +49,6 @@
               ("C-r" . vertico-repeat-select)))
 
 
-(use-package vertico-mouse
-  :straight nil
-  :after vertico
-  :custom-face
-  (vertico-mouse ((t (:inherit hl-line))))
-  :hook (vertico-mode . vertico-mouse-mode))
-
-
 (use-package orderless
   :straight t
   :init (require 'orderless)
@@ -321,6 +313,13 @@
               ("C-, ," . corfu-quick-complete)))
 
 
+(use-package corfu-terminal
+  :straight t
+  :when (not (display-graphic-p))
+  :after corfu
+  :init (corfu-terminal-mode 1))
+
+
 (use-package cape
   :straight t
   :hook ((corfu-mode . +corfu-add-cape-backends)
@@ -338,13 +337,6 @@
 (use-package dabbrev
   :config
   (setq dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
-
-
-(use-package corfu-terminal
-  :straight t
-  :when (not (display-graphic-p))
-  :after corfu
-  :init (corfu-terminal-mode 1))
 
 
 ;; TODO: Consult-dash

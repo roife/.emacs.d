@@ -1,6 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-
 ;; [vc-mode] Version control interface
 (use-package vc
   :config
@@ -18,7 +17,6 @@
          ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) . diff-hl-show-hunk-mouse-mode))
   :config
   (setq
-   diff-hl-draw-borders nil
    ;; Reduce load on remote
    diff-hl-disable-on-remote t
    ;; A slightly faster algorithm for diffing
@@ -32,7 +30,7 @@
     (diff-hl-update-once))
 
   ;; Make fringes look better
-  (define-fringe-bitmap '+diff-hl-bmp (vector #b00000000) 1 8 '(center t))
+  (define-fringe-bitmap '+diff-hl-bmp (vector #b11110000) 1 8 '(center t))
   (setq diff-hl-fringe-bmp-function #'(lambda (&rest _) '+diff-hl-bmp))
 
   ;; Integration with magit

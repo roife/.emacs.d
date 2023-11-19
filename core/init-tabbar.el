@@ -1,7 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
 ;; Show persp list when only one persp exists
-(defvar +tab-bar-shows-single-empty-persp nil)
+;; (defvar +tab-bar-shows-single-empty-persp nil)
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
@@ -41,37 +41,37 @@
              (propertize (concat " " (alist-get 'name tab) " ") 'face face)))))
 
   ;; cache for persp indicator
-  (with-eval-after-load 'persp-mode
-    (defvar +tab-bar-persp-indicator-cache nil)
-
-    (add-hook! (persp-activated-functions persp-names-cache-changed-functions)
-      (defun +tab-bar-update-persp-indicator (&rest _)
-        (when-let* ((persp-list (persp-names-current-frame-fast-ordered))
-                    (len (length persp-list)))
-          (setq +tab-bar-persp-indicator-cache
-                (when (or (> len 1) +tab-bar-shows-single-empty-persp)
-                  (let* ((cur-persp-name (safe-persp-name (get-current-persp)))
-                         (cur-pos (cl-position cur-persp-name persp-list))
-                         (before (seq-subseq persp-list 0 cur-pos))
-                         (before-joined (concat (string-join before " ") " "))
-                         (after (seq-subseq persp-list (1+ cur-pos)))
-                         (after-joined (concat " " (string-join after " ")))
-                         (face '(:inherit font-lock-constant-face :inverse-video t))
-                         (text (concat (propertize (concat " " (when before before-joined) "") 'face face)
-                                       (propertize (concat cur-persp-name)
-                                                   'face (append face '(:weight ultra-bold :underline t)))
-                                       (propertize (concat (when after after-joined) " ") 'face face))))
-                    `((tab-bar-persp menu-item
-                                     ,text
-                                     ignore
-                                     :help ,(concat "Current persp: " cur-persp-name))))))
-          (force-mode-line-update t)
-          +tab-bar-persp-indicator-cache))))
-
-  (defun +tab-bar-persp-indicator ()
-    (when (bound-and-true-p persp-mode)
-      (or +tab-bar-persp-indicator-cache
-          (+tab-bar-update-persp-indicator))))
+  ;; (with-eval-after-load 'persp-mode
+  ;;   (defvar +tab-bar-persp-indicator-cache nil)
+  ;;
+  ;;   (add-hook! (persp-activated-functions persp-names-cache-changed-functions)
+  ;;     (defun +tab-bar-update-persp-indicator (&rest _)
+  ;;       (when-let* ((persp-list (persp-names-current-frame-fast-ordered))
+  ;;                   (len (length persp-list)))
+  ;;         (setq +tab-bar-persp-indicator-cache
+  ;;               (when (or (> len 1) +tab-bar-shows-single-empty-persp)
+  ;;                 (let* ((cur-persp-name (safe-persp-name (get-current-persp)))
+  ;;                        (cur-pos (cl-position cur-persp-name persp-list))
+  ;;                        (before (seq-subseq persp-list 0 cur-pos))
+  ;;                        (before-joined (concat (string-join before " ") " "))
+  ;;                        (after (seq-subseq persp-list (1+ cur-pos)))
+  ;;                        (after-joined (concat " " (string-join after " ")))
+  ;;                        (face '(:inherit font-lock-constant-face :inverse-video t))
+  ;;                        (text (concat (propertize (concat " " (when before before-joined) "") 'face face)
+  ;;                                      (propertize (concat cur-persp-name)
+  ;;                                                  'face (append face '(:weight ultra-bold :underline t)))
+  ;;                                      (propertize (concat (when after after-joined) " ") 'face face))))
+  ;;                   `((tab-bar-persp menu-item
+  ;;                                    ,text
+  ;;                                    ignore
+  ;;                                    :help ,(concat "Current persp: " cur-persp-name))))))
+  ;;         (force-mode-line-update t)
+  ;;         +tab-bar-persp-indicator-cache))))
+  ;;
+  ;; (defun +tab-bar-persp-indicator ()
+  ;;   (when (bound-and-true-p persp-mode)
+  ;;     (or +tab-bar-persp-indicator-cache
+  ;;         (+tab-bar-update-persp-indicator))))
 
   ;; cache for telega indicator
   (with-eval-after-load 'telega
@@ -105,10 +105,10 @@
                  (help-echo (concat "Current User: " first-name " " last-name "\n"
                                     "Status: " (if online-p "online" "offline"))))
             (setq +tab-bar-telega-indicator-cache
-                  `((tab-bar-persp menu-item
-                                   ,text
-                                   ignore
-                                   :help ,help-echo))))
+                  `((tab-bar-telega menu-item
+                                    ,text
+                                    ignore
+                                    :help ,help-echo))))
           (force-mode-line-update t)
           +tab-bar-telega-indicator-cache)
         ))
@@ -180,7 +180,8 @@
   (defun-call! +show-tab-bar ()
     (interactive)
     (setq tab-bar-format '(meow-indicator +tab-bar-telega-icon
-                                          +tab-bar-org-pomodoro-indicator +tab-bar-persp-indicator
+                                          +tab-bar-org-pomodoro-indicator
+                                          ;; +tab-bar-persp-indicator
                                           tab-bar-format-tabs))
     (tab-bar--update-tab-bar-lines))
 

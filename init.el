@@ -31,7 +31,6 @@
                      'init-highlight
                      'init-edit
                      'init-spell
-                     'init-persp
                      'init-window
                      'init-dired
                      'init-eshell
@@ -51,6 +50,7 @@
                      'init-pdf
                      'init-test
 
+                     ;; 'init-persp
                      ;; 'init-elfeed
                      ;; 'init-gnus
                      ;; 'init-webservice

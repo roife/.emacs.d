@@ -44,16 +44,6 @@
     (add-hook! kill-emacs-hook #'rime-lib-finalize))
   )
 
-;; `defmacro' cannot be placed in use-package
-;; (defmacro +sis-add-post-cmd-hook! (modes func)
-;;   "Add post-command-hook to MODES."
-;;   (declare (indent defun))
-;;   (let ((func-name (cadr func)))
-;;     `(add-hook! ,modes
-;;        (defun ,(intern (format "%s-add-post-cmd-hook" func-name)) ()
-;;          (add-hook! post-command-hook :local
-;;            ,func)))))
-
 
 (use-package sis
   :straight t
