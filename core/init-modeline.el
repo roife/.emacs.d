@@ -211,14 +211,11 @@
 
 ;; [project-crumb]
 (defvar-local +mode-line-project-crumb nil)
-(defsubst +mode-line-update-project-crumb (&rest _)
-  (or +mode-line-project-crumb
-      (setq +mode-line-project-crumb
-            (breadcrumb-project-crumbs))))
-(add-hook 'find-file-hook #'+mode-line-update-project-crumb)
-(add-hook 'after-save-hook #'+mode-line-update-project-crumb)
-(add-hook 'clone-indirect-buffer-hook #'+mode-line-update-project-crumb)
-(add-hook 'Info-selection-hook #'+mode-line-update-project-crumb)
+(add-hook! (find-file-hook after-save-hook clone-indirect-buffer-hook Info-selection-hook
+                           window-configuration-change-hook window-size-change-functions)
+  (defun +mode-line-update-project-crumb (&rest _)
+    (setq +mode-line-project-crumb
+          (breadcrumb-project-crumbs))))
 (advice-add #'rename-buffer :after #'+mode-line-update-project-crumb)
 (advice-add #'set-visited-file-name :after #'+mode-line-update-project-crumb)
 (advice-add #'pop-to-buffer :after #'+mode-line-update-project-crumb)
