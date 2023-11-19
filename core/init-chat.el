@@ -1,6 +1,6 @@
 ;; -*- lexical-binding: t; -*-
-(use-package language-detection
-  :straight t)
+;; (use-package language-detection
+;;   :straight t)
 
 (use-package telega
   :straight t
@@ -86,12 +86,12 @@
   )
 
 
-(use-package telega-mnz
-  :straight nil
-  :hook ((telega-load . global-telega-mnz-mode))
-  :config
-  (setq telega-mnz-use-language-detection t)
-  )
+;; (use-package telega-mnz
+;;   :straight nil
+;;   :hook ((telega-load . global-telega-mnz-mode))
+;;   :config
+;;   (setq telega-mnz-use-language-detection t)
+;;   )
 
 
 (use-package telega-dired-dwim
