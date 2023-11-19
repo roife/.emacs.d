@@ -91,12 +91,12 @@
 (use-package dired-hacks
   :straight (:files (:defaults "*.el"))
   :after dired
-  :bind (:map dired-mode-map
-              ("TAB" . dired-subtree-toggle))
   :init
-  ;; Don't show background, which is ugly in light themes
-  (with-eval-after-load 'dired-subtree
-    (setq dired-subtree-use-backgrounds nil)))
+  (use-package dired-subtree
+    :bind (:map dired-mode-map
+                ("TAB" . dired-subtree-toggle))
+    :config
+    (setq dired-subtree-line-prefix "    ")))
 
 
 ;; [diredfl] Make dired colorful
