@@ -40,22 +40,24 @@
    eshell-cmpl-cycle-completions nil
    )
 
-  (defun +eshell-toggle ()
+  (defun +eshell-toggle (&optional arg)
     "Toggle a persistent eshell popup window.
 If popup is visible but unselected, select it.
 If popup is focused, kill it."
-    (interactive)
-    (require 'eshell)
-    (if-let ((win (get-buffer-window "*Eshell-pop*")))
-        (if (eq (selected-window) win)
-            ;; If users attempt to delete the sole ordinary window. silence it.
-            (ignore-errors (delete-window win))
-          (select-window win))
-      (let ((display-comint-buffer-action '(display-buffer-at-bottom
-                                            (inhibit-same-window . nil)))
-            (eshell-buffer-name "*Eshell-pop*"))
-        (with-current-buffer (eshell)
-          (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t)))))
+    (interactive "P")
+    (if arg
+        (chatgpt-shell)
+      (require 'eshell)
+      (if-let ((win (get-buffer-window "*Eshell-pop*")))
+          (if (eq (selected-window) win)
+              ;; If users attempt to delete the sole ordinary window. silence it.
+              (ignore-errors (delete-window win))
+            (select-window win))
+        (let ((display-comint-buffer-action '(display-buffer-at-bottom
+                                              (inhibit-same-window . nil)))
+              (eshell-buffer-name "*Eshell-pop*"))
+          (with-current-buffer (eshell)
+            (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t))))))
 
   ;; [UI]
   (add-hook 'eshell-mode-hook
