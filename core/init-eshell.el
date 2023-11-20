@@ -5,7 +5,8 @@
   :defines eshell-prompt-function
   :functions eshell/alias
   :hook ((eshell-mode . compilation-shell-minor-mode))
-  :bind (:map eshell-mode-map
+  :bind (("C-`" . +eshell-toggle)
+         :map eshell-mode-map
          ("C-l" . eshell/clear)
          ("M-s" . consult-history))
   :config
@@ -39,22 +40,22 @@
    eshell-cmpl-cycle-completions nil
    )
 
-;;   (defun +eshell-toggle ()
-;;     "Toggle a persistent eshell popup window.
-;; If popup is visible but unselected, select it.
-;; If popup is focused, kill it."
-;;     (interactive)
-;;     (require 'eshell)
-;;     (if-let ((win (get-buffer-window "*Eshell-pop*")))
-;;         (if (eq (selected-window) win)
-;;             ;; If users attempt to delete the sole ordinary window. silence it.
-;;             (ignore-errors (delete-window win))
-;;           (select-window win))
-;;       (let ((display-comint-buffer-action '(display-buffer-at-bottom
-;;                                             (inhibit-same-window . nil)))
-;;             (eshell-buffer-name "*Eshell-pop*"))
-;;         (with-current-buffer (eshell)
-;;           (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t)))))
+  (defun +eshell-toggle ()
+    "Toggle a persistent eshell popup window.
+If popup is visible but unselected, select it.
+If popup is focused, kill it."
+    (interactive)
+    (require 'eshell)
+    (if-let ((win (get-buffer-window "*Eshell-pop*")))
+        (if (eq (selected-window) win)
+            ;; If users attempt to delete the sole ordinary window. silence it.
+            (ignore-errors (delete-window win))
+          (select-window win))
+      (let ((display-comint-buffer-action '(display-buffer-at-bottom
+                                            (inhibit-same-window . nil)))
+            (eshell-buffer-name "*Eshell-pop*"))
+        (with-current-buffer (eshell)
+          (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t)))))
 
   ;; [UI]
   (add-hook 'eshell-mode-hook
@@ -189,7 +190,7 @@
       "Change eshell buffer name by directory change."
       (when (and (equal major-mode 'eshell-mode)
                  ;; avoid renaming buffer name when in `eshell-popup'
-                 (eq (string-match "^\\*Eshell-pop\\* \\[.+\\]$" (buffer-name)) nil))
+                 (eq (buffer-name) "*Eshell-pop*"))
         (rename-buffer (concat "Esh: " (abbreviate-file-name default-directory)) t))))
   )
 
