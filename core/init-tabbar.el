@@ -21,14 +21,13 @@
   (setq tab-bar-tab-name-function
         (lambda () (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
                      (count (length (window-list-1 nil 'nomini)))
-                     (truncated-tab-name (if (< (length raw-tab-name)
-                                                tab-bar-tab-name-truncated-max)
+                     (truncated-tab-name (if (< (length raw-tab-name) tab-bar-tab-name-truncated-max)
                                              raw-tab-name
                                            (truncate-string-to-width raw-tab-name
                                                                      tab-bar-tab-name-truncated-max
                                                                      nil nil tab-bar-tab-name-ellipsis))))
                 (if (> count 1)
-                    (concat truncated-tab-name "(" (number-to-string count) ")")
+                    (concat truncated-tab-name (+num-to-sup-string count))
                   truncated-tab-name))))
 
   ;; Add spaces for tab-name

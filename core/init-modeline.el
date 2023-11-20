@@ -270,8 +270,6 @@
 
 
 ;;; Header Line
-;; TODO: The performance of bc is a little bad, so I disable it for now.
-;;      Maybe I will solve the problem in the future.
 ;; [breadcrumb] Add breadcrumb navigation in header-line
 (use-package breadcrumb
   :custom-face

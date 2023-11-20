@@ -114,7 +114,7 @@
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
   :init
-  (setq pulse-delay 0.08
+  (setq pulse-delay 0.1
         pulse-iterations 2)
 
   (defun +pulse-momentary-line (&rest _)

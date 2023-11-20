@@ -122,6 +122,14 @@ This command does the inverse of `fill-region'."
   "Return t if BUFFER is temporary."
   (string-match-p "^ " (buffer-name buffer)))
 
+(defun +num-to-sup-string (num)
+  "Convert NUM to a small string.
+
+Example: 12 -> \"¹²\""
+  (let ((str (number-to-string num))
+        (superscripts "⁰¹²³⁴⁵⁶⁷⁸⁹"))
+    (mapconcat (lambda (c) (char-to-string (elt superscripts (- c ?0)))) str)))
+
 ;; theme changed hook
 (defvar +theme-changed-hook nil
   "Hook run after the theme is changed.")

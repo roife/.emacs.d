@@ -339,4 +339,9 @@
   (setq dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
 
-;; TODO: Consult-dash
+(use-package consult-dash
+  :straight t
+  :bind (("M-s d" . consult-dash))
+  :config
+  ;; Use the symbol at point as initial search term
+  (consult-customize consult-dash :initial (thing-at-point 'symbol)))

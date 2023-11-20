@@ -374,3 +374,8 @@
           (typescript-mode . typescript-ts-mode)))
 
   (setq treesit-font-lock-level 4))
+
+
+;; [dash] api docset
+(use-package dash-docs
+  :straight t)
