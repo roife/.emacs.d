@@ -203,6 +203,8 @@
     (defun +savehist--remove-string-properties-h ()
       (setq kill-ring (mapcar #'substring-no-properties
                               (cl-remove-if-not #'stringp kill-ring))
+            search-ring (mapcar #'substring-no-properties search-ring)
+            regexp-search-ring (mapcar #'substring-no-properties regexp-search-ring)
             register-alist (cl-loop for (reg . item) in register-alist
                                     if (stringp item)
                                     collect (cons reg (substring-no-properties item))
