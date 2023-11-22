@@ -226,8 +226,9 @@ begin and end of the block surrounding point."
   :bind (:map project-prefix-map
               ("m" . magit-status))
   :config
-  (setq project-switch-commands '((project-find-file "Find file")
-                                  (project-find-regexp "Find regexp")
+  (setq project-switch-commands '((project-find-file "File")
+                                  (project-find-regexp "Regexp")
+                                  (project-switch-to-buffer "Buffer")
                                   (project-dired "Dired")
                                   (project-eshell "Eshell")
                                   (project-search "Search")
