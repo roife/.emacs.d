@@ -224,15 +224,13 @@ begin and end of the block surrounding point."
 ;; [project] Project manager
 (use-package project
   :bind (:map project-prefix-map
-              ("m" . magit-status)
-              ("s" . shell))
+              ("m" . magit-status))
   :config
   (setq project-switch-commands '((project-find-file "Find file")
                                   (project-find-regexp "Find regexp")
                                   (project-dired "Dired")
                                   (project-eshell "Eshell")
                                   (project-search "Search")
-                                  (shell "Shell")
                                   (magit-status "Magit")))
 
   (defun +project-previous-buffer (arg)
