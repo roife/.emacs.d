@@ -9,7 +9,7 @@
 (defvar +mode-line-show-common-vc-tools-name nil)
 
 ;;; Check whether `window-total-width' is larger than the limit
-(defconst +mode-line-window-width-limit 85)
+(defconst +mode-line-window-width-limit 80)
 (defvar-local +mode-line-enough-width-p nil)
 (add-hook! (after-revert-hook buffer-list-update-hook window-size-change-functions)
            (defun +mode-line-window-size-change-function (&rest _)
@@ -229,7 +229,9 @@
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
          (imenu (and +mode-line-enough-width-p (breadcrumb-imenu-crumbs)))
-         (imenu-text (when (and imenu (not (string-empty-p imenu)))
+         (imenu-text (when (and imenu
+                                (not (string-empty-p imenu))
+                                (< (string-width imenu) (ash (window-width) -2)))
                        (concat "⋅" imenu)))
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,panel-face)
@@ -280,8 +282,8 @@
   :commands breadcrumb--header-line
   :config
   (setq breadcrumb-imenu-crumb-separator "⋅"
-        breadcrumb-project-max-length 0.4
-        breadcrumb-imenu-max-length 0.3
+        breadcrumb-project-max-length 0.35
+        breadcrumb-imenu-max-length 0.2
         breadcrumb-idle-time 10))
 
 (setq-default header-line-format nil)
