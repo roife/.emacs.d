@@ -1,18 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-;; [sis] automatically switch input source
-(defvar meow-leave-insert-mode-hook nil
-  "Hook to run when leaving meow insert mode.")
-(defvar meow-enter-insert-mode-hook nil
-  "Hook to run when entering meow insert mode.")
-(add-hook! meow-insert-mode-hook
-  (defun +meow-insert-mode-run-hook-on-mode ()
-    (run-hooks
-     (if meow-insert-mode 'meow-enter-insert-mode-hook
-       'meow-leave-insert-mode-hook))
-    )
-  )
-
 
 (use-package rime
   :straight (rime :type git
@@ -45,6 +32,7 @@
   )
 
 
+;; [sis] automatically switch input source
 (use-package sis
   :straight t
   :hook (;; Enable the inline-english-mode for all buffers.
@@ -78,8 +66,8 @@
   (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc)
 
   ;; Context mode
-  (add-hook 'meow-leave-insert-mode-hook #'sis-set-english)
-  (add-to-list 'sis-context-hooks 'meow-enter-insert-mode-hook)
+  (add-hook 'meow-insert-exit-hook #'sis-set-english)
+  (add-to-list 'sis-context-hooks 'meow-insert-enter-hook)
 
   ;; Ignore some mode with context mode
   (defadvice! +sis-context-guess-ignore-modes (fn &rest args)

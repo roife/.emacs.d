@@ -41,55 +41,6 @@
 
    org-imenu-depth 4)
 
-  (defconst org-match-substring-regexp
-    (concat
-     "\\(\\S-\\)\\([_^]\\)\\("
-     "\\(?:" (org-create-multibrace-regexp "{" "}" org-match-sexp-depth) "\\)"
-     "\\|"
-     "\\(?:" (org-create-multibrace-regexp "(" ")" org-match-sexp-depth) "\\)"
-     "\\|"
-     "\\(?:.\\)"
-     "\\|"
-     "\\(?:\\\\[[:alnum:].,\\]*[[:alnum:]]\\)"
-     "\\)")
-    "The regular expression matching a sub- or superscript.")
-
-  (defun +org-raise-scripts (limit)
-    "Add raise properties to sub/superscripts."
-    (when (and org-pretty-entities org-pretty-entities-include-sub-superscripts
-               (re-search-forward org-match-substring-regexp limit t))
-      (let* ((pos (point)) table-p comment-p
-             (mpos (match-beginning 3))
-             (emph-p (get-text-property mpos 'org-emphasis))
-             (link-p (get-text-property mpos 'mouse-face))
-             (keyw-p (eq 'org-special-keyword (get-text-property mpos 'face)))
-             (tex-p (eq 'org-latex-and-related (get-text-property mpos 'face))))
-        (goto-char (line-beginning-position))
-        (setq table-p (looking-at-p org-table-dataline-regexp)
-              comment-p (looking-at-p "^[ \t]*#[ +]"))
-        (goto-char pos)
-        ;; Handle a_b^c
-        (when (member (char-after) '(?_ ?^)) (goto-char (1- pos)))
-        (if (not (or comment-p emph-p link-p keyw-p))
-          (put-text-property (match-beginning 3) (match-end 0)
-                             'display
-                             (if (equal (char-after (match-beginning 2)) ?^)
-                                 (nth (if table-p 3 1) org-script-display)
-                               (nth (if table-p 2 0) org-script-display)))
-          (put-text-property (match-beginning 2) (match-end 3) 'org-emphasis t))
-        t)))
-  (advice-add #'org-raise-scripts :override #'+org-raise-scripts)
-
-  ;; custom link
-  (defun +org-custom-link-img-follow (path)
-    (org-open-file
-     (format "%s/static/%s" (project-root (project-current)) path)))
-  (defun +org-custom-link-img-export (path desc format)
-    (cond
-     ((eq format 'html)
-      (format "<img src=\"/images/%s\" alt=\"%s\"/>" path desc))))
-  (org-link-set-parameters "img" :follow '+org-custom-link-img-follow :export '+org-custom-link-img-export)
-
   ;; Better Org Latex Preview
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil
@@ -232,6 +183,26 @@ Assume point is at first MARK."
           ("nsupset" "\\nsupset" t "⊅" "⊅" "⊅" "⊅")
           ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
           ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉"))))
+
+
+;; [org-appear] Make invisible parts of Org elements appear visible.
+(use-package org-appear
+  :straight t
+  :hook ((org-mode . org-appear-mode)
+         (meow-insert-enter . org-appear-manual-start)
+         (meow-insert-exit . org-appear-manual-stop))
+  :config
+  (setq
+   org-hide-emphasis-markers t
+
+   org-appear-autosubmarkers t
+   org-appear-autoentities t
+   org-appear-autokeywords t
+   org-appear-inside-latex t
+
+   org-appear-delay 0.1
+
+   org-appear-trigger 'manual))
 
 
 ;; [org-visual-outline] Add guide lines for org outline
