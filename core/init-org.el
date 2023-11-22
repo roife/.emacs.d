@@ -13,12 +13,12 @@
   :config
   (setq
    ;; subscription: Use {} for sub- or super- scripts
-   org-use-sub-superscripts "{}"
+   org-use-sub-superscripts '{}
+   org-export-with-sub-superscripts '{}
 
    ;; prettify
    org-startup-indented t
    org-pretty-entities t
-   org-pretty-entities-include-sub-superscripts nil
    org-ellipsis "…"
    ;; Highlight quote and verse blocks
    org-fontify-quote-and-verse-blocks t
@@ -41,10 +41,44 @@
 
    org-imenu-depth 4)
 
-  (add-hook! 'org-mode-hook
-    (defun +org-enable-sub-superscript ()
-      (require 'tex-mode)
-      (font-lock-add-keywords nil tex-font-lock-keywords-3)))
+  (defconst org-match-substring-regexp
+    (concat
+     "\\(\\S-\\)\\([_^]\\)\\("
+     "\\(?:" (org-create-multibrace-regexp "{" "}" org-match-sexp-depth) "\\)"
+     "\\|"
+     "\\(?:" (org-create-multibrace-regexp "(" ")" org-match-sexp-depth) "\\)"
+     "\\|"
+     "\\(?:.\\)"
+     "\\|"
+     "\\(?:\\\\[[:alnum:].,\\]*[[:alnum:]]\\)"
+     "\\)")
+    "The regular expression matching a sub- or superscript.")
+
+  (defun +org-raise-scripts (limit)
+    "Add raise properties to sub/superscripts."
+    (when (and org-pretty-entities org-pretty-entities-include-sub-superscripts
+               (re-search-forward org-match-substring-regexp limit t))
+      (let* ((pos (point)) table-p comment-p
+             (mpos (match-beginning 3))
+             (emph-p (get-text-property mpos 'org-emphasis))
+             (link-p (get-text-property mpos 'mouse-face))
+             (keyw-p (eq 'org-special-keyword (get-text-property mpos 'face)))
+             (tex-p (eq 'org-latex-and-related (get-text-property mpos 'face))))
+        (goto-char (line-beginning-position))
+        (setq table-p (looking-at-p org-table-dataline-regexp)
+              comment-p (looking-at-p "^[ \t]*#[ +]"))
+        (goto-char pos)
+        ;; Handle a_b^c
+        (when (member (char-after) '(?_ ?^)) (goto-char (1- pos)))
+        (if (not (or comment-p emph-p link-p keyw-p))
+          (put-text-property (match-beginning 3) (match-end 0)
+                             'display
+                             (if (equal (char-after (match-beginning 2)) ?^)
+                                 (nth (if table-p 3 1) org-script-display)
+                               (nth (if table-p 2 0) org-script-display)))
+          (put-text-property (match-beginning 2) (match-end 3) 'org-emphasis t))
+        t)))
+  (advice-add #'org-raise-scripts :override #'+org-raise-scripts)
 
   ;; custom link
   (defun +org-custom-link-img-follow (path)
@@ -59,7 +93,7 @@
   ;; Better Org Latex Preview
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil
-        org-highlight-latex-and-related '(script entities))
+        org-highlight-latex-and-related '(latex))
   (plist-put org-format-latex-options :scale 1.5)
 
   ;; HACK: inline highlight for CJK
@@ -176,28 +210,28 @@ Assume point is at first MARK."
 (use-package org-entities
   :config
   (setq org-entities-user
-        '(("vdash" "\\vdash" t "&vdash;" "⊢" "⊢" "⊢")
-          ("vDash" "\\vDash" t "&vDash;" "⊨" "⊨" "⊨")
-          ("Vdash" "\\Vdash" t "&Vdash;" "⊩" "⊩" "⊩")
-          ("Vvdash" "\\Vvdash" t "&Vvdash;" "⊪" "⊪" "⊪")
-          ("nvdash" "\\nvdash" t "&nvdash;" "⊬" "⊬" "⊬")
-          ("nvDash" "\\nvDash" t "&nvDash;" "⊭" "⊭" "⊭")
-          ("nVdash" "\\nVdash" t "&nVdash;" "⊮" "⊮" "⊮")
-          ("nVDash" "\\nVDash" t "&nVDash;" "⊯" "⊯" "⊯")
-          ("subseteq" "\\subseteq" t "&subseteq;" "⊆" "⊆" "⊆")
-          ("supseteq" "\\supseteq" t "&supseteq;" "⊇" "⊇" "⊇")
-          ("subsetneq" "\\subsetneq" t "&subsetneq;" "⊊" "⊊" "⊊")
-          ("supsetneq" "\\supsetneq" t "&supsetneq;" "⊋" "⊋" "⊋")
-          ("nsubseteq" "\\nsubseteq" t "&nsubseteq;" "⊈" "⊈" "⊈")
-          ("nsupseteq" "\\nsupseteq" t "&nsupseteq;" "⊉" "⊉" "⊉")
-          ("nsubseteqq" "\\nsubseteqq" t "&nsubseteqq;" "⊈" "⊈" "⊈")
-          ("nsupseteqq" "\\nsupseteqq" t "&nsupseteqq;" "⊉" "⊉" "⊉")
-          ("subsetneqq" "\\subsetneqq" t "&subsetneqq;" "⊊" "⊊" "⊊")
-          ("supsetneqq" "\\supsetneqq" t "&supsetneqq;" "⊋" "⊋" "⊋")
-          ("nsubset" "\\nsubset" t "&nsubset;" "⊄" "⊄" "⊄")
-          ("nsupset" "\\nsupset" t "&nsupset;" "⊅" "⊅" "⊅")
-          ("nsubseteq" "\\nsubseteq" t "&nsubseteq;" "⊈" "⊈" "⊈")
-          ("nsupseteq" "\\nsupseteq" t "&nsupseteq;" "⊉" "⊉" "⊉"))))
+        '(("vdash" "\\vdash" t "⊢" "⊢" "⊢" "⊢")
+          ("vDash" "\\vDash" t "⊨" "⊨" "⊨" "⊨")
+          ("Vdash" "\\Vdash" t "⊩" "⊩" "⊩" "⊩")
+          ("Vvdash" "\\Vvdash" t "⊪" "⊪" "⊪" "⊪")
+          ("nvdash" "\\nvdash" t "⊬" "⊬" "⊬" "⊬")
+          ("nvDash" "\\nvDash" t "⊭" "⊭" "⊭" "⊭")
+          ("nVdash" "\\nVdash" t "⊮" "⊮" "⊮" "⊮")
+          ("nVDash" "\\nVDash" t "⊯" "⊯" "⊯" "⊯")
+          ("subseteq" "\\subseteq" t "⊆" "⊆" "⊆" "⊆")
+          ("supseteq" "\\supseteq" t "⊇" "⊇" "⊇" "⊇")
+          ("subsetneq" "\\subsetneq" t "⊊" "⊊" "⊊" "⊊")
+          ("supsetneq" "\\supsetneq" t "⊋" "⊋" "⊋" "⊋")
+          ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")
+          ("nsubseteqq" "\\nsubseteqq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteqq" "\\nsupseteqq" t "⊉" "⊉" "⊉" "⊉")
+          ("subsetneqq" "\\subsetneqq" t "⊊" "⊊" "⊊" "⊊")
+          ("supsetneqq" "\\supsetneqq" t "⊋" "⊋" "⊋" "⊋")
+          ("nsubset" "\\nsubset" t "⊄" "⊄" "⊄" "⊄")
+          ("nsupset" "\\nsupset" t "⊅" "⊅" "⊅" "⊅")
+          ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉"))))
 
 
 ;; [org-visual-outline] Add guide lines for org outline
