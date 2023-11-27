@@ -70,12 +70,6 @@
   )
 
 
-;; [expand-region] Select a region quickly
-(use-package expand-region
-  :straight t
-  :bind ("C-=" . er/expand-region))
-
-
 ;; [ialign] Interactive align
 (use-package ialign
   :straight t)

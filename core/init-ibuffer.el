@@ -1,8 +1,17 @@
 ;;; -*- lexical-binding: t -*-
 
 (use-package ibuffer
-  :bind (("C-x C-b" . ibuffer))
+  :bind (("C-x C-b" . ibuffer)
+         :map ibuffer-mode-map
+         ("RET" . +ibuffer-visit-buffer-in-popper))
   :config
+  (defun +ibuffer-visit-buffer-in-popper ()
+    (interactive)
+    (if (window-parameter nil 'window-side)
+        (let ((win (selected-window)))
+          (ibuffer-visit-buffer-other-window)
+          (delete-window win))
+      (ibuffer-visit-buffer)))
 
   (setq ibuffer-show-empty-filter-groups nil
         ibuffer-use-other-window t)

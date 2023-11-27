@@ -18,6 +18,7 @@
         telega-user-show-avatars nil
         telega-root-show-avatars nil
         telega-chat-fill-column 68
+        telega-idle-delay 5
         telega-translate-to-language-by-default "zh"
         telega-chat-input-markups '(nil "org")
         telega-chat-prompt-format "▶ "

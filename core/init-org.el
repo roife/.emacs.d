@@ -45,7 +45,7 @@
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil
         org-highlight-latex-and-related '(latex))
-  (plist-put org-format-latex-options :scale 1.5)
+  (plist-put org-format-latex-options :scale 1.3)
 
   ;; HACK: inline highlight for CJK
   (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:][:alpha:]"
