@@ -70,6 +70,11 @@
         eglot-extend-to-xref t))
 
 
+;; [help]
+(use-package help
+  :bind (("s-?" . display-local-help)))
+
+
 ;; [consult-eglot] Eglot support for consult
 (use-package consult-eglot
   :after consult eglot
