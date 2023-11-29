@@ -210,7 +210,7 @@
 
 ;; [symbol-overlay] Highlight symbols
 (use-package symbol-overlay
-  :straight t
+  :straight (:host github :repo "roife/symbol-overlay" :branch "master")
   :bind (("C-c s i" . symbol-overlay-put)
          ("C-c s n" . symbol-overlay-switch-forward)
          ("C-c s p" . symbol-overlay-switch-backward)
