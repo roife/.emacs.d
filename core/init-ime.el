@@ -1,7 +1,8 @@
 ;;; -*- lexical-binding: t; -*-
 
 (use-package macim
-  :straight (:host github :repo "roife/macim.el")
+  :straight (:host github :repo "roife/macim.el"
+                   :files ("*.el" "module/*" "module"))
   :hook (after-init . macim-mode)
   :config
   (setq +macim-chinese-punc-chars (mapcar #'string-to-char macim--chinese-punc-list))
@@ -12,18 +13,22 @@
       (delete-char 1)))
   (setq macim-inline-head-handler #'+macim-remove-head-space-after-cc-punc)
 
-  (defun +macim-remove-tail-space-before-cc-punc (_)
-    (when (eq (char-before) ? )
-      (backward-delete-char 1)
-      (when (and (eq (char-before) ? )
-                 (memq (char-after) +macim-chinese-punc-chars))
-        (backward-delete-char 1))))
+  (defun +macim-remove-tail-space-before-cc-punc (tighten-back-to)
+    (when (> (point) tighten-back-to)
+      (backward-delete-char (1- (- (point) tighten-back-to))))
+    (when (and (eq (char-before) ? )
+               (memq (char-after) +macim-chinese-punc-chars))
+      (backward-delete-char 1)))
   (setq macim-inline-tail-handler #'+macim-remove-tail-space-before-cc-punc)
 
   ;; context-switch
   (add-hook 'meow-insert-exit-hook #'macim-select-ascii)
   (add-hook 'meow-insert-enter-hook #'macim-context-switch)
   (add-hook 'buffer-list-update-hook #'macim-context-switch)
+  ;; (advice-add 'select-window :after
+  ;;             #'(lambda (win &rest _)
+  ;;                 (unless (window-minibuffer-p win))
+  ;;                   (macim-context-switch)))
 
   ;; context-mode
   (defun +macim-context-ignore-modes ()
