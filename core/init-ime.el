@@ -25,26 +25,25 @@
   (add-hook 'meow-insert-exit-hook #'macim-select-ascii)
   (add-hook 'meow-insert-enter-hook #'macim-context-switch)
   (add-hook 'buffer-list-update-hook #'macim-context-switch)
-  ;; (advice-add 'select-window :after
-  ;;             #'(lambda (win &rest _)
-  ;;                 (unless (window-minibuffer-p win))
-  ;;                   (macim-context-switch)))
 
   ;; context-mode
+  (defun +macim-context-meow ()
+    (if meow-insert-mode nil 'ascii))
+
   (defun +macim-context-ignore-modes ()
     (when (derived-mode-p 'pdf-view-mode)
       'ascii))
 
+  (add-to-list 'macim-context-early-predicates #'+macim-context-meow)
   (add-to-list 'macim-context-early-predicates #'+macim-context-ignore-modes)
 
   (defun +macim-context-switching-other (back-detect fore-detect)
-    (when (and meow-insert-mode
-               (or (and (derived-mode-p 'org-mode 'markdown-mode 'text-mode)
-                        (macim--context-other-p back-detect fore-detect))
-                   (and (derived-mode-p 'telega-chat-mode)
-                        (or (and (= (point) telega-chatbuf--input-marker) ; beginning of input
-                                 (eolp))
-                            (macim--context-other-p back-detect fore-detect)))))
+    (when (or (and (derived-mode-p 'org-mode 'markdown-mode 'text-mode)
+                   (macim--context-other-p back-detect fore-detect))
+              (and (derived-mode-p 'telega-chat-mode)
+                   (or (and (= (point) telega-chatbuf--input-marker) ; beginning of input
+                            (eolp))
+                       (macim--context-other-p back-detect fore-detect))))
       'other))
 
   (add-to-list 'macim-context-predicates #'+macim-context-switching-other)
