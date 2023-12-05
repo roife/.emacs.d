@@ -36,6 +36,13 @@
   (add-to-list 'markdown-code-lang-modes '("verilog" . verilog-mode))
   (add-to-list 'markdown-code-lang-modes '("agda" . agda2-mode)))
 
+
+;; [typst-ts-mode]
+(use-package typst-ts-mode
+  :straight (:host sourcehut :repo "meow_king/typst-ts-mode")
+  :custom
+  (typst-ts-mode-watch-options "--open"))
+
 ;; [auctex]
 (use-package tex
   :straight auctex
