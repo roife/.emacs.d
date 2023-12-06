@@ -225,4 +225,6 @@
          ("c" . symbol-overlay-put)
          ("C" . symbol-overlay-remove-all))
   :hook (((prog-mode yaml-mode) . symbol-overlay-mode))
+  :config
+  (setq symbol-overlay-temp-highlight-on-region t)
   )
