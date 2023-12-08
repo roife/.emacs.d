@@ -301,6 +301,11 @@
   :straight t)
 
 
+;; [toml]
+(use-package toml-mode
+  :straight t)
+
+
 ;; [graphviz-dot]
 (use-package graphviz-dot-mode
   :straight t
