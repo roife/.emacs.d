@@ -68,7 +68,7 @@
               ("r" . rainbow-mode))
   :hook ((html-mode css-mode) . rainbow-mode)
   :config
-  ;; removedHACK: Use overlay instead of text properties to override `hl-line' faces.
+  ;; removed HACK: Use overlay instead of text properties to override `hl-line' faces.
   ;; @see https://emacs.stackexchange.com/questions/36420
   )
 
