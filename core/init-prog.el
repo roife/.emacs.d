@@ -257,8 +257,7 @@
   (setq
    rustic-lsp-client 'eglot
    rustic-indent-method-chain t
-   rust-prettify-symbols-alist nil)
-  )
+   rust-prettify-symbols-alist nil))
 
 
 (use-package rust-playground
@@ -270,8 +269,7 @@
   :config
   (setq
    haskell-process-suggest-remove-import-lines t
-   haskell-process-auto-import-loaded-modules t)
-  )
+   haskell-process-auto-import-loaded-modules t))
 
 
 (use-package verilog-mode
@@ -317,8 +315,7 @@
 (use-package proof-general
   :straight t
   :init
-  (setq proof-splash-enable nil)
-  )
+  (setq proof-splash-enable nil))
 
 
 ;; Major mode for editing web templates
@@ -345,8 +342,7 @@
    web-mode-css-indent-offset 2
    web-mode-code-indent-offset 2
    web-mode-enable-html-entities-fontification t
-   web-mode-auto-close-style 1)
-  )
+   web-mode-auto-close-style 1))
 
 
 ;; [skewer-mode] Live browser JavaScript, CSS, and HTML interaction
