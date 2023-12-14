@@ -29,9 +29,9 @@
       (diff-hl-margin-local-mode))
     (diff-hl-update-once))
 
-  ;; Make fringes look better
-  (define-fringe-bitmap '+diff-hl-bmp (vector #b11110000) 1 8 '(center t))
-  (setq diff-hl-fringe-bmp-function #'(lambda (&rest _) '+diff-hl-bmp))
+  ;; Make fringes look better (slow)
+  ;; (define-fringe-bitmap '+diff-hl-bmp (vector #b11110000) 1 8 '(center t))
+  ;; (setq diff-hl-fringe-bmp-function #'(lambda (&rest _) '+diff-hl-bmp))
 
   ;; Integration with magit
   (with-eval-after-load 'magit

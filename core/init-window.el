@@ -182,9 +182,7 @@
 ;; [zoom] Managing the window sizes automatically
 (use-package zoom
   :straight t
-  :hook (window-setup . zoom-mode)
-  :config
-  (timeout-throttle! 'zoom--handler 0.1))
+  :hook (window-setup . zoom-mode))
 
 
 ;; [auto-dim-other-buffers] Dim non-active buffers
