@@ -10,5 +10,5 @@ buffer."
                         (eglot--languages server)
                         when (provided-mode-derived-p major-mode mode)
                         return languageid)
-        ""))
+	"Unknown"))
   )

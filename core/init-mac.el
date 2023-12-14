@@ -15,6 +15,15 @@
                    :files ("*.el" "module/*" "module"))
   :hook (after-init . emt-mode))
 
+(use-package exec-path-from-shell
+  :straight t
+  :init
+  (setq exec-path-from-shell-variables '("PATH" "MANPATH" "EDITOR"))
+
+  (setq exec-path-from-shell-check-startup-files nil) ;
+  (setq exec-path-from-shell-arguments '("-l" )) ;remove -i read form .zshenv
+  (exec-path-from-shell-initialize))
+
 (add-hook! ns-system-appearance-change-functions
   (defun +mac-auto-change-theme-with-system (&rest _)
     (+load-theme)))

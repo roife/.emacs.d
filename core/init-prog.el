@@ -50,15 +50,15 @@
         eglot-autoshutdown t)
 
   ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
-  (setq-local eldoc-documentation-strategy ; eglot has it's own strategy by default
-              'eldoc-documentation-compose-eagerly
-              completion-at-point-functions
-              (cl-nsubst
-               (cape-capf-noninterruptible
-                (cape-capf-buster #'eglot-completion-at-point #'string-prefix-p))
-               'eglot-completion-at-point
-               completion-at-point-functions))
+  ; eglot has it's own strategy by default
+  (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly
+              completion-at-point-functions (cl-nsubst
+                                             (cape-capf-noninterruptible
+                                              (cape-capf-buster #'eglot-completion-at-point #'string-prefix-p))
+                                             'eglot-completion-at-point
+                                             completion-at-point-functions))
   )
+
 
 
 ;; [Eldoc]
