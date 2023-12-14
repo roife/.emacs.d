@@ -13,7 +13,7 @@
 
 ;; [show-paren-mode] Highlight matching parens
 (use-package paren
-  :custom-face (show-paren-match ((t (:underline t :weight bold))))
+  :custom-face (show-paren-match ((t (:foreground "SpringGreen3" :underline t :weight bold))))
   :config
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t
@@ -52,10 +52,8 @@
   :hook ((minibuffer-setup . highlight-parentheses-minibuffer-setup)
          (prog-mode . highlight-parentheses-mode))
   :config
-  (setq highlight-parentheses-colors '("SpringGreen3" "firebrick1" "orange1" "orange3")
-        highlight-parentheses-attributes '((:underline t :weight bold)
-                                           (:underline t :weight bold)
-                                           (:underline t :weight bold))
+  (setq highlight-parentheses-colors '("firebrick1" "firebrick3" "orange1" "orange3")
+        highlight-parentheses-attributes '((:underline t) (:underline t) (:underline t))
         highlight-parentheses-delay 0.2)
   )
 

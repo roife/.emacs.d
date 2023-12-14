@@ -117,7 +117,7 @@
  :straight (:host github :repo "roife/macim.el"
                   :files ("*.el" "module/*" "module"))
  :when (eq system-type 'darwin)
- ;; :hook (after-init . macim-mode)
+ :hook (after-init . macim-mode)
  :config
  (setq +macim-chinese-punc-chars (mapcar #'string-to-char macim--chinese-punc-list))
 
