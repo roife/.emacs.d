@@ -13,10 +13,10 @@
 (add-hook 'emacs-startup-hook #'efs/display-startup-time)
 
 ;; Proxy
-(setq url-proxy-services
-      '(("no_proxy" . "^\\(localhost\\|10.*\\)")
-        ("http" . "127.0.0.1:7890")
-        ("https" . "127.0.0.1:7890")))
+;; (setq url-proxy-services
+;;       '(("no_proxy" . "^\\(localhost\\|10.*\\)")
+;;         ("http" . "127.0.0.1:7890")
+;;         ("https" . "127.0.0.1:7890")))
 
 (defvar +init-files (list
                      'init-util

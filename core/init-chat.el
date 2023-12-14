@@ -42,9 +42,9 @@
 
         telega-symbols-emojify nil)
 
-  (if (eq system-type 'darwin)
-      (setq telega-proxies '((:server "127.0.0.1" :port 7890 :enable t :type (:@type "proxyTypeSocks5"))))
-    (setq telega-proxies '((:server "127.0.0.1" :port 7891 :enable t :type (:@type "proxyTypeSocks5")))))
+  (if (eq system-type 'gnu/linux)
+      (setq telega-proxies '((:server "127.0.0.1" :port 7891 :enable t :type (:@type "proxyTypeSocks5"))))
+    (setq telega-server-libs-prefix "/opt/homebrew/Cellar/tdlib/HEAD-1a50ec4"))
 
   ;; completion
   (setq telega-emoji-company-backend #'telega-company-emoji)

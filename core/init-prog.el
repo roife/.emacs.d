@@ -251,13 +251,13 @@
   (setq css-indent-offset 2))
 
 
-(use-package rustic
+(use-package rust-mode
+  :straight t)
+
+
+(use-package cargo
   :straight t
-  :config
-  (setq
-   rustic-lsp-client 'eglot
-   rustic-indent-method-chain t
-   rust-prettify-symbols-alist nil))
+  :hook (rust-mode . cargo-minor-mode))
 
 
 (use-package rust-playground

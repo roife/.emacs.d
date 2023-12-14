@@ -90,7 +90,7 @@
 
 
 ;; Font: Same width and height for emoji, chinese and english characters
-(defvar +font-size (if (eq system-type 'darwin) 15 26))
+(defvar +font-size (if (eq system-type 'darwin) 18 26))
 
 (add-hook! server-after-make-frame-hook :call-immediately
   (defun +setup-fonts ()
