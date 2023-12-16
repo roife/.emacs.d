@@ -279,7 +279,7 @@ begin and end of the block surrounding point."
 
 ;; [imenu] Jump to function definitions
 (use-package imenu
-  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . imenu-add-menubar-index)
+  ;; :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (imenu--make-index-alist t)))
   )
 
 

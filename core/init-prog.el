@@ -41,28 +41,40 @@
 ;; [Eglot] LSP support
 (use-package eglot
   :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
-  :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
+  ;; :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
          ("M-<return>" . eglot-code-actions))
   :config
   (setq eglot-events-buffer-size 0
         eglot-connect-timeout 10
-        eglot-autoshutdown t)
+        eglot-autoshutdown t
+        eglot-report-progress 'messages)
 
   ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
-  ; eglot has it's own strategy by default
+  ;; eglot has it's own strategy by default
   (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly
               completion-at-point-functions (cl-nsubst
                                              (cape-capf-noninterruptible
                                               (cape-capf-buster #'eglot-completion-at-point #'string-prefix-p))
                                              'eglot-completion-at-point
                                              completion-at-point-functions))
+
+  ;; we call eldoc manually by C-h .
+  (add-hook! eglot-managed-mode-hook
+    (defun +eglot-disable-eldoc-mode ()
+      (when (eglot-managed-p)
+        (eldoc-mode -1))))
   )
 
+
+(use-package eglot-x
+  :straight (:host github :repo "nemethf/eglot-x")
+  :hook (eglot-managed-mode . eglot-x-setup))
 
 
 ;; [Eldoc]
 (use-package eldoc
+  :bind (("C-h ." . eldoc))
   :config
   (setq eldoc-echo-area-display-truncation-message t
         eldoc-echo-area-prefer-doc-buffer t
@@ -214,6 +226,10 @@
 
 (use-package csv-mode
   :straight t)
+
+
+(use-package rainbow-csv-mode
+  :straight (:host github :repo "emacs-vs/rainbow-csv"))
 
 
 (use-package cmake-mode

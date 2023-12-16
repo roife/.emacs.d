@@ -64,7 +64,7 @@
 (use-package popper
   :straight t
   :bind (:map popper-mode-map
-              ("M-<tab>"   . popper-cycle)
+              ("C-M-<tab>"   . popper-cycle)
               ("M-`" . popper-toggle-type))
   :hook (emacs-startup . popper-mode)
   :init

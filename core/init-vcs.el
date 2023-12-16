@@ -140,3 +140,10 @@
 ;; [git-modes] Git configuration major modes
 (use-package git-modes
   :straight t)
+
+
+;; [abridge-diff]
+(use-package abridge-diff
+  :straight t
+  :after magit ;; optional, if you'd like to use with magit
+  :init (abridge-diff-mode 1))

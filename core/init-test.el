@@ -2,13 +2,17 @@
 (with-eval-after-load "eglot"
   (add-to-list 'eglot-stay-out-of 'flymake)
 
-  (cl-defun eglot--languageId (&optional (server (eglot--current-server-or-lose)))
-    "Compute LSP \\='languageId\\=' string for current buffer.
-Doubles as an predicate telling if SERVER can manage current
-buffer."
-    (or (cl-loop for (mode . languageid) in
-                        (eglot--languages server)
-                        when (provided-mode-derived-p major-mode mode)
-                        return languageid)
-	"Unknown"))
+  (defun eglot-current-server ()
+   "Return logical Eglot server for current buffer, nil if none."
+   (setq eglot--cached-server
+         (or eglot--cached-server
+             (and (not (eq major-mode 'fundamental-mode)) ; gh#1330
+                  (or
+                   (cl-find-if #'eglot--languageId
+                               (gethash (eglot--current-project)
+                                        eglot--servers-by-project))
+                   (and eglot-extend-to-xref
+                        buffer-file-name
+                        (gethash (expand-file-name buffer-file-name)
+                                 eglot--servers-by-xrefed-file)))))))
   )
