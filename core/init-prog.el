@@ -228,7 +228,7 @@
   :straight t)
 
 
-(use-package rainbow-csv-mode
+(use-package rainbow-csv
   :straight (:host github :repo "emacs-vs/rainbow-csv"))
 
 
