@@ -55,9 +55,12 @@
   (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly
               completion-at-point-functions (cl-nsubst
                                              (cape-capf-noninterruptible
-                                              (cape-capf-buster #'eglot-completion-at-point #'string-prefix-p))
+                                              (cape-capf-buster #'eglot-completion-at-point
+                                                                #'tempel-expand
+                                                                #'string-prefix-p))
                                              'eglot-completion-at-point
-                                             completion-at-point-functions))
+                                             completion-at-point-functions)
+              )
 
   ;; we call eldoc manually by C-h .
   (add-hook! eglot-managed-mode-hook

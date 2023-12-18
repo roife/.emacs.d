@@ -256,7 +256,11 @@
 
 (use-package eglot-tempel
   :straight t
-  :after (eglot tempel))
+  :after (eglot tempel)
+  :init
+  (eglot-tempel-mode)
+  ;; more settings in eglot (init-prog.el)
+  )
 
 
 ;; [corfu] compleletion frontend

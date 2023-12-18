@@ -251,7 +251,7 @@
  hscroll-step 0
  hscroll-margin 2)
 
-(pixel-scroll-precision-mode)
+;; (pixel-scroll-precision-mode)
 
 (defvar +scrolling-lines 5)
 (defun +scroll-other-window () (interactive) (scroll-other-window +scrolling-lines))

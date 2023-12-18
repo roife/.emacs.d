@@ -16,3 +16,4 @@
                         (gethash (expand-file-name buffer-file-name)
                                  eglot--servers-by-xrefed-file)))))))
   )
+(setq eglot-x-enable-snippet-text-edit nil)
