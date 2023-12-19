@@ -38,3 +38,4 @@ emms/
 librime/
 session*
 modules/
+.env
