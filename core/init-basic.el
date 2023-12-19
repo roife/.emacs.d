@@ -253,7 +253,7 @@
 
 ;; (pixel-scroll-precision-mode)
 
-(defvar +scrolling-lines 5)
+(defvar +scrolling-lines 10)
 (defun +scroll-other-window () (interactive) (scroll-other-window +scrolling-lines))
 (defun +scroll-other-window-down () (interactive) (scroll-other-window-down +scrolling-lines))
 (defun +scroll-window () (interactive) (scroll-up +scrolling-lines))

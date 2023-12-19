@@ -78,7 +78,7 @@
 ;; [hideshow] Code folding
 (use-package hideshow
   :hook ((prog-mode conf-mode yaml-mode) . hs-minor-mode)
-  :bind (("C-c h TAB" . hs-toggle-hiding)
+  :bind (("C-c h TAB" . hs-cycle)
          ("C-c h `" . hs-toggle-all))
   :config
   ;; More functions

@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 (with-eval-after-load "eglot"
-  (add-to-list 'eglot-stay-out-of 'flymake)
+  ;; (add-to-list 'eglot-stay-out-of 'flymake)
 
   (defun eglot-current-server ()
    "Return logical Eglot server for current buffer, nil if none."

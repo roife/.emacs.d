@@ -96,7 +96,7 @@
     :bind (:map dired-mode-map
                 ("TAB" . dired-subtree-toggle))
     :config
-    (setq dired-subtree-line-prefix "    ")))
+    (setq dired-subtree-line-prefix "  |  ")))
 
 
 ;; [diredfl] Make dired colorful

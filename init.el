@@ -46,10 +46,10 @@
                      'init-modeline
                      'init-bib
                      'init-ai
-                     'init-chat
                      'init-pdf
                      'init-test
 
+                     ;; 'init-chat
                      ;; 'init-persp
                      ;; 'init-elfeed
                      ;; 'init-gnus

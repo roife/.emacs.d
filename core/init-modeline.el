@@ -212,7 +212,8 @@
 ;; [project-crumb]
 (defvar-local +mode-line-project-crumb nil)
 (add-hook! (find-file-hook after-save-hook clone-indirect-buffer-hook Info-selection-hook
-                           window-configuration-change-hook window-size-change-functions)
+                           window-configuration-change-hook; window-size-change-functions
+                           )
   (defun +mode-line-update-project-crumb (&rest _)
     (setq +mode-line-project-crumb
           (breadcrumb-project-crumbs))))
