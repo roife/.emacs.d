@@ -147,3 +147,16 @@
   :straight t
   :after magit ;; optional, if you'd like to use with magit
   :init (abridge-diff-mode 1))
+
+
+;; [magit-delta] Use delta as git diff viewer
+(use-package magit-delta
+  :straight t
+  :after magit
+  :hook (magit-mode . magit-delta-mode)
+  :config
+  (setq magit-delta-delta-args '("--max-line-distance" "0.6"
+                                 "--24-bit-color" "always"
+                                 "--color-only"
+                                 "--features" "magit-delta"))
+  )

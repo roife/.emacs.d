@@ -40,7 +40,7 @@
 
 ;; [Eglot] LSP support
 (use-package eglot
-  :hook ((c-mode c++-mode rust-mode python-mode haskell-mode) . eglot-ensure)
+  :hook ((c-mode c++-mode rust-mode python-mode haskell-mode go-mode) . eglot-ensure)
   ;; :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
          ("M-<return>" . eglot-code-actions))
@@ -56,7 +56,6 @@
               completion-at-point-functions (cl-nsubst
                                              (cape-capf-noninterruptible
                                               (cape-capf-buster #'eglot-completion-at-point
-                                                                #'tempel-expand
                                                                 #'string-prefix-p))
                                              'eglot-completion-at-point
                                              completion-at-point-functions)
@@ -67,6 +66,14 @@
     (defun +eglot-disable-eldoc-mode ()
       (when (eglot-managed-p)
         (eldoc-mode -1))))
+  )
+
+
+(use-package eglot-tempel
+  :straight t
+  :after (eglot tempel)
+  :init
+  (eglot-tempel-mode)
   )
 
 
@@ -281,6 +288,17 @@
 
 (use-package rust-playground
   :straight t)
+
+
+(use-package go-mode
+  :straight t
+  :config
+  (setq gofmt-command "goimports")
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  (setq-default eglot-workspace-configuration
+                '((:gopls .
+                          ((staticcheck . t)
+                           (matcher . "CaseSensitive"))))))
 
 
 (use-package haskell-mode

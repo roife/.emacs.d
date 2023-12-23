@@ -8,4 +8,5 @@
 - `fd`
 - `aspell`
 - `readability-cli`
-- `rime` / `fcitx5-rime`
+<!-- - `rime` / `fcitx5-rime` -->
+- `delta`

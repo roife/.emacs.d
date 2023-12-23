@@ -73,55 +73,55 @@
   ;;         (+tab-bar-update-persp-indicator))))
 
   ;; cache for telega indicator
-  (with-eval-after-load 'telega
-    (defvar +tab-bar-telega-indicator-cache nil)
-
-    (add-hook! (telega-connection-state-hook telega-kill-hook telega-online-status-hook)
-      (defun +tab-bar-telega-icon-update (&rest rest)
-        (when (buffer-live-p telega-server--buffer)
-          (let* ((me-user (telega-user-me 'locally))
-                 (online-p (and me-user (telega-user-online-p me-user)))
-                 ;; reactions
-                 (reactions-chats (telega-filter-chats telega--ordered-chats '(and is-known unread-reactions)))
-                 (reactions-count (apply '+ (mapcar (telega--tl-prop :unread_reaction_count) reactions-chats)))
-                 ;; mentioned
-                 (mentioned-chats (telega-filter-chats telega--ordered-chats '(mention)))
-                 (mentioned-count (apply '+ (mapcar (telega--tl-prop :unread_mention_count) mentioned-chats)))
-                 ;; unread
-                 (unmuted-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
-                 (mentioned-unmuted-chats (telega-filter-chats telega--ordered-chats '(and mention unmuted)))
-                 (true-unmuted-count (- unmuted-count (length mentioned-unmuted-chats)))
-                 (text (propertize (concat " " telega-symbol-telegram " "
-                                           (when (> true-unmuted-count 0)
-                                             (concat "●" (number-to-string true-unmuted-count) " "))
-                                           (when (> mentioned-count 0)
-                                             (concat "@" (number-to-string mentioned-count) " "))
-                                           (when (> reactions-count 0)
-                                             (concat "❤" (number-to-string reactions-count) " ")))
-                                   'face `(:inherit font-lock-keyword-face :inverse-video ,online-p)))
-                 (first-name (plist-get me-user :first_name))
-                 (last-name (plist-get me-user :last_name))
-                 (help-echo (concat "Current User: " first-name " " last-name "\n"
-                                    "Status: " (if online-p "online" "offline"))))
-            (setq +tab-bar-telega-indicator-cache
-                  `((tab-bar-telega menu-item
-                                    ,text
-                                    ignore
-                                    :help ,help-echo))))
-          (force-mode-line-update t)
-          +tab-bar-telega-indicator-cache)
-        ))
-
-    (advice-add 'telega--on-updateUserStatus :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
-    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update))
-
-  (defun +tab-bar-telega-icon ()
-    (when (and (fboundp 'telega-server-live-p)
-               (telega-server-live-p))
-      (or +tab-bar-telega-indicator-cache
-          (+tab-bar-telega-icon-update))))
+  ;; (with-eval-after-load 'telega
+  ;;   (defvar +tab-bar-telega-indicator-cache nil)
+  ;;
+  ;;   (add-hook! (telega-connection-state-hook telega-kill-hook telega-online-status-hook)
+  ;;     (defun +tab-bar-telega-icon-update (&rest rest)
+  ;;       (when (buffer-live-p telega-server--buffer)
+  ;;         (let* ((me-user (telega-user-me 'locally))
+  ;;                (online-p (and me-user (telega-user-online-p me-user)))
+  ;;                ;; reactions
+  ;;                (reactions-chats (telega-filter-chats telega--ordered-chats '(and is-known unread-reactions)))
+  ;;                (reactions-count (apply '+ (mapcar (telega--tl-prop :unread_reaction_count) reactions-chats)))
+  ;;                ;; mentioned
+  ;;                (mentioned-chats (telega-filter-chats telega--ordered-chats '(mention)))
+  ;;                (mentioned-count (apply '+ (mapcar (telega--tl-prop :unread_mention_count) mentioned-chats)))
+  ;;                ;; unread
+  ;;                (unmuted-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
+  ;;                (mentioned-unmuted-chats (telega-filter-chats telega--ordered-chats '(and mention unmuted)))
+  ;;                (true-unmuted-count (- unmuted-count (length mentioned-unmuted-chats)))
+  ;;                (text (propertize (concat " " telega-symbol-telegram " "
+  ;;                                          (when (> true-unmuted-count 0)
+  ;;                                            (concat "●" (number-to-string true-unmuted-count) " "))
+  ;;                                          (when (> mentioned-count 0)
+  ;;                                            (concat "@" (number-to-string mentioned-count) " "))
+  ;;                                          (when (> reactions-count 0)
+  ;;                                            (concat "❤" (number-to-string reactions-count) " ")))
+  ;;                                  'face `(:inherit font-lock-keyword-face :inverse-video ,online-p)))
+  ;;                (first-name (plist-get me-user :first_name))
+  ;;                (last-name (plist-get me-user :last_name))
+  ;;                (help-echo (concat "Current User: " first-name " " last-name "\n"
+  ;;                                   "Status: " (if online-p "online" "offline"))))
+  ;;           (setq +tab-bar-telega-indicator-cache
+  ;;                 `((tab-bar-telega menu-item
+  ;;                                   ,text
+  ;;                                   ignore
+  ;;                                   :help ,help-echo))))
+  ;;         (force-mode-line-update t)
+  ;;         +tab-bar-telega-indicator-cache)
+  ;;       ))
+  ;;
+  ;;   (advice-add 'telega--on-updateUserStatus :after #'+tab-bar-telega-icon-update)
+  ;;   (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-icon-update)
+  ;;   (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-icon-update)
+  ;;   (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-icon-update))
+  ;;
+  ;; (defun +tab-bar-telega-icon ()
+  ;;   (when (and (fboundp 'telega-server-live-p)
+  ;;              (telega-server-live-p))
+  ;;     (or +tab-bar-telega-indicator-cache
+  ;;         (+tab-bar-telega-icon-update))))
 
   ;; (defun +tab-bar-copilot-icon ()
   ;;   (when (bound-and-true-p copilot-mode)
@@ -178,7 +178,7 @@
 
   (defun-call! +show-tab-bar ()
     (interactive)
-    (setq tab-bar-format '(meow-indicator +tab-bar-telega-icon
+    (setq tab-bar-format '(meow-indicator ;; +tab-bar-telega-icon
                                           +tab-bar-org-pomodoro-indicator
                                           ;; +tab-bar-persp-indicator
                                           tab-bar-format-tabs))

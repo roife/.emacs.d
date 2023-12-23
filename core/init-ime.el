@@ -138,7 +138,7 @@
  ;; context-switch
  (add-hook 'meow-insert-exit-hook #'macim-select-ascii)
  (add-hook 'meow-insert-enter-hook #'macim-context-switch)
- (add-hook 'buffer-list-update-hook #'macim-context-switch)
+ ;; (add-hook 'buffer-list-update-hook #'macim-context-switch)
 
  ;; context-mode
  (defun +macim-context-meow ()

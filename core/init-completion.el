@@ -254,15 +254,6 @@
   :after tempel)
 
 
-(use-package eglot-tempel
-  :straight t
-  :after (eglot tempel)
-  :init
-  (eglot-tempel-mode)
-  ;; more settings in eglot (init-prog.el)
-  )
-
-
 ;; [corfu] compleletion frontend
 (use-package corfu
   :straight (:files (:defaults "extensions/*.el"))
