@@ -192,7 +192,8 @@
   (setq savehist-additional-variables '(mark-ring global-mark-ring
 			  search-ring
 			  regexp-search-ring
-			  kill-ring)
+			  ;kill-ring
+              )
     savehist-autosave-interval 300)
 
   (with-eval-after-load 'vertico
