@@ -39,3 +39,5 @@ librime/
 session*
 modules/
 .env
+cache/
+org-persist/

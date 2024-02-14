@@ -201,7 +201,8 @@ Assume point is at first MARK."
    org-appear-delay 0.1
 
    org-appear-trigger 'manual)
-  (add-hook! org-mode-hook
+
+  (add-hook! org-mode-hook :call-immediately
     (defun +org-add-appear-hook ()
       (add-hook 'meow-insert-enter-hook #'org-appear-manual-start nil t)
       (add-hook 'meow-insert-exit-hook #'org-appear-manual-stop nil t))))
