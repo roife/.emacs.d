@@ -45,7 +45,7 @@
   :bind (:map eglot-mode-map
          ("M-<return>" . eglot-code-actions))
   :config
-  (setq eglot-events-buffer-size 0
+  (setq eglot-events-buffer-config '(:size 0 :format full)
         eglot-connect-timeout 10
         eglot-autoshutdown t
         eglot-report-progress 'messages)
@@ -414,7 +414,20 @@
           (c++-mode . c++-ts-mode)
           (python-mode . python-ts-mode)
           (javascript-mode . javascript-ts-mode)
-          (typescript-mode . typescript-ts-mode)))
+          (typescript-mode . typescript-ts-mode)
+          (rust-mode . rust-ts-mode)))
+
+  (setq treesit-language-source-alist
+        '((c "https://github.com/tree-sitter/tree-sitter-c")
+          (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+          (python "https://github.com/tree-sitter/tree-sitter-python")
+          (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+          (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+          (rust "https://github.com/tree-sitter/tree-sitter-rust")))
+
+  (dolist (lang treesit-language-source-alist)
+  (unless (treesit-language-available-p (car lang))
+    (treesit-install-language-grammar (car lang))))
 
   (setq treesit-font-lock-level 4))
 

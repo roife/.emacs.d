@@ -229,11 +229,6 @@
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
-         (imenu (and +mode-line-enough-width-p (breadcrumb-imenu-crumbs)))
-         (imenu-text (when (and imenu
-                                (not (string-empty-p imenu))
-                                (< (string-width imenu) (ash (window-width) -2)))
-                       (concat "⋅" imenu)))
          (lhs `((:propertize ,(+mode-line-get-window-name)
                              face ,panel-face)
                 (:propertize ,(+mode-line-overwrite-readonly-indicator)
@@ -249,7 +244,6 @@
                  ,+mode-line-project-crumb)
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
-                (,active-p ,imenu-text (:propertize ,imenu-text face nil))
                 ))
          (vcs-info (concat +mode-line-vcs-info +mode-line-smerge-count))
          (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
@@ -283,8 +277,7 @@
   :commands breadcrumb--header-line
   :config
   (setq breadcrumb-imenu-crumb-separator "⋅"
-        breadcrumb-project-max-length 0.35
-        breadcrumb-imenu-max-length 0.2
+        breadcrumb-project-max-length 0.55
         breadcrumb-idle-time 10))
 
 (setq-default header-line-format nil)

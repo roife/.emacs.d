@@ -73,7 +73,11 @@
      ((string-suffix-p "=" pattern) `(orderless-literal . ,(substring pattern 0 -1)))
      ;; Flex matching
      ((string-prefix-p "~" pattern) `(orderless-flex . ,(substring pattern 1)))
-     ((string-suffix-p "~" pattern) `(orderless-flex . ,(substring pattern 0 -1)))))
+     ((string-suffix-p "~" pattern) `(orderless-flex . ,(substring pattern 0 -1)))
+     ;; Annotations
+     ((string-prefix-p "@" pattern) `(orderless-annotation . ,(substring pattern 1)))
+     ((string-suffix-p "@" pattern) `(orderless-annotation . ,(substring pattern 0 -1)))
+     ))
 
   ;; Remote file completion
   (defun +vertico-basic-remote-try-completion (string table pred point)
@@ -266,7 +270,7 @@
   :config
   (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
         corfu-auto t                 ;; Enable auto completion
-        corfu-separator "&"          ;; Orderless field separator
+        corfu-separator ?&           ;; Orderless field separator
         corfu-auto-prefix 2          ;; minimun prefix to enable completion
         corfu-preview-current nil
         corfu-auto-delay 0.1)
