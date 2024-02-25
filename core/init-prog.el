@@ -40,7 +40,7 @@
 
 ;; [Eglot] LSP support
 (use-package eglot
-  :hook ((c-mode c++-mode rust-mode python-mode haskell-mode go-mode) . eglot-ensure)
+  :hook ((c-ts-mode c++-ts-mode rust-ts-mode python-ts-mode) . eglot-ensure)
   ;; :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
          ("M-<return>" . eglot-code-actions))

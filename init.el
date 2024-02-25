@@ -41,7 +41,7 @@
                      'init-browser
                      'init-ibuffer
                      'init-dict
-                     ;;'init-ime
+                     'init-ime
                      'init-modal
                      'init-modeline
                      'init-bib

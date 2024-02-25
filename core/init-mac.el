@@ -10,10 +10,10 @@
   :bind (("C-c d i" . osx-dictionary-search-input)
          ("C-c d d" . osx-dictionary-search-pointer)))
 
-;(use-package emt
-;  :straight (:host github :repo "roife/emt"
-;                   :files ("*.el" "module/*" "module"))
-;  :hook (after-init . emt-mode))
+(use-package emt
+ :straight (:host github :repo "roife/emt"
+                  :files ("*.el" "module/*" "module"))
+ :hook (after-init . emt-mode))
 
 (defconst +env-file (concat user-emacs-directory ".env"))
 
