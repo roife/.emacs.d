@@ -43,7 +43,8 @@
   :hook ((c-ts-mode c++-ts-mode rust-ts-mode python-ts-mode) . eglot-ensure)
   ;; :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
-         ("M-<return>" . eglot-code-actions))
+              ("M-<return>" . eglot-code-actions)
+              ("M-/" . eglot-find-typeDefinition))
   :config
   (setq eglot-events-buffer-config '(:size 0 :format full)
         eglot-connect-timeout 10
@@ -283,7 +284,7 @@
 
 (use-package cargo
   :straight t
-  :hook (rust-mode . cargo-minor-mode))
+  :hook ((rust-mode rust-ts-mode) . cargo-minor-mode))
 
 
 (use-package rust-playground
@@ -423,7 +424,8 @@
           (python "https://github.com/tree-sitter/tree-sitter-python")
           (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
           (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-          (rust "https://github.com/tree-sitter/tree-sitter-rust")))
+          (rust "https://github.com/tree-sitter/tree-sitter-rust")
+          (typst "https://github.com/uben0/tree-sitter-typst")))
 
   (dolist (lang treesit-language-source-alist)
   (unless (treesit-language-available-p (car lang))

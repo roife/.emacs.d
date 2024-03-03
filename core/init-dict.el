@@ -4,7 +4,7 @@
 (use-package google-this
   :straight t
   :defines (google-this)
-  :bind (("C-, g" . google-this)))
+  :bind (("C-, w" . google-this)))
 
 
 ;; [google-translate]

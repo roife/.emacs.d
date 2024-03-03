@@ -227,11 +227,3 @@ If popup is focused, kill it."
   :config
   (setq eshell-up-ignore-case nil)
   )
-
-
-;; [esh-autosuggest]
-(use-package esh-autosuggest
-  :straight t
-  :hook ((eshell-mode . esh-autosuggest-mode))
-  :bind (:map esh-autosuggest-active-map
-              ("C-e" . 'company-complete-selection)))

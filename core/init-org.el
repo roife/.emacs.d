@@ -1,15 +1,31 @@
 ;;; -*- lexical-binding: t -*-
 
 ;; [org-fragtog] Preview and edit latex in md/org elegantly
-(use-package org-fragtog
-  :straight t
-  :hook ((org-mode . org-fragtog-mode)))
+;; (use-package org-fragtog
+;;   :straight t
+;;   :hook ((org-mode . org-fragtog-mode)))
 
 ;; [org]
 (use-package org
   :straight (:type built-in)
   :custom-face (org-quote ((t (:inherit org-block-begin-line))))
-  :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
+  :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]")))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
+         (org-mode . (lambda ()
+                       (push '("\\operatorname{\\mathrm{" . (?  (Bc . Bl) ?{ (Bc . Br) ?{)) prettify-symbols-alist)
+                       (push '("\\mathcal{" . (?  (Bc . Bl) ?{ (Bc . Br) ?𝒞)) prettify-symbols-alist)
+                       (push '("\\mathbb{" . (?  (Bc . Bl) ?{ (Bc . Br) ?𝔹)) prettify-symbols-alist)
+                       (push '("\\\\{" . ?{) prettify-symbols-alist)
+                       (push '("\\\\}" . ?}) prettify-symbols-alist)
+                       (push '("\\vec{" . (?  (Bc . Bl) ?{ (Bc . Br) ?⃗)) prettify-symbols-alist)
+                       (push '("\\ " . ? ) prettify-symbols-alist)
+                       (push '("\\(" . ?‹) prettify-symbols-alist)
+                             (push '("\\)" . ?›) prettify-symbols-alist)
+                       (push '("\\)，" . (?  (Bc . Bl) ?， (Bc . Br) ?›)) prettify-symbols-alist)
+                   (push '("\\)。" . (?  (Bc . Bl) ?。 (Bc . Br) ?›)) prettify-symbols-alist)
+                   (push '("\\)；" . (?  (Bc . Bl) ?； (Bc . Br) ?›)) prettify-symbols-alist)
+                   (push '("\\[" . ?«) prettify-symbols-alist)
+                   (push '("\\]" . ?») prettify-symbols-alist)
+                       (prettify-symbols-mode))))
   :config
   (setq
    ;; subscription: Use {} for sub- or super- scripts
@@ -45,7 +61,7 @@
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil
         org-highlight-latex-and-related '(latex))
-  (plist-put org-format-latex-options :scale 1.3)
+  (plist-put org-format-latex-options :scale 1.5)
 
   ;; HACK: inline highlight for CJK
   (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:][:alpha:]"

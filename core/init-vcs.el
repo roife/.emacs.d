@@ -6,6 +6,14 @@
   (setq vc-allow-async-revert t))
 
 
+;; [git-link] Get remote repo URL for buffer location
+(use-package git-link
+  :straight t
+  :bind (("C-, g l" . git-link)
+         ("C-, g c" . git-link-commit)
+         ("C-, g h" . git-link-homepage)))
+
+
 ;; [diff-hl] Highlight uncommitted changes using VC
 (use-package diff-hl
   :straight t
