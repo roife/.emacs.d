@@ -38,9 +38,15 @@
   )
 
 
+;; [imenu]
+(use-package imenu
+  :config
+  (setq imenu-auto-rescan t))
+
+
 ;; [Eglot] LSP support
 (use-package eglot
-  :hook ((c-ts-mode c++-ts-mode rust-ts-mode python-ts-mode) . eglot-ensure)
+  :hook ((c-mode c++-mode rust-mode python-mode java-mode c-ts-mode c++-ts-mode rust-ts-mode python-ts-mode) . eglot-ensure)
   ;; :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
               ("M-<return>" . eglot-code-actions)
@@ -279,8 +285,10 @@
 
 
 (use-package rust-mode
-  :straight t)
-
+  :straight t
+  :init
+  (setq rust-mode-treeisitter-derive t)
+  )
 
 (use-package cargo
   :straight t
@@ -383,6 +391,12 @@
    web-mode-auto-close-style 1))
 
 
+(use-package js-ts-mode
+  :mode ("\\.js[x]?\\'" . js-ts-mode)
+  :config
+  (setq js-ts-indent-level 2))
+
+
 ;; [skewer-mode] Live browser JavaScript, CSS, and HTML interaction
 (use-package skewer-mode
   :straight t
@@ -406,6 +420,10 @@
                (shell-command-to-string "agda-mode locate"))))
 
 
+(use-package moonbit-mode
+  :straight (:host github :repo "tonyfettes/moonbit-mode"))
+
+
 ;; [treesit]
 (use-package treesit
   :when (treesit-available-p)
@@ -416,7 +434,8 @@
           (python-mode . python-ts-mode)
           (javascript-mode . javascript-ts-mode)
           (typescript-mode . typescript-ts-mode)
-          (rust-mode . rust-ts-mode)))
+          ;; (rust-mode . rust-ts-mode)
+          ))
 
   (setq treesit-language-source-alist
         '((c "https://github.com/tree-sitter/tree-sitter-c")
@@ -425,7 +444,8 @@
           (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
           (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
           (rust "https://github.com/tree-sitter/tree-sitter-rust")
-          (typst "https://github.com/uben0/tree-sitter-typst")))
+          (typst "https://github.com/uben0/tree-sitter-typst")
+          (moonbit "https://github.com/moonbitlang/tree-sitter-moonbit")))
 
   (dolist (lang treesit-language-source-alist)
   (unless (treesit-language-available-p (car lang))
@@ -437,3 +457,18 @@
 ;; [dash] api docset
 (use-package dash-docs
   :straight t)
+
+
+;; [indent-bars] Show indent guides
+(use-package indent-bars
+  :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
+  :hook (prog-mode . indent-bars-mode)
+  :config
+  (setq indent-bars-display-on-blank-lines nil
+        indent-bars-width-frac 0.2
+        indent-bars-color '(highlight :face-bg t :blend 0.2)
+        indent-bars-zigzag nil
+        indent-bars-highlight-current-depth nil
+        indent-bars-pattern "|"
+        indent-bars-prefer-character t)
+  )

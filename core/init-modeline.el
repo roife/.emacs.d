@@ -274,10 +274,17 @@
   (breadcrumb-project-leaf-face ((t (:inherit font-lock-function-name-face :bold t))))
   (breadcrumb-imenu-leaf-face ((t (:inherit font-lock-function-name-face :foreground unspecified))))
   :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
+  :bind ("M-=" . +mode-line-show-imenu-breadcrumb)
   :commands breadcrumb--header-line
   :config
-  (setq breadcrumb-imenu-crumb-separator "⋅"
+  (setq breadcrumb-imenu-crumb-separator " ⋅ "
         breadcrumb-project-max-length 0.55
-        breadcrumb-idle-time 10))
+        breadcrumb-idle-time 10)
+
+  (defun +mode-line-show-imenu-breadcrumb ()
+    (interactive)
+    (if (region-active-p)
+        (call-interactively 'count-words-region)
+      (message (breadcrumb-imenu-crumbs)))))
 
 (setq-default header-line-format nil)

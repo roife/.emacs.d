@@ -46,7 +46,7 @@ If popup is visible but unselected, select it.
 If popup is focused, kill it."
     (interactive "P")
     (if arg
-        (chatgpt-shell)
+        (gptel "GPT: gpt-popup")
       (require 'eshell)
       (if-let ((win (get-buffer-window "*Eshell-pop*")))
           (if (eq (selected-window) win)

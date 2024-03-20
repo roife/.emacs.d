@@ -20,8 +20,10 @@
 
   ;; [motion]
   (meow-motion-overwrite-define-key
+   '("h" . meow-left)
    '("j" . meow-next)
    '("k" . meow-prev)
+   '("l" . meow-right)
    '("<escape>" . ignore))
 
   ;; [leader]

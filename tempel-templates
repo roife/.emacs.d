@@ -15,4 +15,3 @@ org-mode markdown-mode
 (gatherr "\\begin{gather*}\n" r> n> "\\end{gather*}")
 (latexbeg "\\begin{" (s env) "}" r> n> "\\end{" (s env) "}")
 (center "\\begin{center}\n" r> n> "\\end{center}")
-
