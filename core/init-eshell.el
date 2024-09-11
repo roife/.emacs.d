@@ -6,6 +6,7 @@
   :functions eshell/alias
   :hook ((eshell-mode . compilation-shell-minor-mode))
   :bind (("C-`" . +eshell-toggle)
+         ("C-·" . +eshell-toggle)
          :map eshell-mode-map
          ("C-l" . eshell/clear)
          ("M-s" . consult-history))
@@ -40,24 +41,48 @@
    eshell-cmpl-cycle-completions nil
    )
 
+
   (defun +eshell-toggle (&optional arg)
-    "Toggle a persistent eshell popup window.
-If popup is visible but unselected, select it.
-If popup is focused, kill it."
+    "Toggle a persistent Eshell popup window for the current project or directory.
+If the popup is visible but unselected, select it.
+If the popup is focused, kill it.
+If no project is found, create a temporary Eshell instance in the current directory."
     (interactive "P")
-    (if arg
-        (gptel "GPT: gpt-popup")
-      (require 'eshell)
-      (if-let ((win (get-buffer-window "*Eshell-pop*")))
+    (require 'eshell)
+    (require 'project)  ;; Ensure we load project.el
+    (let* ((project (project-current)) ;; Get the current project
+           (dir-name (if project
+                         (file-name-nondirectory (directory-file-name (project-root project))) ;; Use project name
+                       (file-name-nondirectory (directory-file-name default-directory)))) ;; Use current directory name if no project
+           (popup-buffer-name (if arg
+                                   (format "*GPTel-popup*: %s" dir-name)
+                                 (format "*Eshell-popup*: %s" dir-name)))
+           (win (get-buffer-window popup-buffer-name)))
+
+      ;; If an argument is provided, you can add some custom behavior, like opening a GPT prompt.
+      ;; If Eshell window exists, either focus or kill it.
+      (if win
           (if (eq (selected-window) win)
-              ;; If users attempt to delete the sole ordinary window. silence it.
-              (ignore-errors (delete-window win))
-            (select-window win))
+              (ignore-errors (delete-window win)) ;; Close window if already focused
+            (select-window win)) ;; Focus the Eshell window if it exists but not selected
+        ;; If no Eshell window, create one
         (let ((display-comint-buffer-action '(display-buffer-at-bottom
-                                              (inhibit-same-window . nil)))
-              (eshell-buffer-name "*Eshell-pop*"))
-          (with-current-buffer (eshell)
-            (add-hook 'eshell-exit-hook #'(lambda () (ignore-errors (delete-window win))) nil t))))))
+                                              (inhibit-same-window . nil))))
+          (if arg
+              ;; Open a GPT prompt
+              (with-current-buffer (gptel popup-buffer-name)
+                ;; display current buffer
+                (display-buffer (current-buffer)))
+            ;; Open a eshell
+            (let ((eshell-buffer-name popup-buffer-name))
+              (with-current-buffer (eshell)
+                ;; Navigate to project root or current directory
+                ;; (eshell/cd (if project (project-root project) default-directory))
+                ;; Add a hook to close the window when Eshell exits
+                (add-hook 'eshell-exit-hook
+                          (lambda ()
+                            (ignore-errors (delete-window (get-buffer-window popup-buffer-name))))
+                          nil t))))))))
 
   ;; [UI]
   (add-hook 'eshell-mode-hook

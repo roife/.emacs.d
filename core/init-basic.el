@@ -228,9 +228,9 @@
 
 
 ;; [visual-line-mode] Soft line-wrapping
-(use-package visual-line-mode
-  :defer nil
-  :hook (text-mode . visual-line-mode))
+;; (use-package visual-line-mode
+;;   :defer nil
+;;   :hook (text-mode . visual-line-mode))
 
 
 ;; [Scrolling]

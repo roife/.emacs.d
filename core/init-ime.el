@@ -138,7 +138,7 @@
  ;; context-switch
  (add-hook 'meow-insert-exit-hook #'macim-select-ascii)
  (add-hook 'meow-insert-enter-hook #'macim-context-switch)
- ;; (add-hook 'buffer-list-update-hook #'macim-context-switch)
+ (add-hook 'buffer-list-update-hook #'macim-context-switch)
 
  ;; context-mode
  (defun +macim-context-meow ()
@@ -151,6 +151,10 @@
  (add-to-list 'macim-context-early-predicates #'+macim-context-meow)
  (add-to-list 'macim-context-early-predicates #'+macim-context-ignore-modes)
 
+ (defun +macim-context-switching-ascii (back-detect fore-detect)
+   (when (derived-mode-p 'eshell-mode 'shell-mode 'term-mode)
+     'ascii))
+
  (defun +macim-context-switching-other (back-detect fore-detect)
    (when (or (and (derived-mode-p 'org-mode 'markdown-mode 'text-mode)
                   (macim--context-other-p back-detect fore-detect))
@@ -160,6 +164,7 @@
                       (macim--context-other-p back-detect fore-detect))))
      'other))
 
+ (add-to-list 'macim-context-predicates #'+macim-context-switching-ascii)
  (add-to-list 'macim-context-predicates #'+macim-context-switching-other)
 
  ;; inline-mode

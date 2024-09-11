@@ -16,11 +16,11 @@
     contact))
 
 (with-eval-after-load "eglot"
+  ;; I don't like flymake
   (add-to-list 'eglot-stay-out-of 'flymake)
 
   (push '(verilog-mode . ("vizsla")) eglot-server-programs)
   (push '(java-mode . jdtls-command-contact) eglot-server-programs)
-  (setq eglot-workspace-configuration '(:rust-analyzer (:completion (:limit 10))))
 
   ;; (add-to-list 'eglot-server-programs
   ;;              `((typst-mode typst-ts-mode) . ("typst-lsp")))
@@ -35,7 +35,7 @@
              (string= (file-name-nondirectory (directory-file-name default-directory)) "rust-analyzer"))
         (progn
           (message "Running cargo xtask install --server")
-          (compile "cargo xtask install --server")
+          (compile "cargo xtask install --server --mimalloc")
           (message "Running cargo xtask install --server done"))
       (message "Not in rust-analyzer project")))
   )

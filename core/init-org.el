@@ -7,7 +7,7 @@
 
 ;; [org]
 (use-package org
-  :straight (:type built-in)
+  ;; :straight (:type built-in)
   :custom-face (org-quote ((t (:inherit org-block-begin-line))))
   :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]")))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
          (org-mode . (lambda ()
@@ -61,7 +61,7 @@
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil
         org-highlight-latex-and-related '(latex))
-  (plist-put org-format-latex-options :scale 1.5)
+  (plist-put org-format-latex-options :scale 1.7)
 
   ;; HACK: inline highlight for CJK
   (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:][:alpha:]"
@@ -202,26 +202,26 @@ Assume point is at first MARK."
 
 
 ;; [org-appear] Make invisible parts of Org elements appear visible.
-(use-package org-appear
-  :straight t
-  :hook ((org-mode . org-appear-mode))
-  :config
-  (setq
-   org-hide-emphasis-markers t
-
-   org-appear-autosubmarkers t
-   org-appear-autoentities t
-   org-appear-autokeywords t
-   org-appear-inside-latex t
-
-   org-appear-delay 0.1
-
-   org-appear-trigger 'manual)
-
-  (add-hook! org-mode-hook :call-immediately
-    (defun +org-add-appear-hook ()
-      (add-hook 'meow-insert-enter-hook #'org-appear-manual-start nil t)
-      (add-hook 'meow-insert-exit-hook #'org-appear-manual-stop nil t))))
+;; (use-package org-appear
+;;   :straight t
+;;   :hook ((org-mode . org-appear-mode))
+;;   :config
+;;   (setq
+;;    org-hide-emphasis-markers t
+;;
+;;    org-appear-autosubmarkers t
+;;    org-appear-autoentities t
+;;    org-appear-autokeywords t
+;;    org-appear-inside-latex t
+;;
+;;    org-appear-delay 0.1
+;;
+;;    org-appear-trigger 'manual)
+;;
+;;   (add-hook! org-mode-hook :call-immediately
+;;     (defun +org-add-appear-hook ()
+;;       (add-hook 'meow-insert-enter-hook #'org-appear-manual-start nil t)
+;;       (add-hook 'meow-insert-exit-hook #'org-appear-manual-stop nil t))))
 
 
 ;; [org-visual-outline] Add guide lines for org outline

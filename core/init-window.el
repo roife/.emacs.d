@@ -113,11 +113,11 @@
           reb-mode
 
           "\\*Agenda Commands\\*" "\\*Org Select\\*" "\\*Capture\\*" "^CAPTURE-.*\\.org*"
-          "\\*rustfmt\\*$" rustic-compilation-mode rustic-cargo-clippy-mode
-          rustic-cargo-outdated-mode rustic-cargo-test-mode
           "\\*Graphviz Preview: .*\\*"
 
-          chatgpt-shell-mode
+          "\\*GPTel-popup\\*: .*"
+
+          (lambda (buffer) (with-current-buffer buffer (derived-mode-p 'compilation-mode)))
           ))
   (setq +popper-reference-buffer-no-select
         '("\\*Warnings\\*"))

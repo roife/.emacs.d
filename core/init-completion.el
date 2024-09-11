@@ -240,8 +240,8 @@
 (use-package tempel
   :straight t
   :bind (:map tempel-map
-              ("TAB" . tempel-next)
-              ("S-<tab>" . tempel-previous))
+              ("C-e" . tempel-next)
+              ("C-a" . tempel-previous))
   :hook (((prog-mode text-mode) . +tempel-setup-capf)
          ((prog-mode text-mode) . tempel-abbrev-mode))
   :config

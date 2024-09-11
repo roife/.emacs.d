@@ -28,8 +28,10 @@
   :config
   (setq
    xref-search-program 'ripgrep
-   xref-show-definitions-function #'xref-show-definitions-completing-read
-   xref-show-xrefs-function #'xref-show-definitions-completing-read
+   ;; TODO: https://github.com/oantolin/embark/issues/162#issuecomment-785039305
+   ;; Maybe a bug?
+   ;; xref-show-definitions-function #'xref-show-definitions-completing-read
+   ;; xref-show-xrefs-function #'xref-show-definitions-completing-read
    xref-history-storage 'xref-window-local-history)
 
   (defadvice! +xref--push-marker-stack-a (&rest rest)
@@ -47,7 +49,7 @@
 ;; [Eglot] LSP support
 (use-package eglot
   :hook ((c-mode c++-mode rust-mode python-mode java-mode c-ts-mode c++-ts-mode rust-ts-mode python-ts-mode) . eglot-ensure)
-  ;; :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
+  :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
               ("M-<return>" . eglot-code-actions)
               ("M-/" . eglot-find-typeDefinition))
@@ -65,8 +67,34 @@
                                               (cape-capf-buster #'eglot-completion-at-point
                                                                 #'string-prefix-p))
                                              'eglot-completion-at-point
-                                             completion-at-point-functions)
-              )
+                                             completion-at-point-functions))
+  (setq-default eglot-workspace-configuration
+                '((:pyls . (:plugins (:jedi_completion (:fuzzy t))))
+                  (:rust-analyzer . (:cargo (:allFeatures t :allTargets t :features "full")
+                                            :checkOnSave :json-false
+                                            :diagnostics (:enable :json-false)
+                                            :completion (:termSearch (:enable t)
+                                                                     :fullFunctionSignatures (:enable t))
+                                            :hover (:memoryLayout (:size "both")
+                                                                  :show (:traitAssocItems 5)
+                                                                  :documentation (:keywords (:enable :json-false)))
+                                            :inlayHints(:bindingModeHints (:enable t)
+                                                                          :lifetimeElisionHints (:enable "skip_trivial" :useParameterNames t)
+                                                                          :closureReturnTypeHints (:enable "always")
+                                                                          :discriminantHints (:enable t)
+                                                                          :genericParameterHints (:lifetime (:enable t)))
+                                            ;; :lens (:references (:adt (:enable t)
+                                            ;;                          :enumVariant (:enable t)
+                                            ;;                          :trait (:enable t)
+                                            ;;                          :method (:enable t)))
+                                            ;; :semanticHighlighting (:operator (:specialization (:enable t))
+                                            ;;                                  :punctuation (:enable t :specialization (:enable t)))
+                                            :workspace (:symbol (:search (:kind "all_symbols"
+                                                                                :scope "workspace_and_dependencies")))
+                                            :lru (:capacity 1024)))
+                  (:typescript . (:preferences (:importModuleSpecifierPreference "non-relative")))
+                  (:gopls . ((staticcheck . t)
+                             (matcher . "CaseSensitive")))))
 
   ;; we call eldoc manually by C-h .
   (add-hook! eglot-managed-mode-hook
@@ -127,7 +155,9 @@
 
   (defun +copilot-activate ()
     (interactive)
-    (when (not (+temp-buffer-p (current-buffer)))
+    (when (and (not (+temp-buffer-p (current-buffer)))
+               (not (or (string-prefix-p "*GPTel-" (buffer-name))
+                        (string= "ChatGPT" (buffer-name)))))
       (copilot-mode)))
 
   (defun +copilot-complete ()
@@ -221,15 +251,15 @@
 
 
 ;; [flymake] On-the-fly syntax checker
-(use-package flymake
-  :hook ((prog-mode . flymake-mode))
-  :bind (("C-c f ]" . flymake-goto-next-error)
-         ("C-c f [" . flymake-goto-prev-error)
-         ("C-c f b" . flymake-show-buffer-diagnostics))
-  :config
-  (setq
-   flymake-diagnostic-functions nil)
-  )
+;; (use-package flymake
+;;   :hook ((prog-mode . flymake-mode))
+;;   :bind (("C-c f ]" . flymake-goto-next-error)
+;;          ("C-c f [" . flymake-goto-prev-error)
+;;          ("C-c f b" . flymake-show-buffer-diagnostics))
+;;   :config
+;;   (setq
+;;    flymake-diagnostic-functions nil)
+;;   )
 
 ;; Langs
 (use-package cc-mode
@@ -287,7 +317,8 @@
 (use-package rust-mode
   :straight t
   :init
-  (setq rust-mode-treeisitter-derive t)
+  (setq rust-mode-treesitter-derive t
+        rust-format-goto-problem nil)
   )
 
 (use-package cargo
@@ -304,10 +335,7 @@
   :config
   (setq gofmt-command "goimports")
   (add-hook 'before-save-hook 'gofmt-before-save)
-  (setq-default eglot-workspace-configuration
-                '((:gopls .
-                          ((staticcheck . t)
-                           (matcher . "CaseSensitive"))))))
+  )
 
 
 (use-package haskell-mode
