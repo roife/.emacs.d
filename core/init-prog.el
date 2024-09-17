@@ -42,6 +42,7 @@
 
 ;; [imenu]
 (use-package imenu
+  :hook (prog-mode . imenu--make-index-alist)
   :config
   (setq imenu-auto-rescan t))
 

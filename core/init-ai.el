@@ -4,35 +4,35 @@
   :straight t
   :init
   (require 'auth-source)
-  (setq gptel-model "gpt-4o-mini")
+  (setq gptel-model "gpt-4o")
 
-(let ((auth-info (car (auth-source-search :user "roife-gemini"))))
+  (let ((auth-info (car (auth-source-search :user "roife-gemini"))))
     (gptel-make-gemini "Gemini"
       :key (plist-get auth-info :secret)
       :stream t))
 
-(let* ((auth-info (car (auth-source-search :user "roife-openai")))
-       (host (plist-get auth-info :host))
-       (key (plist-get auth-info :secret)))
-  (setq-default gptel-backend
-                (gptel-make-openai "ChatGPT"
-                  :protocol "https"
-                  :host host
-                  :stream t
-                  :key key
-                  :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
-                  :models (gptel-openai-models gptel--openai))))
+  (let* ((auth-info (car (auth-source-search :user "roife-openai")))
+         (host (plist-get auth-info :host))
+         (key (plist-get auth-info :secret)))
+    (setq-default gptel-backend
+                  (gptel-make-openai "ChatGPT"
+                    :protocol "https"
+                    :host host
+                    :stream t
+                    :key key
+                    :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
+                    :models (gptel-openai-models gptel--openai))))
 
-(let* ((auth-info (car (auth-source-search :user "roife-openai")))
-       (host (plist-get auth-info :host))
-       (key (plist-get auth-info :secret)))
-  (gptel-make-openai "Claude"
-    :protocol "https"
-    :host host
-    :stream t
-    :key key
-    :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
-    :models '("claude-3-5-sonnet-20240620")))
+  (let* ((auth-info (car (auth-source-search :user "roife-openai")))
+         (host (plist-get auth-info :host))
+         (key (plist-get auth-info :secret)))
+    (gptel-make-openai "Claude"
+      :protocol "https"
+      :host host
+      :stream t
+      :key key
+      :header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
+      :models '("claude-3-5-sonnet-20240620")))
 
   :config
   (setq gptel-directives '((default . "You are a large language model living in Emacs and a helpful assistant. Respond concisely. DO NOT BE LAZY.")

@@ -224,8 +224,16 @@
 (advice-add #'popup-delete :after #'+mode-line-update-project-crumb)
 
 
+;; [imenu-crumb]
+(defvar-local +mode-line-imenu-crumb nil)
+(defun +mode-line-update-imenu-crumb (&rest _)
+  (let ((imenu-breadcrumb (breadcrumb-imenu-crumbs)))
+    (setq +mode-line-imenu-crumb
+          (when (and imenu-breadcrumb (not (string-empty-p imenu-breadcrumb))) (concat ": " imenu-breadcrumb)))))
+
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
+  (+mode-line-update-imenu-crumb)
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
@@ -238,10 +246,10 @@
                                      (+mode-line-symbol-overlay-indicator))
                             face ,panel-face))
                 " "
-                ;; (:propertize "%b" face ,meta-face)
                 (,(not +mode-line-project-crumb)
                  (:propertize "%b" face ,meta-face)
                  ,+mode-line-project-crumb)
+                (:eval +mode-line-imenu-crumb)
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))
@@ -265,7 +273,6 @@
 (setq-default mode-line-format
               '((:eval (+mode-line-normal))))
 
-
 ;;; Header Line
 ;; [breadcrumb] Add breadcrumb navigation in header-line
 (use-package breadcrumb
@@ -285,6 +292,9 @@
     (interactive)
     (if (region-active-p)
         (call-interactively 'count-words-region)
-      (message (breadcrumb-imenu-crumbs)))))
+      (message (breadcrumb-imenu-crumbs))))
+
+  (timeout-debounce! '+mode-line-update-imenu-crumb 0.2)
+  )
 
 (setq-default header-line-format nil)
