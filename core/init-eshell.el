@@ -51,12 +51,13 @@ If no project is found, create a temporary Eshell instance in the current direct
     (require 'eshell)
     (require 'project)  ;; Ensure we load project.el
     (let* ((project (project-current)) ;; Get the current project
-           (dir-name (if project
-                         (file-name-nondirectory (directory-file-name (project-root project))) ;; Use project name
-                       (file-name-nondirectory (directory-file-name default-directory)))) ;; Use current directory name if no project
+           (dir-name (directory-file-name default-directory))
+           (root-name (if project
+                          (file-name-nondirectory (directory-file-name (project-root project))) ;; Use project name
+                        (file-name-nondirectory dir-name))) ;; Use current directory name if no project
            (popup-buffer-name (if arg
-                                   (format "*GPTel-popup*: %s" dir-name)
-                                 (format "*Eshell-popup*: %s" dir-name)))
+                                  (format "*GPTel-popup*: %s" root-name)
+                                (format "*Eshell-popup*: %s" root-name)))
            (win (get-buffer-window popup-buffer-name)))
 
       ;; If an argument is provided, you can add some custom behavior, like opening a GPT prompt.
@@ -76,8 +77,9 @@ If no project is found, create a temporary Eshell instance in the current direct
             ;; Open a eshell
             (let ((eshell-buffer-name popup-buffer-name))
               (with-current-buffer (eshell)
-                ;; Navigate to project root or current directory
-                ;; (eshell/cd (if project (project-root project) default-directory))
+                (unless (string= dir-name (directory-file-name default-directory))
+                  (eshell/cd dir-name)
+                  (eshell-send-input))
                 ;; Add a hook to close the window when Eshell exits
                 (add-hook 'eshell-exit-hook
                           (lambda ()
@@ -127,8 +129,7 @@ If no project is found, create a temporary Eshell instance in the current direct
     "Clear the eshell buffer."
     (interactive)
     (let ((inhibit-read-only t))
-      (erase-buffer)
-      (eshell-send-input)))
+      (erase-buffer)))
 
   ;; [emacs, e, ec, ecc]
   (defun eshell/emacs (&rest args)
