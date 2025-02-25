@@ -18,6 +18,7 @@
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t
         show-paren-context-when-offscreen t
+        blink-matching-paren-highlight-offscreen t
         show-paren-delay 0.2)
   )
 
@@ -42,8 +43,7 @@
   :straight t
   :hook ((prog-mode conf-mode yaml-mode) . rainbow-delimiters-mode)
   :config
-  (setq rainbow-delimiters-max-face-count 5)
-  )
+  (setq rainbow-delimiters-max-face-count 5))
 
 
 ;; [highlight-parentheses] Highlight surrounding parentheses
@@ -88,8 +88,8 @@
         (push `(,keyword . ,color) hl-todo-keyword-faces))))
 
   ;; HACK: `hl-todo' won't update face when changing theme, so we must add a hook for it
-  (add-hook! +theme-changed-hook :call-immediately
-    (defun +hl-update-keyword-faces ()
+  (add-hook! enable-theme-functions :call-immediately
+    (defun +hl-update-keyword-faces (&rest _)
       (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
       (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning))))
   )
@@ -200,7 +200,7 @@
 ;;
 ;;   ;; HACK: `indent-bars' calculates its faces from the current theme,
 ;;   ;; but it could be wrong after switching theme.
-;;   (add-hook! +theme-changed-hook
+;;   (add-hook! enable-theme-functions
 ;;     (defun +indent-bars-auto-set-faces ()
 ;;       (when indent-bars-mode (indent-bars-reset))))
 ;;   )

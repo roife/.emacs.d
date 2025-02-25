@@ -115,7 +115,7 @@
           "\\*Agenda Commands\\*" "\\*Org Select\\*" "\\*Capture\\*" "^CAPTURE-.*\\.org*"
           "\\*Graphviz Preview: .*\\*"
 
-          "\\*GPTel-popup\\*: .*"
+          "^GPTel-popup: .*"
 
           (lambda (buffer) (with-current-buffer buffer (derived-mode-p 'compilation-mode)))
           ))

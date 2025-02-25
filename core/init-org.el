@@ -236,8 +236,8 @@ Assume point is at first MARK."
     :config
     ;; HACK: `org-visual-indent' calculates its faces from the current theme,
     ;; but it could be wrong after switching theme.
-    (add-hook! +theme-changed-hook :call-immediately
-      (defun +org-visual-outline-indent-color-update ()
+    (add-hook! enable-theme-functions :call-immediately
+      (defun +org-visual-outline-indent-color-update (&rest _)
         (let (bufs)
           (dolist (buf (buffer-list))
             (with-current-buffer buf

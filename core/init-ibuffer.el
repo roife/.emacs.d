@@ -40,8 +40,6 @@
                            (mode . eww-history-mode)
                            (mode . eww-buffers-mode)
                            (mode . eww-search-annotations-mode)))
-          (chatgpt-filter '(mode . chatgpt-shell-mode))
-          (eshell-pop-filter '(name . "^\\*Eshell-pop\\*$"))
           (telega-filter '(or (mode . telega-chat-mode)
                               (mode . telega-root-mode)
                               (mode . telega-image-mode)
@@ -53,12 +51,10 @@
       ;; ChatGPT buffer should be added first to avoid being grouped into projects
       (add-to-list 'ibuffer-filter-groups (list "Telega" telega-filter))
       (add-to-list 'ibuffer-filter-groups (list "Scratch" scratch-filter))
-      (add-to-list 'ibuffer-filter-groups (list "ChatGPT" chatgpt-filter))
       (add-to-list 'ibuffer-filter-groups (list "Eww" eww-filter))
       (add-to-list 'ibuffer-filter-groups (list "Xwidget" xwidget-filter))
       (add-to-list 'ibuffer-filter-groups (list "Ebib" ebib-filter))
       (add-to-list 'ibuffer-filter-groups (list "Elfeed" elfeed-filter))
-      (add-to-list 'ibuffer-filter-groups (list "Eshell-pop" eshell-pop-filter))
       (add-to-list 'ibuffer-filter-groups (list "Temporary buffers" starred-name-filter) :append)
       )
 

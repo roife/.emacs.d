@@ -129,10 +129,3 @@ Example: 12 -> \"¹²\""
   (let ((str (number-to-string num))
         (superscripts "⁰¹²³⁴⁵⁶⁷⁸⁹"))
     (mapconcat (lambda (c) (char-to-string (elt superscripts (- c ?0)))) str)))
-
-;; theme changed hook
-(defvar +theme-changed-hook nil
-  "Hook run after the theme is changed.")
-(defadvice! +run-theme-changed-hook-a (&rest _)
-  :after #'enable-theme
-  (run-hooks '+theme-changed-hook))

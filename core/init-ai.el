@@ -69,7 +69,4 @@ Ensure that after all these changes, the code maintains the same functionality a
 
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
-  (with-eval-after-load 'corfu
-    (when (fboundp 'corfu-quit)
-      (add-hook 'gptel-pre-response-hook 'corfu-quit)))
   )

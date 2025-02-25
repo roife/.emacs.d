@@ -123,7 +123,16 @@
 
 (use-package marginalia
   :straight t
-  :hook (vertico-mode . marginalia-mode))
+  :hook (vertico-mode . marginalia-mode)
+  :config
+  (defun marginalia-annotate-buffer (cand)
+    "Annotate buffer CAND with modification status, file name and major mode."
+    (when-let ((buffer (get-buffer cand)))
+      (if (buffer-live-p buffer)
+          (marginalia--fields
+           ((marginalia--buffer-status buffer))
+           ((marginalia--buffer-file buffer) :face 'marginalia-file-name))
+        (marginalia--fields ("(dead buffer)" :face 'error))))))
 
 
 (use-package embark-consult
@@ -236,106 +245,37 @@
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-local t)
   )
 
-
-(use-package tempel
+(use-package company
   :straight t
-  :bind (:map tempel-map
-              ("C-e" . tempel-next)
-              ("C-a" . tempel-previous))
-  :hook (((prog-mode text-mode) . +tempel-setup-capf)
-         ((prog-mode text-mode) . tempel-abbrev-mode))
+  :hook (after-init . global-company-mode)
+  :bind (:map company-active-map
+              ("TAB" . company-complete-selection)
+              ("<tab>" . company-complete-selection))
   :config
-  (defun +tempel-setup-capf ()
-    (push #'tempel-complete completion-at-point-functions))
-
-  (setq tempel-trigger-prefix "\\"
-        tempel-path (expand-file-name "tempel-templates" user-emacs-directory))
+  (setq company-tooltip-align-annotations t
+        company-tooltip-limit 12
+        company-idle-delay 0.1
+        company-echo-delay (if (display-graphic-p) nil 0)
+        company-minimum-prefix-length 1
+        company-icon-margin 3
+        company-require-match nil
+        company-dabbrev-ignore-case nil
+        company-dabbrev-downcase nil
+        company-global-modes '(not erc-mode message-mode help-mode
+                                   gud-mode eshell-mode shell-mode)
+        company-backends '((company-capf :with company-yasnippet)
+                           (company-dabbrev-code company-keywords company-files)
+                           company-dabbrev)
+        company-format-margin-function nil
+        company-transformers '(company-sort-prefer-same-case-prefix
+                               company-sort-by-occurrence
+                               company-sort-by-backend-importance))
   )
 
 
-(use-package tempel-collection
+(use-package yasnippet
   :straight t
-  :after tempel)
-
-
-;; [corfu] compleletion frontend
-(use-package corfu
-  :straight (:files (:defaults "extensions/*.el"))
-  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode org-mode markdown-mode) . corfu-mode)
-         ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
-         (minibuffer-setup . +corfu-enable-in-minibuffer))
-  :bind (:map corfu-map
-              ("s-m" . +corfu-move-to-minibuffer)
-              ("RET" . nil))
-  :config
-  (setq corfu-cycle t                ;; Enable cycling for `corfu-next/previous'
-        corfu-auto t                 ;; Enable auto completion
-        corfu-separator ?&           ;; Orderless field separator
-        corfu-auto-prefix 1          ;; minimun prefix to enable completion
-        corfu-preview-current nil
-        corfu-auto-delay 0.1)
-
-  ;; Transfer completion to the minibuffer
-  (defun +corfu-move-to-minibuffer ()
-    (interactive)
-    (let ((completion-extra-properties corfu--extra)
-          completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
-
-  ;; Completing in the minibuffer
-  (defun +corfu-enable-in-minibuffer ()
-    "Enable Corfu in the minibuffer if `completion-at-point' is bound."
-    (when (where-is-internal #'completion-at-point (list (current-local-map)))
-      (corfu-mode 1)))
-  )
-
-
-(use-package corfu-history
-  :straight nil
-  :after corfu
-  :init
-  (corfu-history-mode 1)
-  :config
-  (with-eval-after-load 'savehist
-    (cl-pushnew 'corfu-history savehist-additional-variables))
-  )
-
-
-(use-package corfu-popupinfo
-  :straight nil
-  :after corfu
-  :init
-  (corfu-popupinfo-mode 1)
-  :config
-  (setq corfu-popupinfo-delay '(1.0 . 1.0)))
-
-
-(use-package corfu-quick
-  :straight nil
-  :after corfu
-  :bind (:map corfu-map
-              ("C-, ," . corfu-quick-complete)))
-
-
-(use-package corfu-terminal
-  :straight t
-  :when (not (display-graphic-p))
-  :after corfu
-  :init (corfu-terminal-mode 1))
-
-
-(use-package cape
-  :straight t
-  :hook ((corfu-mode . +corfu-add-cape-backends)
-         ((TeX-mode LaTeX-mode org-mode markdown-mode) . +corfu-add-cape-tex-backends))
-  :config
-  (defun +corfu-add-cape-backends ()
-    (add-to-list 'completion-at-point-functions #'cape-file :append)
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev :append))
-
-  (defun +corfu-add-cape-tex-backends ()
-    (add-to-list 'completion-at-point-functions #'cape-tex :append))
-  )
+  :hook (after-init . yas-global-mode))
 
 
 (use-package dabbrev

@@ -42,7 +42,7 @@
 
 ;; [imenu]
 (use-package imenu
-  :hook (prog-mode . imenu--make-index-alist)
+  :hook (prog-mode . (lambda () (ignore-errors (imenu--make-index-alist))))
   :config
   (setq imenu-auto-rescan t))
 
@@ -53,49 +53,86 @@
   :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
               ("M-<return>" . eglot-code-actions)
-              ("M-/" . eglot-find-typeDefinition))
+              ("M-/" . eglot-find-typeDefinition)
+              ("M-?" . xref-find-references))
   :config
   (setq eglot-events-buffer-config '(:size 0 :format full)
-        eglot-connect-timeout 10
         eglot-autoshutdown t
         eglot-report-progress 'messages)
 
-  ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   ;; eglot has it's own strategy by default
-  (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly
-              completion-at-point-functions (cl-nsubst
-                                             (cape-capf-noninterruptible
-                                              (cape-capf-buster #'eglot-completion-at-point
-                                                                #'string-prefix-p))
-                                             'eglot-completion-at-point
-                                             completion-at-point-functions))
+  (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   (setq-default eglot-workspace-configuration
                 '((:pyls . (:plugins (:jedi_completion (:fuzzy t))))
                   (:rust-analyzer . (:cargo (:allFeatures t :allTargets t :features "full")
                                             :checkOnSave :json-false
-                                            :diagnostics (:enable :json-false)
                                             :completion (:termSearch (:enable t)
                                                                      :fullFunctionSignatures (:enable t))
                                             :hover (:memoryLayout (:size "both")
                                                                   :show (:traitAssocItems 5)
                                                                   :documentation (:keywords (:enable :json-false)))
-                                            :inlayHints(:bindingModeHints (:enable t)
+                                            :inlayHints(;:bindingModeHints (:enable t)
                                                                           :lifetimeElisionHints (:enable "skip_trivial" :useParameterNames t)
                                                                           :closureReturnTypeHints (:enable "always")
                                                                           :discriminantHints (:enable t)
                                                                           :genericParameterHints (:lifetime (:enable t)))
-                                            ;; :lens (:references (:adt (:enable t)
-                                            ;;                          :enumVariant (:enable t)
-                                            ;;                          :trait (:enable t)
-                                            ;;                          :method (:enable t)))
-                                            ;; :semanticHighlighting (:operator (:specialization (:enable t))
-                                            ;;                                  :punctuation (:enable t :specialization (:enable t)))
+                                            :semanticHighlighting (:operator (:specialization (:enable t))
+                                                                             :punctuation (:enable t :specialization (:enable t)))
                                             :workspace (:symbol (:search (:kind "all_symbols"
                                                                                 :scope "workspace_and_dependencies")))
                                             :lru (:capacity 1024)))
                   (:typescript . (:preferences (:importModuleSpecifierPreference "non-relative")))
                   (:gopls . ((staticcheck . t)
                              (matcher . "CaseSensitive")))))
+
+  (defsubst find-value-and-succ (value lst)
+    (while (and lst (not (eq (car lst) value)))
+      (setq lst (cdr lst)))
+    (if lst
+        (car (cdr lst))
+      nil))
+
+  (defsubst set-value-and-succ (key value lst)
+    (let ((key-pos (member key lst)))
+      (if key-pos
+          (if (cdr key-pos)
+              (setcar (cdr key-pos) value)
+            (error "Key found but no value (no succ element) to update"))
+        (setf lst (append lst (list key value)))))
+    lst)
+
+  (defsubst toggle-boolean-json (v)
+    (if (eq v :json-false)
+        t
+      :json-false))
+
+  (defun +eglot-toggle-exclude-imports-for-rust-analyzer ()
+    (interactive)
+    (let* ((current-config (alist-get :rust-analyzer eglot-workspace-configuration))
+           (references (find-value-and-succ :references current-config))
+           (val (find-value-and-succ :excludeImports references)))
+      (if references
+          (setf references (set-value-and-succ :excludeImports (toggle-boolean-json (or val :json-false)) references))
+        (setq references (list :excludeImports t)))
+      (setq current-config (set-value-and-succ :references references current-config))
+      (setf (alist-get :rust-analyzer eglot-workspace-configuration) current-config)
+      (if (eq val :json-false)
+          (message "Exclude imports")
+        (message "Include imports")))
+    )
+
+  (defun +eglot-toggle-exclude-tests-for-rust-analyzer ()
+    (interactive)
+    (let* ((current-config (alist-get :rust-analyzer eglot-workspace-configuration))
+           (references (find-value-and-succ :references current-config))
+           (val (find-value-and-succ :excludeTests references)))
+      (if references
+          (setf references (set-value-and-succ :excludeTests (toggle-boolean-json (or val :json-false)) references))
+        (setq references (list :excludeTests t)))
+      (setq current-config (set-value-and-succ :references references current-config))
+      (setf (alist-get :rust-analyzer eglot-workspace-configuration) current-config)
+      )
+    )
 
   ;; we call eldoc manually by C-h .
   (add-hook! eglot-managed-mode-hook
@@ -105,12 +142,18 @@
   )
 
 
-(use-package eglot-tempel
-  :straight t
-  :after (eglot tempel)
-  :init
-  (eglot-tempel-mode)
-  )
+(use-package eglot-booster
+  :straight (:host github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :config (eglot-booster-mode))
+
+
+;; (use-package eglot-tempel
+;;   :straight t
+;;   :after (eglot tempel)
+;;   :init
+;;   (eglot-tempel-mode)
+;;   )
 
 
 (use-package eglot-x
@@ -120,7 +163,7 @@
 
 ;; [Eldoc]
 (use-package eldoc
-  :bind (("C-h ." . eldoc))
+  :bind (("C-h h" . eldoc))
   :config
   (setq eldoc-echo-area-display-truncation-message t
         eldoc-echo-area-prefer-doc-buffer t
@@ -181,6 +224,10 @@
   (setq webpaste-paste-confirmation t
         webpaste-add-to-killring t
         webpaste-provider-priority '("paste.mozilla.org" "dpaste.org" "ix.io")))
+
+
+(use-package lua-mode
+  :straight t)
 
 
 ;; [dumb-jump] Jump to definition (integrated with xref, a fallback of lsp)
@@ -288,13 +335,12 @@
   :straight t)
 
 
-(use-package scala-mode
+(use-package scala-ts-mode
   :straight t
   :config
-  (setq
-   scala-indent:align-parameters t
-   ;; indent block comments to first asterix, not second
-   scala-indent:use-javadoc-style t))
+  (add-to-list 'eglot-server-programs
+               `((scala-mode scala-ts-mode)
+               . ,(alist-get 'scala-mode eglot-server-programs))))
 
 
 (use-package llvm-mode
@@ -347,26 +393,30 @@
    haskell-process-auto-import-loaded-modules t))
 
 
-(use-package verilog-mode
-  :straight t
-  :config
-  (setq verilog-align-ifelse t
-        verilog-auto-delete-trailing-whitespace t
-        verilog-auto-inst-param-value t
-        verilog-auto-inst-vector nil
-        verilog-auto-lineup (quote all)
-        verilog-auto-newline nil
-        verilog-auto-save-policy nil
-        verilog-auto-template-warn-unused t
-        verilog-case-indent 4
-        verilog-cexp-indent 4
-        verilog-highlight-grouping-keywords t
-        verilog-highlight-modules t
-        verilog-indent-level 4
-        verilog-indent-level-behavioral 4
-        verilog-indent-level-declaration 4
-        verilog-indent-level-module 4
-        verilog-tab-to-comment t))
+(use-package tuareg
+  :straight t)
+
+
+;; (use-package verilog-mode
+;;   :straight t
+;;   :config
+;;   (setq verilog-align-ifelse t
+;;         verilog-auto-delete-trailing-whitespace t
+;;         verilog-auto-inst-param-value t
+;;         verilog-auto-inst-vector nil
+;;         verilog-auto-lineup (quote all)
+;;         verilog-auto-newline nil
+;;         verilog-auto-save-policy nil
+;;         verilog-auto-template-warn-unused t
+;;         verilog-case-indent 4
+;;         verilog-cexp-indent 4
+;;         verilog-highlight-grouping-keywords t
+;;         verilog-highlight-modules t
+;;         verilog-indent-level 4
+;;         verilog-indent-level-behavioral 4
+;;         verilog-indent-level-declaration 4
+;;         verilog-indent-level-module 4
+;;         verilog-tab-to-comment t))
 
 
 ;; [yaml]
@@ -387,10 +437,10 @@
 
 
 ;; [Proof General] Proof General is a generic front-end for proof assistants
-(use-package proof-general
-  :straight t
-  :init
-  (setq proof-splash-enable nil))
+;; (use-package proof-general
+;;   :straight t
+;;   :init
+;;   (setq proof-splash-enable nil))
 
 
 ;; Major mode for editing web templates

@@ -249,7 +249,7 @@
                 (,(not +mode-line-project-crumb)
                  (:propertize "%b" face ,meta-face)
                  ,+mode-line-project-crumb)
-                (:eval +mode-line-imenu-crumb)
+                ;; (:eval +mode-line-imenu-crumb)
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))

@@ -56,8 +56,8 @@ If no project is found, create a temporary Eshell instance in the current direct
                           (file-name-nondirectory (directory-file-name (project-root project))) ;; Use project name
                         (file-name-nondirectory dir-name))) ;; Use current directory name if no project
            (popup-buffer-name (if arg
-                                  (format "*GPTel-popup*: %s" root-name)
-                                (format "*Eshell-popup*: %s" root-name)))
+                                  (format "GPTel-popup: %s" root-name)
+                                (format "Eshell-popup: %s" root-name)))
            (win (get-buffer-window popup-buffer-name)))
 
       ;; If an argument is provided, you can add some custom behavior, like opening a GPT prompt.
@@ -217,8 +217,8 @@ If no project is found, create a temporary Eshell instance in the current direct
     (defun +eshell-sync-dir-buffer-name ()
       "Change eshell buffer name by directory change."
       (when (and (equal major-mode 'eshell-mode)
-                 ;; avoid renaming buffer name when in `eshell-popup'
-                 (eq (buffer-name) "*Eshell-pop*"))
+                 ;; avoid renaming buffer name like Eshell-popup: ...
+                 (not (string-match-p "^Eshell-popup: " (buffer-name))))
         (rename-buffer (concat "Esh: " (abbreviate-file-name default-directory)) t))))
   )
 

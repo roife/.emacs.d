@@ -4,11 +4,8 @@
          (project-dir (file-name-nondirectory (directory-file-name (project-root (project-current)))))
          (data-dir (expand-file-name (file-name-concat jdtls-cache-dir (md5 project-dir))))
          (jvm-args `("-Xmx8G"
-                     ;; "-XX:+UseG1GC"
                      "-XX:+UseZGC"
                      "-XX:+UseStringDeduplication"
-                     ;; "-XX:FreqInlineSize=325"
-                     ;; "-XX:MaxInlineLevel=9"
                      "-XX:+UseCompressedOops"))
          (jvm-args (mapcar (lambda (arg) (concat "--jvm-arg=" arg)) jvm-args))
          ;; tell jdtls the data directory and jvm args
@@ -17,7 +14,7 @@
 
 (with-eval-after-load "eglot"
   ;; I don't like flymake
-  (add-to-list 'eglot-stay-out-of 'flymake)
+  ;; (add-to-list 'eglot-stay-out-of 'flymake)
 
   (push '(verilog-mode . ("vizsla")) eglot-server-programs)
   (push '(java-mode . jdtls-command-contact) eglot-server-programs)
@@ -50,7 +47,7 @@
                              (file-name-nondirectory
                               (directory-file-name
                                (project-root (project-current))))))
-             (log-buffer-name (format "*EGLOT (%s/(rust-mode rust-ts-mode)) events*"
+             (log-buffer-name (format "*EGLOT (%s/(rust-ts-mode rust-mode)) events*"
                                       project-name)))
     (let ((eglot-log-window (catch 'found
                               (dolist (win (window-list))
@@ -67,14 +64,8 @@
         (switch-to-buffer log-buffer-name)
         (select-window current-window)))))
 
-(defun +xref-find-definition-in-split-window ()
-  (interactive)
-  (let ((win (split-window-right)))
-    (select-window win)
-    (call-interactively #'xref-find-definitions)))
-(global-set-key (kbd "M-s-.") '+xref-find-definition-in-split-window)
-
-(defun +xref-go-back-kill-window ()
-  (interactive)
-  (delete-window))
-(global-set-key (kbd "M-s-,") '+xref-go-back-kill-window)
+;; (use-package buffer-name-relative
+;;   :straight (:host codeberg :repo "ideasman42/emacs-buffer-name-relative")
+;;   :hook (after-init . buffer-name-relative-mode)
+;;   :config
+;;   (setq buffer-name-relative-prefix '("" . "/")))
