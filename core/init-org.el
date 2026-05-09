@@ -104,65 +104,26 @@
 
 
 ;; [org-appear] Make invisible parts of Org elements appear visible.
-;; (use-package org-appear
-;;   :straight t
-;;   :hook ((org-mode . org-appear-mode))
-;;   :config
-;;   (setq
-;;    org-hide-emphasis-markers t
-;;
-;;    org-appear-autosubmarkers t
-;;    org-appear-autoentities t
-;;    org-appear-autokeywords t
-;;    org-appear-inside-latex t
-;;
-;;    org-appear-delay 0.1
-;;
-;;    org-appear-trigger 'manual)
-;;
-;;   (add-hook! org-mode-hook :call-immediately
-;;     (defun +org-add-appear-hook ()
-;;       (add-hook 'meow-insert-enter-hook #'org-appear-manual-start nil t)
-;;       (add-hook 'meow-insert-exit-hook #'org-appear-manual-stop nil t))))
+(use-package org-appear
+  :straight t
+  :hook ((org-mode . org-appear-mode))
+  :config
+  (setq
+   org-hide-emphasis-markers t
 
+   org-appear-autosubmarkers t
+   org-appear-autoentities t
+   org-appear-autokeywords t
+   org-appear-inside-latex t
 
-;; [org-visual-outline] Add guide lines for org outline
-(use-package org-visual-outline
-  :after org
-  :no-require t
-  :straight (:host github :repo "legalnonsense/org-visual-outline" :files ("*.el"))
-  :init
-  (use-package org-visual-indent
-    :after org
-    :hook ((org-mode . org-visual-indent-mode))
-    :config
-    ;; HACK: `org-visual-indent' calculates its faces from the current theme,
-    ;; but it could be wrong after switching theme.
-    (add-hook! enable-theme-functions :call-immediately
-      (defun +org-visual-outline-indent-color-update (&rest _)
-        (let (bufs)
-          (dolist (buf (buffer-list))
-            (with-current-buffer buf
-              (when org-visual-indent-mode
-                (push buf bufs)
-                (org-visual-indent-mode -1))))
-          (setq org-visual-indent-color-indent
-                (cl-loop for x from 1 to 8
-                         with color = nil
-                         do (setq color (or (face-foreground (intern (concat "org-level-" (number-to-string x))) nil t)
-                                            (face-foreground 'org-level-1)))
-                         collect `(,x ,(list :background color :foreground color :height .1))))
-          (set-face-attribute 'org-visual-indent-pipe-face nil
-                              :foreground (face-attribute 'default :foreground)
-                              :background (face-attribute 'default :foreground))
-          (set-face-attribute 'org-visual-indent-blank-pipe-face nil
-                              :foreground (face-attribute 'default :background)
-                              :background (face-attribute 'default :background))
-          (dolist (buf bufs)
-            (with-current-buffer buf
-              (org-visual-indent-mode t))))
-        ))
-    ))
+   org-appear-delay 0.1
+
+   org-appear-trigger 'manual)
+
+  (add-hook! org-mode-hook :call-immediately
+    (defun +org-add-appear-hook ()
+      (add-hook 'meow-insert-enter-hook #'org-appear-manual-start nil t)
+      (add-hook 'meow-insert-exit-hook #'org-appear-manual-stop nil t))))
 
 
 ;; [org-pomodoro] Pomodoro timer for org-mode
@@ -180,6 +141,11 @@
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda-mode)))
 
+(use-package org-modern-indent
+  :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+  :config
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+
 
 ;; [ox]
 (use-package ox
@@ -188,48 +154,3 @@
         org-html-validation-link nil
         org-latex-prefer-user-labels t
         org-export-with-latex t))
-
-
-;; [ox-hugo]
-(use-package ox-hugo
-  :straight t
-  :after ox
-  :init (require 'ox-hugo)
-  :config
-  (setq org-hugo-section "posts"
-        org-hugo-base-dir +blog-dir
-        org-hugo-external-file-extensions-allowed-for-copying nil)
-
-  (defun +ox-hugo/export-all (&optional org-files-root-dir dont-recurse)
-    "Export all Org files (including nested) under ORG-FILES-ROOT-DIR.
-
-All valid post subtrees in all Org files are exported using
-`org-hugo-export-wim-to-md'.
-
-If optional arg ORG-FILES-ROOT-DIR is nil, all Org files in
-current buffer's directory are exported.
-
-If optional arg DONT-RECURSE is nil, all Org files in
-ORG-FILES-ROOT-DIR in all subdirectories are exported. Else, only
-the Org files directly present in the current directory are
-exported.  If this function is called interactively with
-\\[universal-argument] prefix, DONT-RECURSE is set to non-nil.
-
-Example usage in Emacs Lisp: (ox-hugo/export-all \"~/org\")."
-    (interactive)
-    (let* ((org-files-root-dir (or org-files-root-dir default-directory))
-           (dont-recurse (or dont-recurse (and current-prefix-arg t)))
-           (search-path (file-name-as-directory (expand-file-name org-files-root-dir)))
-           (org-files (if dont-recurse
-                          (directory-files search-path :full "\.org$")
-                        (directory-files-recursively search-path "\.org$"))))
-      (if (null org-files)
-          (message "No Org files found in %s" search-path)
-        (let ((cnt 1)
-              (num-files (length org-files)))
-          (dolist (org-file org-files)
-            (with-current-buffer (find-file-noselect org-file)
-              (message "[ox-hugo/export-all file %d/%d] Exporting %s" cnt num-files org-file)
-              (org-hugo-export-wim-to-md :all-subtrees)
-              (cl-incf cnt)))))))
-  )

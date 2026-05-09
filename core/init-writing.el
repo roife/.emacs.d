@@ -6,7 +6,8 @@
   :config
   (defun +center-text ()
     (visual-fill-column-mode)
-    (setq visual-fill-column-center-text t)))
+    (setq visual-fill-column-center-text t)
+    (visual-line-mode)))
 
 
 ;; [edit-indirect] Edit code blocks indirectly
