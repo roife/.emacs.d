@@ -264,11 +264,6 @@ begin and end of the block surrounding point."
   )
 
 
-;; [rg] support for ripgrep
-(use-package rg
-  :straight t)
-
-
 ;; [vundo] Undo tree
 (use-package vundo
   :straight t

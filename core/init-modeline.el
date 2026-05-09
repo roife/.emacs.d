@@ -233,7 +233,6 @@
 
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
-  (+mode-line-update-imenu-crumb)
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p))

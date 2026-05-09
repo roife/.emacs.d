@@ -121,11 +121,3 @@ This command does the inverse of `fill-region'."
 (defun +temp-buffer-p (buffer)
   "Return t if BUFFER is temporary."
   (string-match-p "^ " (buffer-name buffer)))
-
-(defun +num-to-sup-string (num)
-  "Convert NUM to a small string.
-
-Example: 12 -> \"¹²\""
-  (let ((str (number-to-string num))
-        (superscripts "⁰¹²³⁴⁵⁶⁷⁸⁹"))
-    (mapconcat (lambda (c) (char-to-string (elt superscripts (- c ?0)))) str)))

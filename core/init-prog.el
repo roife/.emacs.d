@@ -202,7 +202,8 @@
     (when (and (not (+temp-buffer-p (current-buffer)))
                (not (or (string-prefix-p "*GPTel-" (buffer-name))
                         (string= "ChatGPT" (buffer-name)))))
-      (copilot-mode)))
+      (copilot-mode)
+      (copilot-nes-mode)))
 
   (defun +copilot-complete ()
     (interactive)
@@ -499,10 +500,6 @@
                (shell-command-to-string "agda-mode locate"))))
 
 
-(use-package moonbit-mode
-  :straight (:host github :repo "tonyfettes/moonbit-mode"))
-
-
 ;; [treesit]
 (use-package treesit
   :when (treesit-available-p)
@@ -523,19 +520,13 @@
           (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
           (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
           (rust "https://github.com/tree-sitter/tree-sitter-rust")
-          (typst "https://github.com/uben0/tree-sitter-typst")
-          (moonbit "https://github.com/moonbitlang/tree-sitter-moonbit")))
+          (typst "https://github.com/uben0/tree-sitter-typst")))
 
   (dolist (lang treesit-language-source-alist)
   (unless (treesit-language-available-p (car lang))
     (treesit-install-language-grammar (car lang))))
 
   (setq treesit-font-lock-level 4))
-
-
-;; [dash] api docset
-(use-package dash-docs
-  :straight t)
 
 
 ;; [indent-bars] Show indent guides

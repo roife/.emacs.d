@@ -27,7 +27,7 @@
                                                                      tab-bar-tab-name-truncated-max
                                                                      nil nil tab-bar-tab-name-ellipsis))))
                 (if (> count 1)
-                    (concat truncated-tab-name (+num-to-sup-string count))
+                    (concat truncated-tab-name "⁺")
                   truncated-tab-name))))
 
   ;; Add spaces for tab-name

@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
+(require 'compile)
+
 ;; startup time
 (defun efs/display-startup-time ()
   (message
@@ -44,7 +46,6 @@
                      'init-ime
                      'init-modal
                      'init-modeline
-                     'init-bib
                      'init-ai
                      'init-pdf
                      'init-test

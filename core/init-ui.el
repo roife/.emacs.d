@@ -183,3 +183,10 @@
 (setq frame-title-format
       '((:eval (or buffer-file-truename "%b"))
         (" · Emacs")))
+
+
+(use-package exec-path-from-shell
+  :straight t
+  :init
+  (setq exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-initialize))
