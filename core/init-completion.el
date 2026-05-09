@@ -223,8 +223,6 @@
   (consult-customize
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file
-   consult--source-recent-file
-   consult--source-project-recent-file consult--source-bookmark
    consult-buffer
    :preview-key "s-p")
   (consult-customize
