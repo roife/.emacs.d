@@ -294,7 +294,7 @@
         (call-interactively 'count-words-region)
       (message (breadcrumb-imenu-crumbs))))
 
-  (timeout-debounce! '+mode-line-update-imenu-crumb 0.2)
+  (timeout-debounce '+mode-line-update-imenu-crumb 0.2)
   )
 
 (setq-default header-line-format nil)
