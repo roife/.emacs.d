@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;; [ispell] spell checker
 (use-package ispell
   :hook ((org-mode . org-skip-region-alist)
