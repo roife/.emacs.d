@@ -182,8 +182,16 @@
 ;; [zoom] Managing the window sizes automatically
 (use-package zoom
   :straight t
-  :hook (window-setup . zoom-mode))
+  :hook (window-setup . zoom-mode)
+  :config
+  (setq zoom-ignored-major-modes '(ediff-mode))
+  (defun +fix-zoom ()
+    (with-selected-window (get-buffer-window "*Ediff Control Panel*")
+      (setq window-size-fixed t)
+      (window-resize (selected-window) (- 5 (window-total-height)) nil t)))
 
+  (add-hook 'ediff-after-setup-windows-hook '+fix-zoom)
+  )
 
 ;; [auto-dim-other-buffers] Dim non-active buffers
 (use-package auto-dim-other-buffers

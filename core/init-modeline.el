@@ -36,11 +36,6 @@
   "Face used for meta panel on the mode-line of an active window."
   :group '+mode-line)
 
-(defface +mode-line-mode-name-active-face
-  '((t (:inherit (font-lock-function-name-face))))
-  "The face for buffer name on the mode-line of an active window."
-  :group '+mode-line)
-
 (defface +mode-line-host-name-active-face
   '((t (:inherit (font-lock-function-name-face bold italic))))
   "The face for host name on the mode-line of an active window."
@@ -178,21 +173,24 @@
                                ((eq state 'ignored) 'vc-dir-status-ignored)
                                ((memq state '(needs-update needs-merge conflict missing)) 'vc-dir-status-warning)
                                (t 'vc-dir-status-edited)))
-                   (state-symbol (cond ((eq state 'up-to-date) "√")
-                                       ((eq state 'edited) "*")
-                                       ((eq state 'added) "@")
-                                       ((eq state 'needs-update) "￬")
-                                       ((eq state 'needs-merge) "&")
-                                       ((eq state 'unlocked-changes) "")
-                                       ((eq state 'removed) "×")
-                                       ((eq state 'conflict) "!")
-                                       ((eq state 'missing) "?")
-                                       ((eq state 'ignored) "-")
-                                       ((eq state 'unregistered) "+")
-                                       ((stringp state) (concat "#" state ":"))
-                                       (t " "))))
+                   ;; (state-symbol (cond ((eq state 'up-to-date) "√")
+                   ;;                     ((eq state 'edited) "*")
+                   ;;                     ((eq state 'added) "@")
+                   ;;                     ((eq state 'needs-update) "￬")
+                   ;;                     ((eq state 'needs-merge) "&")
+                   ;;                     ((eq state 'unlocked-changes) "")
+                   ;;                     ((eq state 'removed) "×")
+                   ;;                     ((eq state 'conflict) "!")
+                   ;;                     ((eq state 'missing) "?")
+                   ;;                     ((eq state 'ignored) "-")
+                   ;;                     ((eq state 'unregistered) "+")
+                   ;;                     ((stringp state) (concat "#" state ":"))
+                   ;;                     (t " ")))
+                   )
               (concat " "
-                      (propertize (concat rev state-symbol)
+                      (propertize (concat rev
+                                          ;; state-symbol
+                                          )
                                   'face face
                                   'help-echo (get-text-property 1 'help-echo vc-mode))))))))
 (advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
@@ -253,14 +251,13 @@
                              face +mode-line-host-name-active-face)
                 ))
          (vcs-info (concat +mode-line-vcs-info +mode-line-smerge-count))
-         (rhs `((:propertize mode-name face ,(when active-p '+mode-line-mode-name-active-face))
-                (,active-p ,vcs-info
+         (rhs `((,active-p ,vcs-info
                            (:propertize ,vcs-info face nil))
                 (,active-p ,+mode-line-flymake-indicator)
                 " "
                 (:eval +mode-line-encoding)
                 ,(or +mode-line-pdf-pages
-                     (list "%l⋅" '(:eval (+mode-line-buffer-position))))
+                     (list "%l " '(:eval (+mode-line-buffer-position))))
                 " "
                 ))
          (rhs-str (format-mode-line rhs))

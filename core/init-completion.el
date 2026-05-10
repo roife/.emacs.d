@@ -41,12 +41,10 @@
   )
 
 
-(use-package vertico-repeat
-  :straight nil
-  :after vertico
-  :hook (minibuffer-setup . vertico-repeat-save)
-  :bind (:map vertico-map
-              ("C-r" . vertico-repeat-select)))
+;; (use-package vertico-repeat
+;;   :straight nil
+;;   :after vertico
+;;   :hook (minibuffer-setup . vertico-repeat-save))
 
 
 (use-package orderless
@@ -197,14 +195,15 @@
          ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop)
-         ("C-c d r"                             . consult-ripgrep)
-         ("C-c d f"                             . consult-fd)
+         ("C-r"                             . consult-ripgrep)
+         ("C-t"                             . consult-fd)
          :map minibuffer-mode-map
          ("C-r" . consult-history))
   ;; :hook ((completion-list-mode . consult-preview-at-point-mode))
   :config
   (setq consult-narrow-key "<"
-        consult-async-min-input 2)
+        consult-async-min-input 2
+        consult-async-refresh-delay 0.14)
 
   ;; replace multi-occur with consult-multi-occur
   (advice-add #'multi-occur :override #'consult-multi-occur)
@@ -243,32 +242,74 @@
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-local t)
   )
 
-(use-package company
-  :straight t
-  :hook (after-init . global-company-mode)
-  :bind (:map company-active-map
-              ("TAB" . company-complete-selection)
-              ("<tab>" . company-complete-selection))
+;; [corfu] compleletion frontend
+(use-package corfu
+  :straight (:files (:defaults "extensions/*.el"))
+  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode org-mode markdown-mode) . corfu-mode)
+         ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
+         (minibuffer-setup . +corfu-enable-in-minibuffer))
+  :bind (:map corfu-map
+              ("s-m" . +corfu-move-to-minibuffer)
+              ("RET" . nil))
   :config
-  (setq company-tooltip-align-annotations t
-        company-tooltip-limit 12
-        company-idle-delay 0.1
-        company-echo-delay (if (display-graphic-p) nil 0)
-        company-minimum-prefix-length 1
-        company-icon-margin 3
-        company-require-match nil
-        company-dabbrev-ignore-case nil
-        company-dabbrev-downcase nil
-        company-global-modes '(not erc-mode message-mode help-mode
-                                   gud-mode eshell-mode shell-mode)
-        company-backends '((company-capf :with company-yasnippet)
-                           (company-dabbrev-code company-keywords company-files)
-                           company-dabbrev)
-        company-format-margin-function nil
-        company-transformers '(company-sort-prefer-same-case-prefix
-                               company-sort-by-occurrence
-                               company-sort-by-backend-importance))
-  )
+  (setq corfu-cycle t
+        corfu-auto t
+        corfu-separator ?&
+        corfu-auto-prefix 1
+        corfu-preview-current nil
+        corfu-auto-delay 0.1)
+
+  (defun +corfu-move-to-minibuffer ()
+    (interactive)
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+
+  (defun +corfu-enable-in-minibuffer ()
+    "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+    (when (where-is-internal #'completion-at-point (list (current-local-map)))
+      (corfu-mode 1))))
+
+(use-package corfu-history
+  :straight nil
+  :after corfu
+  :init
+  (corfu-history-mode 1)
+  :config
+  (with-eval-after-load 'savehist
+    (cl-pushnew 'corfu-history savehist-additional-variables)))
+
+;; (use-package corfu-popupinfo
+;;   :straight nil
+;;   :after corfu
+;;   :init
+;;   (corfu-popupinfo-mode 1)
+;;   :config
+;;   (setq corfu-popupinfo-delay '(1.0 . 1.0)))
+
+(use-package corfu-quick
+  :straight nil
+  :after corfu
+  :bind (:map corfu-map
+              ("C-, ," . corfu-quick-complete)))
+
+(use-package corfu-terminal
+  :straight t
+  :when (not (display-graphic-p))
+  :after corfu
+  :init (corfu-terminal-mode 1))
+
+(use-package cape
+  :straight t
+  :hook ((corfu-mode . +corfu-add-cape-backends)
+         ((TeX-mode LaTeX-mode org-mode markdown-mode) . +corfu-add-cape-tex-backends))
+  :config
+  (defun +corfu-add-cape-backends ()
+    (add-to-list 'completion-at-point-functions #'cape-file :append)
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev :append))
+
+  (defun +corfu-add-cape-tex-backends ()
+    (add-to-list 'completion-at-point-functions #'cape-tex :append)))
 
 
 (use-package yasnippet
@@ -279,11 +320,3 @@
 (use-package dabbrev
   :config
   (setq dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
-
-
-(use-package consult-dash
-  :straight t
-  :bind (("M-s d" . consult-dash))
-  :config
-  ;; Use the symbol at point as initial search term
-  (consult-customize consult-dash :initial (thing-at-point 'symbol)))

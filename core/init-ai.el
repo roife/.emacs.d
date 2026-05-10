@@ -5,8 +5,9 @@
   :init
   (require 'auth-source)
   (setq auth-sources '("~/.authinfo" "~/.authinfo.gpg" "~/.netrc"))
-  (setq gptel-model 'deepseek-v4-flash
-        gptel-default-mode 'org-mode)
+  (setq gptel-model 'deepseek-v4-pro
+        gptel-default-mode 'org-mode
+        gptel-confirm-tool-calls nil)
   (setq-default
    gptel-backend
    (gptel-make-deepseek "DeepSeek"
@@ -16,7 +17,11 @@
   :config
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
+  (gptel-agent-update)
   )
+
+(use-package gptel-agent
+  :straight t)
 
 (use-package codex-ide
   :straight (:type git :host github :repo "dgillis/emacs-codex-ide")
