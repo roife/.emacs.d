@@ -197,14 +197,14 @@
 
 
 ;; [buffer position]
-(defsubst +mode-line-buffer-position ()
-  (let ((pos (format-mode-line '(-3 "%p"))))
-    (pcase pos
-      ("Top" "⊤")
-      ("Bot" "⊥")
-      ("All" "∀")
-      (_ (let ((first-char (substring pos 0 1)))
-           (if (string= first-char " ") "0" first-char))))))
+;; (defsubst +mode-line-buffer-position ()
+;;   (let ((pos (format-mode-line '(-3 "%p"))))
+;;     (pcase pos
+;;       ("Top" "⊤")
+;;       ("Bot" "⊥")
+;;       ("All" "∀")
+;;       (_ (let ((first-char (substring pos 0 1)))
+;;            (if (string= first-char " ") "0" first-char))))))
 
 
 ;; [project-crumb]
@@ -256,8 +256,7 @@
                 (,active-p ,+mode-line-flymake-indicator)
                 " "
                 (:eval +mode-line-encoding)
-                ,(or +mode-line-pdf-pages
-                     (list "%l " '(:eval (+mode-line-buffer-position))))
+                ,(or +mode-line-pdf-pages "%l")
                 " "
                 ))
          (rhs-str (format-mode-line rhs))

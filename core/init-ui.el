@@ -124,8 +124,6 @@
 ;; first-time startup on Emacs > 26.3.
 (setq custom-safe-themes t)
 
-(use-package modus-themes
-  :straight t)
 
 (use-package doom-themes
   :straight t
@@ -185,8 +183,10 @@
         (" · Emacs")))
 
 
-(use-package exec-path-from-shell
-  :straight t
-  :init
-  (setq exec-path-from-shell-arguments '("-l"))
-  (exec-path-from-shell-initialize))
+(use-package yascroll
+  ;; :straight (:type git :host github :repo "roife/yascroll")
+  :straight (yascroll :local-repo "~/code/yascroll/")
+  :hook (after-init . global-yascroll-bar-mode)
+  :config
+  (setq yascroll:delay-to-hide nil)
+  )

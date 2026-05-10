@@ -193,9 +193,8 @@
          ("C-e" . +copilot-complete)
          ("M-f" . +copilot-complete-word))
   :config
-  (copilot--start-agent)
-
-  (setq copilot-indent-warning-suppress t)
+  (setq copilot-indent-offset-warning-disable t
+        copilot-max-char-warning-disable t)
 
   (defun +copilot-activate ()
     (interactive)
@@ -300,15 +299,13 @@
 
 
 ;; [flymake] On-the-fly syntax checker
-;; (use-package flymake
-;;   :hook ((prog-mode . flymake-mode))
-;;   :bind (("C-c f ]" . flymake-goto-next-error)
-;;          ("C-c f [" . flymake-goto-prev-error)
-;;          ("C-c f b" . flymake-show-buffer-diagnostics))
-;;   :config
-;;   (setq
-;;    flymake-diagnostic-functions nil)
-;;   )
+(use-package flymake
+  :hook ((prog-mode . flymake-mode))
+  :bind (("C-c f ]" . flymake-goto-next-error)
+         ("C-c f [" . flymake-goto-prev-error)
+         ("C-c f b" . flymake-show-buffer-diagnostics))
+  :config
+  (setq flymake-show-diagnostics-at-end-of-line 'short))
 
 ;; Langs
 (use-package cc-mode

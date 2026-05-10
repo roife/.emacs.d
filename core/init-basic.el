@@ -317,3 +317,11 @@
 ;; [timeout] debounce and throttle
 (use-package timeout
   :straight (:host github :repo "karthink/timeout" :branch "master"))
+
+
+;; [environment variables]
+(use-package exec-path-from-shell
+  :straight t
+  :init
+  (setq exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-initialize))

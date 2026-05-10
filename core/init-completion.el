@@ -115,7 +115,8 @@
         completion-category-overrides '((file (styles +vertico-basic-remote orderless+basic))
                                         (eglot (styles orderless)))
         orderless-style-dispatchers '(+vertico-orderless-dispatch)
-        orderless-component-separator "[ &]")
+        orderless-component-separator "[ -]"
+        )
   )
 
 
@@ -195,8 +196,8 @@
          ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop)
-         ("C-r"                             . consult-ripgrep)
-         ("C-t"                             . consult-fd)
+         ("C-c p"                             . consult-ripgrep)
+         ("C-c t"                             . consult-fd)
          :map minibuffer-mode-map
          ("C-r" . consult-history))
   ;; :hook ((completion-list-mode . consult-preview-at-point-mode))
@@ -293,11 +294,6 @@
   :bind (:map corfu-map
               ("C-, ," . corfu-quick-complete)))
 
-(use-package corfu-terminal
-  :straight t
-  :when (not (display-graphic-p))
-  :after corfu
-  :init (corfu-terminal-mode 1))
 
 (use-package cape
   :straight t
