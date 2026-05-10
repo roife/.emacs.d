@@ -7,7 +7,7 @@
 
 ;; [org]
 (use-package org
-  ;; :straight (:type built-in)
+  :straight (:type built-in)
   :custom-face (org-quote ((t (:inherit org-block-begin-line))))
   :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]")))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
          (org-mode . (lambda ()

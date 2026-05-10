@@ -226,10 +226,6 @@
         webpaste-provider-priority '("paste.mozilla.org" "dpaste.org" "ix.io")))
 
 
-(use-package lua-mode
-  :straight t)
-
-
 ;; [dumb-jump] Jump to definition (integrated with xref, a fallback of lsp)
 (use-package dumb-jump
   :straight t
@@ -325,20 +321,8 @@
   :straight (:host github :repo "emacs-vs/rainbow-csv"))
 
 
-(use-package cmake-mode
-  :straight t)
-
-
 (use-package rmsbolt ; A compiler output viewer
   :straight t)
-
-
-(use-package scala-ts-mode
-  :straight t
-  :config
-  (add-to-list 'eglot-server-programs
-               `((scala-mode scala-ts-mode)
-               . ,(alist-get 'scala-mode eglot-server-programs))))
 
 
 (use-package llvm-mode
@@ -379,8 +363,7 @@
   :straight t
   :config
   (setq gofmt-command "goimports")
-  (add-hook 'before-save-hook 'gofmt-before-save)
-  )
+  (add-hook 'before-save-hook 'gofmt-before-save))
 
 
 (use-package haskell-mode
@@ -391,30 +374,26 @@
    haskell-process-auto-import-loaded-modules t))
 
 
-(use-package tuareg
-  :straight t)
-
-
-;; (use-package verilog-mode
-;;   :straight t
-;;   :config
-;;   (setq verilog-align-ifelse t
-;;         verilog-auto-delete-trailing-whitespace t
-;;         verilog-auto-inst-param-value t
-;;         verilog-auto-inst-vector nil
-;;         verilog-auto-lineup (quote all)
-;;         verilog-auto-newline nil
-;;         verilog-auto-save-policy nil
-;;         verilog-auto-template-warn-unused t
-;;         verilog-case-indent 4
-;;         verilog-cexp-indent 4
-;;         verilog-highlight-grouping-keywords t
-;;         verilog-highlight-modules t
-;;         verilog-indent-level 4
-;;         verilog-indent-level-behavioral 4
-;;         verilog-indent-level-declaration 4
-;;         verilog-indent-level-module 4
-;;         verilog-tab-to-comment t))
+(use-package verilog-mode
+  :straight t
+  :config
+  (setq verilog-align-ifelse t
+        verilog-auto-delete-trailing-whitespace t
+        verilog-auto-inst-param-value t
+        verilog-auto-inst-vector nil
+        verilog-auto-lineup (quote all)
+        verilog-auto-newline nil
+        verilog-auto-save-policy nil
+        verilog-auto-template-warn-unused t
+        verilog-case-indent 4
+        verilog-cexp-indent 4
+        verilog-highlight-grouping-keywords t
+        verilog-highlight-modules t
+        verilog-indent-level 4
+        verilog-indent-level-behavioral 4
+        verilog-indent-level-declaration 4
+        verilog-indent-level-module 4
+        verilog-tab-to-comment t))
 
 
 ;; [yaml]
@@ -432,13 +411,6 @@
   :straight t
   :config
   (setq graphviz-dot-indent-width 4))
-
-
-;; [Proof General] Proof General is a generic front-end for proof assistants
-;; (use-package proof-general
-;;   :straight t
-;;   :init
-;;   (setq proof-splash-enable nil))
 
 
 ;; Major mode for editing web templates
