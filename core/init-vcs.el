@@ -37,18 +37,57 @@
       (diff-hl-margin-local-mode))
     (diff-hl-update-once))
 
-  ;; Make fringes look better (slow)
-  ;; (define-fringe-bitmap '+diff-hl-bmp (vector #b11110000) 1 8 '(center t))
-  ;; (setq diff-hl-fringe-bmp-function #'(lambda (&rest _) '+diff-hl-bmp))
+  ;; HACK: Redefine fringe bitmaps to be simpler.
+  (setq diff-hl-bmp-max-width 4)
+  (defun diff-hl-define-bitmaps ()
+    (let* ((scale (if (and (boundp 'text-scale-mode-amount)
+                           (numberp text-scale-mode-amount))
+                      (expt text-scale-mode-step text-scale-mode-amount)
+                    1))
+           (spacing (or (and (display-graphic-p) (default-value 'line-spacing)) 0))
+           (total-spacing (pcase spacing
+                            ((pred numberp) spacing)
+                            (`(,above . ,below) (+ above below))))
+           (h (+ (ceiling (* (frame-char-height) scale))
+                 (if (floatp total-spacing)
+                     (truncate (* (frame-char-height) total-spacing))
+                   total-spacing)))
+           (bmp-w (frame-parameter nil (intern (format "%s-fringe" diff-hl-side))))
+           (_ (when (zerop bmp-w) (setq bmp-w diff-hl-bmp-max-width)))
+           (line-w (min diff-hl-bmp-max-width bmp-w))
+           (shift (- bmp-w line-w))
+           (line-mask (ash (1- (expt 2 line-w)) shift))
+           (line (make-vector h line-mask)))
+      (define-fringe-bitmap 'diff-hl-bmp-top line h bmp-w 'top)
+      (define-fringe-bitmap 'diff-hl-bmp-middle line h bmp-w 'center)
+      (define-fringe-bitmap 'diff-hl-bmp-bottom line h bmp-w 'bottom)
+      (define-fringe-bitmap 'diff-hl-bmp-single line h bmp-w 'top)
+      (define-fringe-bitmap 'diff-hl-bmp-i [3 3 0 3 3 3 3 3 3 3] nil 2 'center)
+      (define-fringe-bitmap 'diff-hl-bmp-delete [0 0] 2 2 'center)
+      (define-fringe-bitmap 'diff-hl-bmp-insert [0 0] 2 2 'center)))
+  (add-hook! enable-theme-functions :call-immediately
+    (defun +diff-hl-refresh-fringe (&rest _)
+      (dolist (face '(diff-hl-insert diff-hl-delete diff-hl-change
+                                     diff-hl-reference-insert
+                                     diff-hl-reference-delete
+                                     diff-hl-reference-change))
+        (let ((color (or (face-foreground face nil t)
+                         (face-background face nil t)
+                         (face-foreground 'fringe nil t)
+                         (face-foreground 'default nil t))))
+          (set-face-attribute face nil :foreground color :background 'unspecified)))
+      (when (display-graphic-p)
+        (setq diff-hl-spec-cache (make-hash-table :test 'equal))
+        (diff-hl-maybe-redefine-bitmaps)
+        (dolist (buf (buffer-list))
+          (with-current-buffer buf
+            (when (bound-and-true-p diff-hl-mode) (diff-hl-update))
+            (when (bound-and-true-p diff-hl-dired-mode) (diff-hl-dired-update)))))))
 
   ;; Integration with magit
   (with-eval-after-load 'magit
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-
-  ;; Integration with flymake
-  (with-eval-after-load 'flymake
-    (setq flymake-fringe-indicator-position 'right-fringe))
 
   ;; WORKAROUND: Integration with ws-butler
   (advice-add #'ws-butler-after-save :after #'diff-hl-update-once)
