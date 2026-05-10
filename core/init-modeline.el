@@ -58,8 +58,8 @@
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
-  (cond (defining-kbd-macro "🞄 MacroDef ")
-        (executing-kbd-macro "🞄 MacroExc ")))
+  (cond (defining-kbd-macro "/ MacroDef ")
+        (executing-kbd-macro "/ MacroExc ")))
 
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display whether it is in overwrite mode or read-only buffer."
@@ -77,7 +77,7 @@
            (after (symbol-overlay-get-list 1 symbol))
            (count (length before)))
       (if (symbol-overlay-assoc symbol)
-          (concat  "🞄 " (number-to-string (1+ count))
+          (concat  "/ " (number-to-string (1+ count))
                    "/" (number-to-string (+ count (length after)))
                    " sym "
                    (and (cadr keyword) "in scope "))))))
@@ -95,25 +95,6 @@
               (concat "@" hostname)))
           )))
 
-;;; Cache flymake report
-(defvar-local +mode-line-flymake-indicator nil)
-(add-hook! flymake-mode-hook
-  (defun +mode-line-update-flymake (&rest _)
-    "Display flymake info for current buffer."
-    (setq +mode-line-flymake-indicator
-          (when (and flymake-mode (flymake-running-backends))
-            (let* ((err-count (cadadr (flymake--mode-line-counter :error)))
-                   (warning-count (cadadr (flymake--mode-line-counter :warning)))
-                   (note-count (cadadr (flymake--mode-line-counter :note)))
-                   (err (when (and err-count (not (string= err-count "0")))
-                          (propertize err-count 'face '(:inherit compilation-error))))
-                   (warning (when (and warning-count (not (string= warning-count "0")))
-                              (propertize warning-count 'face '(:inherit compilation-warning))))
-                   (note (when (and note-count (not (string= note-count "0")))
-                           (propertize note-count 'face '(:inherit compilation-info))))
-                   (info (string-join (remove nil (list err warning note)) "/")))
-              (when (not (string-empty-p info)) (concat " " info)))))))
-(advice-add #'flymake--handle-report :after #'+mode-line-update-flymake)
 
 ;;; Cache encoding info
 (defvar-local +mode-line-encoding nil)
@@ -172,39 +153,10 @@
                    (face (cond ((eq state 'up-to-date) 'vc-dir-status-up-to-date)
                                ((eq state 'ignored) 'vc-dir-status-ignored)
                                ((memq state '(needs-update needs-merge conflict missing)) 'vc-dir-status-warning)
-                               (t 'vc-dir-status-edited)))
-                   ;; (state-symbol (cond ((eq state 'up-to-date) "√")
-                   ;;                     ((eq state 'edited) "*")
-                   ;;                     ((eq state 'added) "@")
-                   ;;                     ((eq state 'needs-update) "￬")
-                   ;;                     ((eq state 'needs-merge) "&")
-                   ;;                     ((eq state 'unlocked-changes) "")
-                   ;;                     ((eq state 'removed) "×")
-                   ;;                     ((eq state 'conflict) "!")
-                   ;;                     ((eq state 'missing) "?")
-                   ;;                     ((eq state 'ignored) "-")
-                   ;;                     ((eq state 'unregistered) "+")
-                   ;;                     ((stringp state) (concat "#" state ":"))
-                   ;;                     (t " ")))
-                   )
+                               (t 'vc-dir-status-edited))))
               (concat " "
-                      (propertize (concat rev
-                                          ;; state-symbol
-                                          )
-                                  'face face
-                                  'help-echo (get-text-property 1 'help-echo vc-mode))))))))
+                      (propertize rev 'face face)))))))
 (advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
-
-
-;; [buffer position]
-;; (defsubst +mode-line-buffer-position ()
-;;   (let ((pos (format-mode-line '(-3 "%p"))))
-;;     (pcase pos
-;;       ("Top" "⊤")
-;;       ("Bot" "⊥")
-;;       ("All" "∀")
-;;       (_ (let ((first-char (substring pos 0 1)))
-;;            (if (string= first-char " ") "0" first-char))))))
 
 
 ;; [project-crumb]
@@ -221,13 +173,10 @@
 (advice-add #'popup-create :after #'+mode-line-update-project-crumb)
 (advice-add #'popup-delete :after #'+mode-line-update-project-crumb)
 
-
 ;; [imenu-crumb]
 (defvar-local +mode-line-imenu-crumb nil)
 (defun +mode-line-update-imenu-crumb (&rest _)
-  (let ((imenu-breadcrumb (breadcrumb-imenu-crumbs)))
-    (setq +mode-line-imenu-crumb
-          (when (and imenu-breadcrumb (not (string-empty-p imenu-breadcrumb))) (concat ": " imenu-breadcrumb)))))
+  (setq +mode-line-imenu-crumb (breadcrumb-imenu-crumbs)))
 
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
@@ -246,14 +195,14 @@
                 (,(not +mode-line-project-crumb)
                  (:propertize "%b" face ,meta-face)
                  ,+mode-line-project-crumb)
-                ;; (:eval +mode-line-imenu-crumb)
+                " "
+                (:eval +mode-line-imenu-crumb)
                 (:propertize +mode-line-remote-host-name
                              face +mode-line-host-name-active-face)
                 ))
          (vcs-info (concat +mode-line-vcs-info +mode-line-smerge-count))
          (rhs `((,active-p ,vcs-info
                            (:propertize ,vcs-info face nil))
-                (,active-p ,+mode-line-flymake-indicator)
                 " "
                 (:eval +mode-line-encoding)
                 ,(or +mode-line-pdf-pages "%l")
