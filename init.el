@@ -51,10 +51,7 @@
                      'init-test
 
                      ;; 'init-chat
-                     ;; 'init-persp
                      ;; 'init-elfeed
-                     ;; 'init-gnus
-                     ;; 'init-webservice
                      ))
 
 (let ((init-directory (expand-file-name "core/" user-emacs-directory)))

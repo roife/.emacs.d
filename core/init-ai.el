@@ -3,8 +3,6 @@
 (use-package gptel
   :straight t
   :init
-  (require 'auth-source)
-  (setq auth-sources '("~/.authinfo" "~/.authinfo.gpg" "~/.netrc"))
   (setq gptel-model 'deepseek-v4-pro
         gptel-default-mode 'org-mode
         gptel-confirm-tool-calls nil)

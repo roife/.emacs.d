@@ -41,12 +41,6 @@
   )
 
 
-;; (use-package vertico-repeat
-;;   :straight nil
-;;   :after vertico
-;;   :hook (minibuffer-setup . vertico-repeat-save))
-
-
 (use-package orderless
   :straight t
   :init (require 'orderless)
@@ -280,13 +274,13 @@
   (with-eval-after-load 'savehist
     (cl-pushnew 'corfu-history savehist-additional-variables)))
 
-;; (use-package corfu-popupinfo
-;;   :straight nil
-;;   :after corfu
-;;   :init
-;;   (corfu-popupinfo-mode 1)
-;;   :config
-;;   (setq corfu-popupinfo-delay '(1.0 . 1.0)))
+(use-package corfu-popupinfo
+  :straight nil
+  :after corfu
+  :init
+  (corfu-popupinfo-mode 1)
+  :config
+  (setq corfu-popupinfo-delay '(1.0 . 1.0)))
 
 (use-package corfu-quick
   :straight nil

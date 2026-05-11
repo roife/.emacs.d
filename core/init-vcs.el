@@ -38,7 +38,7 @@
     (diff-hl-update-once))
 
   ;; HACK: Redefine fringe bitmaps to be simpler.
-  (setq diff-hl-bmp-max-width 4)
+  (setq diff-hl-bmp-max-width 3)
   (defun diff-hl-define-bitmaps ()
     (let* ((scale (if (and (boundp 'text-scale-mode-amount)
                            (numberp text-scale-mode-amount))

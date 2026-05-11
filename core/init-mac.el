@@ -22,9 +22,3 @@
 ;; Prevent accidental touch
 (unbind-key "C-<wheel-down>")
 (unbind-key "C-<wheel-up>")
-
-;; Selects the most-recently-used ASCII-capable keyboard input source when in chineses input mode
-;; (mac-auto-ascii-mode)
-
-;; (setq mac-pass-control-to-system nil)
-;; (setq mac-pass-command-to-system nil)

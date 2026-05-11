@@ -206,36 +206,3 @@
     :after #'enable-theme
     (set-face-background 'auto-dim-other-buffers-face (face-background 'mode-line)))
   )
-
-;; [transient for window operations]
-;; (transient-define-prefix +frame-window-management ()
-;;   "Frame Window Management"
-;;   :transient-suffix     'transient--do-stay
-;;   ;; :transient-non-suffix 'transient--do-warn
-;;   [["Actions"
-;;     ("TAB" "switch" other-window)
-;;     ("d" "delete" ace-delete-window)
-;;     ("D" "delete other" ace-delete-other-windows)
-;;     ("s" "swap" ace-swap-window)
-;;     ("a" "select" ace-select-window)]
-;;    ["Resize"
-;;     (""  "←" shrink-window-horizontally)
-;;     ("j" "→" enlarge-window)
-;;     ("k" "→" shrink-window)
-;;     ("l" "→" enlarge-window-horizontally)
-;;     ("n" "balance" balance-windows)]
-;;    ["Split"
-;;     ("" "right" split-window-right)
-;;     ("" "below" split-window-below)]
-;;    ["Winner"]]
-;;   [["Popper"
-;;     ]
-;;    ["Move"
-;;     ]
-;;    ["Font"
-;;     ("C-=" "larger" text-scale-increase)
-;;     ("C--" "smaller" text-scale-decrease)
-;;     ("C-0" "reset" (lambda () (interactive) (text-scale-increase 0)))]
-;;    ["Zoom"
-;;     ("z" "zoom-mode" zoom-mode)
-;;     ("Z" "zoom" zoom)]])

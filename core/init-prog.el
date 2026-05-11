@@ -301,7 +301,8 @@
          ("C-c f [" . flymake-goto-prev-error)
          ("C-c f b" . flymake-show-buffer-diagnostics))
   :config
-  (setq flymake-show-diagnostics-at-end-of-line 'short))
+  (setq flymake-show-diagnostics-at-end-of-line 'short
+        flymake-indicator-type nil))
 
 ;; Langs
 (use-package cc-mode
@@ -321,7 +322,7 @@
   :straight (:host github :repo "emacs-vs/rainbow-csv"))
 
 
-(use-package rmsbolt ; A compiler output viewer
+(use-package rmsbolt
   :straight t)
 
 

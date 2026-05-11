@@ -23,8 +23,7 @@
 ;; [Fringes] Reduce the clutter in the fringes
 (setq indicate-buffer-boundaries nil
       indicate-empty-lines nil)
-;; make left-fringe half
-;; (fringe-mode '(5 . 6))
+
 ;; Better fringe symbol
 (define-fringe-bitmap 'right-curly-arrow
   [#b00110000
@@ -71,6 +70,10 @@
 ;; Suppress GUI features for consistency
 (setq use-file-dialog nil
       use-dialog-box nil)
+
+
+;; Indicate eob lines
+(setq indicate-empty-lines t)
 
 
 ;; [Minibuffer]
@@ -179,14 +182,4 @@
   )
 
 (setq frame-title-format
-      '((:eval (or buffer-file-truename "%b"))
-        (" · Emacs")))
-
-
-(use-package yascroll
-  ;; :straight (:type git :host github :repo "roife/yascroll")
-  :straight (yascroll :local-repo "~/code/yascroll/")
-  :hook (after-init . global-yascroll-bar-mode)
-  :config
-  (setq yascroll:delay-to-hide nil)
-  )
+      '((:eval (or buffer-file-truename "%b"))))

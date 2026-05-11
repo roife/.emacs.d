@@ -135,15 +135,16 @@
   (setq dogears-idle 1
         dogears-limit 200
         dogears-position-delta 20)
-  (setq dogears-functions '(find-file recenter-top-bottom
-                                      other-window switch-to-buffer
-                                      aw-select toggle-window-split
-                                      windmove-do-window-select
-                                      pager-page-down pager-page-up
-                                      tab-bar-select-tab
-                                      pop-to-mark-command
-                                      pop-global-mark
-                                      goto-last-change
-                                      xref-go-back
-                                      xref-find-definitions
-                                      xref-find-references)))
+  (setq dogears-functions '(find-file
+                            recenter-top-bottom
+                            other-window switch-to-buffer
+                            aw-select toggle-window-split
+                            windmove-do-window-select
+                            pager-page-down pager-page-up
+                            tab-bar-select-tab
+                            pop-to-mark-command
+                            pop-global-mark
+                            goto-last-change
+                            xref-go-back
+                            xref-find-definitions
+                            xref-find-references)))
