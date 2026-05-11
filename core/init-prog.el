@@ -80,7 +80,9 @@
                                                                              :punctuation (:enable t :specialization (:enable t)))
                                             :workspace (:symbol (:search (:kind "all_symbols"
                                                                                 :scope "workspace_and_dependencies")))
-                                            :lru (:capacity 1024)))
+                                            :lru (:capacity 1024)
+                                            :diagnostics (:enable :json-false)
+                                            ))
                   (:typescript . (:preferences (:importModuleSpecifierPreference "non-relative")))
                   (:gopls . ((staticcheck . t)
                              (matcher . "CaseSensitive")))))
@@ -302,7 +304,8 @@
          ("C-c f b" . flymake-show-buffer-diagnostics))
   :config
   (setq flymake-show-diagnostics-at-end-of-line 'short
-        flymake-indicator-type nil))
+        flymake-fringe-indicator-position 'right-fringe)
+  )
 
 ;; Langs
 (use-package cc-mode
