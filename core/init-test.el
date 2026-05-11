@@ -60,9 +60,3 @@
           (kill-buffer log-buffer-name))
         (switch-to-buffer log-buffer-name)
         (select-window current-window)))))
-
-;; (use-package buffer-name-relative
-;;   :straight (:host codeberg :repo "ideasman42/emacs-buffer-name-relative")
-;;   :hook (after-init . buffer-name-relative-mode)
-;;   :config
-;;   (setq buffer-name-relative-prefix '("" . "/")))
