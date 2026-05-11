@@ -21,6 +21,15 @@
 (use-package gptel-agent
   :straight t)
 
+(use-package gptel-magit
+  :straight (gptel-magit :type git :host github :repo "roife/gptel-magit")
+  :hook ((magit-mode . gptel-magit-install))
+  :config
+  (setq gptel-magit-body-length 72
+        gptel-magit-commit-prompt (cdr (assoc "Conventional Commits" gptel-magit-commit-styles-alist))
+        gptel-magit-include-reasoning 'ignore)
+  )
+
 (use-package codex-ide
   :straight (:type git :host github :repo "dgillis/emacs-codex-ide")
   :bind (("C-c C-;" . codex-ide-menu))
