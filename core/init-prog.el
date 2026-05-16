@@ -150,14 +150,6 @@
   :config (eglot-booster-mode))
 
 
-;; (use-package eglot-tempel
-;;   :straight t
-;;   :after (eglot tempel)
-;;   :init
-;;   (eglot-tempel-mode)
-;;   )
-
-
 (use-package eglot-x
   :straight (:host github :repo "nemethf/eglot-x")
   :hook (eglot-managed-mode . eglot-x-setup))

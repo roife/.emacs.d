@@ -244,6 +244,8 @@
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . +corfu-enable-in-minibuffer))
   :bind (:map corfu-map
+              ("TAB" . corfu-complete)
+              ("<tab>" . corfu-complete)
               ("s-m" . +corfu-move-to-minibuffer)
               ("RET" . nil))
   :config
@@ -302,9 +304,27 @@
     (add-to-list 'completion-at-point-functions #'cape-tex :append)))
 
 
-(use-package yasnippet
+(use-package tempel
   :straight t
-  :hook (after-init . yas-global-mode))
+  :hook (((prog-mode text-mode conf-mode) . +tempel-setup-capf)
+         ((prog-mode text-mode) . tempel-abbrev-mode))
+  :config
+  (defun +tempel-setup-capf ()
+    (cl-pushnew (cape-capf-trigger #'tempel-complete ?/) completion-at-point-functions))
+
+  (setq tempel-path (expand-file-name "tempel-templates" user-emacs-directory)))
+
+
+(use-package tempel-collection
+  :straight t
+  :after tempel)
+
+
+(use-package eglot-tempel
+  :straight t
+  :after (eglot tempel)
+  :init
+  (eglot-tempel-mode))
 
 
 (use-package dabbrev

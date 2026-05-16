@@ -74,7 +74,9 @@
  tabify-regexp "^\t* [ \t]+"
  ;; Indent with 4 space by default
  indent-tabs-mode nil
- tab-always-indent t
+ ;; Indent first, otherwise run completion-at-point. This lets Tempel
+ ;; templates expand via TAB when indentation does not apply.
+ tab-always-indent 'complete
  tab-width 4
 
  ;; Sentence end
