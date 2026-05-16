@@ -7,6 +7,13 @@
  ;; Save clipboard contents into kill-ring before replace them
  save-interprogram-paste-before-kill t)
 
+(kill-ring-deindent-mode)
+
+
+;; Make script file executable with `chmod +x' after save
+(add-hook 'after-save-hook
+          #'executable-make-buffer-file-executable-if-script-p)
+
 
 ;; [autorevert] TODO: Add hooks as what doom has done?
 (use-package autorevert

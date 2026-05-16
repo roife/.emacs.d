@@ -11,7 +11,7 @@
 
 ;; [visual-line-mode] Soft line-wrapping
 (use-package visual-line-mode
-  :hook (text-mode . visual-line-mode))
+  :hook (text-mode . (visual-line-mode visual-wrap-prefix-mode)))
 
 
 ;; [edit-indirect] Edit code blocks indirectly

@@ -37,7 +37,7 @@
  syntax-wholeline-max 1000
 
  ;; Larger process output buffer for LSP module
- read-process-output-max (* 3 1024 1024)
+ read-process-output-max (* 4 1024 1024)
 
  ;; [Wrapping] words at whitespace, but do not wrap by default
  ;; Wrap words at whitespace, rather than in the middle of a word.
@@ -155,6 +155,11 @@
   ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its
   ;; cache, which is expensive and useless. replace it with `prin1'
   (+advice-pp-to-prin1! 'save-place-alist-to-file)
+
+  ;; recenters the view after the jump
+  (advice-add 'save-place-find-file-hook :after
+              (lambda (&rest _)
+                (when buffer-file-name (ignore-errors (recenter)))))
   )
 
 
@@ -281,8 +286,7 @@
   (setq tramp-default-method "ssh"
     tramp-auto-save-directory (expand-file-name "tramp-autosaves/" user-emacs-directory)
     tramp-backup-directory-alist backup-directory-alist
-    remote-file-name-inhibit-cache 60)
-  )
+    remote-file-name-inhibit-cache 60))
 
 
 ;; [minibuffer]
@@ -291,9 +295,14 @@
   (setq minibuffer-depth-indicate-mode t
     minibuffer-default-prompt-format " [%s]" ; shorten " (default %s)" => " [%s]"
     minibuffer-electric-default-mode t
-    minibuffer-follows-selected-frame nil ; One frame one minibuffer.
-    )
-  )
+    ; One frame one minibuffer.
+    minibuffer-follows-selected-frame nil))
+
+
+;; [repeat] Enable repeatable commands
+(use-package repeat
+  :straight nil
+  :hook (after-init . repeat-mode))
 
 
 ;; [comint] Command interpreter
