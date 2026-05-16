@@ -3,7 +3,7 @@
 (use-package gptel
   :straight t
   :init
-  (setq gptel-model 'deepseek-v4-pro
+  (setq gptel-model 'deepseek-v4-flash
         gptel-default-mode 'org-mode
         gptel-confirm-tool-calls nil)
   (setq-default

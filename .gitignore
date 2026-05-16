@@ -42,3 +42,4 @@ modules/
 cache/
 org-persist/
 .tree-sitter/
+undohist/
