@@ -30,6 +30,12 @@
   :hook ((prog-mode markdown-mode) . ws-butler-mode))
 
 
+;; [editorconfig] Respect project-local formatting rules
+(use-package editorconfig
+  :straight t
+  :hook (after-init . editorconfig-mode))
+
+
 ;; [ediff] Diff & patch
 (use-package ediff
   :hook ((ediff-before-setup . +ediff-save-window-config)

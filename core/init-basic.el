@@ -331,3 +331,9 @@
   (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-variables '("PATH" "JAVA_HOME" "JDTLS_JAVA_HOME" "MANPATH"))
   (exec-path-from-shell-initialize))
+
+
+;; [direnv] Buffer-local project environments
+(use-package envrc
+  :straight t
+  :hook (after-init . envrc-global-mode))
