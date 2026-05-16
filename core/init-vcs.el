@@ -38,7 +38,7 @@
     (diff-hl-update-once))
 
   ;; HACK: Redefine fringe bitmaps to be simpler.
-  (setq diff-hl-bmp-max-width 4)
+  (setq diff-hl-bmp-max-width 6)
   (defun diff-hl-define-bitmaps ()
     (let* ((scale (if (and (boundp 'text-scale-mode-amount)
                            (numberp text-scale-mode-amount))
@@ -55,8 +55,7 @@
            (bmp-w (frame-parameter nil (intern (format "%s-fringe" diff-hl-side))))
            (_ (when (zerop bmp-w) (setq bmp-w diff-hl-bmp-max-width)))
            (line-w (min diff-hl-bmp-max-width bmp-w))
-           (left-pad (min 1 (max 0 (- bmp-w line-w))))
-           (shift (max 0 (- bmp-w left-pad line-w)))
+           (shift (max 0 (- bmp-w line-w)))
            (line-mask (ash (1- (expt 2 line-w)) shift))
            (line (make-vector h line-mask)))
       (define-fringe-bitmap 'diff-hl-bmp-top line h bmp-w 'top)

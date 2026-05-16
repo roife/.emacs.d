@@ -1,13 +1,17 @@
 ;;; -*- lexical-binding: t -*-
 
+
+;; [visual-fill-column] Center text in markdown and org
 (use-package visual-fill-column
   :straight t
-  :hook ((markdown-mode org-mode) . +center-text)
+  :hook (text-mode . visual-fill-column-mode)
   :config
-  (defun +center-text ()
-    (visual-fill-column-mode)
-    (setq visual-fill-column-center-text t)
-    (visual-line-mode)))
+  (setq visual-fill-column-center-text t))
+
+
+;; [visual-line-mode] Soft line-wrapping
+(use-package visual-line-mode
+  :hook (text-mode . visual-line-mode))
 
 
 ;; [edit-indirect] Edit code blocks indirectly
@@ -27,13 +31,12 @@
   (markdown-code-face ((t (:inherit unspecified))))
   :config
   (setq markdown-enable-math t
-        markdown-enable-wiki-links t
         markdown-italic-underscore t
         markdown-header-scaling t
         markdown-asymmetric-header t
         markdown-nested-imenu-heading-index t
         markdown-fontify-code-blocks-natively t)
-  (add-to-list 'markdown-code-lang-modes '("rust" . rustic-mode))
+  (add-to-list 'markdown-code-lang-modes '("rust" . rust-mode))
   (add-to-list 'markdown-code-lang-modes '("verilog" . verilog-mode))
   (add-to-list 'markdown-code-lang-modes '("agda" . agda2-mode)))
 

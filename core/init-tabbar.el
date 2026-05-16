@@ -18,26 +18,11 @@
   (customize-set-variable 'tab-bar-select-tab-modifiers '(super))
 
   ;; truncate for [tab name] and add count
-  (setq tab-bar-tab-name-function
-        (lambda () (let* ((raw-tab-name (buffer-name (window-buffer (minibuffer-selected-window))))
-                     (count (length (window-list-1 nil 'nomini)))
-                     (truncated-tab-name (if (< (length raw-tab-name) tab-bar-tab-name-truncated-max)
-                                             raw-tab-name
-                                           (truncate-string-to-width raw-tab-name
-                                                                     tab-bar-tab-name-truncated-max
-                                                                     nil nil tab-bar-tab-name-ellipsis))))
-                (if (> count 1)
-                    (concat truncated-tab-name "⁺")
-                  truncated-tab-name))))
-
-  ;; Add spaces for tab-name
-  (setq tab-bar-tab-name-format-function
-        (lambda (tab i)
-          (let ((face (funcall tab-bar-tab-face-function tab)))
-            (concat
-             ;; (propertize " " 'face face)
-             (propertize (format " %s" i) 'face `(:inherit ,face :weight ultra-bold))
-             (propertize (concat " " (alist-get 'name tab) " ") 'face face)))))
+  (setq tab-bar-tab-name-format-functions
+        '(tab-bar-tab-name-format-hints
+          tab-bar-tab-name-format-truncated
+          (lambda (name &rest _) (concat " " name " "))
+          tab-bar-tab-name-format-face))
 
   (defun +hide-tab-bar ()
     (interactive)

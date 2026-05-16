@@ -184,13 +184,12 @@
   :straight t
   :hook (window-setup . zoom-mode)
   :config
-  (setq zoom-ignored-major-modes '(ediff-mode))
-  (defun +fix-zoom ()
-    (with-selected-window (get-buffer-window "*Ediff Control Panel*")
-      (setq window-size-fixed t)
-      (window-resize (selected-window) (- 5 (window-total-height)) nil t)))
+  (setq zoom-ignored-major-modes '(ediff-mode vundo-mode))
 
-  (add-hook 'ediff-after-setup-windows-hook '+fix-zoom)
+  (add-hook 'ediff-after-setup-windows-hook
+            '(lambda () (with-selected-window (get-buffer-window "*Ediff Control Panel*")
+                     (setq window-size-fixed t)
+                     (window-resize (selected-window) (- 5 (window-total-height)) nil t))))
   )
 
 ;; [auto-dim-other-buffers] Dim non-active buffers
@@ -202,7 +201,7 @@
   (setq auto-dim-other-buffers-dim-on-focus-out nil
         auto-dim-other-buffers-dim-on-switch-to-minibuffer nil)
 
-  (defadvice! +auto-dim-other-buffers-auto-set-face (&rest _)
-    :after #'enable-theme
-    (set-face-background 'auto-dim-other-buffers-face (face-background 'mode-line)))
+  (add-hook! enable-theme-functions :call-immediately
+    (defun +auto-dim-other-buffers-auto-set-face (&rest _)
+      (set-face-background 'auto-dim-other-buffers-face (face-background 'mode-line))))
   )

@@ -225,11 +225,9 @@
   )
 
 
-;; [visual-line-mode] Soft line-wrapping
-;; (use-package visual-line-mode
-;;   :defer nil
-;;   :hook (text-mode . visual-line-mode))
-
+;; [glyphless-display] Don't render glyphs, in case of undisplayable characters.
+(use-package glyphless-display
+  :init (glyphless-display-mode))
 
 ;; [Scrolling]
 (setq
@@ -319,5 +317,6 @@
 (use-package exec-path-from-shell
   :straight t
   :init
-  (setq exec-path-from-shell-arguments '("-l"))
+  (setq exec-path-from-shell-arguments '("-l")
+        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "JDTLS_JAVA_HOME" "MANPATH"))
   (exec-path-from-shell-initialize))

@@ -268,8 +268,22 @@ begin and end of the block surrounding point."
 (use-package vundo
   :straight t
   :config
-  (setq vundo-compact-display t)
+  (setq vundo-compact-display t
+        vundo-roll-back-on-quit t)
   )
+
+
+;; [undohist] Persist undo history
+(use-package undohist
+  :straight t
+  :hook (after-init . undohist-initialize))
+
+
+;; [undo-hl] Highlight undo changes
+(use-package undo-hl
+  :straight (:host github :repo "casouri/undo-hl")
+  :hook (after-init . undo-hl-mode)
+  :config (setq undo-hl-flash-duration 0.1))
 
 
 ;; [imenu] Jump to function definitions
