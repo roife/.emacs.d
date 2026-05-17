@@ -507,3 +507,9 @@
         indent-bars-pattern "|"
         indent-bars-prefer-character t)
   )
+
+
+;; [direnv] Buffer-local project environments
+(use-package envrc
+  :straight t
+  :hook (after-init . envrc-global-mode))
