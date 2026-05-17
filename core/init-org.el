@@ -60,27 +60,6 @@
 
    org-imenu-depth 4)
 
-  (add-hook! save-place-after-find-file-hook
-    (defun +org-make-last-point-visible-h ()
-      "Reveal point after `save-place' restores it into folded Org text."
-      (unless (or org-inhibit-startup
-                  org-inhibit-startup-visibility-stuff)
-        (cond ((fboundp 'org-fold-show-context)
-               (org-fold-show-context 'mark-goto))
-              ((fboundp 'org-reveal)
-               (org-reveal))))))
-
-  (defun +org-push-marker-stack-h (&rest _)
-    "Record the current Org position in the xref jump ring."
-    (xref-push-marker-stack (point-marker))
-    nil)
-
-  (add-hook! org-open-at-point-functions #'+org-push-marker-stack-h)
-
-  (defadvice! +org--push-marker-stack-a (&rest _)
-    :before #'org-mark-ring-push
-    (+org-push-marker-stack-h))
-
   ;; Better Org Latex Preview
   (setq org-latex-create-formula-image-program 'dvisvgm
         org-startup-with-latex-preview nil
