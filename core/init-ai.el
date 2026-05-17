@@ -6,10 +6,16 @@
   (setq gptel-model 'deepseek-v4-flash
         gptel-default-mode 'org-mode
         gptel-confirm-tool-calls nil)
+  (gptel-make-deepseek "DeepSeek-thinking"
+    :stream t
+    :request-params '(:thinking (:type "enabled"))
+    :key #'gptel-api-key-from-auth-source)
+
   (setq-default
    gptel-backend
    (gptel-make-deepseek "DeepSeek"
      :stream t
+     :request-params '(:thinking (:type "disabled"))
      :key #'gptel-api-key-from-auth-source))
 
   :config
