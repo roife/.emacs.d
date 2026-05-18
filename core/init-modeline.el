@@ -58,8 +58,8 @@
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
-  (cond (defining-kbd-macro "/ MacroDef ")
-        (executing-kbd-macro "/ MacroExc ")))
+  (cond (defining-kbd-macro "| MacroDef ")
+        (executing-kbd-macro "| MacroExc ")))
 
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display whether it is in overwrite mode or read-only buffer."
@@ -77,7 +77,7 @@
            (after (symbol-overlay-get-list 1 symbol))
            (count (length before)))
       (if (symbol-overlay-assoc symbol)
-          (concat  "/ " (number-to-string (1+ count))
+          (concat  "| " (number-to-string (1+ count))
                    "/" (number-to-string (+ count (length after)))
                    " sym "
                    (and (cadr keyword) "in scope "))))))
