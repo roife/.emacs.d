@@ -3,20 +3,21 @@
 (use-package gptel
   :straight t
   :init
-  (setq gptel-model 'deepseek-v4-flash
+  (setq gptel-model "gpt-5.3-codex-spark"
         gptel-default-mode 'org-mode
         gptel-confirm-tool-calls nil)
+
+  (setq-default gptel-backend (gptel-make-openai-oauth "OpenAI-sub"))
+
   (gptel-make-deepseek "DeepSeek-thinking"
     :stream t
     :request-params '(:thinking (:type "enabled"))
     :key #'gptel-api-key-from-auth-source)
 
-  (setq-default
-   gptel-backend
-   (gptel-make-deepseek "DeepSeek"
-     :stream t
-     :request-params '(:thinking (:type "disabled"))
-     :key #'gptel-api-key-from-auth-source))
+  (gptel-make-deepseek "DeepSeek"
+    :stream t
+    :request-params '(:thinking (:type "disabled"))
+    :key #'gptel-api-key-from-auth-source)
 
   :config
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
