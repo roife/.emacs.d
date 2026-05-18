@@ -6,12 +6,12 @@
   :straight t
   :hook (text-mode . visual-fill-column-mode)
   :config
-  (setq visual-fill-column-center-text t))
+  (setq-default visual-fill-column-center-text t))
 
 
 ;; [visual-line-mode] Soft line-wrapping
 (use-package visual-line-mode
-  :hook (text-mode . (visual-line-mode visual-wrap-prefix-mode)))
+  :hook (text-mode . (visual-wrap-prefix-mode)))
 
 
 ;; [edit-indirect] Edit code blocks indirectly
