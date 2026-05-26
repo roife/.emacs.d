@@ -5,7 +5,9 @@
   :init
   (setq gptel-model "gpt-5.3-codex-spark"
         gptel-default-mode 'org-mode
-        gptel-confirm-tool-calls nil)
+        gptel-confirm-tool-calls nil
+        ;; Codex models ignore temperature; keep it nil to avoid warnings.
+        gptel-temperature nil)
 
   (setq-default gptel-backend (gptel-make-openai-oauth "OpenAI-sub"))
 
@@ -33,19 +35,33 @@
   :hook ((magit-mode . gptel-magit-install))
   :config
   (setq gptel-magit-body-length 72
-        gptel-magit-commit-prompt (cdr (assoc "Conventional Commits" gptel-magit-commit-styles-alist))
-        gptel-magit-include-reasoning 'ignore)
+        gptel-magit-commit-prompt (cdr (assoc "Conventional Commits" gptel-magit-commit-styles-alist)))
   )
 
 (use-package codex-ide
   :straight (:type git :host github :repo "dgillis/emacs-codex-ide")
-  :bind (("C-c C-;" . codex-ide-menu))
-  :config
+  :custom-face
+  ;; smaller font
+  (codex-ide-item-summary-face ((t (:inherit font-lock-function-name-face :height 1.0))))
+  (codex-ide-item-detail-face ((t (:inherit shadow :height 0.9))))
+  :bind (:map codex-ide-session-mode-map
+              ("C-c C-;" . codex-ide-menu)
+              ("C-<return>" . codex-ide-submit))
+  :init
   (setq codex-ide-diff-inline-fold-threshold 20
-        codex-ide-renderer-render-markdown-during-streaming nil
-        codex-ide-prompt-placeholder-text ""
+        codex-ide-prompt-placeholder-text "Tell Codex what to do..."
         codex-ide-placeholder-ellipsis-animation-interval nil
         codex-ide-status-placeholder-text-alist '(("approval" . "Need approval...")
                                                   ("interrupting" . "Interrupting..."))
-        codex-ide-status-mode-auto-refresh-delay 0.3)
+        codex-ide-status-mode-auto-refresh-delay 0.3
+        codex-ide-session-baseline-prompt "- You are running inside Emacs and can use MCP tools to interact with Emacs.
+- Use markdown pipe tables. In table cells, wrap code-like idents, paths, symbols, and exprs in backticks.
+- Use markdown links for code references, e.g. [`foo.el`](/tmp/foo.el#L3C2).
+- Do not needlessly use Emacs commands."
+        codex-ide-buffer-name-function (lambda (dir) (format "%s: %s"
+                                                        codex-ide-buffer-name-prefix
+                                                        (codex-ide--project-name dir)))
+        codex-ide--prompt-context-open-tag "<Emacs-context>"
+        codex-ide--prompt-context-close-tag "</Emacs-context>"
+        )
   )

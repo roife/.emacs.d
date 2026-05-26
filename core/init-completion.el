@@ -240,7 +240,7 @@
 ;; [corfu] compleletion frontend
 (use-package corfu
   :straight (:files (:defaults "extensions/*.el"))
-  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode org-mode markdown-mode) . corfu-mode)
+  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode text-mode codex-ide-session-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . +corfu-enable-in-minibuffer))
   :bind (:map corfu-map
@@ -289,6 +289,12 @@
   :after corfu
   :bind (:map corfu-map
               ("C-, ," . corfu-quick-complete)))
+
+(use-package corfu-terminal
+  :straight t
+  :when (not (display-graphic-p))
+  :after corfu
+  :init (corfu-terminal-mode 1))
 
 
 (use-package cape

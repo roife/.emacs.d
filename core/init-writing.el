@@ -2,11 +2,11 @@
 
 
 ;; [visual-fill-column] Center text in markdown and org
-(use-package visual-fill-column
-  :straight t
-  :hook (text-mode . visual-fill-column-mode)
-  :config
-  (setq-default visual-fill-column-center-text t))
+;; (use-package visual-fill-column
+;;   :straight t
+;;   :hook (text-mode . visual-fill-column-mode)
+;;   :config
+;;   (setq-default visual-fill-column-center-text t))
 
 
 ;; [visual-line-mode] Soft line-wrapping

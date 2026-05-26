@@ -6,7 +6,7 @@
   :bind (("C-, o" . browse-url-at-point)
          ("C-, e" . browse-url-emacs))
   :config
-  (setq browse-url-browser-function 'xwidget-webkit-browse-url)
+  ;; (setq browse-url-browser-function 'xwidget-webkit-browse-url)
   )
 
 
@@ -60,14 +60,12 @@
   :init (ace-pinyin-global-mode t))
 
 
-;; [avy-link] Avy support for links
-(use-package ace-link
+;; [link-hint] Open URL in text with avy
+(use-package link-hint
   :straight t
-  :after avy
-  :bind (("C-, j" . ace-link))
-  :init
-  (ace-link-setup-default (kbd "C-, j"))
-  )
+  :bind
+  ("C-, j" . link-hint-open-link)
+  ("C-, c" . link-hint-copy-link))
 
 
 ;; [ialign] Interactive align

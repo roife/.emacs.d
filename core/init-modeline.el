@@ -183,36 +183,30 @@
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
-         (lhs `((:propertize ,(+mode-line-get-window-name)
-                             face ,panel-face)
-                (:propertize ,(+mode-line-overwrite-readonly-indicator)
-                             face ,panel-face)
-                (,active-p (:propertize
-                            ,(concat (+mode-line-macro-indicator)
-                                     (+mode-line-symbol-overlay-indicator))
-                            face ,panel-face))
-                " "
-                (,(not +mode-line-project-crumb)
-                 (:propertize "%b" face ,meta-face)
-                 ,+mode-line-project-crumb)
-                " "
-                (:eval +mode-line-imenu-crumb)
-                (:propertize +mode-line-remote-host-name
-                             face +mode-line-host-name-active-face)
-                ))
-         (vcs-info (concat +mode-line-vcs-info +mode-line-smerge-count))
-         (rhs `((,active-p ,vcs-info
-                           (:propertize ,vcs-info face nil))
-                " "
-                (:eval +mode-line-encoding)
-                ,(or +mode-line-pdf-pages "%l")
-                " "
-                ))
-         (rhs-str (format-mode-line rhs))
-         (rhs-w (string-width rhs-str)))
-    `(,lhs
-      ,(propertize " " 'display `((space :align-to (- (+ right right-fringe right-margin) ,rhs-w))))
-      ,rhs-str)))
+         (vcs-info (concat +mode-line-vcs-info +mode-line-smerge-count)))
+    `((:propertize ,(+mode-line-get-window-name)
+                   face ,panel-face)
+      (:propertize ,(+mode-line-overwrite-readonly-indicator)
+                   face ,panel-face)
+      (,active-p (:propertize
+                  ,(concat (+mode-line-macro-indicator)
+                           (+mode-line-symbol-overlay-indicator))
+                  face ,panel-face))
+      " "
+      ,(or +mode-line-pdf-pages "%l")
+      " "
+      (,(not +mode-line-project-crumb)
+       (:propertize "%b" face ,meta-face)
+       ,+mode-line-project-crumb)
+      " "
+      (:eval +mode-line-imenu-crumb)
+      (:propertize +mode-line-remote-host-name
+                   face +mode-line-host-name-active-face)
+      (,active-p ,vcs-info
+                 (:propertize ,vcs-info face nil))
+      " "
+      (:eval +mode-line-encoding)
+      )))
 
 (setq-default mode-line-format
               '((:eval (+mode-line-normal))))

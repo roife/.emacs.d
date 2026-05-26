@@ -15,6 +15,13 @@
   ;; much data and bog down the rest of Emacs.
   (autoload 'comint-truncate-buffer "comint" nil t)
   (add-hook 'compilation-filter-hook #'comint-truncate-buffer)
+
+  (require 'ansi-color)
+  (add-hook! compilation-filter-hook
+    (defun +compilation--colorize-h ()
+      "Apply ANSI color codes to the compilation buffer."
+      (let ((inhibit-read-only t))
+        (ansi-color-apply-on-region compilation-filter-start (point)))))
   )
 
 
@@ -81,8 +88,7 @@
                                             :workspace (:symbol (:search (:kind "all_symbols"
                                                                                 :scope "workspace_and_dependencies")))
                                             :lru (:capacity 1024)
-                                            :diagnostics (:enable :json-false)
-                                            ))
+                                            :diagnostics (:enable :json-false)))
                   (:typescript . (:preferences (:importModuleSpecifierPreference "non-relative")))
                   (:gopls . ((staticcheck . t)
                              (matcher . "CaseSensitive")))))
@@ -150,9 +156,9 @@
   :config (eglot-booster-mode))
 
 
-(use-package eglot-x
-  :straight (:host github :repo "nemethf/eglot-x")
-  :hook (eglot-managed-mode . eglot-x-setup))
+;; (use-package eglot-x
+;;   :straight (:host github :repo "nemethf/eglot-x")
+;;   :hook (eglot-managed-mode . eglot-x-setup))
 
 
 ;; [Eldoc]
@@ -296,7 +302,8 @@
          ("C-c f b" . flymake-show-buffer-diagnostics))
   :config
   (setq flymake-show-diagnostics-at-end-of-line 'short
-        flymake-fringe-indicator-position 'right-fringe)
+        flymake-indicator-type nil
+        flymake-fringe-indicator-position nil)
   )
 
 ;; Langs
