@@ -55,8 +55,16 @@
 
 
 ;; [Eglot] LSP support
+(defconst +eglot-auto-start-modes
+  '(c-mode c++-mode rust-mode python-mode java-mode
+    c-ts-mode c++-ts-mode rust-ts-mode python-ts-mode)
+  "Major modes where Eglot should start automatically.")
+
 (use-package eglot
-  :hook ((c-mode c++-mode rust-mode python-mode java-mode c-ts-mode c++-ts-mode rust-ts-mode python-ts-mode) . eglot-ensure)
+  :commands (eglot eglot-ensure)
+  :init
+  (dolist (mode +eglot-auto-start-modes)
+    (add-hook (intern (format "%s-hook" mode)) #'eglot-ensure))
   :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
               ("M-<return>" . eglot-code-actions)
@@ -296,7 +304,13 @@
 
 ;; [flymake] On-the-fly syntax checker
 (use-package flymake
-  :hook ((prog-mode . flymake-mode))
+  :preface
+  (defun +flymake-mode-unless-eglot-auto-starts ()
+    "Enable Flymake unless Eglot will enable it after connecting."
+    (unless (memq major-mode +eglot-auto-start-modes)
+      (flymake-mode 1)))
+
+  :hook ((prog-mode . +flymake-mode-unless-eglot-auto-starts))
   :bind (("C-c f ]" . flymake-goto-next-error)
          ("C-c f [" . flymake-goto-prev-error)
          ("C-c f b" . flymake-show-buffer-diagnostics))
