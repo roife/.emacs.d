@@ -18,17 +18,29 @@
 (use-package diff-hl
   :straight t
   :defines desktop-minor-mode-table
+  :preface
+  (defun +diff-hl-disable-right-mouse-bindings ()
+    (when (boundp 'diff-hl-show-hunk-mouse-mode-map)
+      (define-key diff-hl-show-hunk-mouse-mode-map
+                  [right-fringe mouse-1] nil)
+      (define-key diff-hl-show-hunk-mouse-mode-map
+                  [right-margin mouse-1] nil)))
+
   :hook ((find-file    . diff-hl-mode)
          (vc-dir-mode  . diff-hl-dir-mode)
          (dired-mode   . diff-hl-dired-mode)
          ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) . +diff-hl--fallback-margin)
-         ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) . diff-hl-show-hunk-mouse-mode))
+         ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) . diff-hl-show-hunk-mouse-mode)
+         ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) . +diff-hl-disable-right-mouse-bindings))
   :config
   (setq
    ;; Reduce load on remote
    diff-hl-disable-on-remote t
    ;; A slightly faster algorithm for diffing
    vc-git-diff-switches '("--histogram"))
+
+  (with-eval-after-load 'diff-hl-show-hunk
+    (+diff-hl-disable-right-mouse-bindings))
 
   ;; Fall back to the display margin since the fringe is unavailable in tty
   (defun +diff-hl--fallback-margin ()
@@ -65,24 +77,21 @@
       (define-fringe-bitmap 'diff-hl-bmp-i [3 3 0 3 3 3 3 3 3 3] nil 2 'center)
       (define-fringe-bitmap 'diff-hl-bmp-delete [0 0] 2 2 'center)
       (define-fringe-bitmap 'diff-hl-bmp-insert [0 0] 2 2 'center)))
-  (add-hook! enable-theme-functions :call-immediately
-    (defun +diff-hl-refresh-fringe (&rest _)
-      (dolist (face '(diff-hl-insert diff-hl-delete diff-hl-change
-                                     diff-hl-reference-insert
-                                     diff-hl-reference-delete
-                                     diff-hl-reference-change))
-        (let ((color (or (face-foreground face nil t)
-                         (face-background face nil t)
-                         (face-foreground 'fringe nil t)
-                         (face-foreground 'default nil t))))
-          (set-face-attribute face nil :foreground color :background 'unspecified)))
-      (when (display-graphic-p)
-        (setq diff-hl-spec-cache (make-hash-table :test 'equal))
-        (diff-hl-maybe-redefine-bitmaps)
-        (dolist (buf (buffer-list))
-          (with-current-buffer buf
-            (when (bound-and-true-p diff-hl-mode) (diff-hl-update))
-            (when (bound-and-true-p diff-hl-dired-mode) (diff-hl-dired-update)))))))
+
+  (defun +diff-hl--vc-face (type)
+    (pcase type
+      ('insert 'diff-added)
+      ('delete 'diff-removed)
+      ('change 'diff-changed)))
+
+  (setq diff-hl-fringe-face-function
+        #'(lambda (type _pos)
+            (or (+diff-hl--vc-face type)
+                (diff-hl-fringe-face-from-type type nil)))
+        diff-hl-fringe-reference-face-function
+        #'(lambda (type _pos)
+            (or (+diff-hl--vc-face type)
+                (diff-hl-fringe-reference-face-from-type type nil))))
 
   ;; Integration with magit
   (with-eval-after-load 'magit

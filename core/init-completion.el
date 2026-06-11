@@ -312,6 +312,11 @@
 
 (use-package tempel
   :straight t
+  :bind (:map tempel-map
+              ("TAB" . tempel-next)
+              ("<tab>" . tempel-next)
+              ("S-<tab>" . tempel-previous)
+              ("<backtab>" . tempel-previous))
   :hook (((prog-mode text-mode conf-mode) . +tempel-setup-capf)
          ((prog-mode text-mode) . tempel-abbrev-mode))
   :config

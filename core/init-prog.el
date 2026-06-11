@@ -313,7 +313,10 @@
   :hook ((prog-mode . +flymake-mode-unless-eglot-auto-starts))
   :bind (("C-c f ]" . flymake-goto-next-error)
          ("C-c f [" . flymake-goto-prev-error)
-         ("C-c f b" . flymake-show-buffer-diagnostics))
+         ("C-c f b" . flymake-show-buffer-diagnostics)
+         :map flymake-mode-map
+         ("<left-fringe> <mouse-1>" . nil)
+         ("<right-fringe> <mouse-1>" . nil))
   :config
   (setq flymake-show-diagnostics-at-end-of-line 'short
         flymake-indicator-type nil

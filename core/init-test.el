@@ -13,7 +13,7 @@
     contact))
 
 (with-eval-after-load "eglot"
-  (push '(verilog-mode . ("/Users/roifewu/code/vizsla/target/debug/vizsla")) eglot-server-programs)
+  (push '(verilog-mode . ("/Users/roifewu/code/vide/target/debug/vide")) eglot-server-programs)
   (push '(java-mode . jdtls-command-contact) eglot-server-programs)
 
   ;; (add-to-list 'eglot-server-programs
