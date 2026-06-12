@@ -33,3 +33,15 @@
         ispell-aspell-data-dir (ispell-get-aspell-config-value "data-dir")
         ispell-personal-dictionary (expand-file-name "ispell/.pws" user-emacs-directory))
   )
+
+
+;; [flyspell] spell checking overlays
+(use-package flyspell
+  :after ispell
+  :hook ((text-mode . flyspell-mode)
+         (prog-mode . flyspell-prog-mode))
+  :config
+  (setq flyspell-issue-message-flag nil
+        flyspell-issue-welcome-flag nil
+        flyspell-use-meta-tab nil)
+  )

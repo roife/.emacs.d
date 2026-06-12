@@ -98,22 +98,19 @@
 (add-hook! server-after-make-frame-hook :call-immediately
   (defun +setup-fonts ()
     "Setup fonts."
-    (set-face-attribute 'default nil :font (font-spec :family "Sarasa Term SC" :size +font-size))
-    (set-face-font 'fixed-pitch "Sarasa Term SC")
-    (set-face-font 'fixed-pitch-serif "Sarasa Term Slab SC")
+    (set-face-attribute 'default nil :font (font-spec :family "Sarasa Mono SC" :size +font-size))
+    (set-face-font 'fixed-pitch "Sarasa Mono SC")
+    (set-face-font 'fixed-pitch-serif "Sarasa Mono Slab SC")
     (set-face-font 'variable-pitch "Sarasa UI SC")
 
     (dolist (charset '(han cjk-misc))
-      (set-fontset-font t charset (font-spec :family "Sarasa Term SC")))
+      (set-fontset-font t charset (font-spec :family "Sarasa Mono SC")))
 
     ;; font for emoji, set as unicode to cover more chars
     (if (eq system-type 'darwin)
         (progn (set-fontset-font t 'unicode (font-spec :family "Apple Color Emoji") nil 'append)
                (setq face-font-rescale-alist '(("Apple Color Emoji" . 0.79))))
-      (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append))
-
-    (set-fontset-font t 'unicode (font-spec :family "Symbola") nil 'append)
-    ))
+      (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append))))
 
 
 ;; Smooth Scroll (less "jumpy" than defaults)
@@ -162,23 +159,20 @@
 ;; [ligature] ligature support for Emacs
 (use-package ligature
   :straight t
-  :hook ((prog-mode markdown-mode) . ligature-mode)
+  :hook ((prog-mode markdown-mode org-mode) . ligature-mode)
   :config
-  ;; Enable all Cascadia Code ligatures in programming modes
+  ;; Enable Sarasa/Iosevka ligatures in programming modes
   (ligature-set-ligatures '(prog-mode markdown-mode org-mode)
-                          '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-                            ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                          '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "||=" "||>"
+                            ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "!=="
                             "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-                            "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-                            "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-                            "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-                            "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-                            "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-                            ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-                            "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-                            "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-                            "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-                            "\\\\" "://"))
+                            "<~~" "<~>" "<*>" "<||" "<|>" "<==" "<=>" "<=<" "<->"
+                            "<--" "<-<" "<<=" "<<-" "<<<" "</>" "###" "..<"
+                            "..." "+++" "/==" "///" "~=" "~>" "~-" "*>" "*/"
+                            "||" "|>" "::" ":=" ":>" ":<" "==" "=>" "!=" "!!" ">:"
+                            ">=" ">>" "-~" "->" "<~" "<*" "<:" "<=" "<>"
+                            "<-" "<<" "</" ".." ".?" "?:" "?." "??" ";;" "/*"
+                            "/>" "//" "\\\\" "://"))
   )
 
 

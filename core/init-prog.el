@@ -330,9 +330,6 @@
   (c-set-offset 'case-label '+))
 
 
-(use-package elisp-mode)
-
-
 (use-package csv-mode
   :straight t)
 

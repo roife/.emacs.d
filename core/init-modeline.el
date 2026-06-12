@@ -182,8 +182,7 @@
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
-         (panel-face `(:inherit ,meta-face :inverse-video ,active-p))
-         (vcs-info (concat +mode-line-vcs-info +mode-line-smerge-count)))
+         (panel-face `(:inherit ,meta-face :inverse-video ,active-p)))
     `((:propertize ,(+mode-line-get-window-name)
                    face ,panel-face)
       (:propertize ,(+mode-line-overwrite-readonly-indicator)
@@ -202,8 +201,6 @@
       (:eval +mode-line-imenu-crumb)
       (:propertize +mode-line-remote-host-name
                    face +mode-line-host-name-active-face)
-      (,active-p ,vcs-info
-                 (:propertize ,vcs-info face nil))
       " "
       (:eval +mode-line-encoding)
       )))
