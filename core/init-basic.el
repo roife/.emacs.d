@@ -233,8 +233,8 @@
 
 
 ;; [glyphless-display] Don't render glyphs, in case of undisplayable characters.
-(use-package glyphless-display
-  :init (glyphless-display-mode))
+(use-package glyphless-mode
+  :hook (after-init . glyphless-display-mode))
 
 ;; [Scrolling]
 (setq

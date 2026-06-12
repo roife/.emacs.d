@@ -204,4 +204,10 @@
   (add-hook! enable-theme-functions :call-immediately
     (defun +auto-dim-other-buffers-auto-set-face (&rest _)
       (set-face-background 'auto-dim-other-buffers-face (face-background 'mode-line))))
+
+  (add-hook! server-after-make-frame-hook
+    (defun +auto-dim-other-buffers-refresh-for-client-frame ()
+      (when (bound-and-true-p auto-dim-other-buffers-mode)
+        (adob--initialize)
+        (adob--rescan-windows))))
   )

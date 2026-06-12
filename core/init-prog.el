@@ -457,12 +457,6 @@
    web-mode-auto-close-style 1))
 
 
-(use-package js-ts-mode
-  :mode ("\\.js[x]?\\'" . js-ts-mode)
-  :config
-  (setq js-ts-indent-level 2))
-
-
 ;; [skewer-mode] Live browser JavaScript, CSS, and HTML interaction
 (use-package skewer-mode
   :straight t

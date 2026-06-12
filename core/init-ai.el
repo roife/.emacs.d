@@ -20,11 +20,9 @@
     :stream t
     :request-params '(:thinking (:type "disabled"))
     :key #'gptel-api-key-from-auth-source)
-
   :config
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
-  (gptel-agent-update)
   )
 
 (use-package gptel-agent
