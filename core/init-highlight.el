@@ -88,7 +88,7 @@
         (push `(,keyword . ,color) hl-todo-keyword-faces))))
 
   ;; HACK: `hl-todo' won't update face when changing theme, so we must add a hook for it
-  (add-hook! enable-theme-functions :call-immediately
+  (add-hook! enable-theme-functions :unless-daemonp-call-immediately
     (defun +hl-update-keyword-faces (&rest _)
       (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
       (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning))))

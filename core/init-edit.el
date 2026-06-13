@@ -9,6 +9,11 @@
 
 (kill-ring-deindent-mode)
 
+;; [clipetty] Use system clipboard in terminal Emacs
+(use-package clipetty
+  :straight t
+  :hook (after-init . global-clipetty-mode))
+
 
 ;; Make script file executable with `chmod +x' after save
 (add-hook 'after-save-hook

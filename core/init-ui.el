@@ -95,22 +95,23 @@
 ;; Font: Same width and height for emoji, chinese and english characters
 (defvar +font-size (if (eq system-type 'darwin) 16 26))
 
-(add-hook! server-after-make-frame-hook :call-immediately
+(add-hook! server-after-make-frame-hook :unless-daemonp-call-immediately
   (defun +setup-fonts ()
     "Setup fonts."
-    (set-face-attribute 'default nil :font (font-spec :family "Sarasa Mono SC" :size +font-size))
-    (set-face-font 'fixed-pitch "Sarasa Mono SC")
-    (set-face-font 'fixed-pitch-serif "Sarasa Mono Slab SC")
-    (set-face-font 'variable-pitch "Sarasa UI SC")
+    (when (display-graphic-p)
+      (set-face-attribute 'default nil :font (font-spec :family "Sarasa Mono SC" :size +font-size))
+      (set-face-font 'fixed-pitch "Sarasa Mono SC")
+      (set-face-font 'fixed-pitch-serif "Sarasa Mono Slab SC")
+      (set-face-font 'variable-pitch "Sarasa UI SC")
 
-    (dolist (charset '(han cjk-misc))
-      (set-fontset-font t charset (font-spec :family "Sarasa Mono SC")))
+      (dolist (charset '(han cjk-misc))
+        (set-fontset-font t charset (font-spec :family "Sarasa Mono SC")))
 
-    ;; font for emoji, set as unicode to cover more chars
-    (if (eq system-type 'darwin)
-        (progn (set-fontset-font t 'unicode (font-spec :family "Apple Color Emoji") nil 'append)
-               (setq face-font-rescale-alist '(("Apple Color Emoji" . 0.79))))
-      (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append))))
+      ;; font for emoji, set as unicode to cover more chars
+      (if (eq system-type 'darwin)
+          (progn (set-fontset-font t 'unicode (font-spec :family "Apple Color Emoji") nil 'append)
+                 (setq face-font-rescale-alist '(("Apple Color Emoji" . 0.79))))
+        (set-fontset-font t 'unicode (font-spec :family "Noto Color Emoji") nil 'append)))))
 
 
 ;; Smooth Scroll (less "jumpy" than defaults)
@@ -136,7 +137,7 @@
 
 (defvar +light-theme 'doom-nord-light)
 (defvar +dark-theme 'doom-spacegrey)
-(add-hook! server-after-make-frame-hook :call-immediately
+(add-hook! server-after-make-frame-hook :unless-daemonp-call-immediately
   (defun +load-theme (&optional theme)
     (unless theme
       (setq theme (if (and (display-graphic-p)

@@ -17,19 +17,21 @@ This macro accepts, in order:
      thereof, a list of `defun' or `cl-defun' forms, or arbitrary forms (will
      implicitly be wrapped in a lambda).
 
-\(fn HOOKS [:append :local [:depth N] :remove :call-immediately] FUNCTIONS-OR-FORMS...)"
+\(fn HOOKS [:append :local [:depth N] :remove :call-immediately :unless-daemonp-call-immediately] FUNCTIONS-OR-FORMS...)"
   (declare (indent defun))
   (let* ((hook-forms (if (listp hooks) hooks (list hooks)))
          (func-forms ())
          (defn-forms ())
-         append-p local-p remove-p call-immediately-p depth)
+         append-p local-p remove-p call-immediately-p unless-daemonp-call-immediately-p depth)
     (while (keywordp (car rest))
       (pcase (pop rest)
         (:append (setq append-p t))
         (:depth  (setq depth (pop rest)))
         (:local  (setq local-p t))
         (:remove (setq remove-p t))
-        (:call-immediately (setq call-immediately-p t))))
+        (:call-immediately (setq call-immediately-p t))
+        (:unless-daemonp-call-immediately
+         (setq unless-daemonp-call-immediately-p t))))
     (while rest
       (let* ((next (pop rest))
              (first (car-safe next)))
@@ -54,7 +56,10 @@ This macro accepts, in order:
            ,(if remove-p
                 `(remove-hook hook func ,local-p)
               `(add-hook hook func ,(or depth append-p) ,local-p)))
-         ,(if call-immediately-p `(funcall func))))))
+         ,(cond (call-immediately-p `(funcall func))
+                (unless-daemonp-call-immediately-p
+                 `(unless (daemonp)
+                    (funcall func))))))))
 
 (defmacro defadvice! (symbol arglist &rest body)
   "Define an advice called SYMBOL and add it to PLACES.

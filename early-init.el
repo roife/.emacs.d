@@ -33,7 +33,8 @@
           (lambda ()
             (setq-default inhibit-redisplay nil
                           inhibit-message nil)
-            (redraw-frame)))
+            (unless (daemonp)
+              (redraw-frame))))
 
 ;; Inhibit package.el initialization
 (setq package-enable-at-startup nil)
