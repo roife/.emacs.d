@@ -272,9 +272,16 @@ begin and end of the block surrounding point."
 
 
 ;; [undohist] Persist undo history
-(use-package undohist
+(use-package undo-fu-session
   :straight t
-  :hook (after-init . undohist-initialize))
+  :hook (after-init . global-undo-fu-session-mode)
+  :config
+  (setq undo-fu-session-incompatible-files '("\\.gpg$" "/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
+
+  (when (executable-find "zstd")
+    ;; There are other algorithms available, but zstd is the fastest, and speed
+    ;; is our priority within Emacs
+    (setq undo-fu-session-compression 'zst)))
 
 
 ;; [undo-hl] Highlight undo changes

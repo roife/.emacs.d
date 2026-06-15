@@ -175,3 +175,20 @@
   :config
   (setq symbol-overlay-temp-highlight-on-region t)
   )
+
+
+;; [highlight]
+(use-package hilit-chg
+  :preface
+  (defun +highlight-changes-mode-turn-on ()
+    (highlight-changes-mode 1)
+    (highlight-changes-visible-mode -1))
+  (defun +highlight-changes-mode-turn-off ()
+    (and highlight-changes-mode (highlight-changes-mode -1)))
+  (defun +highlight-changes-auto ()
+    (when (buffer-file-name)
+      (+highlight-changes-mode-turn-on)
+      (add-hook 'after-save-hook #'+highlight-changes-mode-turn-on nil t)
+      (add-hook 'before-save-hook #'+highlight-changes-mode-turn-off nil t)))
+  :hook ((prog-mode conf-mode text-mode) . +highlight-changes-auto)
+  )

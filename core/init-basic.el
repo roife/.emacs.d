@@ -7,15 +7,14 @@
  ;; Files
  ;; [lockfile]
  create-lockfiles nil
- ;; [backup] Use auto-save, which maintains a copy when a buffer is unsaved
- make-backup-files nil
- ;; [version-control]
- ;; In case I enable it later
- ;; version-control t
- ;; backup-by-copying t
- ;; delete-old-versions t
- ;; kept-new-versions 5
- ;; tramp-backup-directory-alist backup-directory-alist
+ ;; [backup]
+ backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory)))
+ vc-make-backup-files t
+ version-control t
+ backup-by-copying t
+ delete-old-versions t
+ kept-new-versions 6
+ tramp-backup-directory-alist backup-directory-alist
  ;; [auto-save]
  auto-save-default t
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
@@ -331,3 +330,8 @@
   (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-variables '("PATH" "JAVA_HOME" "JDTLS_JAVA_HOME" "MANPATH"))
   (exec-path-from-shell-initialize))
+
+
+;; [backup walker] A utility to view Emacs backup files.
+(use-package backup-walker
+  :straight t)
