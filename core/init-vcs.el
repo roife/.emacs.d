@@ -27,48 +27,17 @@
    diff-hl-disable-on-remote t
    ;; A slightly faster algorithm for diffing
    vc-git-diff-switches '("--histogram")
-   ;; Don't show diffs for ignored files
-   diff-hl-autohide-margin t)
-
-  ;; HACK: Redefine fringe bitmaps to be simpler.
-  (setq diff-hl-bmp-max-width 6)
-  (defun diff-hl-define-bitmaps ()
-    (let* ((scale (if (and (boundp 'text-scale-mode-amount)
-                           (numberp text-scale-mode-amount))
-                      (expt text-scale-mode-step text-scale-mode-amount)
-                    1))
-           (spacing (or (and (display-graphic-p) (default-value 'line-spacing)) 0))
-           (total-spacing (pcase spacing
-                            ((pred numberp) spacing)
-                            (`(,above . ,below) (+ above below))))
-           (h (+ (ceiling (* (frame-char-height) scale))
-                 (if (floatp total-spacing)
-                     (truncate (* (frame-char-height) total-spacing))
-                   total-spacing)))
-           (bmp-w (frame-parameter nil (intern (format "%s-fringe" diff-hl-side))))
-           (_ (when (zerop bmp-w) (setq bmp-w diff-hl-bmp-max-width)))
-           (line-w (min diff-hl-bmp-max-width bmp-w))
-           (shift (max 0 (- bmp-w line-w)))
-           (line-mask (ash (1- (expt 2 line-w)) shift))
-           (line (make-vector h line-mask)))
-      (define-fringe-bitmap 'diff-hl-bmp-top line h bmp-w 'top)
-      (define-fringe-bitmap 'diff-hl-bmp-middle line h bmp-w 'center)
-      (define-fringe-bitmap 'diff-hl-bmp-bottom line h bmp-w 'bottom)
-      (define-fringe-bitmap 'diff-hl-bmp-single line h bmp-w 'top)
-      (define-fringe-bitmap 'diff-hl-bmp-i [3 3 0 3 3 3 3 3 3 3] nil 2 'center)
-      (define-fringe-bitmap 'diff-hl-bmp-delete [0 0] 2 2 'center)
-      (define-fringe-bitmap 'diff-hl-bmp-insert [0 0] 2 2 'center)))
+   ;; Use margins in terminal frames where fringes don't exist.
+   diff-hl-fallback-to-margin t)
 
   (defun +diff-hl--vc-face (type)
     (pcase type
-      ('insert 'diff-added)
-      ('delete 'diff-removed)
-      ('change 'diff-changed)))
+      ('insert 'diff-refine-added)
+      ('delete 'diff-refine-removed)
+      ('change 'diff-refine-changed)))
 
-  (setq diff-hl-fringe-face-function
-        #'(lambda (type _pos) (+diff-hl--vc-face type))
-        diff-hl-fringe-reference-face-function
-        #'(lambda (type _pos) (+diff-hl--vc-face type)))
+  (setq diff-hl-fringe-face-function #'(lambda (type _pos) (+diff-hl--vc-face type))
+        diff-hl-fringe-reference-face-function #'(lambda (type _pos) (+diff-hl--vc-face type)))
 
   ;; Integration with magit
   (with-eval-after-load 'magit
@@ -77,7 +46,14 @@
 
   ;; WORKAROUND: Integration with ws-butler
   (with-eval-after-load 'ws-butler
-    (advice-add #'ws-butler-after-save :after #'diff-hl-update-once))
+    (advice-add #'ws-butler-after-save :after #'diff-hl-update))
+
+  ;; HACK: Update after vc-state refreshed
+  (advice-add #'vc-refresh-state :after #'diff-hl-update)
+  (add-hook 'find-file-hook #'diff-hl-update)
+
+  ;; Update after focus change
+  (add-function :after after-focus-change-function #'diff-hl-update)
   )
 
 

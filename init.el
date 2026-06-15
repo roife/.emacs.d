@@ -23,9 +23,9 @@
 (defvar +init-files (list
                      'init-util
                      'init-straight
+                     'init-basic
                      'init-ui
                      'init-tabbar
-                     'init-basic
                      'init-completion
                      (when (eq system-type 'darwin) 'init-mac)
                      'init-tools
@@ -47,9 +47,9 @@
                      'init-modal
                      'init-modeline
                      'init-ai
-                     'init-pdf
                      'init-test
 
+                     ;; 'init-pdf
                      ;; 'init-chat
                      ;; 'init-elfeed
                      ))

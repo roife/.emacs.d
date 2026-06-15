@@ -132,7 +132,6 @@
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
 
-  (doom-themes-visual-bell-config)
   (doom-themes-org-config))
 
 (defvar +light-theme 'doom-nord-light)
@@ -180,7 +179,7 @@
 ;; [scrollview] Show scroll progress in the fringe
 (use-package scrollview
   :straight (:host github :repo "roife/scrollview.el" :branch "main")
-  :hook (after-init . global-scrollview-mode))
+  :hook ((after-init . global-scrollview-mode)))
 
 (setq frame-title-format
       '((:eval (or buffer-file-truename "%b"))))
