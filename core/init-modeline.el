@@ -8,14 +8,6 @@
 ;; show VC tools name for Git
 (defvar +mode-line-show-common-vc-tools-name nil)
 
-;;; Check whether `window-total-width' is larger than the limit
-(defconst +mode-line-window-width-limit 80)
-(defvar-local +mode-line-enough-width-p nil)
-(add-hook! (after-revert-hook buffer-list-update-hook window-size-change-functions)
-           (defun +mode-line-window-size-change-function (&rest _)
-             (setq +mode-line-enough-width-p
-                   (> (window-total-width) +mode-line-window-width-limit))))
-
 ;;; face
 (defgroup +mode-line nil
   "Mode-Line faces."

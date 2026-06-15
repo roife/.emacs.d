@@ -17,37 +17,18 @@
 ;; [diff-hl] Highlight uncommitted changes using VC
 (use-package diff-hl
   :straight t
-  :defines desktop-minor-mode-table
-  :preface
-  (defun +diff-hl-disable-right-mouse-bindings ()
-    (when (boundp 'diff-hl-show-hunk-mouse-mode-map)
-      (define-key diff-hl-show-hunk-mouse-mode-map
-                  [right-fringe mouse-1] nil)
-      (define-key diff-hl-show-hunk-mouse-mode-map
-                  [right-margin mouse-1] nil)))
-
-  :hook ((find-file    . diff-hl-mode)
+  :demand t
+  :hook ((after-init . global-diff-hl-mode)
          (vc-dir-mode  . diff-hl-dir-mode)
-         (dired-mode   . diff-hl-dired-mode)
-         ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) . +diff-hl--fallback-margin)
-         ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) . diff-hl-show-hunk-mouse-mode)
-         ((diff-hl-mode diff-hl-dir-mode diff-hl-dired-mode) . +diff-hl-disable-right-mouse-bindings))
+         (dired-mode   . diff-hl-dired-mode))
   :config
   (setq
    ;; Reduce load on remote
    diff-hl-disable-on-remote t
    ;; A slightly faster algorithm for diffing
-   vc-git-diff-switches '("--histogram"))
-
-  (with-eval-after-load 'diff-hl-show-hunk
-    (+diff-hl-disable-right-mouse-bindings))
-
-  ;; Fall back to the display margin since the fringe is unavailable in tty
-  (defun +diff-hl--fallback-margin ()
-    (if (display-graphic-p)
-        (diff-hl-margin-local-mode -1)
-      (diff-hl-margin-local-mode))
-    (diff-hl-update-once))
+   vc-git-diff-switches '("--histogram")
+   ;; Don't show diffs for ignored files
+   diff-hl-autohide-margin t)
 
   ;; HACK: Redefine fringe bitmaps to be simpler.
   (setq diff-hl-bmp-max-width 6)
@@ -85,13 +66,9 @@
       ('change 'diff-changed)))
 
   (setq diff-hl-fringe-face-function
-        #'(lambda (type _pos)
-            (or (+diff-hl--vc-face type)
-                (diff-hl-fringe-face-from-type type nil)))
+        #'(lambda (type _pos) (+diff-hl--vc-face type))
         diff-hl-fringe-reference-face-function
-        #'(lambda (type _pos)
-            (or (+diff-hl--vc-face type)
-                (diff-hl-fringe-reference-face-from-type type nil))))
+        #'(lambda (type _pos) (+diff-hl--vc-face type)))
 
   ;; Integration with magit
   (with-eval-after-load 'magit
@@ -99,13 +76,8 @@
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 
   ;; WORKAROUND: Integration with ws-butler
-  (advice-add #'ws-butler-after-save :after #'diff-hl-update-once)
-
-  ;; HACK: Update after vc-state refreshed
-  (advice-add #'vc-refresh-state :after #'diff-hl-update)
-
-  ;; Update after focus change
-  (add-function :after after-focus-change-function #'diff-hl-update-once)
+  (with-eval-after-load 'ws-butler
+    (advice-add #'ws-butler-after-save :after #'diff-hl-update-once))
   )
 
 
