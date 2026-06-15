@@ -154,8 +154,7 @@
 ;; [project-crumb]
 (defvar-local +mode-line-project-crumb nil)
 (add-hook! (find-file-hook after-save-hook clone-indirect-buffer-hook Info-selection-hook
-                           window-configuration-change-hook; window-size-change-functions
-                           )
+                           window-configuration-change-hook)
   (defun +mode-line-update-project-crumb (&rest _)
     (setq +mode-line-project-crumb
           (breadcrumb-project-crumbs))))
@@ -164,11 +163,6 @@
 (advice-add #'pop-to-buffer :after #'+mode-line-update-project-crumb)
 (advice-add #'popup-create :after #'+mode-line-update-project-crumb)
 (advice-add #'popup-delete :after #'+mode-line-update-project-crumb)
-
-;; [imenu-crumb]
-(defvar-local +mode-line-imenu-crumb nil)
-(defun +mode-line-update-imenu-crumb (&rest _)
-  (setq +mode-line-imenu-crumb (breadcrumb-imenu-crumbs)))
 
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
@@ -190,7 +184,7 @@
        (:propertize "%b" face ,meta-face)
        ,+mode-line-project-crumb)
       " "
-      (:eval +mode-line-imenu-crumb)
+      (:eval (breadcrumb-imenu-crumbs))
       (:propertize +mode-line-remote-host-name
                    face +mode-line-host-name-active-face)
       " "
@@ -221,7 +215,7 @@
         (call-interactively 'count-words-region)
       (message (breadcrumb-imenu-crumbs))))
 
-  (timeout-debounce '+mode-line-update-imenu-crumb 0.2)
+  (timeout-debounce '+mode-line-update-imenu-crumb 0.4)
   )
 
 (setq-default header-line-format nil)
