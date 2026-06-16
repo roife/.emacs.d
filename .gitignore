@@ -43,3 +43,4 @@ cache/
 org-persist/
 .tree-sitter/
 undohist/
+undo-fu-session/
