@@ -25,9 +25,10 @@
                      'init-straight
                      'init-basic
                      'init-ui
+                     'init-xterm
                      'init-tabbar
-                     'init-completion
                      (when (eq system-type 'darwin) 'init-mac)
+                     'init-completion
                      'init-tools
                      'init-keybinding
                      'init-highlight

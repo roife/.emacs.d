@@ -134,17 +134,16 @@
 
   (doom-themes-org-config))
 
-(defvar +light-theme 'doom-nord-light)
-(defvar +dark-theme 'doom-spacegrey)
+(defvar +light-theme 'doom-gruvbox-light)
+(defvar +dark-theme 'doom-gruvbox)
 (add-hook! server-after-make-frame-hook :unless-daemonp-call-immediately
   (defun +load-theme (&optional theme)
-    (unless theme
-      (setq theme (if (and (display-graphic-p)
-                           (cond ((eq system-type 'darwin)
-                                  (eq ns-system-appearance 'light))
-                                 (t t)))
-                      +light-theme
-                    +dark-theme)))
+    (setq theme (if (if (display-graphic-p)
+                        (cond ((eq system-type 'darwin) (eq ns-system-appearance 'dark))
+                              (t t))
+                      (eq (frame-parameter nil 'background-mode) 'dark))
+                    +dark-theme
+                  +light-theme))
     (unless (member theme custom-enabled-themes)
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme theme t))))
