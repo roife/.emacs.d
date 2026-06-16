@@ -198,7 +198,7 @@
   :config
   (setq consult-narrow-key "<"
         consult-async-min-input 2
-        consult-async-refresh-delay 0.14)
+        consult-async-refresh-delay 0.05)
 
   ;; replace multi-occur with consult-multi-occur
   (advice-add #'multi-occur :override #'consult-multi-occur)

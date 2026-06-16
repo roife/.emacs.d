@@ -1,10 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-;; custom directory
-(defconst +blog-dir (expand-file-name "~/code/roife.github.io/"))
-(defconst +ebib-bib-dir (expand-file-name "~/Documents/papers/"))
-(defconst +elfeed-enclosure-dir (expand-file-name "~/Downloads/"))
-
 ;; Thanks to DOOM Emacs
 (defmacro add-hook! (hooks &rest rest)
   "A convenience macro for adding N functions to M hooks.
