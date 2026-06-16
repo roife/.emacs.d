@@ -44,17 +44,13 @@
     (push "\e[?2031l" (terminal-parameter nil 'tty-mode-reset-strings))
     (push "\e[?2031h" (terminal-parameter nil 'tty-mode-set-strings))))
 
-(defun +xterm-setup-frame ()
-  "Enable xterm niceties for terminal FRAME."
-  (let ((frame (selected-frame)))
-    (when (and (not (display-graphic-p frame))
-               (eq (terminal-parameter (frame-terminal frame) 'terminal-initted)
-                   'terminal-init-xterm))
-      (with-selected-frame frame
-        (+xterm-init-theme-update-notifications)
-        (xterm-mouse-mode 1)))))
-
-;; Cover future text terminals; call once below for the current terminal.
-(add-hook 'tty-setup-hook #'+xterm-setup-frame)
-
-(+xterm-setup-frame)
+(add-hook! tty-setup-hook :call-immediately
+  (defun +xterm-setup-frame ()
+    "Enable xterm niceties for the current terminal frame."
+    (let ((frame (selected-frame)))
+      (when (and (not (display-graphic-p frame))
+                 (eq (terminal-parameter (frame-terminal frame) 'terminal-initted)
+                     'terminal-init-xterm))
+        (with-selected-frame frame
+          (+xterm-init-theme-update-notifications)
+          (xterm-mouse-mode 1))))))
