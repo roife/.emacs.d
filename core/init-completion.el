@@ -290,12 +290,6 @@
   :bind (:map corfu-map
               ("C-, ," . corfu-quick-complete)))
 
-(use-package corfu-terminal
-  :straight t
-  :when (not (display-graphic-p))
-  :after corfu
-  :init (corfu-terminal-mode 1))
-
 
 (use-package cape
   :straight t

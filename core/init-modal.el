@@ -83,7 +83,8 @@ included; for the final argument the leading separator is included."
   (add-hook! tty-setup-hook :unless-daemonp-call-immediately
     (defun +meow-enable-global-mode-once ()
       "Enable Meow after a usable frame exists."
-      (meow-global-mode 1)))
+      (meow-global-mode 1)
+      (meow-esc-mode -1)))
   :config
   (setq-default meow-replace-state-name-list '((normal . "N")
                                                (motion . "M")

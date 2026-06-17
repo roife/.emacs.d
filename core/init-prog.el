@@ -47,13 +47,6 @@
   )
 
 
-;; [imenu]
-(use-package imenu
-  :hook (prog-mode . (lambda () (ignore-errors (imenu--make-index-alist))))
-  :config
-  (setq imenu-auto-rescan t))
-
-
 ;; [Eglot] LSP support
 (defconst +eglot-auto-start-modes
   '(c-mode c++-mode rust-mode python-mode java-mode
