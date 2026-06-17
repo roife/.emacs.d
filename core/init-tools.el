@@ -151,7 +151,7 @@
     "Toggle to the previous buffer that belongs to current project."
     (interactive "P")
     (unless arg
-      (if-let ((pr (project-current)))
+      (if-let* ((pr (project-current)))
           (switch-to-buffer
            (->> (project--buffer-list pr)
                 (--remove (or (minibufferp it)

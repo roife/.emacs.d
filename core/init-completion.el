@@ -120,7 +120,7 @@
   :config
   (defun marginalia-annotate-buffer (cand)
     "Annotate buffer CAND with modification status, file name and major mode."
-    (when-let ((buffer (get-buffer cand)))
+    (when-let* ((buffer (get-buffer cand)))
       (if (buffer-live-p buffer)
           (marginalia--fields
            ((marginalia--buffer-status buffer))

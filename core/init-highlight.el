@@ -83,7 +83,7 @@
 
   (defun +hl-todo-add-keywords (keys color)
     (dolist (keyword keys)
-      (if-let ((item (assoc keyword hl-todo-keyword-faces)))
+      (if-let* ((item (assoc keyword hl-todo-keyword-faces)))
           (setf (cdr item) color)
         (push `(,keyword . ,color) hl-todo-keyword-faces))))
 

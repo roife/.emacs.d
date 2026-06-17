@@ -40,11 +40,11 @@
 (defun restart-eglot-and-switch-logs ()
   "Restart Eglot in the current buffer and switch to the Eglot log buffer."
   (interactive)
-  (when-let ((project-name (when (project-current)
+  (when-let* ((project-name (when (project-current)
                              (file-name-nondirectory
                               (directory-file-name
                                (project-root (project-current))))))
-             (log-buffer-name (format "*EGLOT (%s/(rust-ts-mode rust-mode)) events*"
+              (log-buffer-name (format "*EGLOT (%s/(rust-ts-mode rust-mode)) events*"
                                       project-name)))
     (let ((eglot-log-window (catch 'found
                               (dolist (win (window-list))

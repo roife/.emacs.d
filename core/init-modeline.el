@@ -81,8 +81,8 @@
   (defun +mode-line-update-remote-host-name ()
     "Hostname for remote buffers."
     (setq +mode-line-remote-host-name
-          (when-let ((hostname (and default-directory
-                                    (file-remote-p default-directory 'host))))
+          (when-let* ((hostname (and default-directory
+                                     (file-remote-p default-directory 'host))))
             (when (not (string-equal hostname "localhost"))
               (concat "@" hostname)))
           )))
