@@ -320,7 +320,7 @@
 
 ;; [timeout] debounce and throttle
 (use-package timeout
-  :straight (:host github :repo "karthink/timeout" :branch "master"))
+  :straight nil)
 
 
 ;; [environment variables]
