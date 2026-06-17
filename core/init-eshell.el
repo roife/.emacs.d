@@ -8,7 +8,6 @@
   :bind (("C-`" . +eshell-toggle)
          ("C-·" . +eshell-toggle)
          :map eshell-mode-map
-         ("C-l" . eshell/clear)
          ("M-s" . consult-history))
   :config
   (setq
@@ -105,7 +104,6 @@ If no project is found, create a temporary Eshell instance in the current direct
     (eshell/alias "ll" "ls -laG $*")
     (defalias 'eshell-q 'eshell/exit)
     (eshell/alias "rg" "rg --color=always $*")
-    (defalias 'eshell-clear 'eshell/clear-scrollback)
     ;; Vim
     (defalias 'eshell-vim 'find-file)
     (defalias 'eshell-vi 'find-file)
@@ -124,13 +122,6 @@ If no project is found, create a temporary Eshell instance in the current direct
   (advice-add #'eshell-write-aliases-list :override #'ignore)
 
   ;;; A bunch of eshell functions
-  ;; [clear]
-  (defun eshell/clear ()
-    "Clear the eshell buffer."
-    (interactive)
-    (let ((inhibit-read-only t))
-      (erase-buffer)))
-
   ;; [emacs, e, ec, ecc]
   (defun eshell/emacs (&rest args)
     "Open a file (ARGS) in Emacs."

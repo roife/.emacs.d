@@ -202,8 +202,8 @@
 
 
 ;; [imenu] Jump to function definitions
-;; (use-package imenu
-;;   :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (imenu--make-index-alist t))))
+(use-package imenu
+  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (imenu--make-index-alist t))))
 
 
 ;; [re-builder]

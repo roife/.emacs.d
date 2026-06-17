@@ -57,21 +57,6 @@
   :bind (:map dired-mode-map
               ("." . dired-omit-mode))
   :config
-  (let ((cmd (cond ((and (eq system-type 'darwin) (display-graphic-p)) "open")
-                   ((and (eq system-type 'gnu/linux) (display-graphic-p)) "xdg-open")
-                   ((and (eq system-type 'windows-nt) (display-graphic-p)) "start")
-                   (t ""))))
-    (setq dired-guess-shell-alist-user
-          `(("\\.pdf\\'" ,cmd)
-            ("\\.docx\\'" ,cmd)
-            ("\\.\\(?:djvu\\|eps\\)\\'" ,cmd)
-            ("\\.\\(?:jpg\\|jpeg\\|png\\|gif\\|xpm\\)\\'" ,cmd)
-            ("\\.\\(?:xcf\\)\\'" ,cmd)
-            ("\\.csv\\'" ,cmd)
-            ("\\.tex\\'" ,cmd)
-            ("\\.\\(?:mp4\\|mkv\\|avi\\|flv\\|rm\\|rmvb\\|ogv\\)\\(?:\\.part\\)?\\'" ,cmd)
-            ("\\.\\(?:mp3\\|flac\\)\\'" ,cmd))))
-
   (setq dired-omit-verbose nil
         ;; hide dot files
         dired-omit-files "^\\..*\\'")

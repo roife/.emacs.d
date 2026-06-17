@@ -32,7 +32,6 @@
 
 ;; [editorconfig] Respect project-local formatting rules
 (use-package editorconfig
-  :straight t
   :hook (after-init . editorconfig-mode))
 
 
