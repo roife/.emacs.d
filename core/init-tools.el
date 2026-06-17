@@ -80,17 +80,11 @@
     "Set up hideshow block definitions for modes that need overrides."
     (require 'hideshow)
     (pcase major-mode
-      ('yaml-mode
-       (hs-indentation-mode 1))
       ('ruby-mode
        (setq-local hs-block-start-regexp "class\\|d\\(?:ef\\|o\\)\\|module\\|[[{]"
                    hs-block-end-regexp "end\\|[]}]"
                    hs-c-start-regexp "#\\|=begin"
                    hs-forward-sexp-function #'ruby-forward-sexp))
-      ('matlab-mode
-       (setq-local hs-block-start-regexp "if\\|switch\\|case\\|otherwise\\|while\\|for\\|try\\|catch"
-                   hs-block-end-regexp "end"
-                   hs-forward-sexp-function (lambda (_arg) (matlab-forward-sexp))))
       ('nxml-mode
        (setq-local hs-block-start-regexp "<!--\\|<[^/>]*[^/]>"
                    hs-block-end-regexp "-->\\|</[^/>]*[^/]>"
@@ -109,13 +103,9 @@
                                                 (line-beginning-position) t))
                        (LaTeX-find-matching-end)))))))
 
-  (defun +hideshow-enable ()
-    "Set up and enable hideshow in the current buffer."
-    (+hideshow-setup)
-    (hs-minor-mode 1))
-
-  :hook (((prog-mode conf-mode yaml-mode) . +hideshow-enable)
-         ((nxml-mode latex-mode LaTeX-mode) . +hideshow-setup))
+  :hook (((prog-mode conf-mode yaml-mode) . hs-minor-mode)
+         ((ruby-mode nxml-mode latex-mode LaTeX-mode) . +hideshow-setup)
+         ((yaml-mode) . hs-indentation-mode))
   :bind (("C-c h TAB" . hs-cycle)
          ("C-c h `" . hs-toggle-all))
   :config
@@ -126,11 +116,10 @@
       (overlay-put ov 'display
                    (let ((lines (number-to-string (count-lines (overlay-start ov) (overlay-end ov)))))
                      (concat " "
-                             (propertize (concat " ... L" lines " ") 'face '(:inherit shadow :height 0.8 :box t))
+                             (propertize (concat " .. L" lines " ") 'face '(:inherit shadow :height 0.8 :box t))
                              " "))
                    )))
   (setq hs-set-up-overlay #'+hs-display-code-line-counts)
-
   )
 
 
@@ -213,8 +202,8 @@
 
 
 ;; [imenu] Jump to function definitions
-(use-package imenu
-  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (imenu--make-index-alist t))))
+;; (use-package imenu
+;;   :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (imenu--make-index-alist t))))
 
 
 ;; [re-builder]

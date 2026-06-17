@@ -15,11 +15,11 @@
   :straight t
   :hook (tty-setup . global-kkp-mode))
 
+
+;; []
 (use-package term/xterm
   :straight nil
-  :hook (tty-setup . xterm-mouse-mode)
   :init
   (setq xterm-extra-capabilities '(modifyOtherKeys reportBackground
                                                    getSelection setSelection)
-        xterm-update-cursor t
         xterm-set-window-title t))

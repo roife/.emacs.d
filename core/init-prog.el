@@ -312,10 +312,7 @@
          ("<left-fringe> <mouse-1>" . nil)
          ("<right-fringe> <mouse-1>" . nil))
   :config
-  (setq flymake-show-diagnostics-at-end-of-line 'short
-        flymake-indicator-type nil
-        flymake-fringe-indicator-position nil)
-  )
+  (setq flymake-show-diagnostics-at-end-of-line 'short))
 
 ;; Langs
 (use-package cc-mode

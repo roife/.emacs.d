@@ -153,6 +153,8 @@
 (use-package saveplace
   :hook (after-init . save-place-mode)
   :config
+  (setopt save-place-autosave-interval 300)
+
   ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its
   ;; cache, which is expensive and useless. replace it with `prin1'
   (+advice-pp-to-prin1! 'save-place-alist-to-file)
@@ -169,6 +171,8 @@
   :bind (("C-x C-r" . recentf-open-files))
   :hook (after-init . recentf-mode)
   :config
+  (setopt recentf-autosave-interval 300)
+
   (setq recentf-auto-cleanup 'never
     recentf-max-saved-items 200
     recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
@@ -317,10 +321,6 @@
 
         ;; better history search
         comint-history-isearch 'dwim))
-
-;; [timeout] debounce and throttle
-(use-package timeout
-  :straight nil)
 
 
 ;; [environment variables]
