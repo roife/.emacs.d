@@ -490,9 +490,7 @@
           (rust "https://github.com/tree-sitter/tree-sitter-rust")
           (typst "https://github.com/uben0/tree-sitter-typst")))
 
-  (dolist (lang treesit-language-source-alist)
-  (unless (treesit-language-available-p (car lang))
-    (treesit-install-language-grammar (car lang))))
+  (setopt treesit-auto-install-grammar 'always)
 
   (setq treesit-font-lock-level 4))
 
