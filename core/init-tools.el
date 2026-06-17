@@ -75,7 +75,47 @@
 
 ;; [hideshow] Code folding
 (use-package hideshow
-  :hook ((prog-mode conf-mode yaml-mode) . hs-minor-mode)
+  :preface
+  (defun +hideshow-setup ()
+    "Set up hideshow block definitions for modes that need overrides."
+    (require 'hideshow)
+    (pcase major-mode
+      ('yaml-mode
+       (hs-indentation-mode 1))
+      ('ruby-mode
+       (setq-local hs-block-start-regexp "class\\|d\\(?:ef\\|o\\)\\|module\\|[[{]"
+                   hs-block-end-regexp "end\\|[]}]"
+                   hs-c-start-regexp "#\\|=begin"
+                   hs-forward-sexp-function #'ruby-forward-sexp))
+      ('matlab-mode
+       (setq-local hs-block-start-regexp "if\\|switch\\|case\\|otherwise\\|while\\|for\\|try\\|catch"
+                   hs-block-end-regexp "end"
+                   hs-forward-sexp-function (lambda (_arg) (matlab-forward-sexp))))
+      ('nxml-mode
+       (setq-local hs-block-start-regexp "<!--\\|<[^/>]*[^/]>"
+                   hs-block-end-regexp "-->\\|</[^/>]*[^/]>"
+                   hs-c-start-regexp "<!--"
+                   hs-forward-sexp-function #'sgml-skip-tag-forward))
+      ((or 'latex-mode 'LaTeX-mode)
+       (setq-local hs-block-start-regexp "\\\\begin{[a-zA-Z*]+}\\(\\)"
+                   hs-block-start-mdata-select 1
+                   hs-block-end-regexp "\\\\end{[a-zA-Z*]+}"
+                   hs-c-start-regexp "%"
+                   hs-forward-sexp-function
+                   (lambda (_arg)
+                     ;; LaTeX-find-matching-end needs to be inside the environment.
+                     (unless (save-excursion
+                               (search-backward "\\begin{document}"
+                                                (line-beginning-position) t))
+                       (LaTeX-find-matching-end)))))))
+
+  (defun +hideshow-enable ()
+    "Set up and enable hideshow in the current buffer."
+    (+hideshow-setup)
+    (hs-minor-mode 1))
+
+  :hook (((prog-mode conf-mode yaml-mode) . +hideshow-enable)
+         ((nxml-mode latex-mode LaTeX-mode) . +hideshow-setup))
   :bind (("C-c h TAB" . hs-cycle)
          ("C-c h `" . hs-toggle-all))
   :config
@@ -91,92 +131,6 @@
                    )))
   (setq hs-set-up-overlay #'+hs-display-code-line-counts)
 
-  ;; hide-show by indentation
-  (defun +fold--hideshow-empty-line-p (_)
-    (string= "" (string-trim (thing-at-point 'line 'no-props))))
-
-  (defun +fold--hideshow-geq-or-empty-p (base-indent)
-    (or (+fold--hideshow-empty-line-p base-indent)
-        (>= (current-indentation) base-indent)))
-
-  (defun +fold--hideshow-g-or-empty-p (base-indent)
-    (or (+fold--hideshow-empty-line-p base-indent)
-        (> (current-indentation) base-indent)))
-
-  (defun +fold--hideshow-seek (start direction before skip predicate base-indent)
-    "Seeks forward (if direction is 1) or backward (if direction is -1) from start, until predicate
-fails. If before is nil, it will return the first line where predicate fails, otherwise it returns
-the last line where predicate holds."
-    (save-excursion
-      (goto-char start)
-      (goto-char (point-at-bol))
-      (let ((bnd (if (> 0 direction)
-                     (point-min)
-                   (point-max)))
-            (pt (point)))
-        (when skip (forward-line direction))
-        (cl-loop while (and (/= (point) bnd) (funcall predicate base-indent))
-                 do (progn
-                      (when before (setq pt (point-at-bol)))
-                      (forward-line direction)
-                      (unless before (setq pt (point-at-bol)))))
-        pt)))
-
-  (defun +fold-hideshow-indent-range (&optional point)
-    "Return the point at the begin and end of the text block with the same (or
-greater) indentation. If `point' is supplied and non-nil it will return the
-begin and end of the block surrounding point."
-    (save-excursion
-      (when point
-        (goto-char point))
-      (let ((base-indent (current-indentation))
-            (begin (point))
-            (end (point)))
-        (setq begin (+fold--hideshow-seek begin -1 t nil #'+fold--hideshow-geq-or-empty-p base-indent)
-              begin (+fold--hideshow-seek begin 1 nil nil #'+fold--hideshow-g-or-empty-p base-indent)
-              end   (+fold--hideshow-seek end 1 t nil #'+fold--hideshow-geq-or-empty-p base-indent)
-              end   (+fold--hideshow-seek end -1 nil nil #'+fold--hideshow-empty-line-p base-indent))
-        (list begin end base-indent))))
-
-  (defun +fold-hideshow-forward-block-by-indent-fn (_arg)
-    (let ((start (current-indentation)))
-      (forward-line)
-      (unless (= start (current-indentation))
-        (let ((range (+fold-hideshow-indent-range)))
-          (goto-char (cadr range))
-          (end-of-line)))))
-
-  ;; support for special modes
-  (setq hs-special-modes-alist
-        (append
-         '((yaml-mode "\\s-*\\_<\\(?:[^:]+\\)\\_>"
-                      ""
-                      "#"
-                      +fold-hideshow-forward-block-by-indent-fn nil)
-           (ruby-mode "class\\|d\\(?:ef\\|o\\)\\|module\\|[[{]"
-                      "end\\|[]}]"
-                      "#\\|=begin"
-                      ruby-forward-sexp)
-           (matlab-mode "if\\|switch\\|case\\|otherwise\\|while\\|for\\|try\\|catch"
-                        "end"
-                        nil (lambda (_arg) (matlab-forward-sexp)))
-           (nxml-mode "<!--\\|<[^/>]*[^/]>"
-                      "-->\\|</[^/>]*[^/]>"
-                      "<!--" sgml-skip-tag-forward nil)
-           (latex-mode
-            ;; LaTeX-find-matching-end needs to be inside the env
-            ("\\\\begin{[a-zA-Z*]+}\\(\\)" 1)
-            "\\\\end{[a-zA-Z*]+}"
-            "%"
-            (lambda (_arg)
-              ;; Don't fold whole document, that's useless
-              (unless (save-excursion
-                        (search-backward "\\begin{document}"
-                                         (line-beginning-position) t))
-                (LaTeX-find-matching-end)))
-            nil))
-         hs-special-modes-alist
-         '((t))))
   )
 
 
