@@ -71,14 +71,19 @@ included; for the final argument the leading separator is included."
 ;; [meow] Modal editing
 (use-package meow
   :straight t
-  :hook (after-init . meow-global-mode)
   :demand t
+  :commands (meow-global-mode)
   :custom-face
   (meow-normal-indicator ((t (:inherit (font-lock-function-name-face bold :inverse-video t)))))
   (meow-insert-indicator ((t (:inherit (font-lock-keyword-face bold :inverse-video t)))))
   (meow-keypad-indicator ((t (:inherit (font-lock-builtin-face bold :inverse-video t)))))
   (meow-beacon-indicator ((t (:inherit (font-lock-type-face bold :inverse-video t)))))
   (meow-motion-indicator ((t (:inherit (font-lock-doc-face bold :inverse-video t)))))
+  :init
+  (add-hook! tty-setup-hook :unless-daemonp-call-immediately
+    (defun +meow-enable-global-mode-once ()
+      "Enable Meow after a usable frame exists."
+      (meow-global-mode 1)))
   :config
   (setq-default meow-replace-state-name-list '((normal . "N")
                                                (motion . "M")

@@ -38,7 +38,7 @@
     (tab-bar--update-tab-bar-lines))
 
   ;; WORKAROUND: fresh tab-bar for daemon
-  (when (daemonp)
-    (add-hook 'after-make-frame-functions
-              #'(lambda (&rest _) (force-mode-line-update))))
+  (add-hook! server-after-make-frame-hook
+    (defun +refresh-tab-bar (&rest _)
+        (force-mode-line-update)))
   )

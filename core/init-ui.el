@@ -76,6 +76,17 @@
 (setq indicate-empty-lines t)
 
 
+;; Disable menu/tool/scroll bars in daemon/client frames
+(add-hook! after-make-frame-functions
+  (defun +disable-frame-chrome (&optional frame)
+    "Keep daemon/client frames from restoring menu/tool/scroll bars."
+    (let ((frame (or frame (selected-frame))))
+      (when (frame-live-p frame)
+        (set-frame-parameter frame 'menu-bar-lines 0)
+        (set-frame-parameter frame 'tool-bar-lines 0)
+        (set-frame-parameter frame 'vertical-scroll-bars nil)))))
+
+
 ;; [Minibuffer]
 ;; Allow minibuffer commands while in the minibuffer.
 (setq enable-recursive-minibuffers t
@@ -136,7 +147,7 @@
 
 (defvar +light-theme 'doom-gruvbox-light)
 (defvar +dark-theme 'doom-gruvbox)
-(add-hook! server-after-make-frame-hook :unless-daemonp-call-immediately
+(add-hook! (tty-setup-hook server-after-make-frame-hook) :unless-daemonp-call-immediately
   (defun +load-theme (&optional theme)
     (setq theme (if (if (display-graphic-p)
                         (cond ((eq system-type 'darwin) (eq ns-system-appearance 'dark))

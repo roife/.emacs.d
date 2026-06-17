@@ -161,7 +161,8 @@
 (use-package eglot-booster
   :straight (:host github :repo "jdtsmith/eglot-booster")
   :after eglot
-  :config (eglot-booster-mode))
+  :config (eglot-booster-mode)
+  (setq eglot-booster-io-only t))
 
 
 ;; (use-package eglot-x
