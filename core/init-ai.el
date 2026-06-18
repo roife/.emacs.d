@@ -8,7 +8,7 @@
         gptel-confirm-tool-calls nil
         ;; Codex models ignore temperature; keep it nil to avoid warnings.
         gptel-temperature nil)
-
+  :config
   (setq-default gptel-backend (gptel-make-openai-oauth "OpenAI-sub"))
 
   (gptel-make-deepseek "DeepSeek-thinking"
@@ -20,14 +20,14 @@
     :stream t
     :request-params '(:thinking (:type "disabled"))
     :key #'gptel-api-key-from-auth-source)
-  :config
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
-  (gptel-agent-update)
   )
 
 (use-package gptel-agent
-  :straight t)
+  :straight t
+  :config
+  (gptel-agent-update))
 
 (use-package gptel-magit
   :straight (gptel-magit :type git :host github :repo "roife/gptel-magit")

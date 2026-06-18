@@ -9,7 +9,8 @@
               ("<tab>" . minibuffer-complete)
               ("C-<return>" . vertico-exit-input)
               ("C-, ." . vertico-quick-jump))
-  :hook (after-init . vertico-mode)
+  :hook ((after-init . vertico-mode)
+         (vertico-mode . vertico-mouse-mode))
   :config
   (setq vertico-cycle t
         vertico-resize nil
@@ -36,6 +37,38 @@
   :after vertico
   :bind (:map vertico-map
               ("M-q" . vertico-quick-jump)))
+
+
+(use-package vertico-multiform
+  :straight nil
+  :after vertico
+  :hook (vertico-mode . vertico-multiform-mode)
+  :config
+  (setq vertico-buffer-display-action
+        '(display-buffer-in-side-window
+          (side . bottom)
+          (window-height . 0.35))
+        vertico-multiform-commands
+        '((consult-buffer buffer)
+          (consult-buffer-other-frame buffer)
+          (consult-buffer-other-window buffer)
+          (consult-fd buffer)
+          (consult-grep buffer)
+          (consult-git-grep buffer)
+          (consult-imenu buffer)
+          (consult-imenu-multi buffer)
+          (consult-line buffer)
+          (consult-locate buffer)
+          (consult-ripgrep buffer)
+          (consult-yank-pop grid)
+          (consult-register grid)
+          (consult-theme grid))
+        vertico-multiform-categories
+        '((buffer buffer)
+          (consult-grep buffer)
+          (consult-location buffer)
+          (imenu buffer)
+          (kill-ring grid))))
 
 
 ;;; Matching styles
@@ -81,6 +114,23 @@
         completion-pcm-leading-wildcard t))
 
 
+(use-package prescient
+  :straight t
+  :hook (after-init . prescient-persist-mode)
+  :config
+  (setq prescient-save-file (expand-file-name "cache/prescient-save.el" user-emacs-directory)
+        prescient-sort-length-enable nil))
+
+
+(use-package vertico-prescient
+  :straight t
+  :after (prescient vertico)
+  :hook (vertico-mode . vertico-prescient-mode)
+  :config
+  (setq vertico-prescient-enable-filtering nil
+        vertico-prescient-enable-sorting t))
+
+
 (use-package marginalia
   :straight t
   :hook (vertico-mode . marginalia-mode))
@@ -91,16 +141,20 @@
 (use-package embark
   :straight t
   :bind (("C-;" . embark-act)
-         ("C-c ; e" . embark-export)
-         ("C-c ; c" . embark-collect)
-         :map minibuffer-local-map
-         ("C-c C-e" . +embark-export-write)
+         ("M-;" . embark-dwim)
+         ("C-h E" . embark-bindings)
          :map embark-file-map
-         ("s" . +reopen-file-with-sudo)
+         ("s" . sudo-edit)
          ("g" . +embark-magit-status))
   :init
   (setq prefix-help-command 'embark-prefix-help-command)
   :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none))))
+
   (defun +embark-magit-status (file)
     "Run `magit-status` on repo containing the embark target."
     (interactive "GFile: ")
@@ -160,6 +214,16 @@
 (use-package embark-consult
   :straight t
   :after (embark consult))
+
+
+(use-package avy-embark-collect
+  :straight (:host github :repo "oantolin/embark"
+             :local-repo "embark"
+             :files ("avy-embark-collect.el"))
+  :after (embark avy)
+  :bind (:map embark-collect-mode-map
+              ("j" . avy-embark-collect-choose)
+              ("J" . avy-embark-collect-act)))
 
 
 ;; [consult-dir] Insert path quickly in minibuffer
@@ -230,6 +294,15 @@
   :after corfu
   :bind (:map corfu-map
               ("C-, ," . corfu-quick-complete)))
+
+
+(use-package corfu-prescient
+  :straight t
+  :after (prescient corfu)
+  :hook (corfu-mode . corfu-prescient-mode)
+  :config
+  (setq corfu-prescient-enable-filtering nil
+        corfu-prescient-enable-sorting t))
 
 
 (use-package cape
