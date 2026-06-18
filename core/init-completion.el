@@ -130,8 +130,7 @@
 
 (use-package embark-consult
   :straight t
-  :after (embark consult)
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
+  :after (embark consult))
 
 
 (use-package embark
@@ -144,7 +143,6 @@
          :map embark-file-map
          ("s" . +reopen-file-with-sudo)
          ("g" . +embark-magit-status))
-  :defines (wgrep-change-to-wgrep-mode)
   :init
   (setq prefix-help-command 'embark-prefix-help-command)
   :config
@@ -152,25 +150,6 @@
     "Run `magit-status` on repo containing the embark target."
     (interactive "GFile: ")
     (magit-status (locate-dominating-file file ".git")))
-
-  (defun +embark-export-write ()
-    "Export the current vertico results to a writable buffer if possible.
-     Supports exporting consult-grep/consult-ripgrep to wgrep, file to wdeired,
-     and consult-location to occur-edit"
-    (interactive)
-    (require 'embark)
-    (require 'wgrep)
-    (let* ((edit-command
-            (pcase-let ((`(,type . ,candidates)
-                         (run-hook-with-args-until-success 'embark-candidate-collectors)))
-              (pcase type
-                ('consult-grep #'wgrep-change-to-wgrep-mode)
-                ('consult-ripgrep #'wgrep-change-to-wgrep-mode)
-                ('file #'wdired-change-to-wdired-mode)
-                ('consult-location #'occur-edit-mode)
-                (x (user-error "embark category %S doesn't support writable export" x)))))
-           (embark-after-export-hook `(,@embark-after-export-hook ,edit-command)))
-      (embark-export)))
   )
 
 
@@ -194,7 +173,6 @@
          ("C-c t"                             . consult-fd)
          :map minibuffer-mode-map
          ("C-r" . consult-history))
-  ;; :hook ((completion-list-mode . consult-preview-at-point-mode))
   :config
   (setq consult-narrow-key "<"
         consult-async-min-input 2
@@ -258,9 +236,12 @@
 
   (defun +corfu-move-to-minibuffer ()
     (interactive)
-    (let ((completion-extra-properties corfu--extra)
-          completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
+    (pcase completion-in-region--data
+      (`(,beg ,end ,table ,pred ,extras)
+       (let ((completion-extra-properties extras)
+             completion-cycle-threshold completion-cycling)
+         (consult-completion-in-region beg end table pred)))))
+  (add-to-list 'corfu-continue-commands #'corfu-move-to-minibuffer)
 
   (defun +corfu-enable-in-minibuffer ()
     "Enable Corfu in the minibuffer if `completion-at-point' is bound."

@@ -163,34 +163,23 @@
   )
 
 
-
-;; [wgrep] Edit a grep buffer and apply changes to the file buffer
-(use-package wgrep
-  :straight t
-  :config
-  (setq wgrep-auto-save-buffer t)
-  )
-
-
 ;; [vundo] Undo tree
 (use-package vundo
   :straight t
   :config
   (setq vundo-compact-display t
-        vundo-roll-back-on-quit t)
-  )
+        vundo-roll-back-on-quit t))
 
 
 ;; [undohist] Persist undo history
 (use-package undo-fu-session
   :straight t
-  :hook (after-init . global-undo-fu-session-mode)
+  :hook (after-init . undo-fu-session-global-mode)
   :config
   (setq undo-fu-session-incompatible-files '("\\.gpg$" "/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
 
   (when (executable-find "zstd")
-    ;; There are other algorithms available, but zstd is the fastest, and speed
-    ;; is our priority within Emacs
+    ;; There are other algorithms available, but zstd is the fastest
     (setq undo-fu-session-compression 'zst)))
 
 
@@ -203,7 +192,7 @@
 
 ;; [imenu] Jump to function definitions
 (use-package imenu
-  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (imenu--make-index-alist t))))
+  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (when (bound-and-true-p imenu--make-index-alist) (imenu--make-index-alist t)))))
 
 
 ;; [re-builder]

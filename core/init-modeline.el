@@ -164,6 +164,7 @@
 (advice-add #'popup-create :after #'+mode-line-update-project-crumb)
 (advice-add #'popup-delete :after #'+mode-line-update-project-crumb)
 
+
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
@@ -197,25 +198,14 @@
 ;;; Header Line
 ;; [breadcrumb] Add breadcrumb navigation in header-line
 (use-package breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
   :custom-face
   (breadcrumb-project-base-face ((t (:inherit breadcrumb-project-crumbs-face :bold t))))
   (breadcrumb-project-leaf-face ((t (:inherit font-lock-function-name-face :bold t))))
   (breadcrumb-imenu-leaf-face ((t (:inherit font-lock-function-name-face :foreground unspecified))))
-  :straight (:host github :repo "joaotavora/breadcrumb" :files ("*.el"))
-  :bind ("M-=" . +mode-line-show-imenu-breadcrumb)
-  :commands breadcrumb--header-line
   :config
   (setq breadcrumb-imenu-crumb-separator " ⋅ "
         breadcrumb-project-max-length 0.55
-        breadcrumb-idle-time 10)
-
-  (defun +mode-line-show-imenu-breadcrumb ()
-    (interactive)
-    (if (region-active-p)
-        (call-interactively 'count-words-region)
-      (message (breadcrumb-imenu-crumbs))))
-
-  (timeout-debounce '+mode-line-update-imenu-crumb 0.4)
-  )
+        breadcrumb-idle-time 10))
 
 (setq-default header-line-format nil)

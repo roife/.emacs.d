@@ -97,7 +97,7 @@ included; for the final argument the leading separator is included."
                        (lambda () (+bounds-of-thing-at-point-arg t)))
 
   ;; [motion]
-  (meow-motion-overwrite-define-key
+  (meow-motion-define-key
    '("h" . meow-left)
    '("j" . meow-next)
    '("k" . meow-prev)

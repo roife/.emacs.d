@@ -6,7 +6,7 @@
       gc-cons-percentage 1.0)
 
 ;; Prevent unwanted runtime compilation
-(setq native-comp-deferred-compilation t)
+(setq native-comp-jit-compilation t)
 
 ;; In noninteractive sessions, prioritize .el file. It saves IO time
 (setq load-prefer-newer noninteractive)

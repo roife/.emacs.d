@@ -2,9 +2,6 @@
 
 ;; Optimization
 (setq
- ;; Update UI slowly
- idle-update-delay 1.0
-
  ;; Inhibits fontification while receiving input, which should help a little with scrolling performance.
  redisplay-skip-fontification-on-input t
 
@@ -152,7 +149,9 @@
     (setq theme (if (if (display-graphic-p)
                         (cond ((eq system-type 'darwin) (eq ns-system-appearance 'dark))
                               (t t))
-                      (eq (frame-parameter nil 'background-mode) 'dark))
+                      (eq (or (terminal-parameter nil 'background-mode)
+                              (frame-parameter nil 'background-mode))
+                          'dark))
                     +dark-theme
                   +light-theme))
     (unless (member theme custom-enabled-themes)

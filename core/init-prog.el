@@ -255,8 +255,7 @@
   :config
   (setq citre-auto-enable-citre-mode-modes '(prog-mode)
         citre-default-create-tags-file-location 'global-cache
-        citre-use-project-root-when-creating-tags t
-        citre-prompt-language-for-ctags-command t
+        citre-edit-ctags-options-manually t
         citre-enable-capf-integration t)
 
   (defun +citre-jump ()

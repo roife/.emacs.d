@@ -47,7 +47,6 @@
    ;; Edit settings
    org-auto-align-tags nil
    org-tags-column 0
-   org-catch-invisible-edits 'show-and-error
    org-insert-heading-respect-content t
 
    ;; better keybindings
@@ -61,7 +60,7 @@
    org-imenu-depth 4)
 
   ;; Better Org Latex Preview
-  (setq org-latex-create-formula-image-program 'dvisvgm
+  (setq org-preview-latex-default-process 'dvisvgm
         org-startup-with-latex-preview nil
         org-highlight-latex-and-related '(latex))
   (plist-put org-format-latex-options :scale 1.7)

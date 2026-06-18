@@ -3,7 +3,7 @@
 (use-package gptel
   :straight t
   :init
-  (setq gptel-model "gpt-5.3-codex-spark"
+  (setq gptel-model 'gpt-5.3-codex-spark
         gptel-default-mode 'org-mode
         gptel-confirm-tool-calls nil
         ;; Codex models ignore temperature; keep it nil to avoid warnings.
@@ -23,6 +23,7 @@
   :config
   (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
+  (gptel-agent-update)
   )
 
 (use-package gptel-agent

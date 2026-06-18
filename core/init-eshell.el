@@ -145,7 +145,7 @@ If no project is found, create a temporary Eshell instance in the current direct
                      (list 'setq 'process-environment
                            (list 'quote (eshell-copy-environment))))))
           (compile (eshell-flatten-and-stringify args))
-          (pop-to-buffer compilation-last-buffer))
+          (pop-to-buffer next-error-last-buffer))
       (throw 'eshell-replace-command
              (let ((l (eshell-stringify-list (flatten-tree args))))
                (eshell-parse-command (car l) (cdr l))))))
