@@ -206,6 +206,7 @@
   :config
   (setq breadcrumb-imenu-crumb-separator " ⋅ "
         breadcrumb-project-max-length 0.55
-        breadcrumb-idle-time 10))
+        breadcrumb-idle-time 10)
+  )
 
 (setq-default header-line-format nil)

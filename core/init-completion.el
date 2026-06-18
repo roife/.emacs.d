@@ -14,15 +14,6 @@
         vertico-resize nil
         vertico-count 15)
 
-  (defadvice! +vertico--set-crm-separator-a (args)
-    :filter-args #'completing-read-multiple
-    (cons (concat "[CRM"
-                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                                            crm-separator)
-                  "] "
-                  (car args))
-          (cdr args)))
-
   ;; WORKAROUND: https://github.com/minad/vertico#problematic-completion-commands
   (setq org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil)
