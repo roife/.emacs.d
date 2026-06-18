@@ -87,7 +87,7 @@
           "\\*Apropos\\*"
           "\\*Backtrace\\*"
           "\\*Calendar\\*"
-          "\\*Embark Actions\\*"
+          ;; "\\*Embark Actions\\*"
           "\\*Finder\\*"
           "\\*Kill Ring\\*"
           "\\*Go-Translate\\*"
@@ -101,7 +101,7 @@
           Buffer-menu-mode
           flymake-diagnostics-buffer-mode
 
-          grep-mode occur-mode rg-mode
+          ;; grep-mode occur-mode rg-mode
           osx-dictionary-mode
 
           "^\\*Process List\\*" process-menu-mode
@@ -127,7 +127,10 @@
 
           "^GPTel-popup: .*"
 
-          (lambda (buffer) (with-current-buffer buffer (derived-mode-p 'compilation-mode)))
+          (lambda (buffer)
+            (with-current-buffer buffer
+              (and (derived-mode-p 'compilation-mode)
+                   (not (derived-mode-p 'grep-mode)))))
           ))
   (setq +popper-reference-buffer-no-select
         '("\\*Warnings\\*"))
@@ -221,7 +224,7 @@
          (auto-dim-other-buffers-mode . +auto-dim-other-buffers-auto-set-face))
   :config
   (setq auto-dim-other-buffers-dim-on-focus-out nil
-        auto-dim-other-buffers-dim-on-switch-to-minibuffer nil)
+        auto-dim-other-buffers-dim-on-switch-to-minibuffer t)
 
   (add-hook! auto-dim-other-buffers-never-dim-buffer-functions
     (defun +auto-dim-other-buffers-never-dim-minibuffer (buffer)

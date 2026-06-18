@@ -24,11 +24,6 @@
   (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
   )
 
-(use-package gptel-agent
-  :straight t
-  :config
-  (gptel-agent-update))
-
 (use-package gptel-magit
   :straight (gptel-magit :type git :host github :repo "roife/gptel-magit")
   :hook ((magit-mode . gptel-magit-install))

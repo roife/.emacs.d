@@ -48,10 +48,7 @@
         '((display-buffer-reuse-window display-buffer-pop-up-window)
           (window-parameters (mode-line-format . none)))
         vertico-multiform-commands
-        '((consult-buffer buffer)
-          (consult-buffer-other-frame buffer)
-          (consult-buffer-other-window buffer)
-          (consult-fd buffer)
+        '((consult-fd buffer)
           (consult-grep buffer)
           (consult-git-grep buffer)
           (consult-imenu buffer)
@@ -59,9 +56,7 @@
           (consult-line buffer)
           (consult-locate buffer)
           (consult-ripgrep buffer)
-          (consult-yank-pop grid)
-          (consult-register grid)
-          (consult-theme grid))
+          (consult-register grid))
         vertico-multiform-categories
         '((buffer buffer)
           (consult-grep buffer)

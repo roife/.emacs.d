@@ -174,13 +174,13 @@
   (setopt recentf-autosave-interval 1000)
 
   (setq recentf-auto-cleanup 'never
-    recentf-max-saved-items 200
-    recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
-                          "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                          "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
-                          (lambda (file) (file-in-directory-p file package-user-dir))
-                          (expand-file-name recentf-save-file))
-    recentf-keep nil)
+        recentf-max-saved-items 200
+        recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
+                              "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+                              "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                              (lambda (file) (file-in-directory-p file package-user-dir))
+                              (expand-file-name recentf-save-file))
+        recentf-keep nil)
 
   (add-to-list 'recentf-filename-handlers #'abbreviate-file-name)
 
