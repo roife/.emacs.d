@@ -1,5 +1,15 @@
 ;;; -*- lexical-binding: t -*-
 
+(defadvice! +window-rotate-stacked-after-maximize-a (&rest _)
+  :after #'toggle-frame-maximized
+  (let* ((frame (selected-frame))
+         (wins (window-list frame 'no-minibuf)))
+    (when (and (eq (frame-parameter frame 'fullscreen) 'maximized)
+               (= (length wins) 2)
+               (window-combined-p (car wins) nil))
+      (with-selected-frame frame
+        (window-layout-rotate-anticlockwise (frame-root-window frame))))))
+
 ;; [ace-window] Add number for each window
 (use-package ace-window
   :straight t
@@ -184,7 +194,19 @@
   :straight t
   :hook (window-setup . zoom-mode)
   :config
-  (setq zoom-ignored-major-modes '(ediff-mode vundo-mode))
+  (setq zoom-ignored-major-modes '(ediff-mode vundo-mode minibuffer-mode))
+
+  (with-eval-after-load 'vertico-buffer
+    (defadvice! +zoom-preserve-vertico-buffer-height (&rest _)
+      :after #'vertico-buffer--setup
+      "Preserve Vertico buffer display height against `zoom-mode'."
+      ;; TRICK: Here we use `vertico--candidates-ov' to get the window of Vertico
+      ;; buffer display, because `vertico-buffer--setup' is called before the
+      ;; window is created.
+      (when-let* ((window (and (overlayp vertico--candidates-ov)
+                               (overlay-get vertico--candidates-ov 'window)))
+                  ((window-live-p window)))
+        (window-preserve-size window nil t))))
 
   (add-hook 'ediff-after-setup-windows-hook
             '(lambda () (with-selected-window (get-buffer-window "*Ediff Control Panel*")

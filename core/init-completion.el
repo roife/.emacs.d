@@ -45,9 +45,8 @@
   :hook (vertico-mode . vertico-multiform-mode)
   :config
   (setq vertico-buffer-display-action
-        '(display-buffer-in-side-window
-          (side . bottom)
-          (window-height . 0.35))
+        '((display-buffer-reuse-window display-buffer-pop-up-window)
+          (window-parameters (mode-line-format . none)))
         vertico-multiform-commands
         '((consult-buffer buffer)
           (consult-buffer-other-frame buffer)
@@ -131,9 +130,12 @@
   :init
   (setq prefix-help-command 'embark-prefix-help-command)
   :config
-  ;; Hide the mode line of the Embark live/completions buffers
+  (setq embark-verbose-indicator-display-action
+        '(display-buffer-reuse-window
+          (window-parameters (mode-line-format . none))))
+
   (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+               '("\\` ?\\*Embark \\(Collect\\|Live\\|Actions\\)"
                  nil
                  (window-parameters (mode-line-format . none))))
 
