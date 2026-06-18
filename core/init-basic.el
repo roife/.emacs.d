@@ -274,17 +274,6 @@
  ("M-v" . +scroll-window))
 
 
-;; [gcmh] Optimize GC
-(use-package gcmh
-  :straight t
-  :hook (emacs-startup . gcmh-mode)
-  :config
-  (setq gcmh-idle-delay 'auto
-    gcmh-auto-idle-delay-factor 10
-    gcmh-high-cons-threshold #x64000000)
-  )
-
-
 ;; [tramp] Edit file remotely
 (use-package tramp
   :config

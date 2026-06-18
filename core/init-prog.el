@@ -455,12 +455,6 @@
          ((html-mode web-mode) . skewer-html-mode)))
 
 
-;; [ts]
-(use-package typescript-mode
-  :straight t
-  :mode ("\\.ts[x]\\'" . typescript-mode))
-
-
 ;; [agda]
 (use-package agda
   :no-require t

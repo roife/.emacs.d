@@ -41,8 +41,11 @@
   :hook ((text-mode . flyspell-mode)
          (prog-mode . flyspell-prog-mode))
   :bind (:map flyspell-mode-map
-              ("C-c d ." . flyspell-auto-correct-previous-word)
-              ("C-;" . nil))
+              ("C-c s ]" . flyspell-goto-next-error)
+              ("C-c s [" . flyspell-goto-prev-error)
+              ("C-c s s" . flyspell-auto-correct-word)
+              ("C-;" . nil)
+              ("C-," . nil))
   :config
   (setq flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil

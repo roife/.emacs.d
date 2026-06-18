@@ -136,17 +136,6 @@
                                   (project-search "Search")
                                   (magit-status "Magit")))
 
-  (defun +project-previous-buffer (arg)
-    "Toggle to the previous buffer that belongs to current project."
-    (interactive "P")
-    (unless arg
-      (if-let* ((pr (project-current)))
-          (switch-to-buffer
-           (->> (project--buffer-list pr)
-                (--remove (or (minibufferp it)
-                              (get-buffer-window-list it)))
-                (car))))))
-
   ;; Use [fd] to find file in project
   (defun +search-project-files-with-fd (dir)
     "Use `fd' to list files in DIR."

@@ -50,6 +50,6 @@
         codex-ide-status-mode-auto-refresh-delay 0.3
         codex-ide-buffer-name-function (lambda (dir) (format "%s: %s"
                                                         codex-ide-buffer-name-prefix
-                                                        (codex-ide--project-name dir)))
+                                                        (file-name-nondirectory (directory-file-name dir))))
         )
   )

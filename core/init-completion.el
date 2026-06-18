@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
+;;; Minibuffer
+
 (use-package vertico
   :straight (:files (:defaults "extensions/*.el"))
   :bind (:map vertico-map
@@ -7,8 +9,7 @@
               ("<tab>" . minibuffer-complete)
               ("C-<return>" . vertico-exit-input)
               ("C-, ." . vertico-quick-jump))
-  :hook ((after-init . vertico-mode))
-  :defines (crm-separator)
+  :hook (after-init . vertico-mode)
   :config
   (setq vertico-cycle t
         vertico-resize nil
@@ -16,8 +17,7 @@
 
   ;; WORKAROUND: https://github.com/minad/vertico#problematic-completion-commands
   (setq org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps nil)
-  )
+        org-outline-path-complete-in-steps nil))
 
 
 (use-package vertico-directory
@@ -27,102 +27,66 @@
               ("RET" . vertico-directory-enter)
               ("DEL" . vertico-directory-delete-char)
               ("M-DEL" . vertico-directory-delete-word))
-  :hook (;; Cleans up path when moving directories with shadowed paths syntax
-         (rfn-eshadow-update-overlay . vertico-directory-tidy))
-  )
+  ;; Cleans up path when moving directories with shadowed paths syntax.
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
+
+(use-package vertico-quick
+  :straight nil
+  :after vertico
+  :bind (:map vertico-map
+              ("M-q" . vertico-quick-jump)))
+
+
+;;; Matching styles
 
 (use-package orderless
   :straight t
-  :init (require 'orderless)
+  :demand t
   :config
-  ;; Dispatchers
-  (defun +vertico-orderless-dispatch (pattern _index _total)
+  ;; Component modifiers:
+  ;;   !foo excludes, =foo matches literally, ~foo uses flex,
+  ;;   ^foo matches a literal prefix, ,foo uses initialism,
+  ;;   %foo enables char-folding, @foo matches annotations.
+  (defun +orderless-dispatch (pattern _index _total)
     (cond
      ;; Ensure $ works with Consult commands, which add disambiguation suffixes
      ((string-suffix-p "$" pattern) `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x200000-\x300000]*$")))
-     ;; Ignore single !
      ((string= "!" pattern) `(orderless-literal . ""))
-     ;; Without literal
      ((string-prefix-p "!" pattern) `(orderless-without-literal . ,(substring pattern 1)))
-     ;; Character folding
      ((string-prefix-p "%" pattern) `(char-fold-to-regexp . ,(substring pattern 1)))
      ((string-suffix-p "%" pattern) `(char-fold-to-regexp . ,(substring pattern 0 -1)))
-     ;; Initialism matching
-     ((string-prefix-p "^" pattern) `(orderless-initialism . ,(substring pattern 1)))
-     ((string-suffix-p "^" pattern) `(orderless-initialism . ,(substring pattern 0 -1)))
-     ;; Literal matching
+     ((string-prefix-p "^" pattern) `(orderless-literal-prefix . ,(substring pattern 1)))
+     ((string-suffix-p "^" pattern) `(orderless-literal-prefix . ,(substring pattern 0 -1)))
+     ((string-prefix-p "," pattern) `(orderless-initialism . ,(substring pattern 1)))
+     ((string-suffix-p "," pattern) `(orderless-initialism . ,(substring pattern 0 -1)))
      ((string-prefix-p "=" pattern) `(orderless-literal . ,(substring pattern 1)))
      ((string-suffix-p "=" pattern) `(orderless-literal . ,(substring pattern 0 -1)))
-     ;; Flex matching
      ((string-prefix-p "~" pattern) `(orderless-flex . ,(substring pattern 1)))
      ((string-suffix-p "~" pattern) `(orderless-flex . ,(substring pattern 0 -1)))
-     ;; Annotations
      ((string-prefix-p "@" pattern) `(orderless-annotation . ,(substring pattern 1)))
-     ((string-suffix-p "@" pattern) `(orderless-annotation . ,(substring pattern 0 -1)))
-     ))
+     ((string-suffix-p "@" pattern) `(orderless-annotation . ,(substring pattern 0 -1)))))
 
-  ;; Remote file completion
-  (defun +vertico-basic-remote-try-completion (string table pred point)
-    (and (vertico--remote-p string)
-         (completion-basic-try-completion string table pred point)))
-
-  (defun +vertico-basic-remote-all-completions (string table pred point)
-    (and (vertico--remote-p string)
-         (completion-basic-all-completions string table pred point)))
-
-  (add-to-list
-   'completion-styles-alist
-   '(+vertico-basic-remote
-     +vertico-basic-remote-try-completion
-     +vertico-basic-remote-all-completions
-     "Use basic completion on remote files only"))
-
-  (defun orderless+basic-all (str table pred point)
-    (or (orderless-all-completions str table pred point)
-        (completion-basic-all-completions str table pred point)))
-
-  (defun orderless+basic-try (str table pred point)
-    (or (completion-basic-try-completion str table pred point)
-        (orderless-try-completion str table pred point)))
-
-  (add-to-list 'completion-styles-alist
-               '(orderless+basic
-                 orderless+basic-try
-                 orderless+basic-all
-                 "Unholy mix of Orderless and Basic."))
-
-  ;; configuration
-  (setq completion-styles '(orderless+basic)
+  (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-ignore-case t
-        ;; despite override in the name, orderless can still be used in find-file etc.
-        completion-category-overrides '((file (styles +vertico-basic-remote orderless+basic))
-                                        (eglot (styles orderless)))
-        orderless-style-dispatchers '(+vertico-orderless-dispatch)
-        orderless-component-separator "[ -]"
-        )
-  )
+        read-buffer-completion-ignore-case t
+        read-file-name-completion-ignore-case t
+        completion-category-overrides '((file (styles basic partial-completion))
+                                        (eglot (styles orderless))
+                                        (eglot-capf (styles orderless)))
+        orderless-style-dispatchers '(+orderless-dispatch)
+        orderless-component-separator #'orderless-escapable-split
+        completions-sort 'historical
+        completion-pcm-leading-wildcard t))
 
 
 (use-package marginalia
   :straight t
-  :hook (vertico-mode . marginalia-mode)
-  :config
-  (defun marginalia-annotate-buffer (cand)
-    "Annotate buffer CAND with modification status, file name and major mode."
-    (when-let* ((buffer (get-buffer cand)))
-      (if (buffer-live-p buffer)
-          (marginalia--fields
-           ((marginalia--buffer-status buffer))
-           ((marginalia--buffer-file buffer) :face 'marginalia-file-name))
-        (marginalia--fields ("(dead buffer)" :face 'error))))))
+  :hook (vertico-mode . marginalia-mode))
 
 
-(use-package embark-consult
-  :straight t
-  :after (embark consult))
-
+;;; Actions and search commands
 
 (use-package embark
   :straight t
@@ -140,8 +104,7 @@
   (defun +embark-magit-status (file)
     "Run `magit-status` on repo containing the embark target."
     (interactive "GFile: ")
-    (magit-status (locate-dominating-file file ".git")))
-  )
+    (magit-status (locate-dominating-file file ".git"))))
 
 
 (use-package consult
@@ -160,10 +123,11 @@
          ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
          ([remap switch-to-buffer-other-frame]  . consult-buffer-other-frame)
          ([remap yank-pop]                      . consult-yank-pop)
-         ("C-c p"                             . consult-ripgrep)
-         ("C-c t"                             . consult-fd)
+         ("C-c l"                               . consult-line)
+         ("C-c p"                               . consult-ripgrep)
+         ("C-c t"                               . consult-fd)
          :map minibuffer-mode-map
-         ("C-r" . consult-history))
+         ("C-r"                                 . consult-history))
   :config
   (setq consult-narrow-key "<"
         consult-async-min-input 2
@@ -190,8 +154,12 @@
    :preview-key "s-p")
   (consult-customize
    consult-theme
-   :preview-key (list "s-p" :debounce 0.6 'any))
-  )
+   :preview-key (list "s-p" :debounce 0.6 'any)))
+
+
+(use-package embark-consult
+  :straight t
+  :after (embark consult))
 
 
 ;; [consult-dir] Insert path quickly in minibuffer
@@ -203,10 +171,11 @@
          ("C-x C-j" . consult-dir-jump-file))
   :config
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t)
-  (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-local t)
-  )
+  (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-local t))
 
-;; [corfu] compleletion frontend
+
+;;; In-buffer completion
+
 (use-package corfu
   :straight (:files (:defaults "extensions/*.el"))
   :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode text-mode codex-ide-session-mode) . corfu-mode)
@@ -215,17 +184,19 @@
   :bind (:map corfu-map
               ("TAB" . corfu-complete)
               ("<tab>" . corfu-complete)
-              ("s-m" . +corfu-move-to-minibuffer)
+              ("S-TAB" . +corfu-move-to-minibuffer)
+              ("S-<tab>" . +corfu-move-to-minibuffer)
               ("RET" . nil))
   :config
   (setq corfu-cycle t
         corfu-auto t
-        corfu-separator ?&
-        corfu-auto-prefix 1
+        corfu-auto-prefix 2
+        corfu-preselect t
         corfu-preview-current nil
         corfu-auto-delay 0.1)
 
   (defun +corfu-move-to-minibuffer ()
+    "Use Consult's minibuffer UI for the current completion-in-region table."
     (interactive)
     (pcase completion-in-region--data
       (`(,beg ,end ,table ,pred ,extras)
@@ -242,18 +213,16 @@
 (use-package corfu-history
   :straight nil
   :after corfu
-  :init
-  (corfu-history-mode 1)
   :config
+  (corfu-history-mode 1)
   (with-eval-after-load 'savehist
     (cl-pushnew 'corfu-history savehist-additional-variables)))
 
 (use-package corfu-popupinfo
   :straight nil
   :after corfu
-  :init
-  (corfu-popupinfo-mode 1)
   :config
+  (corfu-popupinfo-mode 1)
   (setq corfu-popupinfo-delay '(1.0 . 1.0)))
 
 (use-package corfu-quick
@@ -265,16 +234,24 @@
 
 (use-package cape
   :straight t
-  :hook ((corfu-mode . +corfu-add-cape-backends)
-         ((TeX-mode LaTeX-mode org-mode markdown-mode) . +corfu-add-cape-tex-backends))
-  :config
-  (defun +corfu-add-cape-backends ()
-    (add-to-list 'completion-at-point-functions #'cape-file :append)
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev :append))
+  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode text-mode codex-ide-session-mode) . +completion-add-default-capfs)
+         ((TeX-mode LaTeX-mode org-mode markdown-mode) . +completion-add-tex-capfs))
+  :init
+  (defun +completion-add-capfs (&rest capfs)
+    "Append CAPFS to the buffer-local `completion-at-point-functions'."
+    (dolist (capf capfs)
+      (unless (memq capf completion-at-point-functions)
+        (setq-local completion-at-point-functions
+                    (append completion-at-point-functions (list capf))))))
 
-  (defun +corfu-add-cape-tex-backends ()
-    (add-to-list 'completion-at-point-functions #'cape-tex :append)))
+  (defun +completion-add-default-capfs ()
+    (+completion-add-capfs #'cape-file #'cape-dabbrev))
 
+  (defun +completion-add-tex-capfs ()
+    (+completion-add-capfs #'cape-tex)))
+
+
+;;; Snippets
 
 (use-package tempel
   :straight t
@@ -285,10 +262,16 @@
               ("<backtab>" . tempel-previous))
   :hook (((prog-mode text-mode conf-mode) . +tempel-setup-capf)
          ((prog-mode text-mode) . tempel-abbrev-mode))
-  :config
-  (defun +tempel-setup-capf ()
-    (cl-pushnew (cape-capf-trigger #'tempel-complete ?/) completion-at-point-functions))
+  :init
+  (defvar +tempel-trigger-capf nil)
 
+  (defun +tempel-setup-capf ()
+    (unless +tempel-trigger-capf
+      (setq +tempel-trigger-capf (cape-capf-trigger #'tempel-complete ?/)))
+    (unless (memq +tempel-trigger-capf completion-at-point-functions)
+      (setq-local completion-at-point-functions
+                  (cons +tempel-trigger-capf completion-at-point-functions))))
+  :config
   (setq tempel-path (expand-file-name "tempel-templates" user-emacs-directory)))
 
 
@@ -300,8 +283,8 @@
 (use-package eglot-tempel
   :straight t
   :after (eglot tempel)
-  :init
-  (eglot-tempel-mode))
+  :config
+  (eglot-tempel-mode 1))
 
 
 (use-package dabbrev
