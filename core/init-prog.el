@@ -188,7 +188,6 @@
 
 ;; [copilot]
 (use-package copilot
-  :when (executable-find "node")
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
   :hook ((prog-mode org-mode markdown-mode) . +copilot-activate)
   :bind (:map copilot-mode-map
@@ -503,4 +502,4 @@
 ;; [direnv] Buffer-local project environments
 (use-package envrc
   :straight t
-  :hook (after-init . envrc-global-mode))
+  :hook (emacs-startup . envrc-global-mode))

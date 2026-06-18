@@ -17,8 +17,7 @@
 ;; [diff-hl] Highlight uncommitted changes using VC
 (use-package diff-hl
   :straight t
-  :demand t
-  :hook ((after-init . global-diff-hl-mode)
+  :hook ((find-file . global-diff-hl-mode)
          (vc-dir-mode  . diff-hl-dir-mode)
          (dired-mode   . diff-hl-dired-mode))
   :config
@@ -49,7 +48,6 @@
 
   ;; HACK: Update after vc-state refreshed
   (advice-add #'vc-refresh-state :after #'diff-hl-update)
-  (add-hook 'find-file-hook #'diff-hl-update)
 
   ;; Update after focus change
   (add-function :after after-focus-change-function #'diff-hl-update)

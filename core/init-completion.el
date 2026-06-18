@@ -75,8 +75,7 @@
 
 (use-package orderless
   :straight t
-  :demand t
-  :config
+  :init
   ;; Component modifiers:
   ;;   !foo excludes, =foo matches literally, ~foo uses flex,
   ;;   ^foo matches a literal prefix, ,foo uses initialism,
@@ -112,23 +111,6 @@
         orderless-component-separator #'orderless-escapable-split
         completions-sort 'historical
         completion-pcm-leading-wildcard t))
-
-
-(use-package prescient
-  :straight t
-  :hook (after-init . prescient-persist-mode)
-  :config
-  (setq prescient-save-file (expand-file-name "cache/prescient-save.el" user-emacs-directory)
-        prescient-sort-length-enable nil))
-
-
-(use-package vertico-prescient
-  :straight t
-  :after (prescient vertico)
-  :hook (vertico-mode . vertico-prescient-mode)
-  :config
-  (setq vertico-prescient-enable-filtering nil
-        vertico-prescient-enable-sorting t))
 
 
 (use-package marginalia
@@ -294,15 +276,6 @@
   :after corfu
   :bind (:map corfu-map
               ("C-, ," . corfu-quick-complete)))
-
-
-(use-package corfu-prescient
-  :straight t
-  :after (prescient corfu)
-  :hook (corfu-mode . corfu-prescient-mode)
-  :config
-  (setq corfu-prescient-enable-filtering nil
-        corfu-prescient-enable-sorting t))
 
 
 (use-package cape

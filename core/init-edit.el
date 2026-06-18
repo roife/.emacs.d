@@ -32,7 +32,7 @@
 
 ;; [editorconfig] Respect project-local formatting rules
 (use-package editorconfig
-  :hook (after-init . editorconfig-mode))
+  :hook (find-file . editorconfig-mode))
 
 
 ;; [ediff] Diff & patch

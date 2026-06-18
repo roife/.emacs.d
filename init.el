@@ -1,7 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(require 'compile)
-
 ;; startup time
 (defun efs/display-startup-time ()
   (message

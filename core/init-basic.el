@@ -153,7 +153,7 @@
 (use-package saveplace
   :hook (after-init . save-place-mode)
   :config
-  (setopt save-place-autosave-interval 300)
+  (setopt save-place-autosave-interval 1000)
 
   ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its
   ;; cache, which is expensive and useless. replace it with `prin1'
@@ -171,7 +171,7 @@
   :bind (("C-x C-r" . recentf-open-files))
   :hook (after-init . recentf-mode)
   :config
-  (setopt recentf-autosave-interval 300)
+  (setopt recentf-autosave-interval 1000)
 
   (setq recentf-auto-cleanup 'never
     recentf-max-saved-items 200
@@ -202,7 +202,7 @@
   (setq savehist-additional-variables '(mark-ring global-mark-ring
                                                   search-ring
                                                   regexp-search-ring)
-    savehist-autosave-interval 300)
+    savehist-autosave-interval 1000)
 
   (with-eval-after-load 'vertico
     (add-to-list 'savehist-additional-variables 'vertico-repeat-history))
@@ -315,10 +315,11 @@
 ;; [environment variables]
 (use-package exec-path-from-shell
   :straight t
+  :unless (or (daemonp) (display-graphic-p))
+  :hook (after-init . exec-path-from-shell-initialize)
   :init
   (setq exec-path-from-shell-arguments '("-l")
-        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "JDTLS_JAVA_HOME" "MANPATH"))
-  (exec-path-from-shell-initialize))
+        exec-path-from-shell-variables '("PATH" "JAVA_HOME" "JDTLS_JAVA_HOME" "MANPATH")))
 
 
 ;; [backup walker] A utility to view Emacs backup files.
