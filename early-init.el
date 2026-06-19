@@ -1,9 +1,21 @@
 ;;; -*- lexical-binding: t -*-
 ;;; Mainly for speeding up startup time
 
-;; Defer gc
+;; Defer GC during startup, then restore sane runtime defaults later.
+(defvar +gc-cons-threshold (* 32 1024 1024)
+  "Default `gc-cons-threshold' after startup.")
+(defvar +gc-cons-percentage 0.2
+  "Default `gc-cons-percentage' after startup.")
+
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 1.0)
+
+(defun +restore-gc-threshold-h ()
+  "Restore GC settings after startup."
+  (setq gc-cons-threshold +gc-cons-threshold
+        gc-cons-percentage +gc-cons-percentage))
+
+(add-hook 'emacs-startup-hook #'+restore-gc-threshold-h 100)
 
 ;; Prevent unwanted runtime compilation
 (setq native-comp-jit-compilation t)

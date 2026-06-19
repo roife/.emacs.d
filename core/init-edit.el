@@ -15,13 +15,62 @@
           #'executable-make-buffer-file-executable-if-script-p)
 
 
-;; [autorevert] TODO: Add hooks as what doom has done?
+;; [autorevert]
 (use-package autorevert
-  :hook (after-init . global-auto-revert-mode)
+  :straight nil
+  :hook (find-file . +auto-revert-mode)
   :config
-                                        ; Only prompts for confirmation when buffer is unsaved.
-  (setq revert-without-query (list "."))
-  )
+  (setq auto-revert-verbose t
+        auto-revert-use-notify nil
+        auto-revert-stop-on-user-input nil
+        ;; Only prompts for confirmation when buffer is unsaved.
+        revert-without-query (list "."))
+
+  (defun +visible-buffers ()
+    "Return visible buffers across all frames."
+    (let (buffers)
+      (walk-windows (lambda (window)
+                      (push (window-buffer window) buffers))
+                    'no-minibuf t)
+      (delete-dups buffers)))
+
+  (defun +auto-revert-buffer-h (&rest _)
+    "Auto revert current buffer when it is stale."
+    (unless (or (active-minibuffer-window)
+                (and (not auto-revert-remote-files)
+                     buffer-file-name
+                     (file-remote-p buffer-file-name)))
+      (let ((auto-revert-mode t))
+        (auto-revert-handler))))
+
+  (defun +auto-revert-window-buffer-h (window &rest _)
+    "Auto revert WINDOW's buffer when it is stale."
+    (when (window-live-p window)
+      (with-current-buffer (window-buffer window)
+        (+auto-revert-buffer-h))))
+
+  (defun +auto-revert-selected-window-h (&optional frame)
+    "Auto revert the selected window's buffer in FRAME."
+    (+auto-revert-window-buffer-h
+     (frame-selected-window (or frame (selected-frame)))))
+
+  (defun +auto-revert-visible-buffers-h (&rest _)
+    "Auto revert visible stale buffers."
+    (dolist (buffer (+visible-buffers))
+      (with-current-buffer buffer
+        (+auto-revert-buffer-h))))
+
+  (define-minor-mode +auto-revert-mode
+    "A lazy alternative to `global-auto-revert-mode'."
+    :global t
+    (when global-auto-revert-mode
+      (setq +auto-revert-mode nil))
+    (let ((fn (if +auto-revert-mode #'add-hook #'remove-hook)))
+      (funcall fn 'window-buffer-change-functions #'+auto-revert-window-buffer-h)
+      (funcall fn 'window-selection-change-functions #'+auto-revert-selected-window-h)
+      (funcall fn 'focus-in-hook #'+auto-revert-visible-buffers-h)
+      (funcall fn 'after-save-hook #'+auto-revert-visible-buffers-h)
+      (funcall fn 'server-switch-hook #'+auto-revert-buffer-h))))
 
 
 ;; [ws-butler] Remove trailing whitespace with lines touched

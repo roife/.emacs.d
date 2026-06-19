@@ -148,6 +148,18 @@
 (setq-default default-input-method nil)
 (setq system-time-locale "C")
 
+;; [gcmh] Run GC when Emacs is idle, not while commands are active.
+(use-package gcmh
+  :straight t
+  :unless (fboundp 'igc-info)
+  :hook (emacs-startup . gcmh-mode)
+  :config
+  (setq gcmh-idle-delay 'auto
+        gcmh-auto-idle-delay-factor 10
+        gcmh-high-cons-threshold (* 128 1024 1024)
+        gcmh-low-cons-threshold +gc-cons-threshold))
+
+
 ;; History
 ;;; [save-place-mode] save place lastly visited
 (use-package saveplace
@@ -213,25 +225,32 @@
       (setq kill-ring (mapcar #'substring-no-properties
                               (cl-remove-if-not #'stringp kill-ring))
             search-ring (mapcar #'substring-no-properties search-ring)
-        regexp-search-ring (mapcar #'substring-no-properties regexp-search-ring)
-        register-alist (cl-loop for (reg . item) in register-alist
-                                if (stringp item)
-                    collect (cons reg (substring-no-properties item))
-                    else collect (cons reg item)))))
+            regexp-search-ring (mapcar #'substring-no-properties regexp-search-ring)
+            register-alist (cl-loop for (reg . item) in register-alist
+                                    if (stringp item)
+                                    collect (cons reg (substring-no-properties item))
+                                    else collect (cons reg item)))))
   )
 
 
 ;; [so-long] Workaround for long one-line file
 (use-package so-long
-  :hook ((after-init . global-so-long-mode)
-         ((so-long-mode prog-mode fundamental-mode) . +so-long-settings))
+  :hook ((after-init . global-so-long-mode))
   :config
-  ;; improve long line performance
-  (defun +so-long-settings ()
-    (setq bidi-display-reordering nil))
+  (dolist (mode '(conf-mode text-mode))
+    (add-to-list 'so-long-target-modes mode))
 
-  ;; Saveplace should not operate in large/long files
-  (add-to-list 'so-long-variable-overrides '(save-place-alist . nil))
+  (dolist (mode '(font-lock-mode
+                  eldoc-mode
+                  flymake-mode
+                  ws-butler-mode
+                  auto-composition-mode))
+    (add-to-list 'so-long-minor-modes mode))
+
+  (dolist (override '((bidi-display-reordering . nil)
+                      (font-lock-maximum-decoration . 1)
+                      (save-place-alist . nil)))
+    (add-to-list 'so-long-variable-overrides override))
   )
 
 
