@@ -20,6 +20,17 @@
 ;; Prevent unwanted runtime compilation
 (setq native-comp-jit-compilation t)
 
+;; Keep early startup quiet unless we're debugging init.
+(setq ad-redefinition-action 'accept
+      jka-compr-verbose init-file-debug
+      native-comp-async-report-warnings-errors init-file-debug
+      native-comp-warning-on-missing-source init-file-debug
+      warning-suppress-types '((defvaralias) (lexical-binding))
+      warning-inhibit-types '((files missing-lexbind-cookie)))
+
+;; Increase process read size before any package can start subprocesses.
+(setq read-process-output-max (* 64 1024))
+
 ;; In noninteractive sessions, prioritize .el file. It saves IO time
 (setq load-prefer-newer noninteractive)
 
@@ -66,19 +77,54 @@
       scroll-bar-mode nil
       tab-bar-mode t)
 
+;; Avoid toolbar setup work during startup. It is unnecessary while the toolbar is
+;; disabled, and can be reconstructed if `tool-bar-mode' is enabled later.
+(when (fboundp 'tool-bar-setup)
+  (advice-add #'tool-bar-setup :override #'ignore))
+
 ;; Case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
 
+;; TTY terminal capability initialization can be expensive. Defer it until the
+;; frame is up; terminal packages attached to `tty-setup-hook' will run then.
+(unless (or (daemonp) noninteractive init-file-debug initial-window-system)
+  (define-advice tty-run-terminal-initialization (:override (&rest _) defer)
+    (advice-remove #'tty-run-terminal-initialization
+                   #'tty-run-terminal-initialization@defer)
+    (add-hook 'window-setup-hook
+              (lambda ()
+                (tty-run-terminal-initialization (selected-frame) nil t)))))
+
+;; Avoid processing command-line option tables irrelevant to this frame type.
+(unless (eq system-type 'darwin)
+  (setq command-line-ns-option-alist nil))
+(unless (memq initial-window-system '(x pgtk))
+  (setq command-line-x-option-alist nil))
+
+;; `setopt' can load custom dependencies early for type checks. Keep it from
+;; doing so during init; type checks will still happen when variables are defined.
+(when (fboundp 'setopt--set)
+  (define-advice setopt--set (:around (fn &rest args) inhibit-load-symbol -90)
+    (let ((custom-load-recursion t))
+      (apply fn args))))
+
 ;; `file-name-handler-alist' is consulted on each call to `require', `load', or various file/io functions
 (unless (or (daemonp) noninteractive init-file-debug)
-  (let ((old-value file-name-handler-alist))
-    (setq file-name-handler-alist nil)
+  (let ((old-value (default-toplevel-value 'file-name-handler-alist)))
+    (put 'file-name-handler-alist 'initial-value (copy-sequence old-value))
+    (define-advice command-line-1 (:around (fn args-left) restore-file-name-handlers)
+      (let ((file-name-handler-alist
+             (if args-left (copy-sequence old-value) file-name-handler-alist)))
+        (funcall fn args-left)))
     (add-hook 'emacs-startup-hook
               (lambda ()
                 "Recover file name handlers."
-                (setq file-name-handler-alist
-                      (delete-dups (append file-name-handler-alist
-                                           old-value)))))))
+                (set-default-toplevel-value
+                 'file-name-handler-alist
+                 (delete-dups
+                  (append (default-toplevel-value 'file-name-handler-alist)
+                          old-value))))
+              101)))
 
 ;; TODO: optimize `load-suffixes'
 

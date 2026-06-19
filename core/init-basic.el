@@ -165,7 +165,7 @@
 (use-package saveplace
   :hook (after-init . save-place-mode)
   :config
-  (setopt save-place-autosave-interval 1000)
+  (setq save-place-autosave-interval 1000)
 
   ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its
   ;; cache, which is expensive and useless. replace it with `prin1'
@@ -183,7 +183,7 @@
   :bind (("C-x C-r" . recentf-open-files))
   :hook (after-init . recentf-mode)
   :config
-  (setopt recentf-autosave-interval 1000)
+  (setq recentf-autosave-interval 1000)
 
   (setq recentf-auto-cleanup 'never
         recentf-max-saved-items 200
