@@ -14,12 +14,21 @@
   ;; Automatically truncate compilation buffers so they don't accumulate too
   ;; much data and bog down the rest of Emacs.
   (autoload 'comint-truncate-buffer "comint" nil t)
-  (add-hook 'compilation-filter-hook #'comint-truncate-buffer)
+  (add-hook! compilation-filter-hook
+    (defun +compilation--truncate-buffer-h (&optional _string)
+      "Rate-limit `comint-truncate-buffer' in compilation buffers."
+      (require 'comint)
+      (when (> (buffer-size)
+               (* 80 comint-buffer-maximum-size))
+        (let ((gc-cons-threshold most-positive-fixnum)
+              (gc-cons-percentage 1.0))
+          (with-silent-modifications
+            (comint-truncate-buffer))))))
 
-  (require 'ansi-color)
   (add-hook! compilation-filter-hook
     (defun +compilation--colorize-h ()
       "Apply ANSI color codes to the compilation buffer."
+      (require 'ansi-color)
       (let ((inhibit-read-only t))
         (ansi-color-apply-on-region compilation-filter-start (point)))))
   )
