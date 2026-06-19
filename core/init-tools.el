@@ -78,7 +78,6 @@
   :preface
   (defun +hideshow-setup ()
     "Set up hideshow block definitions for modes that need overrides."
-    (require 'hideshow)
     (pcase major-mode
       ('ruby-mode
        (setq-local hs-block-start-regexp "class\\|d\\(?:ef\\|o\\)\\|module\\|[[{]"

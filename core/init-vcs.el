@@ -206,9 +206,7 @@
 (use-package magit-todos
   :straight t
   :after magit
-  :init
-  (let ((inhibit-message t))
-    (magit-todos-mode 1))
+  :hook (magit-mode . magit-todos-mode)
   :config
   (with-eval-after-load 'magit-status
     (transient-append-suffix 'magit-status-jump '(0 0 -1)
@@ -247,7 +245,7 @@
 (use-package abridge-diff
   :straight t
   :after magit ;; optional, if you'd like to use with magit
-  :init (abridge-diff-mode 1))
+  :hook (magit-diff-visit-file . abridge-diff-mode))
 
 
 ;; [magit-delta] Use delta as git diff viewer
