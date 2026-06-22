@@ -85,16 +85,6 @@
 ;; Case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
 
-;; TTY terminal capability initialization can be expensive. Defer it until the
-;; frame is up; terminal packages attached to `tty-setup-hook' will run then.
-(unless (or (daemonp) noninteractive init-file-debug initial-window-system)
-  (define-advice tty-run-terminal-initialization (:override (&rest _) defer)
-    (advice-remove #'tty-run-terminal-initialization
-                   #'tty-run-terminal-initialization@defer)
-    (add-hook 'window-setup-hook
-              (lambda ()
-                (tty-run-terminal-initialization (selected-frame) nil t)))))
-
 ;; Avoid processing command-line option tables irrelevant to this frame type.
 (unless (eq system-type 'darwin)
   (setq command-line-ns-option-alist nil))

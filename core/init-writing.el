@@ -23,23 +23,6 @@
   :straight t)
 
 
-;; [mardown-mode]
-(use-package markdown-mode
-  :straight t
-  :custom-face
-  (markdown-code-face ((t (:inherit unspecified))))
-  :config
-  (setq markdown-enable-math t
-        markdown-italic-underscore t
-        markdown-header-scaling t
-        markdown-asymmetric-header t
-        markdown-nested-imenu-heading-index t
-        markdown-fontify-code-blocks-natively t)
-  (add-to-list 'markdown-code-lang-modes '("rust" . rust-mode))
-  (add-to-list 'markdown-code-lang-modes '("verilog" . verilog-mode))
-  (add-to-list 'markdown-code-lang-modes '("agda" . agda2-mode)))
-
-
 ;; [typst-ts-mode]
 (use-package typst-ts-mode
   :straight (:host sourcehut :repo "meow_king/typst-ts-mode")

@@ -108,18 +108,7 @@
   :bind (("C-c h TAB" . hs-cycle)
          ("C-c h `" . hs-toggle-all))
   :config
-  ;; Display line counts
-  (defun +hs-display-code-line-counts (ov)
-    "Display line counts when hiding codes."
-    (when (eq 'code (overlay-get ov 'hs))
-      (overlay-put ov 'display
-                   (let ((lines (number-to-string (count-lines (overlay-start ov) (overlay-end ov)))))
-                     (concat " "
-                             (propertize (concat " .. L" lines " ") 'face '(:inherit shadow :height 0.8 :box t))
-                             " "))
-                   )))
-  (setq hs-set-up-overlay #'+hs-display-code-line-counts)
-  )
+  (setq hs-indicator-type nil))
 
 
 ;; [project] Project manager
@@ -202,3 +191,4 @@
               ("C-c '" . separedit))
   :config
   (setq separedit-default-mode 'markdown-mode))
+

@@ -58,8 +58,7 @@
           (consult-ripgrep buffer)
           (consult-register grid))
         vertico-multiform-categories
-        '((buffer buffer)
-          (consult-grep buffer)
+        '((consult-grep buffer)
           (consult-location buffer)
           (imenu buffer)
           (kill-ring grid))))
@@ -125,12 +124,8 @@
   :init
   (setq prefix-help-command 'embark-prefix-help-command)
   :config
-  (setq embark-verbose-indicator-display-action
-        '(display-buffer-reuse-window
-          (window-parameters (mode-line-format . none))))
-
   (add-to-list 'display-buffer-alist
-               '("\\` ?\\*Embark \\(Collect\\|Live\\|Actions\\)"
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
                  (window-parameters (mode-line-format . none))))
 
@@ -138,6 +133,11 @@
     "Run `magit-status` on repo containing the embark target."
     (interactive "GFile: ")
     (magit-status (locate-dominating-file file ".git"))))
+
+
+(use-package embark-consult
+  :straight t
+  :after (embark consult))
 
 
 (use-package consult
@@ -188,11 +188,6 @@
   (consult-customize
    consult-theme
    :preview-key (list "s-p" :debounce 0.6 'any)))
-
-
-(use-package embark-consult
-  :straight t
-  :after (embark consult))
 
 
 (use-package avy-embark-collect

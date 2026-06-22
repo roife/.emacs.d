@@ -1,22 +1,10 @@
 ;;; -*- lexical-binding: t -*-
 
-;; startup time
-(defun efs/display-startup-time ()
-  (message
-   "Emacs loaded in %s with %d garbage collections."
-   (format
-    "%.2f seconds"
-    (float-time
-     (time-subtract after-init-time before-init-time)))
-   gcs-done))
-
-(add-hook 'emacs-startup-hook #'efs/display-startup-time)
-
-;; Proxy
-;; (setq url-proxy-services
-;;       '(("no_proxy" . "^\\(localhost\\|10.*\\)")
-;;         ("http" . "127.0.0.1:7890")
-;;         ("https" . "127.0.0.1:7890")))
+(add-hook 'window-setup-hook
+          (lambda ()
+            (message "window-setup: %.3fs, after-init: %.3fs"
+                     (float-time (time-subtract nil before-init-time))
+                     (float-time (time-subtract after-init-time before-init-time)))))
 
 (defvar +init-files (list
                      'init-util

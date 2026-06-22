@@ -1,5 +1,16 @@
 ;;; -*- lexical-binding: t -*-
 
+(use-package esup
+  :straight t
+  :commands (esup)
+  :config
+  (setq esup-run-as-batch-p t)
+
+  (defun +esup-disable-vc-in-child (fn &optional init-file &rest args)
+    (apply fn init-file "--eval=(setq vc-handled-backends nil)" args))
+
+  (advice-add #'esup :around #'+esup-disable-vc-in-child))
+
 (setq-default
  ;; no client startup messages
  server-client-instructions nil
@@ -334,7 +345,7 @@
 ;; [environment variables]
 (use-package exec-path-from-shell
   :straight t
-  :unless (or (daemonp) (display-graphic-p))
+  :unless (or noninteractive (daemonp) (not (display-graphic-p)))
   :hook (after-init . exec-path-from-shell-initialize)
   :init
   (setq exec-path-from-shell-arguments '("-l")

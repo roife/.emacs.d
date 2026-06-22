@@ -85,15 +85,6 @@ If no project is found, create a temporary Eshell instance in the current direct
                             (ignore-errors (delete-window (get-buffer-window popup-buffer-name))))
                           nil t))))))))
 
-  ;; [UI]
-  (add-hook 'eshell-mode-hook
-            (defun +eshell--set-window-ui-h ()
-              (set-window-fringes nil 0 0)
-              (set-window-margins nil 1 nil)
-              (visual-line-mode +1)
-              (set-display-table-slot standard-display-table 0 ?\ )))
-
-
   (defun +eshell/define-alias ()
     "Define alias for eshell"
     ;; Aliases
@@ -134,7 +125,6 @@ If no project is found, create a temporary Eshell instance in the current direct
       (mapc #'find-file (mapcar #'expand-file-name (flatten-tree (reverse args))))))
   (defalias 'eshell/e #'eshell/emacs)
   (defalias 'eshell/ec #'eshell/emacs)
-  (defalias 'eshell/ecc #'eshell/emacs)
 
   ;; [ebc]
   (defun eshell/ebc (&rest args)
@@ -221,14 +211,6 @@ If no project is found, create a temporary Eshell instance in the current direct
   :hook (eshell-mode . eshell-syntax-highlighting-mode))
 
 
-;; [esh-help] `eldoc' support
-(use-package esh-help
-  :straight t
-  :after eshell
-
-  :hook (eshell-mode . setup-esh-help-eldoc))
-
-
 ;; [eshell-z] `cd' to frequent directory in `eshell'
 (use-package eshell-z
   :straight t
@@ -236,11 +218,96 @@ If no project is found, create a temporary Eshell instance in the current direct
   :commands (eshell/z))
 
 
-;; [eshell-up] Quickly navigating to a specific parent directory in eshell
-(use-package eshell-up
+(use-package esh-autosuggest
   :straight t
-  :after eshell
-  :commands (eshell-up eshell-up-peek)
+  :hook (eshell-mode . esh-autosuggest-mode))
+
+
+(use-package esh-help
+  :straight t
+  :preface
+  (defun +eshell-setup-esh-help-eldoc ()
+    "Use `esh-help' as the Eldoc backend in Eshell."
+    (require 'esh-help)
+    (setq-local eldoc-documentation-function #'esh-help-eldoc-command))
+  :hook ((eshell-mode . +eshell-setup-esh-help-eldoc)
+         (eshell-mode . eldoc-mode))
   :config
-  (setq eshell-up-ignore-case nil)
-  )
+  (defadvice! +eshell-esh-help-eldoc-man-minibuffer-string-a (cmd)
+    :override #'esh-help-eldoc-man-minibuffer-string
+    (if-let* ((cache-result (gethash cmd esh-help-man-cache)))
+        (unless (eql 'none cache-result)
+          cache-result)
+      (let ((str (split-string (esh-help-man-string cmd) "\n")))
+        (if (equal (concat "No manual entry for " cmd) (car str))
+            (ignore (puthash cmd 'none esh-help-man-cache))
+          (puthash
+           cmd (when-let* ((str (seq-drop-while (lambda (s) (not (string-match-p "^SYNOPSIS$" s))) str))
+                           (str (nth 1 str)))
+                 (substring str (string-match-p "[^\s\t]" str)))
+           esh-help-man-cache))))))
+
+
+;; [esh-tldr] Browse local tldr pages
+(use-package esh-tldr
+  :load-path "~/code/tldr.el"
+  :bind ("C-h t" . esh-tldr-dwim)
+  :hook ((shell-mode eshell-mode comint-mode) . esh-tldr-capf-setup)
+  :config
+  (setq esh-tldr-use-tempel t))
+
+
+(use-package eshell-did-you-mean
+  :straight t
+  :after esh-mode
+  :init (eshell-did-you-mean-setup)
+  ;; HACK: `pcomplete-completions' returns a function, but
+  ;;   `eshell-did-you-mean--get-all-commands' unconditionally expects it to
+  ;;   return a list of strings, causing wrong-type-arg errors in many cases.
+  ;;   `all-completions' handles all these cases.
+  (defadvice! +eshell--fix-eshell-did-you-mean-a (&rest _)
+    :override #'eshell-did-you-mean--get-all-commands
+    (unless eshell-did-you-mean--all-commands
+      (setq eshell-did-you-mean--all-commands
+            (all-completions "" (pcomplete-completions))))))
+
+
+(use-package ghostel
+  :straight t
+  :preface
+  (defun +ghostel-send-C-k-and-kill ()
+    "Send `C-k' to ghostel.
+Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
+    (interactive)
+    (kill-ring-save (point) (line-end-position))
+    (ghostel-send-key "k" "ctrl"))
+
+  :bind (("C-x m" . ghostel)
+         :map ghostel-semi-char-mode-map
+         ("C-k"  . +ghostel-send-C-k-and-kill)
+         ;; ;; I'm used to go up/down the shell history with M-n/p from eshell
+         ;; ;; Simulate this behavior in ghostel by sending C-p and C-n
+         ("M-p" . (lambda () (interactive) (ghostel-send-key "p" "ctrl")))
+         ("M-n" . (lambda () (interactive) (ghostel-send-key "n" "ctrl")))
+         :map project-prefix-map
+         ("m" . ghostel-project)
+         ("M" . ghostel-project-list-buffers))
+  :config
+  (setq ghostel-enable-osc52 t)
+
+  (add-to-list 'project-switch-commands '(ghostel-project "Ghostel") t)
+  (add-to-list 'project-switch-commands '(ghostel-project-list-buffers "Ghostel buffers") t)
+  (add-to-list 'ghostel-eval-cmds '("magit-status-setup-buffer" magit-status-setup-buffer)))
+
+
+(use-package ghostel-eshell
+  :straight nil
+  :hook (eshell-load . ghostel-eshell-visual-command-mode))
+
+(use-package ghostel-compile
+  :straight nil
+  :hook (after-init . ghostel-compile-global-mode))
+
+(use-package ghostel-comint
+  :straight nil
+  :hook (after-init . ghostel-comint-global-mode))

@@ -140,7 +140,9 @@
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
 
-  (doom-themes-org-config))
+  (doom-themes-org-config)
+  (setcdr (assoc 'gnus-group-news-low-empty doom-themes-base-faces)
+         '(:inherit 'gnus-group-mail-1-empty :weight 'normal)))
 
 (defvar +light-theme 'doom-gruvbox-light)
 (defvar +dark-theme 'doom-gruvbox)

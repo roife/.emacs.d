@@ -89,6 +89,9 @@
           "\\*Calendar\\*"
           ;; "\\*Embark Actions\\*"
           "\\*Finder\\*"
+          ;; `ibuffer' displays the buffer before enabling `ibuffer-mode',
+          ;; so the first display has to match by name.
+          "^\\*Ibuffer\\*$"
           "\\*Kill Ring\\*"
           "\\*Go-Translate\\*"
 
@@ -107,7 +110,9 @@
           "^\\*Process List\\*" process-menu-mode
           list-environment-mode cargo-process-mode
 
-          "^\\*eshell.*\\*.*$" eshell-mode
+          ;; `+eshell-toggle' displays this buffer before `eshell-mode'
+          ;; is active, so the first display has to match by name.
+          "^Eshell-popup: .*$" eshell-mode
           "^\\*shell.*\\*.*$"  shell-mode
           "^\\*terminal.*\\*.*$" term-mode
           "^\\*vterm.*\\*.*$"  vterm-mode
