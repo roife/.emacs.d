@@ -49,8 +49,16 @@
   ;; HACK: Update after vc-state refreshed
   (advice-add #'vc-refresh-state :after #'diff-hl-update)
 
-  ;; Update after focus change
-  (add-function :after after-focus-change-function #'diff-hl-update)
+  ;; Update after focus change for different mode
+  (add-hook! after-focus-change-function
+    (defun +diff-hl-update-after-focus-change ()
+      (cond ((diff-hl-mode)
+             (diff-hl-update))
+            ((diff-hl-dir-mode)
+             (diff-hl-dir-update))
+            ((diff-hl-dired-mode)
+             (diff-hl-dired-update))
+            (t t))))
   )
 
 
