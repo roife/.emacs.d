@@ -81,9 +81,9 @@ included; for the final argument the leading separator is included."
   :preface
   (defun +meow-enable-global-mode-once ()
     "Enable Meow after a usable frame exists."
+    (+meow-bind-keys)
     (meow-global-mode 1)
-    (meow-esc-mode -1)
-    (+meow-bind-keys))
+    (meow-esc-mode -1))
 
   (defun +meow-bind-keys ()
     (setq-default meow-replace-state-name-list '((normal . "N")
