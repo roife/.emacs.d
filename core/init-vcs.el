@@ -3,7 +3,10 @@
 ;; [vc-mode] Version control interface
 (use-package vc
   :config
-  (setq vc-allow-async-revert t))
+  (setq vc-allow-async-revert t
+        vc-auto-revert-mode t
+        vc-allow-rewriting-published-history t
+        vc-dir-auto-hide-up-to-date 'revert))
 
 
 ;; [git-link] Get remote repo URL for buffer location

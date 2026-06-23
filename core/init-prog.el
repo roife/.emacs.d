@@ -62,7 +62,9 @@
     c-ts-mode c++-ts-mode rust-ts-mode python-ts-mode)
   "Major modes where Eglot should start automatically.")
 
+
 (use-package eglot
+  :straight (:type built-in)
   :commands (eglot eglot-ensure)
   :init
   (dolist (mode +eglot-auto-start-modes)
@@ -75,7 +77,9 @@
   :config
   (setq eglot-events-buffer-config '(:size 0 :format full)
         eglot-autoshutdown t
-        eglot-report-progress 'messages)
+        eglot-report-progress 'messages
+        eglot-documentation-renderer 'markdown-ts-view-mode
+        eglot-code-action-indications nil)
 
   ;; eglot has it's own strategy by default
   (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
@@ -160,6 +164,13 @@
   )
 
 
+(use-package eglot-tempel
+  :straight t
+  :after (eglot tempel)
+  :config
+  (eglot-tempel-mode 1))
+
+
 (use-package eglot-booster
   :straight (:host github :repo "jdtsmith/eglot-booster")
   :after eglot
@@ -179,7 +190,8 @@
   (setq eldoc-echo-area-display-truncation-message t
         eldoc-echo-area-prefer-doc-buffer t
         eldoc-echo-area-use-multiline-p nil
-        eglot-extend-to-xref t))
+        eglot-extend-to-xref t
+        eldoc-help-at-pt t))
 
 
 ;; [help]
@@ -305,6 +317,7 @@
 
 ;; [flymake] On-the-fly syntax checker
 (use-package flymake
+  :straight (:type built-in)
   :preface
   (defun +flymake-mode-unless-eglot-auto-starts ()
     "Enable Flymake unless Eglot will enable it after connecting."
@@ -476,21 +489,9 @@
 (use-package treesit
   :when (treesit-available-p)
   :init
-  (setopt treesit-enabled-modes
-          '(c-ts-mode c++-ts-mode python-ts-mode js-ts-mode typescript-ts-mode))
-
-  (setq treesit-language-source-alist
-        '((c "https://github.com/tree-sitter/tree-sitter-c")
-          (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-          (python "https://github.com/tree-sitter/tree-sitter-python")
-          (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-          (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-          (rust "https://github.com/tree-sitter/tree-sitter-rust")
-          (typst "https://github.com/uben0/tree-sitter-typst")))
-
-  (setopt treesit-auto-install-grammar 'always)
-
-  (setq treesit-font-lock-level 4))
+  (setq treesit-enabled-modes t
+        treesit-auto-install-grammar 'always
+        treesit-font-lock-level 4))
 
 
 ;; [indent-bars] Show indent guides

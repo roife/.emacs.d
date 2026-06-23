@@ -25,6 +25,7 @@
       jka-compr-verbose init-file-debug
       native-comp-async-report-warnings-errors init-file-debug
       native-comp-warning-on-missing-source init-file-debug
+      native-comp-async-on-battery-power nil
       warning-suppress-types '((defvaralias) (lexical-binding))
       warning-inhibit-types '((files missing-lexbind-cookie)))
 

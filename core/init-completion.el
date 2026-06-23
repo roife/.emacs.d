@@ -318,13 +318,6 @@
   :after tempel)
 
 
-(use-package eglot-tempel
-  :straight t
-  :after (eglot tempel)
-  :config
-  (eglot-tempel-mode 1))
-
-
 (use-package dabbrev
   :config
   (setq dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))

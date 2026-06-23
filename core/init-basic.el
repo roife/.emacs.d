@@ -1,16 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(use-package esup
-  :straight t
-  :commands (esup)
-  :config
-  (setq esup-run-as-batch-p t)
-
-  (defun +esup-disable-vc-in-child (fn &optional init-file &rest args)
-    (apply fn init-file "--eval=(setq vc-handled-backends nil)" args))
-
-  (advice-add #'esup :around #'+esup-disable-vc-in-child))
-
 (setq-default
  ;; no client startup messages
  server-client-instructions nil
