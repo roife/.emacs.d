@@ -77,13 +77,13 @@ included; for the final argument the leading separator is included."
   (meow-keypad-indicator ((t (:inherit (font-lock-builtin-face bold :inverse-video t)))))
   (meow-beacon-indicator ((t (:inherit (font-lock-type-face bold :inverse-video t)))))
   (meow-motion-indicator ((t (:inherit (font-lock-doc-face bold :inverse-video t)))))
-  :hook ((after-init . +meow-enable-global-mode-once)
-         (meow-mode . +meow-bind-keys))
+  :hook ((after-init . +meow-enable-global-mode-once))
   :preface
   (defun +meow-enable-global-mode-once ()
     "Enable Meow after a usable frame exists."
     (meow-global-mode 1)
-    (meow-esc-mode -1))
+    (meow-esc-mode -1)
+    (+meow-bind-keys))
 
   (defun +meow-bind-keys ()
     (setq-default meow-replace-state-name-list '((normal . "N")

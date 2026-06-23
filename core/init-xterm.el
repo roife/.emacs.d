@@ -22,5 +22,20 @@
   :hook (tty-setup . xterm-mouse-mode)
   :init
   (setq xterm-extra-capabilities '(modifyOtherKeys reportBackground
-                                                   getSelection setSelection)
-        xterm-set-window-title t))
+                                   getSelection setSelection)
+        xterm-set-window-title t)
+
+  (defun +xterm-report-background ()
+    "Query the terminal background color and reload the matching theme."
+    (interactive)
+    (unless (display-graphic-p)
+      (require 'term/xterm)
+      (xterm--query "\e]11;?\e\\"
+                    '(("\e]11;" . xterm--report-background-handler))
+                    t)
+      (let ((bg-color (terminal-parameter nil 'xterm--background-color)))
+        (when bg-color
+          (apply #'xterm--set-background-mode bg-color)))
+      (+load-theme)
+      (message "Reported terminal background as %s"
+               (terminal-parameter nil 'background-mode)))))

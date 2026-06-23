@@ -303,11 +303,3 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
 (use-package ghostel-eshell
   :straight nil
   :hook (eshell-load . ghostel-eshell-visual-command-mode))
-
-(use-package ghostel-compile
-  :straight nil
-  :hook (after-init . ghostel-compile-global-mode))
-
-(use-package ghostel-comint
-  :straight nil
-  :hook (after-init . ghostel-comint-global-mode))

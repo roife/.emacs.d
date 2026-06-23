@@ -45,8 +45,9 @@
   :straight t
   :bind (("C-, ." . avy-goto-char)
          ("C-, ," . avy-goto-char-2)
-         ("C-, l" . avy-goto-line))
-  :hook (after-init . avy-setup-default)
+         ("C-, l" . avy-goto-line)
+         :map isearch-mode-map
+         ("C-, ," . avy-isearch))
   :config
   ;; overlay is used during isearch, `pre' style makes avy keys evident.
   (setq avy-styles-alist '((avy-isearch . pre)))
