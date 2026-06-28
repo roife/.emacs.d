@@ -207,37 +207,6 @@
               ([remap xref-find-apropos] . consult-eglot-symbols)))
 
 
-;; [copilot]
-(use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :hook ((prog-mode org-mode markdown-mode) . +copilot-activate)
-  :bind (:map copilot-mode-map
-         ("C-e" . +copilot-complete)
-         ("M-f" . +copilot-complete-word))
-  :config
-  (setq copilot-indent-offset-warning-disable t
-        copilot-max-char-warning-disable t)
-
-  (defun +copilot-activate ()
-    (interactive)
-    (when (and (not (+temp-buffer-p (current-buffer)))
-               (not (or (string-prefix-p "*GPTel-" (buffer-name))
-                        (string= "ChatGPT" (buffer-name)))))
-      (copilot-mode)
-      (copilot-nes-mode)))
-
-  (defun +copilot-complete ()
-    (interactive)
-    (or (copilot-accept-completion)
-        (mwim-end-of-code-or-line)))
-
-  (defun +copilot-complete-word ()
-    (interactive)
-    (or (copilot-accept-completion-by-word 1)
-        (forward-word)))
-  )
-
-
 ;; [webpaste] Web Pastebin
 (use-package webpaste
   :straight t
@@ -500,12 +469,13 @@
   :hook (prog-mode . indent-bars-mode)
   :config
   (setq indent-bars-display-on-blank-lines nil
-        indent-bars-width-frac 0.2
+        indent-bars-width-frac 0.1
         indent-bars-color '(highlight :face-bg t :blend 0.2)
         indent-bars-zigzag nil
         indent-bars-highlight-current-depth nil
-        indent-bars-pattern "|"
-        indent-bars-prefer-character t)
+        indent-bars-pattern "."
+        ;; indent-bars-prefer-character t
+        )
   )
 
 

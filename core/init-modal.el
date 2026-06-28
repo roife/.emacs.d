@@ -87,11 +87,6 @@ included; for the final argument the leading separator is included."
     (meow-esc-mode -1))
 
   (defun +meow-bind-keys ()
-    (setq-default meow-replace-state-name-list '((normal . "N")
-                                                 (motion . "M")
-                                                 (keypad . "K")
-                                                 (insert . "I")
-                                                 (beacon . "B")))
     (add-to-list 'meow-char-thing-table '(?a . arg))
     (meow-thing-register 'arg
                          #'+bounds-of-thing-at-point-arg

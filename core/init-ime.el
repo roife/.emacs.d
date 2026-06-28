@@ -167,6 +167,15 @@
  (add-to-list 'macim-context-predicates #'+macim-context-switching-ascii)
  (add-to-list 'macim-context-predicates #'+macim-context-switching-other)
 
+ (with-eval-after-load 'kkp
+   (defadvice! +macim-select-ascii-after-kkp-prefix-a (fn &rest args)
+     :around #'kkp--process-keys
+     (let ((keyseq (apply fn args)))
+       (when (and (bound-and-true-p macim-mode)
+                  (keymapp (key-binding keyseq t)))
+         (macim-select-ascii))
+       keyseq)))
+
  ;; inline-mode
  (defvar-local +macim-inline-english-last-space-pos nil
    "The last space position in inline mode.")

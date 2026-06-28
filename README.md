@@ -9,4 +9,3 @@
 - `aspell`
 - `readability-cli`
 <!-- - `rime` / `fcitx5-rime` -->
-- `delta`

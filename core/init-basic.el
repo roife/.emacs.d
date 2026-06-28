@@ -145,8 +145,18 @@
 
 ;; Encoding & locale
 (set-locale-environment "en_US.UTF-8")
+(prefer-coding-system 'utf-8-unix)
 (setq-default default-input-method nil)
 (setq system-time-locale "C")
+
+(add-hook! (tty-setup-hook server-after-make-frame-hook)
+  (defun +setup-tty-coding-system (&optional frame)
+    "Use UTF-8 for keyboard input and terminal output in TTY frames."
+    (let ((frame (or frame (selected-frame))))
+      (unless (display-graphic-p frame)
+        (set-keyboard-coding-system 'utf-8-unix frame)
+        (set-terminal-coding-system 'utf-8-unix frame t)))))
+
 
 ;; [gcmh] Run GC when Emacs is idle, not while commands are active.
 (use-package gcmh
@@ -189,7 +199,7 @@
         recentf-max-saved-items 200
         recentf-exclude (list "\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmarks"
                               "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
-                              "^/tmp/" "^/var/folders/.+$" "^/ssh:" "/persp-confs/"
+                              "^/tmp/" "^/var/folders/.+$" "^/ssh:"
                               (lambda (file) (file-in-directory-p file package-user-dir))
                               (expand-file-name recentf-save-file))
         recentf-keep nil)

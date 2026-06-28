@@ -29,15 +29,11 @@
   :group '+mode-line)
 
 (defface +mode-line-host-name-active-face
-  '((t (:inherit (font-lock-function-name-face bold italic))))
+  '((t (:inherit (font-lock-function-name-face bold))))
   "The face for host name on the mode-line of an active window."
   :group '+mode-line)
 
 ;;; Indicators
-(defsubst +mode-line-get-window-name ()
-  "Get window name for current window."
-  (concat " " (window-parameter (selected-window) 'ace-window-path)))
-
 (defsubst +mode-line-get-window-name-face ()
   "Get face of window name for current window."
   (let ((modified (buffer-modified-p)))
@@ -50,8 +46,8 @@
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
-  (cond (defining-kbd-macro "| MacroDef ")
-        (executing-kbd-macro "| MacroExc ")))
+  (cond (defining-kbd-macro " MacroDef ")
+        (executing-kbd-macro " MacroExc ")))
 
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display whether it is in overwrite mode or read-only buffer."
@@ -69,7 +65,7 @@
            (after (symbol-overlay-get-list 1 symbol))
            (count (length before)))
       (if (symbol-overlay-assoc symbol)
-          (concat  "| " (number-to-string (1+ count))
+          (concat  " " (number-to-string (1+ count))
                    "/" (number-to-string (+ count (length after)))
                    " sym "
                    (and (cadr keyword) "in scope "))))))
@@ -84,8 +80,7 @@
           (when-let* ((hostname (and default-directory
                                      (file-remote-p default-directory 'host))))
             (when (not (string-equal hostname "localhost"))
-              (concat "@" hostname)))
-          )))
+              (concat "@" hostname))))))
 
 
 ;;; Cache encoding info
@@ -107,18 +102,6 @@
                (_ "UNK "))))))
 (advice-add #'after-insert-file-set-coding :after #'+mode-line-update-encoding)
 (advice-add #'set-buffer-file-coding-system :after #'+mode-line-update-encoding)
-
-;;; Cache pdf-tools info
-(defvar-local +mode-line-pdf-pages nil)
-(add-hook! pdf-view-change-page-hook
-  (defun +mode-line-update-pdf-pages ()
-    "Update PDF pages."
-    (when (eq major-mode 'pdf-view-mode)
-      (setq +mode-line-pdf-pages
-            (format "p%d/%d "
-                    (or (eval `(pdf-view-current-page)) 0)
-                    (pdf-cache-number-of-pages))))))
-
 
 ;;; [vcs-info] cache for vcs
 (defvar-local +mode-line-smerge-count nil) ; [smerge] cache for smerge conflict indicator
@@ -170,30 +153,25 @@
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p)))
-    `((:propertize ,(+mode-line-get-window-name)
-                   face ,panel-face)
-      (:propertize ,(+mode-line-overwrite-readonly-indicator)
+    `((:propertize ,(+mode-line-overwrite-readonly-indicator)
                    face ,panel-face)
       (,active-p (:propertize
                   ,(concat (+mode-line-macro-indicator)
                            (+mode-line-symbol-overlay-indicator))
                   face ,panel-face))
       " "
-      ,(or +mode-line-pdf-pages "%l")
+      ,(or +mode-line-project-crumb
+           (:propertize "%b" face ,meta-face))
       " "
-      (,(not +mode-line-project-crumb)
-       (:propertize "%b" face ,meta-face)
-       ,+mode-line-project-crumb)
-      " "
-      (:eval (breadcrumb-imenu-crumbs))
+      (,active-p (:eval (breadcrumb-imenu-crumbs)))
       (:propertize +mode-line-remote-host-name
                    face +mode-line-host-name-active-face)
       " "
       (:eval +mode-line-encoding)
       )))
 
-(setq-default mode-line-format
-              '((:eval (+mode-line-normal))))
+(setq-default mode-line-format '((:eval (+mode-line-normal))))
+(setq-default header-line-format nil)
 
 ;;; Header Line
 ;; [breadcrumb] Add breadcrumb navigation in header-line
@@ -208,5 +186,3 @@
         breadcrumb-project-max-length 0.55
         breadcrumb-idle-time 10)
   )
-
-(setq-default header-line-format nil)

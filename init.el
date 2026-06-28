@@ -11,7 +11,6 @@
                      'init-straight
                      'init-basic
                      'init-ui
-                     'init-tabbar
                      'init-xterm
                      (when (eq system-type 'darwin) 'init-mac)
                      'init-completion
@@ -33,6 +32,7 @@
                      'init-ime
                      'init-modal
                      'init-modeline
+                     'init-tabbar
                      'init-ai
                      'init-test
 

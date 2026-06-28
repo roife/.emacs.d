@@ -29,3 +29,9 @@
       use-package-always-defer (not (daemonp))
       use-package-expand-minimally t
       use-package-enable-imenu-support t)
+
+
+;; [straight-overview]
+(use-package straight-overview
+  :straight (:host github :repo "alberti42/straight-overview")
+  :commands (straight-overview))

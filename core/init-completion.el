@@ -45,8 +45,7 @@
   :hook (vertico-mode . vertico-multiform-mode)
   :config
   (setq vertico-buffer-display-action
-        '((display-buffer-reuse-window display-buffer-pop-up-window)
-          (window-parameters (mode-line-format . none)))
+        '((display-buffer-reuse-window display-buffer-pop-up-window))
         vertico-multiform-commands
         '((consult-fd buffer)
           (consult-grep buffer)

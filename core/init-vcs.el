@@ -23,6 +23,13 @@
   :hook ((find-file . global-diff-hl-mode)
          (vc-dir-mode  . diff-hl-dir-mode)
          (dired-mode   . diff-hl-dired-mode))
+  :bind (:map diff-hl-mode-map
+              ("C-c v v" . diff-hl-show-hunk)
+              ("C-c v r" . diff-hl-revert-hunk)
+              ("C-c v [" . diff-hl-previous-hunk)
+              ("C-c v ]" . diff-hl-next-hunk)
+              ("C-c v s" . diff-hl-stage-current-hunk)
+              ("C-c v u" . diff-hl-undo-revert-hunk))
   :config
   (setq
    ;; Reduce load on remote
@@ -75,12 +82,16 @@
   (setq
    ;; word-granularity diff
    magit-diff-refine-hunk t
+   ;; Highlight the changed region in the hunk
+   magit-diff-fontify-hunk t
    ;; dont paint whitespace
    magit-diff-paint-whitespace nil
    ;; Don't autosave repo buffers. This is too magical
    magit-save-repository-buffers nil
    ;; Don't display parent/related refs in commit buffers; they are rarely helpful and only add to runtime costs.
-   magit-revision-insert-related-refs nil)
+   magit-revision-insert-related-refs nil
+   magit-diff-use-indicator-faces t
+   magit-diff-highlight-trailing nil)
 
   ;; Exterminate Magit buffers
   (defun +magit-kill-buffers (&rest _)
@@ -258,23 +269,3 @@
   :straight t
   :after magit ;; optional, if you'd like to use with magit
   :hook (magit-diff-visit-file . abridge-diff-mode))
-
-
-;; [magit-delta] Use delta as git diff viewer
-(use-package magit-delta
-  :straight t
-  :after magit
-  :hook (magit-mode . magit-delta-mode)
-  :config
-  (setq magit-delta-delta-args '("--max-line-distance" "0.6"
-                                 "--24-bit-color" "always"
-                                 "--color-only"
-                                 "--features" "magit-delta"))
-
-  (defun +magit-delta-toggle ()
-    (interactive)
-    (magit-delta-mode (if magit-delta-mode -1 1))
-    (magit-refresh))
-  (transient-append-suffix 'magit-diff '(-1 -1 -1)
-    '("l" "Toggle magit-delta" +magit-delta-toggle))
-  )

@@ -20,40 +20,7 @@
   :config
   (setq aw-scope 'global
         aw-background nil
-        aw-ignore-current t)
-
-  ;; Select widnow via `M-1'...`M-9'
-  (defun +aw--select-window (number)
-    "Select the specified window."
-    (let* ((window-list (aw-window-list))
-           (target-window nil))
-      (cl-loop for win in window-list
-               when (and (window-live-p win)
-                         (eq number
-                             (string-to-number
-                              (window-parameter win 'ace-window-path))))
-               do (setq target-window win)
-               finally return target-window)
-
-      ;; Select the target window if found
-      (if target-window
-          (aw-switch-to-window target-window)
-        (message "No specified window: %d" number))))
-
-  (defmacro +define-avy-switch-to-window (i)
-    (let ((fn-name (intern (concat "+avy-switch-to-window-" (number-to-string i)))))
-      `(progn
-         (defun ,fn-name ()
-           (interactive)
-           (+aw--select-window ,i))
-         (bind-key (concat "M-" (number-to-string ,i))
-                   #',fn-name)))
-    )
-
-  ;; Select window via `M-1'...`M-9'
-  (cl-loop for i from 1 to 9
-           do (eval `(+define-avy-switch-to-window ,i)))
-  )
+        aw-ignore-current t))
 
 
 ;; [winner] Restore old window configurations

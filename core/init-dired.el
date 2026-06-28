@@ -17,6 +17,8 @@
    dired-auto-revert-buffer #'dired-buffer-stale-p
    ;; symlink
    dired-hide-details-hide-symlink-targets nil
+   ;; free disk
+   dired-free-space nil
    )
 
   (when (eq system-type 'darwin)
