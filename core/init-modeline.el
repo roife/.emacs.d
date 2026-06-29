@@ -3,11 +3,6 @@
 (eval-when-compile (require 'subr-x))
 (eval-when-compile (require 'cl-lib))
 
-;; show encodings for UTF-8:LF
-(defvar +mode-line-show-common-encodings nil)
-;; show VC tools name for Git
-(defvar +mode-line-show-common-vc-tools-name nil)
-
 ;;; face
 (defgroup +mode-line nil
   "Mode-Line faces."
@@ -84,24 +79,23 @@
 
 
 ;;; Cache encoding info
+(setq eol-mnemonic-unix "LF"
+      eol-mnemonic-dos "CRLF"
+      eol-mnemonic-mac "CR"
+      eol-mnemonic-undecided "?")
+
 (defvar-local +mode-line-encoding nil)
 (add-hook! find-file-hook
   (defun +mode-line-update-encoding (&rest _)
     "Get encoding and EOL type of current buffer."
     (setq +mode-line-encoding
-          `(,(if (memq (coding-system-category buffer-file-coding-system)
-                       '(coding-category-undecided coding-category-utf-8))
-                 (when +mode-line-show-common-encodings "U8")
-               (let ((name (coding-system-get buffer-file-coding-system :name)))
-                 (concat (if (eq name 'no-conversion) "NO-CONV" (upcase (symbol-name name)))
-                         "⋅")))
-            ,(pcase (coding-system-eol-type buffer-file-coding-system)
-               (0 (when +mode-line-show-common-encodings "LF "))
-               (1 "CRLF ")
-               (2 "CR ")
-               (_ "UNK "))))))
+          (unless (and (memq (coding-system-category buffer-file-coding-system)
+                   '(coding-category-undecided coding-category-utf-8))
+                       (eq (coding-system-eol-type buffer-file-coding-system) 0))
+            "%Z"))))
 (advice-add #'after-insert-file-set-coding :after #'+mode-line-update-encoding)
 (advice-add #'set-buffer-file-coding-system :after #'+mode-line-update-encoding)
+
 
 ;;; [vcs-info] cache for vcs
 (defvar-local +mode-line-smerge-count nil) ; [smerge] cache for smerge conflict indicator
@@ -114,24 +108,6 @@
                   (propertize (concat "[" (number-to-string all-matches-count) "]")
                               'face 'vc-dir-status-warning)))
     ))
-
-(defvar-local +mode-line-vcs-info nil)
-(add-hook! (find-file-hook after-save-hook)
-  (defun +mode-line-update-vcs-info ()
-    (when (and vc-mode buffer-file-name)
-      (setq +mode-line-vcs-info
-            (let* ((backend (vc-backend buffer-file-name))
-                   (state   (vc-state buffer-file-name backend))
-                   (rev     (if +mode-line-show-common-vc-tools-name
-                                (substring-no-properties vc-mode 1)
-                              (substring-no-properties vc-mode (+ (if (eq backend 'Hg) 2 3) 2))))
-                   (face (cond ((eq state 'up-to-date) 'vc-dir-status-up-to-date)
-                               ((eq state 'ignored) 'vc-dir-status-ignored)
-                               ((memq state '(needs-update needs-merge conflict missing)) 'vc-dir-status-warning)
-                               (t 'vc-dir-status-edited))))
-              (concat " "
-                      (propertize rev 'face face)))))))
-(advice-add #'vc-refresh-state :after #'+mode-line-update-vcs-info)
 
 
 ;; [project-crumb]
@@ -147,7 +123,6 @@
 (advice-add #'popup-create :after #'+mode-line-update-project-crumb)
 (advice-add #'popup-delete :after #'+mode-line-update-project-crumb)
 
-
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
@@ -161,7 +136,7 @@
                   face ,panel-face))
       " "
       ,(or +mode-line-project-crumb
-           (:propertize "%b" face ,meta-face))
+           '(:propertize "%b" face ,meta-face))
       " "
       (,active-p (:eval (breadcrumb-imenu-crumbs)))
       (:propertize +mode-line-remote-host-name

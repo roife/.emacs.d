@@ -81,9 +81,9 @@
   :config
   (setq
    ;; word-granularity diff
-   magit-diff-refine-hunk t
+   ;; magit-diff-refine-hunk nil
    ;; Highlight the changed region in the hunk
-   magit-diff-fontify-hunk t
+   ;; magit-diff-fontify-hunk t
    ;; dont paint whitespace
    magit-diff-paint-whitespace nil
    ;; Don't autosave repo buffers. This is too magical
