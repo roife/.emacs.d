@@ -192,19 +192,16 @@
 ;; [auto-dim-other-buffers] Dim non-active buffers
 (use-package auto-dim-other-buffers
   :straight t
-  :hook ((after-init . auto-dim-other-buffers-mode)
-         (auto-dim-other-buffers-mode . +auto-dim-other-buffers-auto-set-face))
+  :hook ((after-init . auto-dim-other-buffers-mode))
   :config
   (setq auto-dim-other-buffers-dim-on-focus-out nil
         auto-dim-other-buffers-dim-on-switch-to-minibuffer t)
 
-  (add-hook! auto-dim-other-buffers-never-dim-buffer-functions
-    (defun +auto-dim-other-buffers-never-dim-minibuffer (buffer)
-      "Keep minibuffer-backed UI buffers, such as Vertico buffer display, lit."
-      (with-current-buffer buffer
-        (minibufferp))))
-
-  (add-hook! (enable-theme-functions server-after-make-frame-hook) :unless-daemonp-call-immediately
+  (add-hook! (auto-dim-other-buffers-mode-hook enable-theme-functions server-after-make-frame-hook) :unless-daemonp-call-immediately
     (defun +auto-dim-other-buffers-auto-set-face (&rest _)
-      (set-face-background 'auto-dim-other-buffers-face (face-background 'mode-line))))
+      (let ((dim (face-background 'mode-line)))
+        (set-face-background 'auto-dim-other-buffers-face dim)
+        (set-face-attribute 'auto-dim-other-buffers-hide nil
+                            :foreground dim
+                            :background dim))))
 )
