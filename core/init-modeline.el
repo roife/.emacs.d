@@ -96,7 +96,7 @@
     "Get encoding and EOL type of current buffer."
     (setq +mode-line-encoding
           (unless (and (memq (coding-system-category buffer-file-coding-system)
-                   '(coding-category-undecided coding-category-utf-8))
+                             '(coding-category-undecided coding-category-utf-8))
                        (eq (coding-system-eol-type buffer-file-coding-system) 0))
             "%Z"))))
 (advice-add #'after-insert-file-set-coding :after #'+mode-line-update-encoding)
@@ -155,4 +155,23 @@
   (setq breadcrumb-imenu-crumb-separator " ⋅ "
         breadcrumb-project-max-length 0.55
         breadcrumb-idle-time 10)
+  )
+
+;; [tab-bar] Tab bar
+(use-package tab-bar
+  ;; Turn on tab-bar-mode in early-init to speed-up
+  :config
+  (setq tab-bar-separator ""
+        tab-bar-new-tab-choice "*scratch*"
+        tab-bar-tab-name-truncated-max 20
+        tab-bar-auto-width nil
+        tab-bar-close-button-show nil
+        tab-bar-tab-hints t
+        tab-bar-show nil)
+
+  ;; WORKAROUND: fresh tab-bar for daemon
+  (add-hook! (server-after-make-frame-hook window-setup-hook) :call-immediately
+    (defun +refresh-tab-bar (&rest _)
+      (tab-bar--update-tab-bar-lines)
+      (force-mode-line-update)))
   )

@@ -31,7 +31,6 @@
                      'init-ime
                      'init-modal
                      'init-modeline
-                     'init-tabbar
                      'init-ai
                      'init-chat
                      'init-pdf

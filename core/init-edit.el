@@ -100,11 +100,10 @@
   :hook ((text-mode . jinx-mode)
          (prog-mode . jinx-mode))
   :bind (:map jinx-mode-map
-              ("C-c s ]" . jinx-next)
-              ("C-c s [" . jinx-previous)
-              ("C-c s s" . jinx-correct))
-  :custom
-  (jinx-languages "en"))
+              ("C-c f >" . jinx-next)
+              ("C-c f <" . jinx-previous)
+              ("C-c f ." . jinx-correct)
+              ("C-c f /" . jinx-correct-all)))
 
 
 ;; [ediff] Diff & patch
