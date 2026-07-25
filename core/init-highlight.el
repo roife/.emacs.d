@@ -121,9 +121,7 @@
 
   (defun +pulse-momentary (&rest _)
     "Pulse the region or the current line."
-    (if (fboundp 'xref-pulse-momentarily)
-        (xref-pulse-momentarily)
-      (+pulse-momentary-line)))
+    (xref-pulse-momentarily))
 
   (defun +recenter-and-pulse(&rest _)
     "Recenter and pulse the region or the current line."

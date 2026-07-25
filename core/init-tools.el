@@ -164,7 +164,7 @@
 ;; [imenu] Jump to function definitions
 (use-package imenu
   :commands (imenu--make-index-alist)
-  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (when (fboundp 'imenu--make-index-alist) (imenu--make-index-alist t)))))
+  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (imenu--make-index-alist t))))
 
 
 ;; [re-builder]
