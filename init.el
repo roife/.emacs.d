@@ -20,7 +20,7 @@
                      'init-edit
                      'init-window
                      'init-dired
-                     'init-eshell
+                     'init-shell
                      'init-prog
                      'init-writing
                      'init-org

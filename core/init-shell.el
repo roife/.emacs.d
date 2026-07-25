@@ -251,8 +251,7 @@ If no project is found, create a temporary Eshell instance in the current direct
   :commands (esh-tldr esh-tldr-dwim consult-esh-tldr)
   :bind ("C-h t" . esh-tldr-dwim)
   :config
-  (setq esh-tldr-use-tempel t)
-  )
+  (setq esh-tldr-use-tempel t))
 
 
 (use-package eshell-did-you-mean
@@ -280,7 +279,7 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
     (kill-ring-save (point) (line-end-position))
     (ghostel-send-key "k" "ctrl"))
 
-  :bind (("C-x m" . ghostel-project)
+  :bind (("C-x m" . ghostel)
          :map ghostel-semi-char-mode-map
          ("C-g"  . keyboard-quit)
          ("C-k"  . +ghostel-send-C-k-and-kill)
