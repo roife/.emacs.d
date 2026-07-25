@@ -32,8 +32,7 @@
                      'init-modal
                      'init-modeline
                      'init-ai
-                     'init-chat
-                     'init-pdf
+                     'init-social
                      'init-elfeed
                      'init-test
                      ))

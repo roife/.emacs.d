@@ -255,38 +255,3 @@
   :straight t
   :after magit ;; optional, if you'd like to use with magit
   :hook (magit-diff-visit-file . abridge-diff-mode))
-
-
-;; ;; [consult-gh] Interface for GitHub `gh'
-;; (use-package consult-gh
-;;   :straight (consult-gh :type git :host github :repo "armindarvish/consult-gh"
-;;                         :files ("*.el"))
-;;   :after consult
-;;   :config
-;;   (setq consult-gh-default-clone-directory "~/code/"
-;;         consult-gh-preview-key "C-o"
-;;         consult-gh-repo-action #'consult-gh--repo-browse-files-action
-;;         consult-gh-confirm-before-clone t
-;;         consult-gh-notifications-show-unread-only nil
-;;         consult-gh-prioritize-local-folder nil
-;;         consult-gh-preview-major-mode 'org-mode)
-;;
-;;   (add-to-list 'savehist-additional-variables 'consult-gh--known-orgs-list)
-;;   (add-to-list 'savehist-additional-variables 'consult-gh--known-repos-list)
-;;   (consult-gh-enable-default-keybindings))
-;;
-;; ;; Install `consult-gh-embark' for embark actions
-;; (use-package consult-gh-embark
-;;   :straight nil
-;;   :after consult-gh
-;;   :config
-;;   (consult-gh-embark-mode +1))
-;;
-;;
-;; ;; Install `consult-gh-forge' for forge actions
-;; (use-package consult-gh-forge
-;;   :straight nil
-;;   :after consult-gh
-;;   :config
-;;   (consult-gh-forge-mode +1)
-;;   (setq consult-gh-forge-timeout-seconds 10))

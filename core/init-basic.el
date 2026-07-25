@@ -324,11 +324,10 @@
 
 ;; [minibuffer]
 (use-package minibuffer
+  :hook (after-init . minibuffer-electric-default-mode)
   :config
-  (setq minibuffer-depth-indicate-mode t
-        minibuffer-default-prompt-format " [%s]" ; shorten " (default %s)" => " [%s]"
-        minibuffer-electric-default-mode t
-                                        ; One frame one minibuffer.
+  (setq minibuffer-default-prompt-format " [%s]" ; shorten " (default %s)" => " [%s]"
+        ;; One frame one minibuffer.
         minibuffer-follows-selected-frame nil))
 
 

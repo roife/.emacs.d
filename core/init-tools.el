@@ -188,6 +188,13 @@
   (setq separedit-default-mode 'markdown-mode))
 
 
+;; [emacs-reader] read docs in emacs
+(use-package reader
+  :straight '(reader :type git :host codeberg :repo "MonadicSheep/emacs-reader"
+                     :files ("*.el" "render-core.dylib")
+                     :pre-build ("make" "all")))
+
+
 ;; [minuet-ai] AI-powered inline code completion
 ;; (use-package minuet
 ;;   :straight (:host github :repo "milanglacier/minuet-ai.el")

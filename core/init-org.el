@@ -21,13 +21,6 @@
                        (push '("\\\\}" . ?}) prettify-symbols-alist)
                        (push '("\\vec{" . (?  (Bc . Bl) ?{ (Bc . Br) ?⃗)) prettify-symbols-alist)
                        (push '("\\ " . ?‿) prettify-symbols-alist)
-                   ;;     (push '("\\(" . ?‹) prettify-symbols-alist)
-                   ;;           (push '("\\)" . ?›) prettify-symbols-alist)
-                   ;;     (push '("\\)，" . (?  (Bc . Bl) ?， (Bc . Br) ?›)) prettify-symbols-alist)
-                   ;; (push '("\\)。" . (?  (Bc . Bl) ?。 (Bc . Br) ?›)) prettify-symbols-alist)
-                   ;; (push '("\\)；" . (?  (Bc . Bl) ?； (Bc . Br) ?›)) prettify-symbols-alist)
-                   ;; (push '("\\[" . ?«) prettify-symbols-alist)
-                   ;; (push '("\\]" . ?») prettify-symbols-alist)
                        (prettify-symbols-mode))))
   :config
   (setq
