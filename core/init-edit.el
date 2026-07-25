@@ -237,10 +237,19 @@
                             xref-find-definitions
                             xref-find-references))
 
+  (defadvice! +dogears--keep-record-style-only-a (fn &rest args)
+    :around #'dogears--place
+    (mapcar (lambda (item)
+              (cond ((stringp item) (substring-no-properties item))
+                    ((stringp (cdr item))
+                     (cons (car item) (substring-no-properties (cdr item))))
+                    (item)))
+            (apply fn args)))
+
   (defadvice! +dogears--format-record-a (record)
     :override #'dogears--format-record
     (apply #'format
-           "%s %-3.3s %-30.30s %-30.30s %-0.15s %-s %0.0s%-s"
+           "%s %-3.3s %-30.30s %-30.30s %-0.15s %0.0s %0.0s%-s"
            (dogears--format-record-list record)))
 
   (defadvice! +dogears--relevance-without-remote-access-a (fn record)

@@ -241,10 +241,6 @@
                 (if (bufferp buffer)
                     (cons 'buffer (buffer-name buffer))
                   item))
-               (`(within . ,within)
-                (if (stringp within)
-                    (cons 'within (substring-no-properties within))
-                  item))
                (_ item)))
            (cdr record))))
 
