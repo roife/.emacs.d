@@ -175,8 +175,7 @@
 (use-package sudo-edit
   :straight t
   :config
-  (sudo-edit-indicator-mode t)
-  )
+  (sudo-edit-indicator-mode t))
 
 
 ;; [puni]
@@ -203,14 +202,6 @@
   :straight t
   :config
   (dtrt-indent-global-mode 1))
-
-
-;; [embrace] Add/change/delete pairs of symbol
-(use-package embrace
-  :straight t
-  :bind ("C-." . embrace-commander)
-  :hook (org-mode . embrace-org-mode-hook)
-  )
 
 ;; [dogears] Jump to the last edit location
 (use-package dogears
