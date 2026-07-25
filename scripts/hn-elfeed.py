@@ -15,10 +15,8 @@ import argparse
 import datetime as dt
 import html
 import json
-import math
 import netrc
 import os
-import re
 import time
 import urllib.error
 import urllib.parse
@@ -108,8 +106,6 @@ COMMENTS_SYSTEM_PROMPT = """你是一名 Hacker News 中文编辑。把提供的
 """
 
 MARKDOWN = MarkdownIt("commonmark", {"html": False, "linkify": False}).enable("table")
-LATIN_WORD_RE = re.compile(r"[A-Za-z0-9]+(?:['’.-][A-Za-z0-9]+)*")
-CJK_CHAR_RE = re.compile(r"[㐀-䶿一-鿿豈-﫿]")
 
 
 @dataclass(frozen=True)
@@ -159,7 +155,7 @@ def fetch_candidates() -> list[Candidate]:
         Candidate(
             int(item["objectID"]),
             item["title"],
-            item["url"] or HN_COMMENTS_URL.format(story_id=item["objectID"]),
+            item.get("url") or HN_COMMENTS_URL.format(story_id=item["objectID"]),
             HN_COMMENTS_URL.format(story_id=item["objectID"]),
             item["author"],
             item["created_at"],
@@ -212,22 +208,33 @@ def fetch_article_text(article_url: str, item: dict[str, Any]) -> str:
 
     try:
         item_url = item.get("url", article_url)
-        body, headers, final_url = request(item_url, retries=2)
-        if headers.get_content_type() == "application/pdf" or final_url.split("?", 1)[
-            0
-        ].endswith(".pdf"):
-            text = "\n\n".join(
-                page.extract_text() or "" for page in PdfReader(BytesIO(body)).pages
-            )
-        else:
-            text = trafilatura.extract(
-                body,
-                output_format="markdown",
-                include_formatting=True,
-                include_links=True,
-                include_tables=True,
-            )
-        return (text or "").strip()[:MAX_ARTICLE_CHARS]
+        for attempt in range(3):
+            try:
+                body, headers, final_url = request(item_url)
+                if headers.get_content_type() == "application/pdf" or final_url.split(
+                    "?", 1
+                )[0].endswith(".pdf"):
+                    text = "\n\n".join(
+                        page.extract_text() or ""
+                        for page in PdfReader(BytesIO(body)).pages
+                    )
+                else:
+                    text = trafilatura.extract(
+                        body,
+                        output_format="markdown",
+                        include_formatting=True,
+                        include_links=True,
+                        include_tables=True,
+                    )
+                if text := (text or "").strip():
+                    return text[:MAX_ARTICLE_CHARS]
+                raise ValueError("正文提取为空")
+            except urllib.error.HTTPError:
+                raise
+            except (urllib.error.URLError, ValueError):
+                if attempt == 2:
+                    raise
+                time.sleep(2**attempt)
     except Exception as error:
         log(f"跳过无法抓取的正文 {article_url}: {error}")
         return html_fragment_to_text(item.get("text", ""))
@@ -324,10 +331,6 @@ def process_story(candidate: Candidate, api_key: str) -> dict[str, Any]:
     else:
         comments_summary = "评论区暂无可总结的有效内容。"
 
-    minutes = math.ceil(
-        len(LATIN_WORD_RE.findall(article_text)) / 220
-        + len(CJK_CHAR_RE.findall(article_text)) / 500
-    )
     log(f"完成 {candidate.story_id}: {article['translated_title']}")
     return asdict(candidate) | {
         "translated_title": article["translated_title"].strip(),
@@ -335,7 +338,6 @@ def process_story(candidate: Candidate, api_key: str) -> dict[str, Any]:
         "article_summary_md": article["article_summary"].strip() or NO_ARTICLE,
         "comments_summary_md": comments_summary,
         "points": item["points"],
-        "reading_minutes": minutes,
         "updated_at": dt.datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
@@ -343,11 +345,7 @@ def process_story(candidate: Candidate, api_key: str) -> dict[str, Any]:
 def entry_html(row: dict[str, Any]) -> str:
     article_url = html.escape(str(row["article_url"]), quote=True)
     comments_url = html.escape(str(row["comments_url"]), quote=True)
-    metadata = f"{int(row['points'])} 分 · {int(row['comments_count'])} 条评论" + (
-        f" · 原文约 {int(row['reading_minutes'])} 分钟"
-        if row["reading_minutes"]
-        else ""
-    )
+    metadata = f"{int(row['points'])} 分 · {int(row['comments_count'])} 条评论"
     return (
         f"<p><strong>HN 热度：</strong>{metadata}</p>"
         f'<p><a href="{article_url}">阅读原文</a> · '
