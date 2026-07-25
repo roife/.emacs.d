@@ -27,7 +27,6 @@
                      'init-vcs
                      'init-browser
                      'init-ibuffer
-                     'init-dict
                      'init-ime
                      'init-modal
                      'init-modeline
