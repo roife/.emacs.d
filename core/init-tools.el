@@ -164,7 +164,7 @@
 ;; [imenu] Jump to function definitions
 (use-package imenu
   :commands (imenu--make-index-alist)
-  :hook ((prog-mode conf-mode yaml-mode markdown-mode org-mode) . (lambda () (imenu--make-index-alist t))))
+  :hook ((prog-mode conf-mode yaml-mode markdown-ts-mode org-mode) . (lambda () (imenu--make-index-alist t))))
 
 
 ;; [re-builder]
@@ -185,7 +185,7 @@
   :bind (:map prog-mode-map
               ("C-c '" . separedit))
   :config
-  (setq separedit-default-mode 'markdown-mode))
+  (setq separedit-default-mode 'markdown-ts-mode))
 
 
 ;; [emacs-reader] read docs in emacs

@@ -323,10 +323,6 @@
         rust-format-goto-problem nil)
   )
 
-(use-package cargo
-  :straight t
-  :hook ((rust-mode rust-ts-mode) . cargo-minor-mode))
-
 
 (use-package rust-playground
   :straight t)

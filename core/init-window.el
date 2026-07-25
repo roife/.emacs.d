@@ -86,7 +86,6 @@
           ;; so the first display has to match by name.
           "^\\*Ibuffer\\*$"
           "\\*Kill Ring\\*"
-          "\\*Go-Translate\\*"
 
           bookmark-bmenu-mode
           comint-mode
@@ -101,19 +100,16 @@
           osx-dictionary-mode
 
           "^\\*Process List\\*" process-menu-mode
-          list-environment-mode cargo-process-mode
 
           ;; `+eshell-toggle' displays this buffer before `eshell-mode'
           ;; is active, so the first display has to match by name.
           "^Eshell-popup: .*$" eshell-mode
           "^\\*shell.*\\*.*$"  shell-mode
           "^\\*terminal.*\\*.*$" term-mode
-          "^\\*vterm.*\\*.*$"  vterm-mode
           "^\\*eldoc.*\\*.*$" eldoc-mode
 
-          "\\*package update results\\*$" "\\*Package-Lint\\*$"
           "\\*[Wo]*Man.*\\*$"
-          "\\*ert\\*$" overseer-buffer-mode
+          "\\*ert\\*$"
           "\\*gud-debug\\*$"
           "\\*quickrun\\*$"
           "\\*vc-.*\\*$"

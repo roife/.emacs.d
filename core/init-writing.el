@@ -1,7 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
 
-[visual-fill-column] Center text in markdown and org
+;; [visual-fill-column] Center text in markdown and org
 (use-package visual-fill-column
   :straight t
   :hook (text-mode . visual-fill-column-mode)
@@ -22,11 +22,32 @@
 (use-package pangu-spacing
   :straight t)
 
-
 (use-package markdown-ts-mode
   :straight (:type built-in)
   :mode (("\\.md\\'" . markdown-ts-mode)
-         ("\\.markdown\\'" . markdown-ts-mode)))
+         ("\\.markdown\\'" . markdown-ts-mode))
+  :config
+  ;; Hide markup delimiters (**, #, []() ...) for a rendered look.
+  ;; buffer-local (:local t), so set the default value.
+  (setq-default markdown-ts-hide-markup t)
+  (setq
+   ;; Fold bodies on open, keep all heading levels visible
+   markdown-ts-default-folding 'fold-headings
+   ;; Show images inline below their links
+   markdown-ts-inline-images t
+   ;; Highlight fenced code blocks with the embedded language's mode
+   markdown-ts-fontify-code-blocks-natively t
+   ;; TAB/newline run in the code block's language when point is inside it
+   markdown-ts-enable-code-block-context-mode t
+   ;; org-table-like editing/auto-align when point is in a pipe table
+   markdown-ts-enable-table-mode t)
+
+  ;; markdown-ts-mode gives all 6 heading levels the same face; inherit the
+  ;; Org level faces instead so they differ and follow the current theme.
+  (dotimes (i 6)
+    (set-face-attribute (intern (format "markdown-ts-heading-%d" (1+ i))) nil
+                        :inherit (intern (format "org-level-%d" (1+ i)))
+                        :weight 'unspecified)))
 
 
 ;; [typst-ts-mode]

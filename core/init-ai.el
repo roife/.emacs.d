@@ -30,7 +30,7 @@ When OVERLAYS is nil, export all pending rewrites in the current buffer."
             (generate-new-buffer
              (format "*gptel rewrite export: %s*" source-name))))
       (with-current-buffer export-buffer
-        (markdown-mode)
+        (markdown-ts-mode)
         (insert contents)
         (goto-char (+ (point-min)
                       (min prepared-point (- (point-max) (point-min)))))

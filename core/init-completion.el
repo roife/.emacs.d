@@ -255,7 +255,7 @@
 
 (use-package cape
   :straight t
-  :hook (((TeX-mode LaTeX-mode org-mode markdown-mode) . +completion-add-tex-capfs))
+  :hook (((TeX-mode LaTeX-mode org-mode markdown-ts-mode) . +completion-add-tex-capfs))
   :init
   (setq cape-dabbrev-buffer-function #'buffer-list)
 

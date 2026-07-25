@@ -198,7 +198,7 @@ included; for the final argument the leading separator is included."
            (eshell-mode . insert)
            (shell-mode . insert)
            (term-mode . insert)
-           (vterm-mode . insert)
+           (ghostel-mode . insert)
            (help-mode . normal)
            (vundo-mode . motion)))
       (add-to-list 'meow-mode-state-list state))

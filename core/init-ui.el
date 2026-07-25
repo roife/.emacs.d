@@ -170,10 +170,10 @@
 ;; [ligature] ligature support for Emacs
 (use-package ligature
   :straight t
-  :hook ((prog-mode markdown-mode org-mode) . ligature-mode)
+  :hook ((prog-mode markdown-ts-mode org-mode) . ligature-mode)
   :config
   ;; Enable Sarasa/Iosevka ligatures in programming modes
-  (ligature-set-ligatures '(prog-mode markdown-mode org-mode)
+  (ligature-set-ligatures '(prog-mode markdown-ts-mode org-mode)
                           '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "||=" "||>"
                             ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "!=="
                             "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"

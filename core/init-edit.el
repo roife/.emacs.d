@@ -76,7 +76,7 @@
 ;; [ws-butler] Remove trailing whitespace with lines touched
 (use-package ws-butler
   :straight t
-  :hook ((prog-mode markdown-mode) . ws-butler-mode))
+  :hook ((prog-mode markdown-ts-mode) . ws-butler-mode))
 
 
 ;; [editorconfig] Respect project-local formatting rules
@@ -136,7 +136,7 @@
 
 ;; [elec-pair] Automatic parenthesis pairing
 (use-package elec-pair
-  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-mode minibuffer-mode) . electric-pair-mode)
+  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-ts-mode minibuffer-mode) . electric-pair-mode)
   :config
   (setq electric-pair-inhibit-predicate 'electric-pair-default-inhibit)
   )
