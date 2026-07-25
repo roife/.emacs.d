@@ -103,7 +103,9 @@
               ("C-c f >" . jinx-next)
               ("C-c f <" . jinx-previous)
               ("C-c f ." . jinx-correct)
-              ("C-c f /" . jinx-correct-all)))
+              ("C-c f /" . jinx-correct-all))
+  :config
+  (add-to-list 'jinx-exclude-regexps '(t "\\cc")))
 
 
 ;; [ediff] Diff & patch
