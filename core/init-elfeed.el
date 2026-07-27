@@ -61,10 +61,6 @@
         elfeed-show-truncate-long-urls t
         elfeed-show-unique-buffers t)
 
-  (add-hook 'elfeed-db-update-hook #'+refresh-tab-bar)
-  (add-hook 'elfeed-tag-hook #'+refresh-tab-bar)
-  (add-hook 'elfeed-untag-hook #'+refresh-tab-bar)
-
   ;; Ignore db directory in recentf
   (push elfeed-db-directory recentf-exclude)
   )

@@ -159,15 +159,98 @@
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
-  ;; Turn on tab-bar-mode in early-init to speed-up
+  ;; Turn on tab-bar in early-init to speedup
   :config
   (setq tab-bar-separator ""
         tab-bar-new-tab-choice "*scratch*"
         tab-bar-tab-name-truncated-max 20
         tab-bar-auto-width nil
         tab-bar-close-button-show nil
-        tab-bar-tab-hints t
-        tab-bar-show nil)
+        tab-bar-tab-hints t)
+
+  (customize-set-variable 'tab-bar-select-tab-modifiers '(super))
+
+  ;; truncate for [tab name] and add count
+  (setq tab-bar-tab-name-format-functions
+        '(tab-bar-tab-name-format-hints
+          tab-bar-tab-name-format-truncated
+          (lambda (name &rest _) (concat " " name " "))
+          tab-bar-tab-name-format-face))
+
+  (defvar +tab-bar-gnus-indicator-cache nil)
+  (defvar +tab-bar-telega-indicator-cache nil)
+  (defvar +tab-bar-elfeed-indicator-cache nil)
+
+  (setq tab-bar-format '((lambda () +tab-bar-telega-indicator-cache)
+                         (lambda () +tab-bar-elfeed-indicator-cache)
+                         (lambda () +tab-bar-gnus-indicator-cache)
+                         tab-bar-format-tabs))
+
+  (with-eval-after-load 'gnus
+    (add-hook! (gnus-started-hook gnus-after-getting-new-news-hook
+                                  gnus-group-catchup-group-hook gnus-summary-exit-hook)
+      (defun +tab-bar-gnus-indicator-update (&rest _)
+        "Update the cached Gnus unread count in the tab bar."
+        (setq +tab-bar-gnus-indicator-cache
+              (when-let* ((count (cl-loop for entry being the hash-values
+                                          of gnus-newsrc-hashtb
+                                          for unread = (car entry)
+                                          when (numberp unread)
+                                          sum unread))
+                          ((> count 0)))
+                `((tab-bar-gnus menu-item
+                                ,(propertize (format " M %d " count)
+                                             'face 'font-lock-keyword-face)
+                                gnus))))
+        (force-mode-line-update t))))
+
+  (with-eval-after-load 'telega
+    (defun +tab-bar-telega-indicator-update (&rest _)
+      "Update the cached Telega status in the tab bar."
+      (when (and (featurep 'telega)
+                 (telega-server-live-p))
+        (setq +tab-bar-telega-indicator-cache
+              (let* ((chats (telega-chats-list))
+                     (online-p (funcall telega-online-status-function))
+                     (unread-count (or (plist-get telega--unread-chat-count :unread_unmuted_count) 0))
+                     (mention-count (apply #'+ (mapcar (telega--tl-prop :unread_mention_count)
+                                                       (telega-filter-chats chats '(and is-known mention)))))
+                     (reaction-count (apply #'+ (mapcar (telega--tl-prop :unread_reaction_count)
+                                                        (telega-filter-chats chats '(and is-known unread-reactions)))))
+                     (count (+ unread-count mention-count reaction-count))
+                     (text (propertize
+                            (concat " T" (unless (zerop count) (number-to-string count)) " ")
+                            'face `(:inherit font-lock-keyword-face :inverse-video ,online-p))))
+                `((tab-bar-telega menu-item ,text telega)))))
+      (force-mode-line-update t))
+
+    (add-hook! (telega-ready-hook
+                telega-chats-fetched-hook
+                telega-kill-hook
+                telega-online-status-hook)
+      #'+tab-bar-telega-indicator-update)
+
+    (advice-add 'telega--on-updateUnreadChatCount :after #'+tab-bar-telega-indicator-update)
+    (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-indicator-update)
+    (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-indicator-update))
+
+  (with-eval-after-load 'elfeed
+    (add-hook! (elfeed-db-update-hook elfeed-tag-hook elfeed-untag-hook)
+      (defun +tab-bar-elfeed-indicator ()
+        "Show the number of unread Elfeed entries."
+        (when (and (featurep 'elfeed)
+                   (hash-table-p elfeed-db-entries))
+          (setq +tab-bar-elfeed-indicator-cache
+                (cl-loop for entry being the hash-values
+                         of elfeed-db-entries
+                         count (elfeed-tagged-p 'unread entry) into count
+                         finally return
+                         (and (> count 0)
+                              `((tab-bar-elfeed
+                                 menu-item ,(propertize (format " R %d " count)
+                                                        'face 'font-lock-keyword-face)
+                                 elfeed))))))
+        (force-mode-line-update t))))
 
   ;; WORKAROUND: fresh tab-bar for daemon
   (add-hook! (server-after-make-frame-hook window-setup-hook) :call-immediately

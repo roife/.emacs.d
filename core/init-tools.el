@@ -40,7 +40,6 @@
 ;; [arxiv.el] Search, browse, and save arXiv papers
 (use-package arxiv
   :straight (:type git :host github :repo "roife/arxiv.el")
-  :demand t
   :config
   (setq arxiv-browser-function #'arxiv-eww-browse-url)
   (arxiv-url-handler-mode 1))
