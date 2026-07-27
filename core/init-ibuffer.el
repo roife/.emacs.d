@@ -36,6 +36,10 @@
                            (mode . eww-search-annotations-mode)))
           (elfeed-filter '(or (mode . elfeed-show-mode)
                                (mode . elfeed-search-mode)))
+          (gnus-filter
+           '(or (derived-mode . gnus-mode)
+                (predicate . (and (boundp 'gnus-buffers)
+                                  (memq (current-buffer) gnus-buffers)))))
           (telega-filter '(or (mode . telega-chat-mode)
                               (mode . telega-root-mode)
                               (mode . telega-image-mode)
@@ -50,6 +54,7 @@
       (add-to-list 'ibuffer-filter-groups (list "Scratch" scratch-filter))
       (add-to-list 'ibuffer-filter-groups (list "Eww" eww-filter))
       (add-to-list 'ibuffer-filter-groups (list "Elfeed" elfeed-filter))
+      (add-to-list 'ibuffer-filter-groups (list "Gnus" gnus-filter))
       (add-to-list 'ibuffer-filter-groups (list "Xwidget" xwidget-filter))
       (add-to-list 'ibuffer-filter-groups (list "Temporary buffers" starred-name-filter) :append)
       )

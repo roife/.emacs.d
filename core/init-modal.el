@@ -187,6 +187,13 @@ included; for the final argument the leading separator is included."
         (state
          '((telega-root-mode . motion)
            (telega-chat-mode . normal)
+           ;; Gnus readers use their native keymaps with Meow navigation.
+           ;; Message buffers remain in normal state for composing mail.
+           (gnus-group-mode . motion)
+           (gnus-summary-mode . motion)
+           (gnus-article-mode . motion)
+           (gnus-server-mode . motion)
+           (gnus-browse-mode . motion)
            (View-mode . normal)
            ;; (compilation-mode . normal)
            (blink-search-mode . insert)
