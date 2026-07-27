@@ -2,11 +2,26 @@
 
 (use-package gptel
   :straight t
-  :commands (gptel-api-key-from-auth-source
-             +gptel-rewrite-translate-to-chinese
-             +gptel-rewrite-summarize)
+  :init
+  (setq gptel-model 'deepseek-v4-flash
+        gptel-default-mode 'org-mode
+        gptel-confirm-tool-calls nil)
+  :config
+  (setq-default gptel-backend
+                (gptel-make-deepseek "DeepSeek-thinking"
+                  :stream t
+                  :request-params '(:thinking (:type "enabled"))
+                  :key #'gptel-api-key-from-auth-source))
+  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
+  (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
+  )
+
+(use-package gptel-rewrite
+  :straight nil
   :bind (("C-c r t" . +gptel-rewrite-translate-to-chinese)
-         ("C-c r s" . +gptel-rewrite-summarize))
+         ("C-c r s" . +gptel-rewrite-summarize)
+         :map gptel-rewrite-actions-map
+         ("C-c C-x" . +gptel-rewrite-export))
   :preface
   (defun +gptel-rewrite-export (&optional overlays)
     "Export OVERLAYS to a new buffer without changing their source.
@@ -64,27 +79,10 @@ When OVERLAYS is nil, export all pending rewrites in the current buffer."
     (interactive)
     (+gptel-rewrite-region-or-buffer
      "Summarize in Chinese while preserving details and key information."))
-  :init
-  (setq gptel-model 'deepseek-v4-flash
-        gptel-default-mode 'org-mode
-        gptel-confirm-tool-calls nil)
-  :config
-  (setq-default gptel-backend
-                (gptel-make-deepseek "DeepSeek-thinking"
-                  :stream t
-                  :request-params '(:thinking (:type "enabled"))
-                  :key #'gptel-api-key-from-auth-source))
 
-  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
-  (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
-  (with-eval-after-load 'gptel-rewrite
-    (keymap-set gptel-rewrite-actions-map "C-c C-x" #'+gptel-rewrite-export)
-    (transient-append-suffix 'gptel-rewrite 'gptel--suffix-rewrite-accept
-      '("X" "Export rewrites" +gptel-rewrite-export)))
   (with-eval-after-load 'embark
     (keymap-set embark-region-map "T" #'+gptel-rewrite-translate-to-chinese)
-    (keymap-set embark-region-map "S" #'+gptel-rewrite-summarize))
-  )
+    (keymap-set embark-region-map "S" #'+gptel-rewrite-summarize)))
 
 (use-package gptel-agent
   :straight t

@@ -24,7 +24,6 @@
         aw-background nil
         aw-ignore-current t)
 
-  ;; Select window via `H-1'...`H-9'
   (defun +aw--select-window (number)
     "Select the specified window."
     (let* ((window-list (aw-window-list))
@@ -43,7 +42,7 @@
         (message "No specified window: %d" number))))
 
   (dotimes (n 9)
-    (bind-key (format "C-%d" (1+ n))
+    (bind-key (format "M-%d" (1+ n))
               (lambda ()
                 (interactive)
                 (+aw--select-window (1+ n))))))
@@ -227,4 +226,4 @@
         (set-face-attribute 'auto-dim-other-buffers-hide nil
                             :foreground dim
                             :background dim))))
-)
+  )

@@ -42,7 +42,7 @@ commit="$(
     -H "Accept: application/vnd.github+json" \
     -H "User-Agent: Emacs" \
     "https://api.github.com/repos/tdlib/td/commits/$commitish" |
-    sed -n 's/^[[:space:]]*"sha":[[:space:]]*"\([0-9a-f]\{40\}\)".*/\1/p' |
+    sed -n 's/^[{[:space:]]*"sha"[[:space:]]*:[[:space:]]*"\([0-9a-f]\{40\}\)".*/\1/p' |
     head -n 1
 )"
 
@@ -58,7 +58,10 @@ run brew install cmake gperf openssl@3 pkg-config
 run rm -rf "$td_dir"
 run mkdir -p "$repos_dir" "$bin_dir"
 
-run git clone --revision "$commit" https://github.com/tdlib/td.git "$td_dir"
+run git init "$td_dir"
+run git -C "$td_dir" remote add origin https://github.com/tdlib/td.git
+run git -C "$td_dir" fetch --depth 1 origin "$commit"
+run git -C "$td_dir" checkout --detach FETCH_HEAD
 
 cc="$(xcrun -find clang)"
 cxx="$(xcrun -find clang++)"
