@@ -152,7 +152,18 @@
 ;; [beginend] Better M-< M-> for programming
 (use-package beginend
   :straight t
-  :hook (after-init . beginend-global-mode))
+  :hook (after-init . beginend-global-mode)
+  :config
+  (beginend-define-mode telega-root-mode
+    (progn
+      (goto-char (max (point-min)
+                      (1- telega-root-view--ewocs-marker)))
+      (telega-button-forward 1 nil 'no-error))
+    (progn
+      (telega-button-backward 1 nil 'no-error)))
+
+  ;; Install explicitly in case `beginend-global-mode' is already enabled.
+  (add-hook 'telega-root-mode-hook #'beginend-telega-root-mode))
 
 
 ;; Alternatives to [hungry-delete]

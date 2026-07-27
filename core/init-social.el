@@ -32,7 +32,7 @@
   (telega-msg-heading ((t (:inherit hl-line :background unspecified))))
   (telega-msg-inline-reply ((t (:inherit (hl-line font-lock-function-name-face)))))
   (telega-msg-inline-forward ((t (:inherit (hl-line font-lock-type-face)))))
-  (telega-msg-user-title ((t (:bold t))))
+  (telega-msg-self-title ((t (:bold t :italic t))))
   :bind (:map telega-chat-button-map
               ("h" . nil)
               :map telega-root-mode-map
@@ -89,6 +89,25 @@
   (when (eq system-type 'gnu/linux)
     (setq telega-proxies '((:server "127.0.0.1" :port 7891 :enable t :type (:@type "proxyTypeSocks5")))))
 
+  ;; HACK: Work around upstream bot command completion returning nested lists.
+  ;; Each mapped candidate list is freshly allocated, so `mapcan' is safe here.
+  (defun telega-completions--bot-commands (chat)
+    "Return bot command completion candidates for CHAT."
+    (let* ((info (telega-chat--info chat))
+           (telega-full-info-offline-p nil)
+           (full-info (telega--full-info info)))
+      (if (telega-chatbuf-match-p '(type bot))
+          (telega-completions--bot-commands-list
+           (telega--tl-get full-info :bot_info :commands))
+        (mapcan (lambda (bot-commands)
+                  (telega-completions--bot-commands-list
+                   (plist-get bot-commands :commands)
+                   (telega-msg-sender-username
+                    (telega-user-get
+                     (plist-get bot-commands :bot_user_id))
+                    'with-@)))
+                (plist-get full-info :bot_commands)))))
+
   ;; HACK: Show full name only in chatbuf
   (defadvice! +telega-message-header-username-only-a
     (orig msg &optional msg-chat msg-sender addon-inserter)
@@ -137,37 +156,13 @@
         ""
       (apply orig-fn args)))
 
-  ;; HACK: workaround with beginend
-  (with-eval-after-load 'beginend
-    (defun beginend-telega-mode-goto-beginning ()
-      "Go to the first button in the Telega root view."
-      (interactive)
-      (beginend--double-tap-begin
-       (goto-char (max (point-min)
-                       (1- telega-root-view--ewocs-marker)))
-       (telega-button-forward 1 nil 'no-error)))
-
-    (defun beginend-telega-mode-goto-end ()
-      "Go to the last button in the Telega root view."
-      (interactive)
-      (beginend--double-tap-end
-       (telega-button-backward 1 nil 'no-error)))
-
-    (defvar beginend-telega-mode-map
-      (let ((map (make-sparse-keymap)))
-        (beginend--defkey map
-                          #'beginend-telega-mode-goto-beginning
-                          #'beginend-telega-mode-goto-end)
-        map)
-      "Keymap for `beginend-telega-mode'.")
-
-    (define-minor-mode beginend-telega-mode
-      "Make buffer boundary commands aware of the Telega root view."
-      :lighter " be"
-      :keymap beginend-telega-mode-map)
-
-    (add-to-list 'beginend-modes
-                 '(telega-root-mode-hook . beginend-telega-mode)))
+  ;; HACK: preview stickers with vertico
+  (defadvice! +telega-stickerset-preview-with-vertico-a (fn &rest args)
+    :around #'telega-stickerset--minibuf-post-command
+    (cl-letf (((symbol-function #'completion-all-sorted-completions)
+               (lambda (&rest _)
+                 (list (vertico--candidate)))))
+      (apply fn args)))
   )
 
 
