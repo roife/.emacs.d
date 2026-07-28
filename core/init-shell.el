@@ -215,9 +215,9 @@ If no project is found, create a temporary Eshell instance in the current direct
   :commands (eshell/z))
 
 
-(use-package esh-autosuggest
-  :straight t
-  :hook (eshell-mode . esh-autosuggest-mode))
+(use-package esh-autosuggest-corfu
+  :straight (:host github :repo "roife/esh-autosuggest-corfu")
+  :hook (eshell-mode . esh-autosuggest-corfu-mode))
 
 
 (use-package esh-help
