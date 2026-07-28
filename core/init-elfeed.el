@@ -39,13 +39,12 @@
               ("k" . scroll-down-line))
   :config
   (setq elfeed-db-directory (expand-file-name "elfeed" user-emacs-directory)
-        elfeed-feeds `((,(concat "file://" (expand-file-name "feed.atom" +elfeed-local-dir)) hackernews)
+        elfeed-feeds `((,(concat "file://" (expand-file-name "hackernews.atom" +elfeed-local-dir)) hackernews)
                        ;; emacs
                        ("https://karthinks.com/index.xml" karthinks)
                        ("https://emacsredux.com/atom.xml" redux)
                        ("https://egh0bww1.com/rss.xml" includeyy)
                        ("https://www.rahuljuliato.com/rss.xml" rahul)
-                       ("https://emacs-china.org/latest.rss" emacs-china)
                        (,(concat "file://" (expand-file-name "reddit-emacs.atom" +elfeed-local-dir)) r/emacs)
                        ;; programming
                        ("https://matklad.github.io/feed.xml" matklad)

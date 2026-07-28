@@ -46,7 +46,7 @@ HN_COMMENTS_URL = "https://news.ycombinator.com/item?id={story_id}"
 USER_AGENT = "hn-elfeed/1.0 (personal Elfeed generator)"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "rss"
-FEED_PATH = DATA_DIR / "feed.atom"
+FEED_PATH = DATA_DIR / "hackernews.atom"
 AUTHINFO_PATH = Path.home() / ".authinfo"
 
 HTTP_TIMEOUT = 25

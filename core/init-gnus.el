@@ -1,5 +1,19 @@
 ;;; -*- lexical-binding: t -*-
 
+(use-package nnnrss
+  :straight (:host github :repo "jjbarr/nnnrss")
+  :config
+  ;; nnnrss 0.4.1 references an unbound `id' when an item has no GUID.
+  (defun nnnrss--read-id (article)
+    (or (when-let* ((id (dom-child-by-tag article 'guid)))
+          (string-trim (dom-text id)))
+        (dom-attr article 'about)
+        (when-let* ((link (dom-child-by-tag article 'link)))
+          (string-trim (dom-text link)))
+        (when-let* ((title (dom-child-by-tag article 'title)))
+          (string-trim (dom-text title)))))
+  (puthash "include-yy's blog" "Include YY" nnfeed-group-names))
+
 ;; [gnus] a newsreader, mail reader, and news server client
 (use-package gnus
   :commands gnus
@@ -45,13 +59,42 @@
 
   (setq gnus-select-method '(nnnil "")
         gnus-secondary-select-methods
-        '((nnmaildir "GMail"
-                     (directory "~/.local/share/mail/gmail/")))
+        `((nnmaildir "GMail"
+                     (directory "~/.local/share/mail/gmail/"))
+          (nnnrss "karthinks.com/index.xml")
+          (nnnrss "egh0bww1.com/rss.xml")
+          (nnnrss "www.rahuljuliato.com/rss.xml")
+          (nnnrss "rust-analyzer.github.io/feed.xml")
+          (nnatom "emacsredux.com/atom.xml")
+          (nnatom "matklad.github.io/feed.xml")
+          (nnatom "blog.rust-lang.org/feed.xml")
+          (nnatom ,(expand-file-name "rss/hackernews.atom"
+                                     user-emacs-directory))
+          (nndiscourse "emacs-china"
+                       (nndiscourse-base-url "https://emacs-china.org")
+                       (nndiscourse-auth-type user-api-key))
+          (nnreddit "reddit"
+                    (nnreddit-client-id ,(getenv "REDDIT_CLIENT_ID"))
+                    (nnreddit-redirect-uri
+                     "http://localhost:8765/callback")
+                    (nnreddit-subreddits ("emacs"))))
 
         ;; Gmail already keeps a server-side Sent folder, so do not create an
         ;; additional local monthly archive.
         gnus-message-archive-group nil))
 
+;; Read and participate in Emacs China through its Discourse API.
+(use-package nndiscourse
+  :load-path "~/code/nnextension")
+
+(use-package nnreddit
+  :load-path "~/code/nnextension"
+  :commands (nnreddit-authorize
+             nnreddit-summary-upvoted-mark)
+  :init
+  (setq nnreddit-user-agent
+        "emacs:nnreddit:0.1 (by /u/Complex_Outcome697)")
+  :defer t)
 
 ;; [gnus-group] group mode
 (use-package gnus-group
@@ -67,34 +110,52 @@
         gnus-group-sort-function
         '(gnus-group-sort-by-level gnus-group-sort-by-alphabet))
 
-  (defvar +gnus--mbsync-process nil
-    "The active mbsync process.")
+  (defvar +gnus--refresh-process nil
+    "The process updating external sources before a Gnus refresh.")
   (defadvice! +gnus--sync-before-refresh (refresh &rest args)
     :around #'gnus-group-get-new-news
-    "Synchronize mail before calling the Gnus REFRESH function with ARGS."
-    (if (and +gnus--mbsync-process
-             (process-live-p +gnus--mbsync-process))
-        (message "Mail sync is already running")
+    "Update external sources before calling the Gnus REFRESH with ARGS.
+Interactive refreshes update the local Hacker News Atom feed in addition to
+synchronizing mail.  Automatic Gnus demon scans only synchronize mail, so they
+do not repeatedly invoke the comparatively expensive Hacker News generator."
+    (if (and +gnus--refresh-process
+             (process-live-p +gnus--refresh-process))
+        (message "A Gnus source update is already running")
       (let ((group-buffer (current-buffer))
-            (output-buffer (get-buffer-create "*mbsync*")))
+            (interactive-refresh (called-interactively-p 'interactive))
+            (output-buffer (get-buffer-create "*gnus-source-update*"))
+            (command
+             (list
+              (expand-file-name "scripts/update-gnus-sources"
+                                user-emacs-directory))))
+        (when interactive-refresh
+          (setq command (append command '("--hacker-news"))))
         (with-current-buffer output-buffer
           (erase-buffer))
-        (setq +gnus--mbsync-process
+        (setq +gnus--refresh-process
               (make-process
-               :name "mbsync"
+               :name "gnus-source-update"
                :buffer output-buffer
-               :command '("mbsync" "--all")
+               :command command
                :noquery t
                :sentinel
                (lambda (process _event)
                  (when (memq (process-status process) '(exit signal))
-                   (setq +gnus--mbsync-process nil)
+                   (setq +gnus--refresh-process nil)
                    (if (zerop (process-exit-status process))
-                       (when (buffer-live-p group-buffer)
-                         (with-current-buffer group-buffer
-                           (apply refresh args)))
-                     (message "Mail sync failed; see *mbsync*"))))))
-        (message "Synchronizing mail...")))))
+                       (message "Gnus sources updated")
+                     (message
+                      "Some Gnus sources failed to update; see %s"
+                      (buffer-name (process-buffer process))))
+                   ;; Refresh even after an update failure: mbsync or the HN
+                   ;; generator may have completed partially, and the existing
+                   ;; local data remains usable.
+                   (when (buffer-live-p group-buffer)
+                     (with-current-buffer group-buffer
+                       (apply refresh args)))))))
+        (message (if interactive-refresh
+                     "Updating Hacker News and synchronizing mail..."
+                   "Synchronizing mail..."))))))
 
 (use-package gnus-topic
   :after gnus-group
@@ -111,6 +172,10 @@
 (use-package gnus-sum
   :after gnus
   :config
+  (defalias 'gnus-user-format-function-H
+    #'nndiscourse-summary-liked-mark)
+  (defalias 'gnus-user-format-function-R
+    #'nnreddit-summary-upvoted-mark)
   (setq
    ;; Pretty marks
    gnus-sum-thread-tree-root            "┌ "
@@ -120,7 +185,7 @@
    gnus-sum-thread-tree-indent          "  "
    gnus-sum-thread-tree-leaf-with-other "├─►"
    gnus-sum-thread-tree-single-leaf     "╰─►"
-   gnus-summary-line-format "%U%R %3d %[%-23,23f%] %B %s\n"
+   gnus-summary-line-format "%U%R%uH%uR %3d %[%-23,23f%] %B %s\n"
    ;; Loose threads
    gnus-simplify-subject-functions '(gnus-simplify-subject-re gnus-simplify-whitespace)
    gnus-summary-thread-gathering-function 'gnus-gather-threads-by-subject
