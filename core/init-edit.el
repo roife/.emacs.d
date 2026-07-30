@@ -240,6 +240,7 @@
                             xref-go-back
                             xref-find-definitions
                             xref-find-references))
+  (add-to-list 'dogears-ignore-modes 'gnus-article-mode)
 
   (defadvice! +dogears--keep-record-style-only-a (fn &rest args)
     :around #'dogears--place

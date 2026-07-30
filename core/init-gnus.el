@@ -72,12 +72,7 @@
                                      user-emacs-directory))
           (nndiscourse "emacs-china"
                        (nndiscourse-base-url "https://emacs-china.org")
-                       (nndiscourse-auth-type user-api-key))
-          (nnreddit "reddit"
-                    (nnreddit-client-id ,(getenv "REDDIT_CLIENT_ID"))
-                    (nnreddit-redirect-uri
-                     "http://localhost:8765/callback")
-                    (nnreddit-subreddits ("emacs"))))
+                       (nndiscourse-auth-type user-api-key)))
 
         ;; Gmail already keeps a server-side Sent folder, so do not create an
         ;; additional local monthly archive.
@@ -86,15 +81,6 @@
 ;; Read and participate in Emacs China through its Discourse API.
 (use-package nndiscourse
   :load-path "~/code/nnextension")
-
-(use-package nnreddit
-  :load-path "~/code/nnextension"
-  :commands (nnreddit-authorize
-             nnreddit-summary-upvoted-mark)
-  :init
-  (setq nnreddit-user-agent
-        "emacs:nnreddit:0.1 (by /u/Complex_Outcome697)")
-  :defer t)
 
 ;; [gnus-group] group mode
 (use-package gnus-group
@@ -164,7 +150,7 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
 (use-package gnus-demon
   :after gnus
   :config
-  (gnus-demon-add-handler #'gnus-demon-scan-news 120 nil)
+  (gnus-demon-add-handler #'gnus-demon-scan-news 30 nil)
   (add-hook 'gnus-started-hook #'gnus-demon-init))
 
 
@@ -174,8 +160,6 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
   :config
   (defalias 'gnus-user-format-function-H
     #'nndiscourse-summary-liked-mark)
-  (defalias 'gnus-user-format-function-R
-    #'nnreddit-summary-upvoted-mark)
   (setq
    ;; Pretty marks
    gnus-sum-thread-tree-root            "┌ "
@@ -185,7 +169,7 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
    gnus-sum-thread-tree-indent          "  "
    gnus-sum-thread-tree-leaf-with-other "├─►"
    gnus-sum-thread-tree-single-leaf     "╰─►"
-   gnus-summary-line-format "%U%R%uH%uR %3d %[%-23,23f%] %B %s\n"
+   gnus-summary-line-format "%U%R%uH %3d %[%-23,23f%] %B %s\n"
    ;; Loose threads
    gnus-simplify-subject-functions '(gnus-simplify-subject-re gnus-simplify-whitespace)
    gnus-summary-thread-gathering-function 'gnus-gather-threads-by-subject
