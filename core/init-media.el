@@ -20,39 +20,27 @@
 (defun +emms-extract-embedded-covers ()
   "Extract missing cover images from embedded artwork."
   (interactive)
-  (let* ((audio "\\.\\(?:m4a\\|mp3\\|flac\\|ogg\\|opus\\|wav\\)\\'")
-         (ffmpeg (executable-find "ffmpeg"))
-         (tracks (+emms-source-file-directory-tree-fd
-                  emms-source-file-default-directory audio))
-         (albums
-          (delete-dups
-           (mapcar #'file-name-directory tracks)))
-         (created 0))
-    (unless ffmpeg
-      (user-error "ffmpeg is unavailable"))
-    (dolist (album albums)
-      (let ((track (car (directory-files album t audio t))))
-        (dolist (cover '(("cover_small.png" 128)
-                         ("cover_med.png" 256)))
-          (let ((output (expand-file-name (car cover) album)))
-            (unless (file-exists-p output)
-              (when (zerop
-                     (call-process
-                      ffmpeg nil nil nil
-                      "-nostdin" "-v" "error" "-y"
-                      "-i" track "-map" "0:v:0" "-frames:v" "1"
-                      "-vf" (format
-                             "scale=%d:%d:force_original_aspect_ratio=decrease"
-                             (cadr cover) (cadr cover))
-                      "-update" "1" output))
-                (setq created (1+ created))))))))
-    (message "EMMS covers: created %d image%s"
-             created (if (= created 1) "" "s")))
-  (when (featurep 'emms-browser)
-    (when (bound-and-true-p emms-browser--cache-hash)
-      (emms-browser-clear-cache-hash))
-    (when (buffer-live-p emms-browser-buffer)
-      (kill-buffer emms-browser-buffer))))
+  (require 'emms-browser)
+  (let ((ffmpeg (executable-find "ffmpeg"))
+        albums)
+    (dolist (track
+             (+emms-source-file-directory-tree-fd
+              emms-source-file-default-directory
+              "\\.\\(?:m4a\\|mp3\\|flac\\|ogg\\|opus\\|wav\\)\\'"))
+      (let* ((album (file-name-directory track))
+             (output (expand-file-name "cover.png" album)))
+        (unless (member album albums)
+          (push album albums)
+          (unless (funcall emms-browser-thumbnail-filter album)
+            (if (zerop
+                 (call-process
+                  ffmpeg nil nil nil "-nostdin" "-v" "error" "-y"
+                  "-i" track "-map" "0:v:0" "-frames:v" "1" "-update" "1" output))
+                (when (file-exists-p output)
+                  (delete-file output))))))))
+  (emms-browser-clear-cache-hash)
+  (when (buffer-live-p emms-browser-buffer)
+    (kill-buffer emms-browser-buffer)))
 
 (defun +emms-lyrics-find-with-info-lyric (file)
   "Find external lyric FILE, falling back to the current track's tag."
