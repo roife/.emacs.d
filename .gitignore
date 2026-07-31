@@ -5,20 +5,18 @@
 # Emacs runtime files
 /.cache/
 /auto-save-list/
-/cache/
-/data/
-/state/
 /etc/
 /var/
 /rss/
 
 # Package and native build artifacts
 /straight/
+/eln-cache/
 /elpa/
 *.elc
 *.sqlite*
 
 # Local configuration and credentials
-.env
 private.el
 emacs.pdmp
+

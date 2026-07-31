@@ -19,11 +19,6 @@
 
 (setq native-comp-jit-compilation t)
 
-;; Keep native compilation artifacts under no-littering's `var/' directory.
-(startup-redirect-eln-cache
- (convert-standard-filename
-  (expand-file-name "var/eln-cache/" user-emacs-directory)))
-
 ;; Keep early startup quiet unless we're debugging init.
 (setq ad-redefinition-action 'accept
       jka-compr-verbose init-file-debug
