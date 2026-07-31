@@ -425,8 +425,7 @@
 ;; [minuet-ai] AI-powered inline code completion
 (use-package minuet
   :straight (:host github :repo "milanglacier/minuet-ai.el")
-  :hook (prog-mode . minuet-auto-suggestion-mode)
-  :bind (("M-i" . #'minuet-complete-with-minibuffer)
+  :bind (("M-i" . #'minuet-show-suggestion)
          :map minuet-active-mode-map
          ("M-p" . #'minuet-previous-suggestion)
          ("M-n" . #'minuet-next-suggestion)
