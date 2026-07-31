@@ -1,4 +1,6 @@
-# Prerequisites
+# Emacs configuration
+
+## Prerequisites
 
 - Font
   + `Apple Color Emoji` / `Noto Color Emoji`
@@ -8,11 +10,14 @@
 - `enchant` (AppleSpell provider)
 - `rime` / `fcitx5-rime`
 - `isync`
+- `mpv`
+- `ffmpeg`
 
-## Keys
+## Credentials
 
 - `~/.authinfo`
   + Deepseek API (for `gptel`)
-  + GitHub token (for `forge`)
 - `~/.authinfo.gpg`
   + Gmail app password (for Gnus, mbsync, and SMTP, note: use imap.googlemail.com with TLS 1.2 for Gmail)
+  + GitHub token (for `forge`)
+  + Emacs china token (for `gnus`)

@@ -1,7 +1,0 @@
-#!/bin/sh
-
-script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-status=0
-"$script_dir/hn-elfeed.py" update || status=1
-"$script_dir/reddit-elfeed.py" || status=1
-exit "$status"

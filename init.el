@@ -33,7 +33,7 @@
                      'init-ai
                      'init-social
                      'init-gnus
-                     ;; 'init-elfeed
+                     'init-media
                      'init-test
                      ))
 
