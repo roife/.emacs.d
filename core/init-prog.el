@@ -100,7 +100,7 @@
                                             :workspace (:symbol (:search (:kind "all_symbols"
                                                                                 :scope "workspace_and_dependencies")))
                                             :references (:excludeImports t
-                                                         :excludeTests t)
+                                                                         :excludeTests t)
                                             :lru (:capacity 1024)
                                             :diagnostics (:enable :json-false)))
                   (:typescript . (:preferences (:importModuleSpecifierPreference "non-relative")))
@@ -111,7 +111,7 @@
                                                :path "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home/"
                                                :default t)])
                             :import (:gradle (:enabled t
-                                              :wrapper (:enabled t)))
+                                                       :wrapper (:enabled t)))
                             :autobuild (:enabled :json-false)
                             :extendedClientCapabilities (:classFileContentsSupport t)))))
 
@@ -119,8 +119,8 @@
     (let* ((jdtls-java-home (getenv "JDTLS_JAVA_HOME"))
            (project-root (project-root (project-current t)))
            (data-dir (expand-file-name
-                      (file-name-concat user-emacs-directory
-                                        "cache" "lsp-cache"
+                      (file-name-concat +cache-dir
+                                        "lsp-cache"
                                         (md5 (expand-file-name project-root))))))
       `("env" ,(concat "JAVA_HOME=" jdtls-java-home)
         "jdtls" "--jvm-arg=-Xmx16G" "-data" ,data-dir)))
@@ -423,3 +423,29 @@
 (use-package envrc
   :straight t
   :hook (emacs-startup . envrc-global-mode))
+
+
+;; [minuet-ai] AI-powered inline code completion
+(use-package minuet
+  :straight (:host github :repo "milanglacier/minuet-ai.el")
+  :hook (prog-mode . minuet-auto-suggestion-mode)
+  :bind (("M-i" . #'minuet-complete-with-minibuffer)
+         :map minuet-active-mode-map
+         ("M-p" . #'minuet-previous-suggestion)
+         ("M-n" . #'minuet-next-suggestion)
+         ("C-e" . #'minuet-accept-suggestion))
+  :custom-face
+  (minuet-suggestion-face ((t (:inherit font-lock-comment-face :slant italic :weight normal :underline nil))))
+  :config
+  (setq minuet-provider 'openai-fim-compatible)
+
+  (plist-put minuet-openai-fim-compatible-options :end-point "https://api.deepseek.com/beta/completions")
+  (plist-put minuet-openai-fim-compatible-options :model "deepseek-v4-flash")
+  (plist-put minuet-openai-fim-compatible-options :name "Deepseek")
+  (plist-put minuet-openai-fim-compatible-options :api-key
+             (lambda ()
+               (require 'gptel)
+               (gptel-api-key-from-auth-source "api.deepseek.com" "apikey")))
+
+  (minuet-set-optional-options minuet-openai-fim-compatible-options :max_tokens 56)
+  (minuet-set-optional-options minuet-openai-fim-compatible-options :top_p 0.9))
