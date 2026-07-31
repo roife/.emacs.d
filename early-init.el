@@ -19,6 +19,11 @@
 
 (setq native-comp-jit-compilation t)
 
+;; Keep native compilation artifacts under no-littering's `var/' directory.
+(startup-redirect-eln-cache
+ (convert-standard-filename
+  (expand-file-name "var/eln-cache/" user-emacs-directory)))
+
 ;; Keep early startup quiet unless we're debugging init.
 (setq ad-redefinition-action 'accept
       jka-compr-verbose init-file-debug
@@ -71,7 +76,7 @@
 ;; (push '(undecorated-round . t) default-frame-alist)
 (when (featurep 'ns)
   (push '(ns-transparent-titlebar . t) default-frame-alist))
-; Set these to nil so users don't have to toggle the modes twice to reactivate.
+                                        ; Set these to nil so users don't have to toggle the modes twice to reactivate.
 (setq menu-bar-mode nil
       tool-bar-mode nil
       scroll-bar-mode nil
