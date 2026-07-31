@@ -413,10 +413,7 @@
         indent-bars-color '(highlight :face-bg t :blend 0.2)
         indent-bars-zigzag nil
         indent-bars-highlight-current-depth nil
-        indent-bars-pattern "."
-        ;; indent-bars-prefer-character t
-        )
-  )
+        indent-bars-pattern "."))
 
 
 ;; [direnv] Buffer-local project environments
@@ -433,7 +430,8 @@
          :map minuet-active-mode-map
          ("M-p" . #'minuet-previous-suggestion)
          ("M-n" . #'minuet-next-suggestion)
-         ("C-e" . #'minuet-accept-suggestion))
+         ("C-e" . #'minuet-accept-suggestion)
+         ("C-g" . #'minuet-dismiss-suggestion))
   :custom-face
   (minuet-suggestion-face ((t (:inherit font-lock-comment-face :slant italic :weight normal :underline nil))))
   :config
