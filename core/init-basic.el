@@ -322,6 +322,16 @@
         remote-file-name-inhibit-cache 60))
 
 
+(use-package tramp-rpc
+  :straight (:type git
+                   :host github
+                   :repo "ArthurHeymans/emacs-tramp-rpc")
+  :after tramp
+  :config
+  (setq tramp-rpc-deploy-auto-deploy t
+        tramp-rpc-deploy-git-build-policy 'release))
+
+
 ;; [minibuffer]
 (use-package minibuffer
   :hook (after-init . minibuffer-electric-default-mode)
