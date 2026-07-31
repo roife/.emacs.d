@@ -7,7 +7,6 @@
 /auto-save-list/
 /etc/
 /var/
-/rss/
 
 # Package and native build artifacts
 /straight/

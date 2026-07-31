@@ -68,8 +68,7 @@
           (nnatom "emacsredux.com/atom.xml")
           (nnatom "matklad.github.io/feed.xml")
           (nnatom "blog.rust-lang.org/feed.xml")
-          (nnatom ,(expand-file-name "rss/hackernews.atom"
-                                     user-emacs-directory))
+          (nnatom ,(no-littering-expand-var-file-name "rss/hackernews.atom"))
           (nndiscourse "emacs-china"
                        (nndiscourse-base-url "https://emacs-china.org")
                        (nndiscourse-auth-type user-api-key)))
@@ -85,16 +84,25 @@
 ;; [gnus-group] group mode
 (use-package gnus-group
   :config
-  ;;               indentation ------------.
-  ;;       #      process mark ----------. |
-  ;;                     level --------. | |
-  ;;                subscribed ------. | | |
-  ;;       %          new mail ----. | | | |
-  ;;       *   marked articles --. | | | | |
-  ;;                             | | | | | |  Ticked    New     Unread  open-status Group
-  (setq gnus-group-line-format "%M%m%S%L%p%P %1(%7i%) %3(%7U%) %3(%7y%) %4(%B%-45G%)\n"
-        gnus-group-sort-function
-        '(gnus-group-sort-by-level gnus-group-sort-by-alphabet))
+  ;; Keep the useful state on the left and give the group name a stable
+  ;; starting column:
+  ;;
+  ;;   process  open  unread/total  group
+  ;;      #      *       12/340     INBOX
+  ;;
+  ;; For Discourse groups display the category description supplied by the
+  ;; backend (for example, "Emacs-general") instead of its stable category ID.
+  ;; Other backends retain the compact native `%c' name.
+  (setq gnus-group-line-format
+        (concat "%M%p%B %6,6y/%-6,6t  %P%("
+                "%~(form (if (and (string-prefix-p \"nndiscourse+\""
+                " gnus-tmp-group)"
+                " (not (string-empty-p gnus-tmp-newsgroup-description)))"
+                " (car (split-string gnus-tmp-newsgroup-description \" — \"))"
+                " (gnus-short-group-name gnus-tmp-group)))@%)%0,0D\n")
+        gnus-group-uncollapsed-levels 2
+        gnus-group-sort-function '(gnus-group-sort-by-level gnus-group-sort-by-alphabet)
+        gnus-permanently-visible-groups ".*")
 
   (defvar +gnus--refresh-process nil
     "The process updating external sources before a Gnus refresh.")
@@ -145,7 +153,16 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
 
 (use-package gnus-topic
   :after gnus-group
-  :hook (gnus-group-mode . gnus-topic-mode))
+  :hook (gnus-group-mode . gnus-topic-mode)
+  :bind (:map gnus-topic-mode-map
+              ("TAB" . gnus-topic-fold)
+              ("<tab>" . gnus-topic-fold))
+  :config
+  ;; Compact topic headings with an explicit collapsed marker and aggregate
+  ;; unread count.  Empty topics remain visible so the hierarchy is stable.
+  (setq gnus-topic-line-format "%i%(%n%)  %4A %v\n"
+        gnus-topic-display-empty-topics t
+        gnus-topic-indent-level 2))
 
 (use-package gnus-demon
   :after gnus
@@ -157,28 +174,35 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
 ;; [gnus-sum] summary mode
 (use-package gnus-sum
   :after gnus
+  :bind (:map gnus-summary-mode-map
+              ("RET" . gnus-summary-select-article-buffer)
+              ("<return>" . gnus-summary-select-article-buffer))
   :config
-  (defalias 'gnus-user-format-function-H
-    #'nndiscourse-summary-liked-mark)
+  (defalias 'gnus-user-format-function-H #'nndiscourse-summary-liked-mark)
   (setq
-   ;; Pretty marks
+   ;; Keep the original symbols, but match Gnus's native component widths:
+   ;; roots are 2 columns, ancestor segments 2, and leaves 4.
    gnus-sum-thread-tree-root            "┌ "
    gnus-sum-thread-tree-false-root      "◌ "
    gnus-sum-thread-tree-single-indent   "◎ "
-   gnus-sum-thread-tree-vertical        "│"
+   gnus-sum-thread-tree-vertical        "│ "
    gnus-sum-thread-tree-indent          "  "
-   gnus-sum-thread-tree-leaf-with-other "├─►"
-   gnus-sum-thread-tree-single-leaf     "╰─►"
-   gnus-summary-line-format "%U%R%uH %3d %[%-23,23f%] %B %s\n"
+   gnus-sum-thread-tree-leaf-with-other "├─► "
+   gnus-sum-thread-tree-single-leaf     "╰─► "
+   ;; Use Gnus's native summary renderer.  Keep all status columns before
+   ;; variable-width fields so its built-in mark-position tracking stays valid.
+   gnus-summary-line-format "%U%R%uH %3d %-23,23f %B%s\n"
    ;; Loose threads
-   gnus-simplify-subject-functions '(gnus-simplify-subject-re gnus-simplify-whitespace)
+   gnus-simplify-subject-functions
+   '(gnus-simplify-subject-re gnus-simplify-whitespace)
    gnus-summary-thread-gathering-function 'gnus-gather-threads-by-subject
    ;; Filling in threads
-   ;; 2 old articles are enough for memory
+   ;; Keep a little old context available for incomplete conversations.
    gnus-fetch-old-headers 2
    gnus-fetch-old-ephemeral-headers 2
    gnus-build-sparse-threads 'some
    ;; More threading
+   gnus-show-threads t
    gnus-thread-indent-level 2
    ;; Sorting
    gnus-thread-sort-functions 'gnus-thread-sort-by-most-recent-date
@@ -191,7 +215,6 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
    gnus-auto-select-next nil
    gnus-paging-select-next nil))
 
-
 ;; [message] Composing mail and news messages
 (use-package message
   :after gnus
@@ -201,7 +224,7 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
         user-mail-address "roifewu@gmail.com"
         message-kill-buffer-on-exit t
         message-confirm-send t
-        message-signature user-full-name
+        message-signature nil
         message-mail-alias-type 'ecomplete
 
         message-send-mail-function #'message-use-send-mail-function
@@ -212,8 +235,7 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
         smtpmail-smtp-user user-mail-address
         smtpmail-smtp-service 587
         smtpmail-stream-type 'starttls
-        smtpmail-servers-requiring-authorization
-        "\\`smtp\\.gmail\\.com\\'"))
+        smtpmail-servers-requiring-authorization "\\`smtp\\.gmail\\.com\\'"))
 
 
 ;; Attach marked files from Dired with `C-c RET C-a'.
