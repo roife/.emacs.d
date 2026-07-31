@@ -216,7 +216,12 @@
   (setq auto-dim-other-buffers-dim-on-focus-out nil
         auto-dim-other-buffers-dim-on-switch-to-minibuffer nil)
 
-  (add-hook 'auto-dim-other-buffers-never-dim-buffer-functions #'minibufferp)
+  ;; `adob--rescan-windows' does not honor this option.
+  (defadvice! +auto-dim-other-buffers-respect-minibuffer-option-a (fn)
+    :around #'adob--rescan-windows
+    (when (or auto-dim-other-buffers-dim-on-switch-to-minibuffer
+              (not (window-minibuffer-p)))
+      (funcall fn)))
 
   (add-hook! (auto-dim-other-buffers-mode-hook enable-theme-functions server-after-make-frame-hook) :unless-daemonp-call-immediately
     (defun +auto-dim-other-buffers-auto-set-face (&rest _)
