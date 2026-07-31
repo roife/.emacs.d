@@ -291,9 +291,7 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
          ("m" . ghostel-project)
          ("M" . ghostel-project-list-buffers))
   :init
-  (setq ghostel-module-directory
-        (expand-file-name "ghostel/" user-emacs-directory)
-        ghostel-module-auto-install 'download
+  (setq ghostel-module-auto-install 'download
         ghostel-enable-osc52 t)
 
   :config

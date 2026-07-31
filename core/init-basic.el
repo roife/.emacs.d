@@ -1,5 +1,35 @@
 ;;; -*- lexical-binding: t -*-
 
+(use-package no-littering
+  :straight (:host github :repo "emacscollective/no-littering")
+  :demand t
+  :config
+  ;; `no-littering' intentionally leaves `custom-file' to the user.
+  (setq custom-file (no-littering-expand-etc-file-name "custom.el")
+
+        ;; Package-specific paths not covered by no-littering.
+        tramp-rpc-deploy-local-cache-directory (no-littering-expand-var-file-name "tramp-rpc/")
+        forge-post-fallback-directory (no-littering-expand-var-file-name "forge/drafts/")
+        rust-playground-basedir (no-littering-expand-var-file-name "rust-playground/")
+        typst-ts-lsp-download-path (no-littering-expand-var-file-name "lsp/tinymist/tinymist")
+        chirp-cache-directory (no-littering-expand-var-file-name "chirp/")
+        chirp-compose-temporary-directory (no-littering-expand-var-file-name "chirp/compose/")
+        ghostel-module-directory (no-littering-expand-var-file-name "ghostel/"))
+
+  ;; The existing configuration enables backups and auto-save.  This moves
+  ;; them under `var/' as well.
+  (no-littering-theme-backups)
+
+  (dolist (directory
+           (list tramp-rpc-deploy-local-cache-directory
+                 forge-post-fallback-directory
+                 rust-playground-basedir
+                 chirp-cache-directory
+                 chirp-compose-temporary-directory
+                 ghostel-module-directory
+                 (file-name-directory typst-ts-lsp-download-path)))
+    (make-directory directory t)))
+
 (setq-default
  ;; no client startup messages
  server-client-instructions nil
@@ -8,21 +38,14 @@
  ;; [lockfile]
  create-lockfiles nil
  ;; [backup]
- backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory)))
  vc-make-backup-files t
  version-control t
  backup-by-copying t
  delete-old-versions t
  kept-new-versions 6
- tramp-backup-directory-alist backup-directory-alist
  ;; [auto-save]
  auto-save-default t
  auto-save-include-big-deletions t ; Don't auto-disable auto-save after deleting big chunks.
- auto-save-list-file-prefix (expand-file-name "autosaves/" user-emacs-directory)
- auto-save-file-name-transforms (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
-                                            ;; Prefix tramp autosaves to prevent conflicts with local ones
-                                            (concat auto-save-list-file-prefix "tramp-\\2") t)
-                                      (list ".*" auto-save-list-file-prefix t))
 
  ;; Disable [bidirectional text] scanning for a modest performance
  ;; Will improve long line display performance
@@ -46,9 +69,6 @@
  truncate-partial-width-windows nil
  ;; better wrapping for cjk
  word-wrap-by-category t
-
- ;; Custom file path
- custom-file (expand-file-name "custom.el" user-emacs-directory)
 
  ;; Always follow link when visiting a [symbolic link]
  find-file-visit-truename t
@@ -201,6 +221,8 @@
                               "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
                               "^/tmp/" "^/var/folders/.+$" "^/ssh:"
                               (lambda (file) (file-in-directory-p file package-user-dir))
+                              (recentf-expand-file-name no-littering-var-directory)
+                              (recentf-expand-file-name no-littering-etc-directory)
                               (expand-file-name recentf-save-file))
         recentf-keep nil)
 
@@ -317,7 +339,6 @@
 (use-package tramp
   :config
   (setq tramp-default-method "ssh"
-        tramp-auto-save-directory (expand-file-name "tramp-autosaves/" user-emacs-directory)
         tramp-backup-directory-alist backup-directory-alist
         remote-file-name-inhibit-cache 60))
 

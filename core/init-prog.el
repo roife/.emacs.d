@@ -118,10 +118,10 @@
   (defun jdtls-command-contact (&optional interactive)
     (let* ((jdtls-java-home (getenv "JDTLS_JAVA_HOME"))
            (project-root (project-root (project-current t)))
-           (data-dir (expand-file-name
-                      (file-name-concat +cache-dir
-                                        "lsp-cache"
-                                        (md5 (expand-file-name project-root))))))
+           (data-dir
+            (file-name-concat
+             (no-littering-expand-var-file-name "lsp-cache/")
+             (md5 (expand-file-name project-root)))))
       `("env" ,(concat "JAVA_HOME=" jdtls-java-home)
         "jdtls" "--jvm-arg=-Xmx16G" "-data" ,data-dir)))
   (push '(java-mode . jdtls-command-contact) eglot-server-programs)
