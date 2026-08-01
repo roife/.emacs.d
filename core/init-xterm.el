@@ -9,14 +9,17 @@
                         'truncation
                         (make-glyph-code ?… 'shadow))
 
+;; Disable auto-composition in terminal.
+(setq-default auto-composition-mode "xterm-256color")
+
 
 ;; [Kitty Graphics Protocol] Implements support for Kitty's "graphics protocol",
 ;; which allows the terminal to display images and videos inline.
 (use-package kitty-graphics
- :straight (:type git :host github :repo "cashmeredev/kitty-graphics.el")
- :hook (tty-setup . kitty-graphics-setup)
- :init
- (setq kitty-gfx-enable-video t))
+  :straight (:type git :host github :repo "cashmeredev/kitty-graphics.el")
+  :hook (tty-setup . kitty-graphics-setup)
+  :init
+  (setq kitty-gfx-enable-video t))
 
 
 ;; [Kitty Keyboard Protocol] Implements support for Kitty's "keyboard protocol",
@@ -26,13 +29,13 @@
   :hook (tty-setup . global-kkp-mode))
 
 
-;; []
+;; [xterm]
 (use-package term/xterm
   :straight nil
   :hook (tty-setup . xterm-mouse-mode)
   :init
   (setq xterm-extra-capabilities '(modifyOtherKeys reportBackground
-                                   getSelection setSelection)
+                                                   getSelection setSelection)
         xterm-set-window-title t)
 
   (defun +xterm-report-background ()
