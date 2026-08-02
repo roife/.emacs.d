@@ -8,10 +8,13 @@
 - `rg`
 - `fd`
 - `enchant` (AppleSpell provider)
-- `rime` / `fcitx5-rime`
+- `librime`
 - `isync`
 - `mpv`
 - `ffmpeg`
+- `exiftool`
+- `universal-ctags`
+- `difft`
 
 ## Credentials
 
