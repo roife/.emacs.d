@@ -43,17 +43,17 @@
   "Get window number for current window, as set by `ace-window'."
   (let ((path (window-parameter (selected-window) 'ace-window-path)))
     (when (and path (not (string-empty-p path)))
-      (concat " " path " "))))
+      (concat " " path))))
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
-  (cond (defining-kbd-macro " MacroDef ")
-        (executing-kbd-macro " MacroExc ")))
+  (cond (defining-kbd-macro " MacroDef")
+        (executing-kbd-macro " MacroExc")))
 
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display whether it is in overwrite mode or read-only buffer."
-  (let ((ro (when buffer-read-only "%% "))
-        (ov (when overwrite-mode "# ")))
+  (let ((ro (when buffer-read-only " %%"))
+        (ov (when overwrite-mode " #")))
     (concat ro ov)))
 
 (defsubst +mode-line-symbol-overlay-indicator ()
@@ -68,8 +68,8 @@
       (if (symbol-overlay-assoc symbol)
           (concat  " " (number-to-string (1+ count))
                    "/" (number-to-string (+ count (length after)))
-                   " sym "
-                   (and (cadr keyword) "in scope "))))))
+                   " sym"
+                   (and (cadr keyword) " in scope"))))))
 
 
 ;;; Cache remote host name
@@ -120,14 +120,14 @@
   (let* ((meta-face (+mode-line-get-window-name-face))
          (active-p (mode-line-window-selected-p))
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p)))
-    `((:propertize ,(+mode-line-get-window-name)
-                   face ,panel-face)
-      (:propertize ,(+mode-line-overwrite-readonly-indicator)
-                   face ,panel-face)
+    `((:propertize ,(+mode-line-get-window-name) face ,panel-face)
+      (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,panel-face)
+      (:propertize mode-line-process face ,panel-face)
       (,active-p (:propertize
                   ,(concat (+mode-line-macro-indicator)
                            (+mode-line-symbol-overlay-indicator))
                   face ,panel-face))
+      (:propertize " " face ,panel-face)
       " "
       ,(or +mode-line-project-crumb
            `(:propertize "%b" face ,meta-face))
