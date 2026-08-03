@@ -133,7 +133,7 @@
   (setq consult-emms--sort-album-function #'string<))
 
 (use-package emms-ui
-  :straight (:type git :repo "roife/emms-ui")
+  :straight (:host github :repo "roife/emms-ui")
   :commands (emms-ui emms-ui-albums
                      emms-ui-list emms-ui-now-playing)
   :custom
