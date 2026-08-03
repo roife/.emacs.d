@@ -17,30 +17,42 @@
                (split-string (buffer-string) "\0" t))))
         (directory-files-recursively directory regex)))))
 
+(defun +emms-extract-embedded-cover (track)
+  "Return TRACK's embedded artwork as a large cover file."
+  (let ((cover (expand-file-name "cover_large.png"
+                                 (file-name-directory track))))
+    (unless (file-readable-p cover)
+      (unless (zerop
+               (call-process
+                (executable-find "ffmpeg") nil nil nil "-nostdin" "-v" "error" "-y"
+                "-i" track "-map" "0:v:0" "-frames:v" "1" "-update" "1" cover))
+        (when (file-exists-p cover) (delete-file cover))))
+    (and (file-readable-p cover) cover)))
+
 (defun +emms-extract-embedded-covers ()
-  "Extract missing cover images from embedded artwork."
+  "Extract missing large covers from embedded artwork."
   (interactive)
   (require 'emms-browser)
-  (let ((ffmpeg (executable-find "ffmpeg"))
-        albums)
+  (let (albums)
     (dolist (track
              (+emms-source-file-directory-tree-fd
-              emms-source-file-default-directory
-              "\\.\\(?:m4a\\|mp3\\|flac\\|ogg\\|opus\\|wav\\)\\'"))
-      (let* ((album (file-name-directory track))
-             (output (expand-file-name "cover.png" album)))
-        (unless (member album albums)
-          (push album albums)
-          (unless (funcall emms-browser-thumbnail-filter album)
-            (if (zerop
-                 (call-process
-                  ffmpeg nil nil nil "-nostdin" "-v" "error" "-y"
-                  "-i" track "-map" "0:v:0" "-frames:v" "1" "-update" "1" output))
-                (when (file-exists-p output)
-                  (delete-file output))))))))
+              emms-source-file-default-directory (emms-source-file-regex)))
+      (unless (member (file-name-directory track) albums)
+        (push (file-name-directory track) albums)
+        (+emms-extract-embedded-cover track))))
   (emms-browser-clear-cache-hash)
   (when (buffer-live-p emms-browser-buffer)
     (kill-buffer emms-browser-buffer)))
+
+(defun +emms-browser-cover (directory size)
+  "Return an EMMS SIZE cover from DIRECTORY, extracting large artwork on demand."
+  (if (eq size 'large)
+      (let ((cover (expand-file-name "cover_large.png" directory)))
+        (or (and (file-readable-p cover) cover)
+            (when-let* ((track (car (directory-files
+                                     directory t (emms-source-file-regex)))))
+              (+emms-extract-embedded-cover track))))
+    (emms-browser-cache-thumbnail-async directory size)))
 
 (defun +emms-lyrics-find-with-info-lyric (file)
   "Find external lyric FILE, falling back to the current track's tag."
@@ -94,11 +106,12 @@
 
   (add-to-list 'emms-info-exiftool-field-map '(info-lyrics . Lyrics))
 
-  (setq emms-browser-covers #'emms-browser-cache-thumbnail-async
+  (setq emms-browser-covers #'+emms-browser-cover
         emms-browser-thumbnail-small-size 64
         emms-browser-thumbnail-medium-size 128
         emms-info-functions '(emms-info-exiftool)
         emms-lyrics-find-lyric-function #'+emms-lyrics-find-with-info-lyric
+        emms-lyrics-scroll-p nil
         emms-source-file-directory-tree-function #'+emms-source-file-directory-tree-fd
         emms-playlist-buffer-name "*Music*"
         emms-playlist-mode-center-when-go t
@@ -118,3 +131,15 @@
          ("C-c m j" . consult-emms-current-playlist))
   :config
   (setq consult-emms--sort-album-function #'string<))
+
+(use-package emms-ui
+  :straight (:host github :repo "roife/emms-ui")
+  :commands (emms-ui emms-ui-albums
+                     emms-ui-list emms-ui-now-playing)
+  :custom
+  (emms-ui-album-cover-size 220)
+  (emms-ui-track-columns
+   '(status info-title info-playing-time info-artist
+            info-album info-genre info-year play-count))
+  (emms-ui-now-playing-cover-max-size 640)
+  (emms-ui-now-playing-default-view 'cover))

@@ -79,7 +79,7 @@
 
 ;; Read and participate in Emacs China through its Discourse API.
 (use-package nndiscourse
-  :load-path "~/code/nnextension")
+  :straight (:host github :repo "roife/nnext"))
 
 ;; [gnus-group] group mode
 (use-package gnus-group

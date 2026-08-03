@@ -115,6 +115,27 @@
 (advice-add #'popup-create :after #'+mode-line-update-project-crumb)
 (advice-add #'popup-delete :after #'+mode-line-update-project-crumb)
 
+;;; Cache envrc status
+(defvar-local +mode-line-envrc nil)
+(defun +mode-line-update-envrc (&optional buffer)
+  "Cache envrc status for BUFFER."
+  (setq buffer (or buffer (current-buffer)))
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (setq +mode-line-envrc
+            (pcase (and (bound-and-true-p envrc-mode)
+                        envrc--status)
+              ('on t)
+              ('error 'error)
+              (_ nil)))))
+  (force-mode-line-update t))
+(defun +mode-line-envrc-after-apply (buffer _result)
+  "Update the cached envrc status after applying BUFFER's environment."
+  (+mode-line-update-envrc buffer))
+(add-hook 'envrc-mode-hook #'+mode-line-update-envrc)
+(advice-add #'envrc--apply :after #'+mode-line-envrc-after-apply)
+
+
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
   (let* ((meta-face (+mode-line-get-window-name-face))
@@ -122,6 +143,10 @@
          (panel-face `(:inherit ,meta-face :inverse-video ,active-p)))
     `((:propertize ,(+mode-line-get-window-name) face ,panel-face)
       (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,panel-face)
+      (:propertize ,(pcase +mode-line-envrc
+                      ('error " ⎇[error]")
+                      (_ (when +mode-line-envrc " ⎇")))
+                   face ,panel-face)
       (:propertize mode-line-process face ,panel-face)
       (,active-p (:propertize
                   ,(concat (+mode-line-macro-indicator)
@@ -179,10 +204,10 @@
 
   (defvar +tab-bar-gnus-indicator-cache nil)
   (defvar +tab-bar-telega-indicator-cache nil)
-  (defvar +tab-bar-elfeed-indicator-cache nil)
+  (defvar +tab-bar-emms-indicator-cache nil)
 
   (setq tab-bar-format '((lambda () +tab-bar-telega-indicator-cache)
-                         (lambda () +tab-bar-elfeed-indicator-cache)
+                         (lambda () +tab-bar-emms-indicator-cache)
                          (lambda () +tab-bar-gnus-indicator-cache)
                          tab-bar-format-tabs))
 
@@ -234,23 +259,22 @@
     (advice-add 'telega--on-updateChatUnreadMentionCount :after #'+tab-bar-telega-indicator-update)
     (advice-add 'telega--on-updateChatUnreadReactionCount :after #'+tab-bar-telega-indicator-update))
 
-  (with-eval-after-load 'elfeed
-    (add-hook! (elfeed-db-update-hook elfeed-tag-hook elfeed-untag-hook)
-      (defun +tab-bar-elfeed-indicator ()
-        "Show the number of unread Elfeed entries."
-        (when (and (featurep 'elfeed)
-                   (hash-table-p elfeed-db-entries))
-          (setq +tab-bar-elfeed-indicator-cache
-                (cl-loop for entry being the hash-values
-                         of elfeed-db-entries
-                         count (elfeed-tagged-p 'unread entry) into count
-                         finally return
-                         (and (> count 0)
-                              `((tab-bar-elfeed
-                                 menu-item ,(propertize (format " R %d " count)
-                                                        'face 'font-lock-keyword-face)
-                                 elfeed))))))
-        (force-mode-line-update t))))
+  (with-eval-after-load 'emms
+    (defun +tab-bar-emms-indicator-update (&rest _)
+      "Update the cached EMMS track indicator in the tab bar."
+      (setq +tab-bar-emms-indicator-cache
+            (when (and (bound-and-true-p emms-player-playing-p))
+              (let ((text (propertize (concat " " (if emms-player-paused-p "Ⅱ" "♫") " ")
+                                      'face 'font-lock-keyword-face)))
+                `((tab-bar-emms menu-item ,text emms-playlist-mode-go)))))
+      (force-mode-line-update t))
+
+    (dolist (hook '(emms-player-started-hook
+                    emms-player-paused-hook
+                    emms-player-stopped-hook
+                    emms-player-finished-hook))
+      (add-hook hook #'+tab-bar-emms-indicator-update t))
+    (+tab-bar-emms-indicator-update))
 
   ;; WORKAROUND: fresh tab-bar for daemon
   (add-hook! (server-after-make-frame-hook window-setup-hook) :call-immediately
