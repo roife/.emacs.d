@@ -17,7 +17,9 @@
   :straight (liberime :type git :host github :repo "emacs-rime/liberime")
   :init
   (setq liberime-auto-build t
-        liberime-user-data-dir "~/Library/Rime/"))
+        liberime-user-data-dir (if (eq system-type 'darwin)
+                                   "~/Library/Rime/"
+                                 "~/.local/share/fcitx5/rime")))
 
 (use-package rimel
   :straight (rimel :type git :host github :repo "emacs-rime/rimel")
