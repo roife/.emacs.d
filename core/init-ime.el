@@ -21,6 +21,15 @@
                                    "~/Library/Rime/"
                                  "~/.local/share/fcitx5/rime")))
 
+(use-package liberime-regexp
+  :straight (liberime-regexp
+             :type git
+             :host github
+             :repo "roife/liberime-regexp")
+  :hook (liberime-after-start . liberime-regexp-mode)
+  :config
+  (setq liberime-regexp-candidate-limit 40))
+
 (use-package rimel
   :straight (rimel :type git :host github :repo "emacs-rime/rimel")
   :custom-face
