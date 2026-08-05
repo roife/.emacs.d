@@ -320,8 +320,11 @@
   :straight t
   :init
   (setq rust-mode-treesitter-derive t
-        rust-format-goto-problem nil)
-  )
+        rust-format-goto-problem nil))
+
+
+(use-package fish-mode
+  :straight t)
 
 
 (use-package rust-playground

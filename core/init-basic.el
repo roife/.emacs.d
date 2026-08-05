@@ -124,7 +124,7 @@
  uniquify-buffer-name-style 'forward
 
  ;; Fix alignment problem
- truncate-string-ellipsis "…"
+ truncate-string-ellipsis "⁝"
 
  ;; Shell command
  shell-command-prompt-show-cwd t
@@ -394,3 +394,7 @@
 ;; [backup walker] A utility to view Emacs backup files.
 (use-package backup-walker
   :straight t)
+
+
+;; [posframe]
+(use-package posframe :straight t)

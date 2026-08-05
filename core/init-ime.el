@@ -24,11 +24,12 @@
 (use-package liberime-regexp
   :straight (:host github :repo "roife/liberime-regexp")
   :hook (liberime-after-start . liberime-regexp-enable)
-  :custom
-  (liberime-regexp-candidate-limit 40))
+  :config
+  (setq liberime-regexp-candidate-limit 40))
 
 (use-package rimel
   :straight (rimel :type git :host github :repo "emacs-rime/rimel")
+  :defer 1
   :custom-face
   (rimel-candidate-label-face ((t (:inherit font-lock-comment-face :height 0.85))))
   (rimel-page-indicator-face ((t (:inherit font-lock-comment-face :height 0.85))))
@@ -47,8 +48,7 @@
                                    rimel-predicate-current-uppercase-letter-p
                                    rimel-predicate-org-in-src-block-p
                                    rimel-predicate-org-latex-mode-p
-                                   rimel-predicate-tex-math-or-command-p))
-  :bind ("C-SPC" . toggle-input-method))
+                                   rimel-predicate-tex-math-or-command-p)))
 
 (register-input-method "rimel" "Chinese" #'rimel-activate
                        (if (char-displayable-p 12563) (char-to-string 12563) "中")

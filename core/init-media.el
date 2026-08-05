@@ -119,10 +119,8 @@
         emms-info-auto-update t
         emms-volume-change-amount 5
         emms-volume-change-function #'emms-volume-mpv-change
-        emms-show-format "♪ %s")
-
-  (setopt emms-player-mpv-update-metadata t)
-  (emms-history-load))
+        emms-show-format "♪ %s"
+        emms-player-mpv-update-metadata t))
 
 (use-package consult-emms
   :straight (:host github :repo "Hugo-Heagren/consult-emms")
