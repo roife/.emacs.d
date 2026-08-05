@@ -23,7 +23,7 @@
 
 (use-package liberime-regexp
   :straight (:host github :repo "roife/liberime-regexp")
-  :hook (after-init . liberime-regexp-mode)
+  :hook (liberime-after-start . liberime-regexp-enable)
   :custom
   (liberime-regexp-candidate-limit 40))
 
