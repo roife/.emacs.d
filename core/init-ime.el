@@ -29,7 +29,6 @@
 
 (use-package rimel
   :straight (rimel :type git :host github :repo "emacs-rime/rimel")
-  :defer 1
   :custom-face
   (rimel-candidate-label-face ((t (:inherit font-lock-comment-face :height 0.85))))
   (rimel-page-indicator-face ((t (:inherit font-lock-comment-face :height 0.85))))
@@ -51,23 +50,23 @@
                                    rimel-predicate-tex-math-or-command-p)))
 
 (register-input-method "rimel" "Chinese" #'rimel-activate
-                       (if (char-displayable-p 12563) (char-to-string 12563) "中")
+                       (or (char-displayable-p 12563) "中")
                        "Rimel - Rime input method via liberime")
 
 ;; [sis] automatically switch input source
 (use-package sis
   :straight t
-  :hook (;; Enable the inline-english-mode for all buffers.
-         ;; When add space after chinese char, automatically switch to english mode
-         (after-init . sis-global-inline-mode)
+  :hook (;; When add space after chinese char, automatically switch to english mode
+         (liberime-after-start . sis-global-inline-mode)
          ;; Enable the context-mode for all buffers
-         (after-init . sis-global-context-mode)
+         (liberime-after-start . sis-global-context-mode)
          ;; Colored cursor
-         (after-init . sis-global-cursor-color-mode))
-  :config
+         (liberime-after-start . sis-global-cursor-color-mode))
+  :init
   ;; Use rimel as default
   (sis-ism-lazyman-config nil "rimel" 'native)
-
+  (sis-get) ; HACK: set sis--ism
+  :config
   ;; HACK: Set cursor color automatically
   (add-hook! (enable-theme-functions server-after-make-frame-hook) :unless-daemonp-call-immediately
     (defun +sis-set-cursor-color (&rest _)

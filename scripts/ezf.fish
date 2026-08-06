@@ -61,7 +61,7 @@ function __ezf-call
 end
 
 function ezf-file-widget --description 'Paste selected files and directories onto the command line'
-    set -l query (commandline --current-token --tokens-expanded | string collect -N)
+    set -l query (commandline --current-token --tokens-expanded | string collect)
     set -l selection (__ezf-call file "$PWD" "$query" | string split0)
 
     if set -q selection[1]
@@ -95,7 +95,7 @@ function ezf-history-widget --description 'Paste the selected history entry onto
 end
 
 function ezf-cd-widget --description 'Change into the selected directory'
-    set -l query (commandline --current-token --tokens-expanded | string collect -N)
+    set -l query (commandline --current-token --tokens-expanded | string collect)
     set -l selection (__ezf-call directory "$PWD" "$query" | string split0)
 
     if set -q selection[1]

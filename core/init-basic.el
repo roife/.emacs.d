@@ -179,15 +179,15 @@
 
 
 ;; [gcmh] Run GC when Emacs is idle, not while commands are active.
-(use-package gcmh
-  :straight t
-  :unless (fboundp 'igc-info)
-  :hook (emacs-startup . gcmh-mode)
-  :config
-  (setq gcmh-idle-delay 'auto
-        gcmh-auto-idle-delay-factor 10
-        gcmh-high-cons-threshold (* 128 1024 1024)
-        gcmh-low-cons-threshold +gc-cons-threshold))
+;; (use-package gcmh
+;;   :straight t
+;;   :unless (fboundp 'igc-info)
+;;   :hook (emacs-startup . gcmh-mode)
+;;   :config
+;;   (setq gcmh-idle-delay 'auto
+;;         gcmh-auto-idle-delay-factor 10
+;;         gcmh-high-cons-threshold (* 128 1024 1024)
+;;         gcmh-low-cons-threshold +gc-cons-threshold))
 
 
 ;; History
