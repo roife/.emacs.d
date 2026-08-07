@@ -15,7 +15,6 @@
                      (when (eq system-type 'darwin) 'init-mac)
                      'init-completion
                      'init-tools
-                     'init-keybinding
                      'init-highlight
                      'init-edit
                      'init-window
@@ -25,7 +24,6 @@
                      'init-writing
                      'init-org
                      'init-vcs
-                     'init-browser
                      'init-ibuffer
                      'init-ime
                      'init-modal

@@ -12,12 +12,6 @@
 ;; [visual-line-mode] Soft line-wrapping
 (add-hook 'text-mode-hook 'visual-line-mode)
 
-
-;; [edit-indirect] Edit code blocks indirectly
-(use-package edit-indirect
-  :straight t)
-
-
 ;; [pangu] Add pangu spaces
 (use-package pangu-spacing
   :straight t)

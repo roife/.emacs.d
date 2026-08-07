@@ -38,11 +38,11 @@
 
 
 ;; [arxiv.el] Search, browse, and save arXiv papers
-(use-package arxiv
-  :straight (:type git :host github :repo "roife/arxiv.el")
-  :config
-  (setq arxiv-browser-function #'arxiv-eww-browse-url)
-  (arxiv-url-handler-mode 1))
+;; (use-package arxiv
+;;   :straight (:type git :host github :repo "roife/arxiv.el")
+;;   :config
+;;   (setq arxiv-browser-function #'arxiv-eww-browse-url)
+;;   (arxiv-url-handler-mode 1))
 
 
 ;; [avy] Jump with several key strock
@@ -55,15 +55,7 @@
          ("C-, ," . avy-isearch))
   :config
   ;; overlay is used during isearch, `pre' style makes avy keys evident.
-  (setq avy-styles-alist '((avy-isearch . pre)))
-  )
-
-
-;; [avy-pinyin] Avy support for pinyin
-(use-package ace-pinyin
-  :straight t
-  :after avy
-  :init (ace-pinyin-global-mode t))
+  (setq avy-styles-alist '((avy-isearch . pre))))
 
 
 ;; [link-hint] Open URL in text with avy
@@ -192,3 +184,20 @@
   :straight '(reader :type git :host codeberg :repo "MonadicSheep/emacs-reader"
                      :files ("*.el" "render-core.dylib")
                      :pre-build ("make" "all")))
+
+;; [browse-url] Pass a URL to browser
+(use-package browse-url
+  :defines dired-mode-map
+  :bind (("C-, o" . browse-url-at-point)
+         ("C-, e" . browse-url-emacs))
+  :config
+  (setq browse-url-browser-function #'eww-browse-url))
+
+;; [eww] Builtin browser
+(use-package eww
+  :config
+  (setq shr-max-image-proportion 0.5))
+
+(use-package xwidget
+  :config
+  (setq xwidget-webkit-buffer-name-format "*XWidget: %T*"))
