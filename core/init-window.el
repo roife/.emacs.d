@@ -193,7 +193,8 @@
   :straight t
   :hook (window-setup . zoom-mode)
   :config
-  (setq zoom-ignored-major-modes '(ediff-mode vundo-mode minibuffer-mode speedbar-mode))
+  (setq zoom-minibuffer-preserve-layout nil
+        zoom-ignored-major-modes '(ediff-mode vundo-mode minibuffer-mode speedbar-mode))
 
   (defun +zoom-fix-window-size-h ()
     (setq-local window-size-fixed t))
