@@ -47,8 +47,7 @@
                                         (window-height . 0.5)))
   (defadvice! +vertico-buffer-disbale-mode-line ()
     :before #'vertico-buffer--setup
-    (setq-local mode-line-format nil))
-  )
+    (setq-local mode-line-format nil)))
 
 
 ;;; Matching styles
@@ -171,7 +170,29 @@
    :preview-key "s-p")
   (consult-customize
    consult-theme
-   :preview-key (list "s-p" :debounce 0.6 'any)))
+   :preview-key (list "s-p" :debounce 0.6 'any))
+
+  (defvar +consult-fd-dwim (consult--fd-make-builder
+                            (list (or (consult--project-root)
+                                      (expand-file-name default-directory)))))
+
+  (defvar +consult-source-fd
+    (list :name     "Find"
+          :narrow   ?f
+          :category 'file
+          :face     'consult-file
+          :history  'file-name-history
+          :action   #'consult--file-action
+          :state    #'consult--file-preview
+          :async (lambda (sink)
+                   (let ((consult-fd-args '("fd" "--full-path" "--color=never" "--hidden" "--follow" "--exclude .git")))
+                     (funcall
+                      (consult--process-collection +consult-fd-dwim
+                        :transform (consult--async-map #'abbreviate-file-name)
+                        :highlight t
+                        :file-handler t)
+                      sink)))))
+  (add-to-list 'consult-buffer-sources '+consult-source-fd 'append))
 
 
 (use-package avy-embark-collect

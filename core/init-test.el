@@ -1,11 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(with-eval-after-load "eglot"
-  (push '(verilog-mode . ("/Users/roifewu/code/vide/target/debug/vide")) eglot-server-programs)
-  )
-
-(setq eglot-x-enable-snippet-text-edit nil)
-
 (defun cargo-xtask-install-server ()
   (interactive)
   (let ((default-directory (locate-dominating-file default-directory "crates")))
@@ -26,8 +20,8 @@
   (interactive)
   (when-let* ((project-name (when (project-current)
                               (file-name-nondirectory
-                              (directory-file-name
-                               (project-root (project-current))))))
+                               (directory-file-name
+                                (project-root (project-current))))))
               (log-buffer-name (format "*EGLOT (%s/(rust-ts-mode rust-mode)) events*"
                                        project-name)))
     (let ((eglot-log-window (catch 'found
@@ -104,7 +98,7 @@ either \"line\" or \"nul\"; OUTPUT-SEPARATOR joins multiple selections."
                  (when directories-only '("--type=directory")))))
     (consult--find
      (if directories-only "Directory: " "File: ")
-     (consult--fd-make-builder '("."))
+     +consult-fd-dwim
      initial-input)))
 
 (defun ezf--history (filename initial-input)
@@ -132,7 +126,8 @@ either \"line\" or \"nul\"; OUTPUT-SEPARATOR joins multiple selections."
 
 (defun ezf-client (request-file result-file)
   "Handle an ezf terminal REQUEST-FILE, writing to RESULT-FILE."
-  (let ((frame (selected-frame)))
+  (let ((frame (selected-frame))
+        (vertico-buffer-display-action '(display-buffer-same-window)))
     (unwind-protect
         (when-let* ((selection
                      (condition-case nil
