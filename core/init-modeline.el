@@ -153,7 +153,7 @@
                            (+mode-line-symbol-overlay-indicator))
                   face ,panel-face))
       (:propertize " " face ,panel-face)
-      " "
+      " %l "
       ,(or +mode-line-project-crumb
            `(:propertize "%b" face ,meta-face))
       " "

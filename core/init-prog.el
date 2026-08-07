@@ -425,6 +425,21 @@
   :hook (emacs-startup . envrc-global-mode))
 
 
+;; [log-view-mode]
+(use-package logview
+  :straight t
+  :custom
+  (logview-additional-level-mappings
+   '(("Pipeline levels" . ((error       "ERROR")
+                           (warning     "WARN ")
+                           (information "INFO ")
+                           (debug       "DEBUG")
+                           (trace       "TRACE")))))
+  (logview-additional-submodes
+   '(("Pipeline" . ((format . "[TIMESTAMP] [LEVEL] [NAME] MESSAGE")
+                    (levels . "Pipeline levels"))))))
+
+
 ;; [minuet-ai] AI-powered inline code completion
 (use-package minuet
   :straight (:host github :repo "milanglacier/minuet-ai.el")

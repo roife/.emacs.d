@@ -362,12 +362,6 @@
         minibuffer-follows-selected-frame nil))
 
 
-;; [repeat] Enable repeatable commands
-(use-package repeat
-  :straight nil
-  :hook (after-init . repeat-mode))
-
-
 ;; [comint] Command interpreter
 (use-package comint
   :config
