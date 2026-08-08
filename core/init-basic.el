@@ -392,3 +392,18 @@
 
 ;; [posframe]
 (use-package posframe :straight t)
+
+
+;; [project] Project manager
+(use-package project
+  :straight (:type built-in)
+  :bind (:map project-prefix-map
+              ("m" . magit-status))
+  :config
+  (setq project-switch-commands '((project-find-file "File")
+                                  (project-find-regexp "Regexp")
+                                  (project-switch-to-buffer "Buffer")
+                                  (project-dired "Dired")
+                                  (project-eshell "Eshell")
+                                  (project-search "Search")
+                                  (magit-status "Magit"))))

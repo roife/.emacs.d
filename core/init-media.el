@@ -75,6 +75,12 @@
               (insert lyrics))))
         cache-file)))
 
+(autoload 'emms-playlist-mode-go "emms-playlist-mode" nil t)
+(autoload 'emms-tag-editor-edit "emms-tag-editor" nil t)
+(autoload 'emms-lyrics-visit-lyric "emms-lyrics" nil t)
+(autoload 'emms-info-exiftool "emms-info-exiftool")
+(autoload 'emms-last-played-update-current "emms-last-played")
+
 (use-package emms
   :straight t
   :bind (("C-c m b" . emms-smart-browse)
@@ -102,14 +108,22 @@
         emms-player-mpv-parameters '("--quiet" "--no-video" "--force-window=no"))
   (make-directory emms-directory t)
   :config
-  (emms-all)
+  (require 'emms-player-mpv)
+  (require 'emms-cache)
+  (require 'emms-history)
 
-  (add-to-list 'emms-info-exiftool-field-map '(info-lyrics . Lyrics))
+  (add-to-list 'emms-track-initialize-functions
+               #'emms-info-initialize-track)
+  (add-hook 'emms-player-started-hook #'emms-last-played-update-current)
+
+  (with-eval-after-load 'emms-info-exiftool
+    (add-to-list 'emms-info-exiftool-field-map '(info-lyrics . Lyrics)))
 
   (setq emms-browser-covers #'+emms-browser-cover
         emms-browser-thumbnail-small-size 64
         emms-browser-thumbnail-medium-size 128
         emms-info-functions '(emms-info-exiftool)
+        emms-track-description-function #'emms-info-track-description
         emms-lyrics-find-lyric-function #'+emms-lyrics-find-with-info-lyric
         emms-lyrics-scroll-p nil
         emms-source-file-directory-tree-function #'+emms-source-file-directory-tree-fd
@@ -119,8 +133,10 @@
         emms-info-auto-update t
         emms-volume-change-amount 5
         emms-volume-change-function #'emms-volume-mpv-change
-        emms-show-format "♪ %s"
-        emms-player-mpv-update-metadata t))
+        emms-show-format "♪ %s")
+
+  (emms-cache 1)
+  (setopt emms-player-mpv-update-metadata t))
 
 (use-package consult-emms
   :straight (:host github :repo "Hugo-Heagren/consult-emms")
