@@ -212,7 +212,7 @@
               for i from 1
               for current = (eq (car tab) 'current-tab)
               for face = (funcall tab-bar-tab-face-function tab)
-              concat (if (= i 1) "" "  ")
+              concat (if (= i 1) "" " ")
               concat (propertize
                       (format "%d %s" i
                               (tab-bar-tab-name-format-truncated
