@@ -149,10 +149,10 @@
                            (+mode-line-symbol-overlay-indicator))
                   face ,panel-face))
       (:propertize " " face ,panel-face)
-      " %l "
+      " "
       ,(or +mode-line-project-crumb
            `(:propertize "%b" face ,meta-face))
-      " "
+      (:propertize ":%l " face 'font-lock-comment-face)
       (:eval (breadcrumb-imenu-crumbs))
       (:propertize +mode-line-remote-host-name
                    face +mode-line-host-name-active-face)
@@ -183,7 +183,8 @@
   :bind (("M-t" . tab-new)
          ("M-w" . tab-close)
          ("M-<tab>" . tab-next)
-         ("M-S-<tab>" . tab-previous))
+         ("M-S-<tab>" . tab-previous)
+         ("M-SPC" . +tab-bar-echo))
   :config
   (setq tab-bar-separator ""
         tab-bar-new-tab-choice "*scratch*"
@@ -207,28 +208,25 @@
     "Display the current tab bar in the echo area."
     (interactive)
     (message
-     "%s"
+     "%s%s%s%s"
+     (or +tab-bar-telega-indicator-cache "")
+     (or +tab-bar-emms-indicator-cache "")
+     (or +tab-bar-gnus-indicator-cache "")
      (cl-loop for tab in (funcall tab-bar-tabs-function)
               for i from 1
               for current = (eq (car tab) 'current-tab)
-              for face = (funcall tab-bar-tab-face-function tab)
-              concat (if (= i 1) "" " ")
+              for face = (if current
+                             '(:inherit 'tab-bar-tab :inverse-video t)
+                           'tab-bar-tab)
               concat (propertize
-                      (format "%d %s" i
+                      (format " %d %s " i
                               (tab-bar-tab-name-format-truncated
                                (alist-get 'name tab) tab i))
-                      'face (if current
-                                `(:inherit ,face :inverse-video t)
-                              face)))))
+                      'face face))))
 
   (defvar +tab-bar-gnus-indicator-cache nil)
   (defvar +tab-bar-telega-indicator-cache nil)
   (defvar +tab-bar-emms-indicator-cache nil)
-
-  (setq tab-bar-format '((lambda () +tab-bar-telega-indicator-cache)
-                         (lambda () +tab-bar-emms-indicator-cache)
-                         (lambda () +tab-bar-gnus-indicator-cache)
-                         tab-bar-format-tabs))
 
   (with-eval-after-load 'gnus
     (add-hook! (gnus-started-hook gnus-after-getting-new-news-hook
@@ -242,11 +240,7 @@
                                           when (numberp unread)
                                           sum unread))
                           ((> count 0)))
-                `((tab-bar-gnus menu-item
-                                ,(propertize (format " M %d " count)
-                                             'face 'font-lock-keyword-face)
-                                gnus))))
-        (force-mode-line-update t))))
+                (propertize (format " M %d " count) 'face 'font-lock-keyword-face))))))
 
   (with-eval-after-load 'telega
     (defadvice! +tab-bar-telega-indicator-update (&rest _)
@@ -264,12 +258,10 @@
                                                        (telega-filter-chats chats '(and is-known mention)))))
                      (reaction-count (apply #'+ (mapcar (telega--tl-prop :unread_reaction_count)
                                                         (telega-filter-chats chats '(and is-known unread-reactions)))))
-                     (count (+ unread-count mention-count reaction-count))
-                     (text (propertize
-                            (concat " T" (unless (zerop count) (number-to-string count)) " ")
-                            'face `(:inherit font-lock-keyword-face :inverse-video ,online-p))))
-                `((tab-bar-telega menu-item ,text telega)))))
-      (force-mode-line-update t))
+                     (count (+ unread-count mention-count reaction-count)))
+                (propertize
+                 (concat " T" (unless (zerop count) (number-to-string count)) " ")
+                 'face `(:inherit font-lock-keyword-face :inverse-video ,online-p))))))
 
     (add-hook! (telega-ready-hook
                 telega-chats-fetched-hook
@@ -282,10 +274,8 @@
       "Update the cached EMMS track indicator in the tab bar."
       (setq +tab-bar-emms-indicator-cache
             (when (and (bound-and-true-p emms-player-playing-p))
-              (let ((text (propertize (concat " " (if emms-player-paused-p "Ⅱ" "♫") " ")
-                                      'face 'font-lock-keyword-face)))
-                `((tab-bar-emms menu-item ,text emms-playlist-mode-go)))))
-      (force-mode-line-update t))
+              (propertize (concat " " (if emms-player-paused-p "Ⅱ" "♫") " ")
+                          'face 'font-lock-keyword-face))))
 
     (add-hook! (emms-player-started-hook
                 emms-player-paused-hook
