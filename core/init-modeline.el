@@ -184,7 +184,10 @@
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
-  ;; Turn on tab-bar in early-init to speedup
+  :bind (("M-t" . tab-new)
+         ("M-w" . tab-close)
+         ("M-<tab>" . tab-next)
+         ("M-S-<tab>" . tab-previous))
   :config
   (setq tab-bar-separator ""
         tab-bar-new-tab-choice "*scratch*"
@@ -194,6 +197,7 @@
         tab-bar-tab-hints t)
 
   (customize-set-variable 'tab-bar-select-tab-modifiers '(meta))
+  (customize-set-variable 'tab-bar-show nil)
 
   ;; truncate for [tab name] and add count
   (setq tab-bar-tab-name-format-functions
@@ -201,6 +205,28 @@
           tab-bar-tab-name-format-truncated
           (lambda (name &rest _) (concat " " name " "))
           tab-bar-tab-name-format-face))
+
+  (defun +tab-bar-echo (&rest _)
+    "Display the current tab bar in the echo area."
+    (interactive)
+    (message
+     "%s"
+     (cl-loop for tab in (funcall tab-bar-tabs-function)
+              for i from 1
+              for current = (eq (car tab) 'current-tab)
+              for face = (funcall tab-bar-tab-face-function tab)
+              concat (if (= i 1) "" "  ")
+              concat (propertize
+                      (format "%d %s" i
+                              (tab-bar-tab-name-format-truncated
+                               (alist-get 'name tab) tab i))
+                      'face (if current
+                                `(:inherit ,face :inverse-video t)
+                              face)))))
+
+  (add-hook 'tab-bar-tab-post-select-functions #'+tab-bar-echo)
+  (advice-add 'tab-bar-new-tab :after #'+tab-bar-echo)
+  (advice-add 'tab-bar-close-tab :after #'+tab-bar-echo)
 
   (defvar +tab-bar-gnus-indicator-cache nil)
   (defvar +tab-bar-telega-indicator-cache nil)
