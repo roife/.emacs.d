@@ -138,3 +138,6 @@
               (backward-char 2)
               (delete-char 1)
               (setq-local +sis-inline-english-last-space-pos nil))))))))
+
+(when (daemonp)
+  (liberime-load))
