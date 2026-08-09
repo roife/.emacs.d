@@ -186,7 +186,7 @@
 (use-package dumb-jump
   :straight t
   :init
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  (add-hook! xref-backend-functions #'dumb-jump-xref-activate)
   :config
   (setq dumb-jump-prefer-searcher 'rg
         dumb-jump-selector 'completing-read
@@ -269,7 +269,7 @@
   :init
   (setq dape-buffer-window-arrangement 'right)
   :config
-  (add-hook 'dape-start-hook #'+dape-save-buffers-h))
+  (add-hook! dape-start-hook #'+dape-save-buffers-h))
 
 
 ;; [flymake] On-the-fly syntax checker
@@ -419,6 +419,10 @@
   :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
   :hook (prog-mode . indent-bars-mode)
   :config
+  ;; Prevent terminal display properties from leaking into inserted text.
+  (setf (alist-get 'indent-bars-display
+                   (default-value 'text-property-default-nonsticky))
+        t)
   (setq indent-bars-display-on-blank-lines nil
         indent-bars-width-frac 0.1
         indent-bars-color '(highlight :face-bg t :blend 0.2)

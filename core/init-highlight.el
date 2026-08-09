@@ -111,7 +111,14 @@
   (setq pulse-delay 0.1
         pulse-iterations 2)
 
-  (defun +pulse-momentary-line (&rest _)
+  (defadvice! +pulse-momentary-line (&rest _)
+    :after '(recenter-top-bottom
+             other-window switch-to-buffer
+             aw-select
+             windmove-do-window-select
+             pager-page-up
+             treemacs-select-window
+             tab-bar-select-tab)
     "Pulse the current line."
     (pulse-momentary-highlight-one-line (point)))
 
@@ -119,32 +126,17 @@
     "Pulse the region or the current line."
     (xref-pulse-momentarily))
 
-  (defun +recenter-and-pulse(&rest _)
+  (defadvice! +recenter-and-pulse (&rest _)
+    :after '(pop-to-mark-command pop-global-mark)
     "Recenter and pulse the region or the current line."
     (recenter)
     (+pulse-momentary))
 
-  (defun +recenter-and-pulse-line (&rest _)
+  (defadvice! +recenter-and-pulse-line (&rest _)
+    :after '(symbol-overlay-basic-jump compile-goto-error)
     "Recenter and pulse the current line."
     (recenter)
     (+pulse-momentary-line))
-
-  (dolist (cmd '(recenter-top-bottom
-                 other-window switch-to-buffer
-                 aw-select
-                 windmove-do-window-select
-                 pager-page-up
-                 treemacs-select-window
-                 tab-bar-select-tab))
-    (advice-add cmd :after #'+pulse-momentary-line))
-
-  (dolist (cmd '(pop-to-mark-command
-                 pop-global-mark))
-    (advice-add cmd :after #'+recenter-and-pulse))
-
-  (dolist (cmd '(symbol-overlay-basic-jump
-                 compile-goto-error))
-    (advice-add cmd :after #'+recenter-and-pulse-line))
   )
 
 
@@ -181,7 +173,7 @@
   (defun +highlight-changes-auto ()
     (when (buffer-file-name)
       (+highlight-changes-mode-turn-on)
-      (add-hook 'after-save-hook #'+highlight-changes-mode-turn-on nil t)
-      (add-hook 'before-save-hook #'+highlight-changes-mode-turn-off nil t)))
+      (add-hook! after-save-hook :local #'+highlight-changes-mode-turn-on)
+      (add-hook! before-save-hook :local #'+highlight-changes-mode-turn-off)))
   :hook ((prog-mode conf-mode text-mode) . +highlight-changes-auto)
   )

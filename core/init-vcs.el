@@ -50,7 +50,7 @@
 
   ;; Integration with magit
   (with-eval-after-load 'magit
-    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+    (add-hook! magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 
   ;; WORKAROUND: Integration with ws-butler
   (with-eval-after-load 'ws-butler

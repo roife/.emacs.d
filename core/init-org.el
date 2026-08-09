@@ -117,8 +117,8 @@
 
   (add-hook! org-mode-hook :call-immediately
     (defun +org-add-appear-hook ()
-      (add-hook 'meow-insert-enter-hook #'org-appear-manual-start nil t)
-      (add-hook 'meow-insert-exit-hook #'org-appear-manual-stop nil t))))
+      (add-hook! meow-insert-enter-hook :local #'org-appear-manual-start)
+      (add-hook! meow-insert-exit-hook :local #'org-appear-manual-stop))))
 
 
 (use-package org-modern
@@ -130,7 +130,7 @@
 (use-package org-modern-indent
   :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
   :config
-  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+  (add-hook! org-mode-hook :depth 90 #'org-modern-indent-mode))
 
 
 ;; [ox]

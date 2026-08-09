@@ -114,7 +114,7 @@
 
   (add-to-list 'emms-track-initialize-functions
                #'emms-info-initialize-track)
-  (add-hook 'emms-player-started-hook #'emms-last-played-update-current)
+  (add-hook! emms-player-started-hook #'emms-last-played-update-current)
 
   (with-eval-after-load 'emms-info-exiftool
     (add-to-list 'emms-info-exiftool-field-map '(info-lyrics . Lyrics)))

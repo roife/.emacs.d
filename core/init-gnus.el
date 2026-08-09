@@ -168,7 +168,7 @@ do not repeatedly invoke the comparatively expensive Hacker News generator."
   :after gnus
   :config
   (gnus-demon-add-handler #'gnus-demon-scan-news 30 nil)
-  (add-hook 'gnus-started-hook #'gnus-demon-init))
+  (add-hook! gnus-started-hook #'gnus-demon-init))
 
 
 ;; [gnus-sum] summary mode

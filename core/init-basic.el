@@ -202,9 +202,9 @@
   (+advice-pp-to-prin1! 'save-place-alist-to-file)
 
   ;; recenters the view after the jump
-  (advice-add 'save-place-find-file-hook :after
-              (lambda (&rest _)
-                (when buffer-file-name (ignore-errors (recenter)))))
+  (defadvice! +save-place-recenter-a (&rest _)
+    :after #'save-place-find-file-hook
+    (when buffer-file-name (ignore-errors (recenter))))
   )
 
 

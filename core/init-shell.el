@@ -77,10 +77,9 @@ If no project is found, create a temporary Eshell instance in the current direct
                   (eshell/cd dir-name)
                   (eshell-send-input))
                 ;; Add a hook to close the window when Eshell exits
-                (add-hook 'eshell-exit-hook
-                          (lambda ()
-                            (ignore-errors (delete-window (get-buffer-window popup-buffer-name))))
-                          nil t))))))))
+                (add-hook! eshell-exit-hook :local
+                  (ignore-errors
+                    (delete-window (get-buffer-window popup-buffer-name)))))))))))
 
   (defun +eshell/define-alias ()
     "Define alias for eshell"
@@ -105,7 +104,7 @@ If no project is found, create a temporary Eshell instance in the current direct
     (eshell/alias "gch" "git checkout $*")
     (eshell/alias "gcb" "git checkout -b $*")
     )
-  (add-hook 'eshell-first-time-mode-hook #'+eshell/define-alias)
+  (add-hook! eshell-first-time-mode-hook #'+eshell/define-alias)
   ;; Don't auto-write our aliases! Let us manage our own `eshell-aliases-file' via elisp
   (advice-add #'eshell-write-aliases-list :override #'ignore)
 

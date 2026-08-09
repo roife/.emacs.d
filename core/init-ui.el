@@ -95,7 +95,7 @@
                                                intangible t
                                                cursor-intangible t
                                                face minibuffer-prompt))
-(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+(add-hook! minibuffer-setup-hook #'cursor-intangible-mode)
 ;; Allow emacs to query passphrase through minibuffer
 (setq epg-pinentry-mode 'loopback)
 
@@ -164,7 +164,7 @@
 (setq window-divider-default-places t
       window-divider-default-bottom-width 1
       window-divider-default-right-width 1)
-(add-hook 'window-setup-hook #'window-divider-mode)
+(add-hook! window-setup-hook #'window-divider-mode)
 
 
 ;; [ligature] ligature support for Emacs

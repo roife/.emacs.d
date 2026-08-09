@@ -10,7 +10,7 @@
 
 
 ;; [visual-line-mode] Soft line-wrapping
-(add-hook 'text-mode-hook 'visual-line-mode)
+(add-hook! text-mode-hook #'visual-line-mode)
 
 ;; [pangu] Add pangu spaces
 (use-package pangu-spacing

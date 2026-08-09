@@ -12,8 +12,8 @@
                   :stream t
                   :request-params '(:thinking (:type "enabled"))
                   :key #'gptel-api-key-from-auth-source))
-  (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
-  (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
+  (add-hook! gptel-post-stream-hook #'gptel-auto-scroll)
+  (add-hook! gptel-post-response-functions #'gptel-end-of-response)
   )
 
 (use-package gptel-rewrite

@@ -98,7 +98,7 @@
   (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc)
 
   ;; Context mode
-  (add-hook 'meow-insert-exit-hook #'sis-set-english)
+  (add-hook! meow-insert-exit-hook #'sis-set-english)
   (add-to-list 'sis-context-hooks 'meow-insert-enter-hook)
 
   ;; Ignore some mode with context mode
