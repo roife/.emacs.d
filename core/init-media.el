@@ -40,7 +40,8 @@
       (unless (member (file-name-directory track) albums)
         (push (file-name-directory track) albums)
         (+emms-extract-embedded-cover track))))
-  (emms-browser-clear-cache-hash)
+  (when (hash-table-p emms-browser--cache-hash)
+    (emms-browser-clear-cache-hash))
   (when (buffer-live-p emms-browser-buffer)
     (kill-buffer emms-browser-buffer)))
 

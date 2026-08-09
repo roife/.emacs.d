@@ -152,7 +152,7 @@
       " "
       ,(or +mode-line-project-crumb
            `(:propertize "%b" face ,meta-face))
-      (:propertize ":%l " face 'font-lock-comment-face)
+      (:propertize ":%l " face font-lock-comment-face)
       (:eval (breadcrumb-imenu-crumbs))
       (:propertize +mode-line-remote-host-name
                    face +mode-line-host-name-active-face)
@@ -216,7 +216,7 @@
               for i from 1
               for current = (eq (car tab) 'current-tab)
               for face = (if current
-                             '(:inherit 'tab-bar-tab :inverse-video t)
+                             '(:inherit tab-bar-tab :inverse-video t)
                            'tab-bar-tab)
               concat (propertize
                       (format " %d %s " i

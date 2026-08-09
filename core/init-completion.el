@@ -174,10 +174,6 @@
    consult-theme
    :preview-key (list "s-p" :debounce 0.6 'any))
 
-  (defvar +consult-fd-dwim (consult--fd-make-builder
-                            (list (or (consult--project-root)
-                                      (expand-file-name default-directory)))))
-
   (defvar +consult-source-fd
     (list :name     "Find"
           :narrow   ?f
@@ -187,9 +183,13 @@
           :action   #'consult--file-action
           :state    #'consult--file-preview
           :async (lambda (sink)
-                   (let ((consult-fd-args '("fd" "--full-path" "--color=never" "--hidden" "--follow" "--exclude .git")))
+                   (let* ((consult-fd-args '("fd" "--full-path" "--color=never" "--hidden" "--follow"
+                                            "--exclude=.git" "--max-results=100"))
+                         (builder (consult--fd-make-builder
+                                   (list (or (consult--project-root)
+                                             (expand-file-name default-directory))))))
                      (funcall
-                      (consult--process-collection +consult-fd-dwim
+                      (consult--process-collection builder
                         :transform (consult--async-map #'abbreviate-file-name)
                         :highlight t
                         :file-handler t)
