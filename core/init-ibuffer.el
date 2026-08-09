@@ -35,7 +35,9 @@
                            (mode . eww-buffers-mode)
                            (mode . eww-search-annotations-mode)))
           (elfeed-filter '(or (mode . elfeed-show-mode)
-                               (mode . elfeed-search-mode)))
+                              (mode . elfeed-search-mode)))
+          (emms-filter
+           '(predicate . (string-prefix-p "emms-" (symbol-name major-mode))))
           (gnus-filter
            '(or (derived-mode . gnus-mode)
                 (predicate . (and (boundp 'gnus-buffers)
@@ -56,6 +58,7 @@
       (add-to-list 'ibuffer-filter-groups (list "Elfeed" elfeed-filter))
       (add-to-list 'ibuffer-filter-groups (list "Gnus" gnus-filter))
       (add-to-list 'ibuffer-filter-groups (list "Xwidget" xwidget-filter))
+      (add-to-list 'ibuffer-filter-groups (list "EMMS" emms-filter))
       (add-to-list 'ibuffer-filter-groups (list "Temporary buffers" starred-name-filter) :append)
       )
 

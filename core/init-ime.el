@@ -16,7 +16,8 @@
 (use-package liberime
   :straight (liberime :type git :host github :repo "emacs-rime/liberime")
   :init
-  (setq liberime-auto-build t
+  (setq liberime-load-on-require nil
+        liberime-auto-build t
         liberime-user-data-dir (if (eq system-type 'darwin)
                                    "~/Library/Rime/"
                                  "~/.local/share/fcitx5/rime")))
@@ -49,9 +50,7 @@
                                    rimel-predicate-org-latex-mode-p
                                    rimel-predicate-tex-math-or-command-p)))
 
-(register-input-method "rimel" "Chinese" #'rimel-activate
-                       (or (char-displayable-p 12563) "中")
-                       "Rimel - Rime input method via liberime")
+(register-input-method "rimel" "Chinese" #'rimel-activate "中" "Rimel")
 
 ;; [sis] automatically switch input source
 (use-package sis
