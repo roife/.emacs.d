@@ -24,6 +24,12 @@
    regexp-search-ring-max 200))
 
 
+;; [ezf] Use Emacs completion from terminal shells
+(use-package ezf
+  :straight (:type git :host github :repo "roife/ezf")
+  :demand t)
+
+
 ;; [speedbar]
 (use-package speedbar
   :init
