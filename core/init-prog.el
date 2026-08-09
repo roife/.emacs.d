@@ -198,19 +198,27 @@
 ;; [citre] Ctags-infra
 (use-package citre
   :straight t
+  :commands (citre-update-this-tags-file)
+  :preface
+  (defun +citre-auto-enable ()
+    (when (and buffer-file-name (derived-mode-p 'prog-mode))
+      (require 'citre)
+      (citre-auto-enable-citre-mode)))
   :bind (:map prog-mode-map
               ("C-c c j" . +citre-jump)
               ("C-c c k" . +citre-jump-back)
               ("C-c c p" . citre-peek)
               ("C-c c a" . citre-ace-peek)
               ("C-c c u" . citre-update-this-tags-file))
-  :init
-  (require 'citre-config)
+  :hook (find-file . +citre-auto-enable)
   :config
-  (setq citre-auto-enable-citre-mode-modes '(prog-mode)
-        citre-default-create-tags-file-location 'global-cache
+  (setq citre-default-create-tags-file-location 'global-cache
         citre-edit-ctags-options-manually t
         citre-enable-capf-integration t)
+
+  (with-eval-after-load 'cc-mode (require 'citre-lang-c))
+  (with-eval-after-load 'dired (require 'citre-lang-fileref))
+  (with-eval-after-load 'verilog-mode (require 'citre-lang-verilog))
 
   (defun +citre-jump ()
     "Jump to the definition of the symbol at point. Fallback to `xref-find-definitions'."

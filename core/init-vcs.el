@@ -157,16 +157,16 @@
 
 ;; [smerge] Highlight all the conflicted regions for git
 (use-package smerge-mode
-  :hook ((find-file . +smerge-try-smerge))
-  :config
+  :preface
   (defun +smerge-try-smerge ()
-    (when (and buffer-file-name (vc-backend buffer-file-name))
-      (save-excursion
-        (goto-char (point-min))
-        (when (re-search-forward "^<<<<<<< " nil t)
-          (require 'smerge-mode)
-          (smerge-mode 1)))))
-  )
+    (when (and buffer-file-name
+               (save-excursion
+                 (goto-char (point-min))
+                 (re-search-forward "^<<<<<<< " nil t))
+               (vc-backend buffer-file-name))
+      (require 'smerge-mode)
+      (smerge-mode 1)))
+  :hook (find-file . +smerge-try-smerge))
 
 
 ;; [browse-at-remote] Open github/gitlab/bitbucket page
