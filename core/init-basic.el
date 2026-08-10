@@ -51,7 +51,7 @@
  ;; Will improve long line display performance
  bidi-inhibit-bpa t
  bidi-paragraph-direction 'left-to-right
- bidi-display-reordering 'left-to-right
+ bidi-display-reordering nil
 
  ;; smaller threshold to improve long line performance
  long-line-threshold 1000
@@ -286,7 +286,21 @@
                   eldoc-mode
                   flymake-mode
                   ws-butler-mode
-                  auto-composition-mode))
+                  auto-composition-mode
+                  diff-hl-mode
+                  display-fill-column-indicator-mode
+                  goggles-mode
+                  highlight-changes-mode
+                  highlight-parentheses-mode
+                  hl-line-mode
+                  indent-bars-mode
+                  jinx-mode
+                  ligature-mode
+                  prettify-symbols-mode
+                  rainbow-delimiters-mode
+                  scrollview-mode
+                  symbol-overlay-mode
+                  whitespace-mode))
     (add-to-list 'so-long-minor-modes mode))
 
   (dolist (override '((bidi-display-reordering . nil)

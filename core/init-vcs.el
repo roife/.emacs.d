@@ -3,8 +3,9 @@
 ;; [vc-mode] Version control interface
 (use-package vc
   :config
-  (setq vc-allow-async-revert t
-        vc-auto-revert-mode t
+  (setq vc-handled-backends '(Git)
+        vc-consult-headers nil
+        vc-allow-async-revert t
         vc-allow-rewriting-published-history t
         vc-dir-auto-hide-up-to-date 'revert))
 

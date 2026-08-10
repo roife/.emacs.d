@@ -175,13 +175,13 @@
   :config
   (setq breadcrumb-imenu-crumb-separator " ⋅ "
         breadcrumb-project-max-length 0.55
-        breadcrumb-idle-time 10)
+        breadcrumb-idle-time 5)
   )
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
   :bind (("M-t" . tab-new)
-         ("M-w" . tab-close)
+         ("M-q" . tab-close)
          ("M-<tab>" . tab-next)
          ("M-S-<tab>" . tab-previous)
          ("M-SPC" . +tab-bar-echo))

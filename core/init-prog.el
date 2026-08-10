@@ -410,8 +410,7 @@
   :when (treesit-available-p)
   :init
   (setq treesit-enabled-modes t
-        treesit-auto-install-grammar 'always
-        treesit-font-lock-level 4))
+        treesit-auto-install-grammar 'always))
 
 
 ;; [indent-bars] Show indent guides
@@ -424,6 +423,7 @@
                    (default-value 'text-property-default-nonsticky))
         t)
   (setq indent-bars-display-on-blank-lines nil
+        indent-bars-depth-update-delay 0.15
         indent-bars-width-frac 0.1
         indent-bars-color '(highlight :face-bg t :blend 0.2)
         indent-bars-zigzag nil

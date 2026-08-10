@@ -104,6 +104,7 @@
               ("C-c f ." . jinx-correct)
               ("C-c f /" . jinx-correct-all))
   :config
+  (setq jinx-delay 0.5)
   (add-to-list 'jinx-exclude-regexps '(t "\\cc")))
 
 
