@@ -320,18 +320,17 @@
  fast-but-imprecise-scrolling t
 
  ;; Keep 5 lines when scrolling
- scroll-step 0
- scroll-margin 3
- scroll-up-aggressively 0.01 ; less jumpy
- scroll-down-aggressively 0.01
- scroll-conservatively 101
+ scroll-step 6
+ scroll-margin 6
+ scroll-up-aggressively 0.25
+ scroll-down-aggressively 0.25
  ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines.
  auto-window-vscroll nil
 
  ;; [hscroll]
  auto-hscroll-mode t
- hscroll-step 0
- hscroll-margin 2)
+ hscroll-step 0.3
+ hscroll-margin 6)
 
 (defvar +scrolling-lines 10)
 (defun +scroll-other-window () (interactive) (scroll-other-window +scrolling-lines))

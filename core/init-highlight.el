@@ -48,9 +48,9 @@
   :hook ((minibuffer-setup . highlight-parentheses-minibuffer-setup)
          (prog-mode . highlight-parentheses-mode))
   :config
-  (setq highlight-parentheses-colors '("firebrick1" "firebrick3" "orange1" "orange3")
+  (setq highlight-parentheses-colors '("green3" "firebrick1" "orange1")
         highlight-parentheses-attributes '((:underline t) (:underline t) (:underline t))
-        highlight-parentheses-delay 0.2)
+        highlight-parentheses-delay 0.25)
   )
 
 

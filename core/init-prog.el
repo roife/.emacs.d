@@ -1,9 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(use-package prog-mode
-  :hook ((prog-mode . prettify-symbols-mode)))
-
-
 ;; [compile]
 (use-package compile
   :config
