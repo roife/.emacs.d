@@ -340,7 +340,7 @@
 
 
 (use-package verilog-mode
-  :straight t
+  :straight (:type built-in)
   :config
   (setq verilog-align-ifelse t
         verilog-auto-delete-trailing-whitespace t

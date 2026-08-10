@@ -76,4 +76,4 @@
 
 ;; [reftex]
 (use-package reftex
-  :straight t)
+  :straight (:type built-in))
