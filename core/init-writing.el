@@ -43,8 +43,7 @@
 
 ;; [md-babel] Execute Markdown fenced blocks through Org Babel
 (use-package md-babel
-  :straight nil
-  :load-path "~/code/md-babel"
+  :straight (:host github :repo "roife/md-babel")
   :hook (markdown-ts-mode . md-babel-mode))
 
 
