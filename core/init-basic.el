@@ -325,7 +325,7 @@
  scroll-up-aggressively 0.25
  scroll-down-aggressively 0.25
  ;; Reduce cursor lag by a tiny bit by not auto-adjusting `window-vscroll' for tall lines.
- auto-window-vscroll nil
+ auto-window-vscroll t
 
  ;; [hscroll]
  auto-hscroll-mode t
@@ -406,6 +406,7 @@
 ;; [posframe]
 (use-package posframe :straight t)
 
+(use-package cl-lib :straight t)
 
 ;; [project] Project manager
 (use-package project
