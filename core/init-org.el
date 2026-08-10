@@ -70,6 +70,14 @@
   )
 
 
+;; [ob-mermaid] Generate Mermaid diagrams through Org Babel
+(use-package ob-mermaid
+  :straight t
+  :after org
+  :config
+  (setf (alist-get 'mermaid org-babel-load-languages) t))
+
+
 ;; [org-entities]
 (use-package org-entities
   :config

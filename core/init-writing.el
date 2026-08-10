@@ -21,14 +21,11 @@
   :mode (("\\.md\\'" . markdown-ts-mode)
          ("\\.markdown\\'" . markdown-ts-mode))
   :config
-  ;; Hide markup delimiters (**, #, []() ...) for a rendered look.
-  ;; buffer-local (:local t), so set the default value.
-  (setq-default markdown-ts-hide-markup t)
+  (setq-default markdown-ts-hide-markup t
+                markdown-ts-inline-images t)
   (setq
    ;; Fold bodies on open, keep all heading levels visible
    markdown-ts-default-folding 'fold-headings
-   ;; Show images inline below their links
-   markdown-ts-inline-images t
    ;; Highlight fenced code blocks with the embedded language's mode
    markdown-ts-fontify-code-blocks-natively t
    ;; TAB/newline run in the code block's language when point is inside it
@@ -42,6 +39,13 @@
     (set-face-attribute (intern (format "markdown-ts-heading-%d" (1+ i))) nil
                         :inherit (intern (format "org-level-%d" (1+ i)))
                         :weight 'unspecified)))
+
+
+;; [md-babel] Execute Markdown fenced blocks through Org Babel
+(use-package md-babel
+  :straight nil
+  :load-path "~/code/md-babel"
+  :hook (markdown-ts-mode . md-babel-mode))
 
 
 ;; [typst-ts-mode]
