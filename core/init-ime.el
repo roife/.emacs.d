@@ -66,35 +66,23 @@
   (sis-ism-lazyman-config nil "rimel" 'native)
   (sis-get) ; HACK: set sis--ism
   :config
+  (add-hook! buffer-list-update-hook
+    (defun +sis-refresh-cursor-color ()
+      (sis--get)
+      (sis--update-cursor-color)))
+
   ;; HACK: Set cursor color automatically
   (add-hook! (enable-theme-functions server-after-make-frame-hook) :unless-daemonp-call-immediately
     (defun +sis-set-cursor-color (&rest _)
       (setq sis-other-cursor-color (face-foreground 'error nil t)
-            sis-default-cursor-color (face-background 'cursor nil t))))
+            sis-default-cursor-color (face-background 'cursor nil t))
+      (+sis-refresh-cursor-color)))
 
   ;; Recover the terminal cursor color when leaving Emacs (TUI only).
   (add-hook! kill-emacs-hook
     (defun +sis-reset-terminal-cursor-color ()
       (unless (display-graphic-p)
         (send-string-to-terminal "\e]112\a"))))
-
-  (defconst +sis-chinese-puncs "，。？！；：（【「“")
-
-  (defconst +sis-chinese-punc-chars (string-to-list +sis-chinese-puncs))
-
-  (defun +sis-remove-head-space-after-cc-punc (_)
-    (when (or (memq (char-before) +sis-chinese-punc-chars)
-              (bolp))
-      (delete-char 1)))
-  (setq sis-inline-tighten-head-rule #'+sis-remove-head-space-after-cc-punc)
-
-  (defun +sis-remove-tail-space-before-cc-punc (_)
-    (when (eq (char-before) ? )
-      (backward-delete-char 1)
-      (when (and (eq (char-before) ? )
-                 (memq (char-after) +sis-chinese-punc-chars))
-        (backward-delete-char 1))))
-  (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc)
 
   ;; Context mode
   (add-hook! meow-insert-exit-hook #'sis-set-english)
@@ -137,7 +125,26 @@
             (save-excursion
               (backward-char 2)
               (delete-char 1)
-              (setq-local +sis-inline-english-last-space-pos nil))))))))
+              (setq-local +sis-inline-english-last-space-pos nil)))))))
+
+  ;; Chinese punc adjustment for inline mode
+  (defconst +sis-chinese-puncs "，。？！；：（【「“")
+
+  (defconst +sis-chinese-punc-chars (string-to-list +sis-chinese-puncs))
+
+  (defun +sis-remove-head-space-after-cc-punc (_)
+    (when (or (memq (char-before) +sis-chinese-punc-chars)
+              (bolp))
+      (delete-char 1)))
+  (setq sis-inline-tighten-head-rule #'+sis-remove-head-space-after-cc-punc)
+
+  (defun +sis-remove-tail-space-before-cc-punc (_)
+    (when (eq (char-before) ? )
+      (backward-delete-char 1)
+      (when (and (eq (char-before) ? )
+                 (memq (char-after) +sis-chinese-punc-chars))
+        (backward-delete-char 1))))
+  (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc))
 
 (when (daemonp)
   (liberime-load))
