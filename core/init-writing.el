@@ -4,13 +4,11 @@
 ;; [visual-fill-column] Center text in markdown and org
 (use-package visual-fill-column
   :straight t
-  :hook (text-mode . visual-fill-column-mode)
   :config
   (setq-default visual-fill-column-center-text t))
 
-
 ;; [visual-line-mode] Soft line-wrapping
-(add-hook! text-mode-hook #'visual-line-mode)
+(add-hook! (org-mode-hook markdown-ts-mode-hook) #'visual-line-mode)
 
 ;; [pangu] Add pangu spaces
 (use-package pangu-spacing

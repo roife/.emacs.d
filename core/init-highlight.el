@@ -4,7 +4,10 @@
 (use-package hl-line
   :hook (after-init . global-hl-line-mode)
   :config
-  (setq hl-line-sticky-flag nil))
+  (setq hl-line-sticky-flag nil
+        ;; Highlight starts from EOL, to avoid conflicts with other overlays
+        hl-line-range-function (lambda () (cons (line-end-position)
+                                                (line-beginning-position 2)))))
 
 
 ;; [show-paren-mode] Highlight matching parens
