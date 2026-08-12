@@ -1,6 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(eval-when-compile (require 'subr-x))
 (eval-when-compile (require 'cl-lib))
 
 ;;; face
@@ -8,19 +7,9 @@
   "Mode-Line faces."
   :group 'faces)
 
-(defface +mode-line-meta-inactive-unchanged-face
+(defface +mode-line-meta-face
   '((t (:inherit (font-lock-function-name-face bold))))
   "The face for meta panel on the mode-line of an inactive window."
-  :group '+mode-line)
-
-(defface +mode-line-meta-inactive-modified-face
-  '((t (:inherit (font-lock-keyword-face bold))))
-  "Face used for meta panel on the mode-line of an active window."
-  :group '+mode-line)
-
-(defface +mode-line-meta-inactive-autosaved-face
-  '((t (:inherit (font-lock-doc-face bold))))
-  "Face used for meta panel on the mode-line of an active window."
   :group '+mode-line)
 
 (defface +mode-line-host-name-active-face
@@ -29,47 +18,30 @@
   :group '+mode-line)
 
 ;;; Indicators
-(defsubst +mode-line-get-window-name-face ()
-  "Get face of window name for current window."
-  (let ((modified (buffer-modified-p)))
-    (cond ((eq modified t)
-           '+mode-line-meta-inactive-modified-face)
-          ((eq modified nil)
-           '+mode-line-meta-inactive-unchanged-face)
-          ((eq modified 'autosaved)
-           '+mode-line-meta-inactive-autosaved-face))))
-
-(defsubst +mode-line-get-window-name ()
-  "Get window number for current window, as set by `ace-window'."
-  (let ((path (window-parameter (selected-window) 'ace-window-path)))
-    (when (and path (not (string-empty-p path)))
-      (concat " " path))))
+(defsubst +mode-line-overwrite-readonly-indicator ()
+  "Display whether it is in overwrite mode or read-only buffer."
+  (let ((mo (pcase (buffer-modified-p)
+              ('t (and (buffer-file-name) " *"))
+              ('autosaved " ~")
+              (_ "")))
+        (ro (and buffer-read-only " %%"))
+        (ov (and overwrite-mode " #")))
+    (concat mo ro ov)))
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
   (cond (defining-kbd-macro " MacroDef")
         (executing-kbd-macro " MacroExc")))
 
-(defsubst +mode-line-overwrite-readonly-indicator ()
-  "Display whether it is in overwrite mode or read-only buffer."
-  (let ((ro (when buffer-read-only " %%"))
-        (ov (when overwrite-mode " #")))
-    (concat ro ov)))
-
 (defsubst +mode-line-symbol-overlay-indicator ()
   "Display the number of matches for symbol overlay."
-  (when (and (bound-and-true-p symbol-overlay-keywords-alist)
-             (not symbol-overlay-temp-symbol))
-    (let* ((keyword (symbol-overlay-assoc (symbol-overlay-get-symbol t)))
-           (symbol (car keyword))
-           (before (symbol-overlay-get-list -1 symbol))
-           (after (symbol-overlay-get-list 1 symbol))
-           (count (length before)))
-      (if (symbol-overlay-assoc symbol)
-          (concat  " " (number-to-string (1+ count))
-                   "/" (number-to-string (+ count (length after)))
-                   " sym"
-                   (and (cadr keyword) " in scope"))))))
+  (when-let* (((bound-and-true-p symbol-overlay-keywords-alist))
+              ((not symbol-overlay-temp-symbol))
+              (keyword (symbol-overlay-assoc (symbol-overlay-get-symbol t)))
+              (symbol (car keyword))
+              (before (length (symbol-overlay-get-list -1 symbol)))
+              (after (length (symbol-overlay-get-list 1 symbol))))
+    (format " %d/%d sym%s" (1+ before) (+ before after) (if (cadr keyword) " in scope" ""))))
 
 
 ;;; Cache remote host name
@@ -98,7 +70,7 @@
         (unless (and (memq (coding-system-category buffer-file-coding-system)
                            '(coding-category-undecided coding-category-utf-8))
                      (eq (coding-system-eol-type buffer-file-coding-system) 0))
-          "%Z")))
+          " %Z")))
 (add-hook! find-file-hook #'+mode-line-update-encoding)
 
 ;; [project-crumb]
@@ -121,8 +93,8 @@
       (setq +mode-line-envrc
             (pcase (and (bound-and-true-p envrc-mode)
                         envrc--status)
-              ('on t)
-              ('error 'error)
+              ('on " ⎇")
+              ('error " ⎇[error]")
               (_ nil)))))
   (force-mode-line-update t))
 (defadvice! +mode-line-envrc-after-apply (buffer _result)
@@ -134,15 +106,12 @@
 
 (defsubst +mode-line-normal ()
   "Formatting active-long mode-line."
-  (let* ((meta-face (+mode-line-get-window-name-face))
-         (active-p (mode-line-window-selected-p))
-         (panel-face `(:inherit ,meta-face :inverse-video ,active-p)))
-    `((:propertize ,(+mode-line-get-window-name) face ,panel-face)
-      (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,panel-face)
-      (:propertize ,(pcase +mode-line-envrc
-                      ('error " ⎇[error]")
-                      (_ (when +mode-line-envrc " ⎇")))
+  (let* ((active-p (mode-line-window-selected-p))
+         (panel-face `(:inherit +mode-line-meta-face :inverse-video ,active-p)))
+    `((:propertize ,(concat " " (window-parameter (selected-window) 'ace-window-path))
                    face ,panel-face)
+      (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,panel-face)
+      (:propertize +mode-line-envrc face ,panel-face)
       (:propertize mode-line-process face ,panel-face)
       (,active-p (:propertize
                   ,(concat (+mode-line-macro-indicator)
@@ -151,15 +120,13 @@
       (:propertize " " face ,panel-face)
       " "
       ,(or +mode-line-project-crumb
-           `(:propertize "%b" face ,meta-face))
+           '(:propertize "%b" face +mode-line-meta-face))
       (:propertize ":%l " face font-lock-comment-face)
       (:eval (breadcrumb-imenu-crumbs))
       (:propertize +mode-line-remote-host-name
                    face +mode-line-host-name-active-face)
-      " "
-      (:eval +mode-line-encoding)
-      " "
-      eglot-mode-line-progress)))
+      (:eval +mode-line-encoding))
+    ))
 
 (setq-default mode-line-format '((:eval (+mode-line-normal))))
 (setq-default header-line-format nil)
