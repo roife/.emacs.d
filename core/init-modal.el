@@ -102,9 +102,6 @@ included; for the final argument the leading separator is included."
 
     ;; [leader]
     (meow-leader-define-key
-     ;; SPC j/k will run the original command in MOTION state.
-     '("j" . "H-j")
-     '("k" . "H-k")
      ;; Use SPC (0-9) for digit arguments.
      '("1" . meow-digit-argument)
      '("2" . meow-digit-argument)
@@ -194,6 +191,9 @@ included; for the final argument the leading separator is included."
            (gnus-article-mode . motion)
            (gnus-server-mode . motion)
            (gnus-browse-mode . motion)
+           (emms-ui-albums-mode . motion)
+           (emms-ui-list-mode . motion)
+           (emms-ui-now-playing-mode . motion)
            (View-mode . normal)
            ;; (compilation-mode . normal)
            (blink-search-mode . insert)
