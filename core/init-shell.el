@@ -282,6 +282,7 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
          :map ghostel-semi-char-mode-map
          ("C-g"  . keyboard-quit)
          ("C-k"  . +ghostel-send-C-k-and-kill)
+         ("M-SPC" . +tab-bar-echo)
          ;; I'm used to go up/down the shell history with M-n/p from eshell
          ;; Simulate this behavior in ghostel by sending C-p and C-n
          ("M-p" . (lambda () (interactive) (ghostel-send-key "p" "ctrl")))

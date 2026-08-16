@@ -124,7 +124,7 @@
  uniquify-buffer-name-style 'forward
 
  ;; Fix alignment problem
- truncate-string-ellipsis "⁝"
+ truncate-string-ellipsis "›"
 
  ;; Shell command
  shell-command-prompt-show-cwd t
@@ -351,7 +351,7 @@
 ;; [tramp] Edit file remotely
 (use-package tramp
   :config
-  (setq tramp-default-method "ssh"
+  (setq tramp-default-method "rpc"
         tramp-backup-directory-alist backup-directory-alist
         remote-file-name-inhibit-cache 60))
 

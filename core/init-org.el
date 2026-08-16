@@ -11,6 +11,12 @@
   :init
   ;; Load optional Org modules only when explicitly enabled.
   (setq org-modules nil)
+  (defvar +org-agenda-directory nil
+    "Directory containing files used by Org Agenda.")
+  (defvar +org-refile-files nil
+    "Org files that contain GTD refile destinations.")
+  :bind (("C-c a" . org-agenda)
+         ("C-c n c" . org-capture))
   :custom-face (org-quote ((t (:inherit org-block-begin-line))))
   :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]")))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
          (org-mode . (lambda ()
@@ -24,6 +30,100 @@
                        (prettify-symbols-mode))))
   :config
   (setq
+   org-directory (file-truename "~/org/")
+   +org-agenda-directory (expand-file-name "agenda/" org-directory)
+   +org-refile-files
+   (mapcar (lambda (file) (expand-file-name file +org-agenda-directory))
+           '("actions.org" "projects.org" "someday.org" "reference.org"))
+   org-default-notes-file (expand-file-name "inbox.org" +org-agenda-directory)
+
+   ;; Task workflow
+   org-todo-keywords
+   '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "SOMEDAY(s)"
+               "|" "DONE(d!)" "CANCELED(c@)"))
+   org-log-done 'time
+   org-log-into-drawer t
+   org-log-reschedule 'time
+   org-log-redeadline 'time
+   org-tag-alist
+   '((:startgroup)
+     ("@home" . ?h)
+     ("@work" . ?w)
+     (:endgroup)
+     ("project" . ?p)
+     ("note" . ?n))
+
+   ;; Refile clarified inbox items into an action list or a project.
+   org-refile-targets '((+org-refile-files :maxlevel . 3))
+   org-refile-use-outline-path 'file
+   org-outline-path-complete-in-steps nil
+   org-refile-allow-creating-parent-nodes 'confirm
+   org-archive-location "%s_archive::* Archived"
+
+   ;; Agenda: all Org files directly under ~/org/agenda/ are included.
+   org-agenda-files (list +org-agenda-directory)
+   org-agenda-span 7
+   org-agenda-start-on-weekday 1
+   org-agenda-window-setup 'current-window
+   org-agenda-restore-windows-after-quit t
+   org-agenda-skip-scheduled-if-done t
+   org-agenda-skip-deadline-if-done t
+   org-agenda-tags-column 0
+   org-agenda-prefix-format
+   '((agenda . " %i %-12:c%?-12t% s")
+     (todo . " %i %-12:c")
+     (tags . " %i %-12:c")
+     (search . " %i %-12:c"))
+   org-agenda-custom-commands
+   '(("d" "Dashboard"
+      ((agenda ""
+               ((org-agenda-overriding-header "This week")
+                (org-agenda-span 7)))
+       (todo "NEXT"
+             ((org-agenda-overriding-header "Next actions")))
+       (todo "WAIT"
+             ((org-agenda-overriding-header "Waiting")))
+       (todo "TODO"
+             ((org-agenda-overriding-header "Unscheduled tasks")
+              (org-agenda-skip-function
+               '(org-agenda-skip-entry-if 'scheduled 'deadline))))))
+     ("n" "Next actions" todo "NEXT")
+     ("w" "Waiting" todo "WAIT")
+     ("s" "Someday / maybe" todo "SOMEDAY"))
+
+   ;; Capture quickly; clarify and organize during inbox processing.
+   org-capture-templates
+   '(("t" "Inbox task" entry
+      (file org-default-notes-file)
+      "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%a\n"
+      :empty-lines 1)
+     ("n" "Inbox note" entry
+      (file org-default-notes-file)
+      "* %? :note:\n:PROPERTIES:\n:CREATED: %U\n:END:\n%a\n"
+      :empty-lines 1)
+     ("a" "Next action" entry
+      (file+headline (lambda ()
+                       (expand-file-name "actions.org" +org-agenda-directory))
+                     "Actions")
+      "* NEXT %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%a\n"
+      :empty-lines 1)
+     ("p" "Project" entry
+      (file (lambda ()
+              (expand-file-name "projects.org" +org-agenda-directory)))
+      "* %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
+      :empty-lines 1)
+     ("s" "Someday / maybe" entry
+      (file+headline (lambda ()
+                       (expand-file-name "someday.org" +org-agenda-directory))
+                     "Someday / Maybe")
+      "* SOMEDAY %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%a\n"
+      :empty-lines 1)
+     ("e" "Calendar event" entry
+      (file (lambda ()
+              (expand-file-name "calendar.org" +org-agenda-directory)))
+      "* %?\nSCHEDULED: %^T\n:PROPERTIES:\n:CREATED: %U\n:END:\n"
+      :empty-lines 1))
+
    ;; subscription: Use {} for sub- or super- scripts
    org-use-sub-superscripts '{}
    org-export-with-sub-superscripts '{}
@@ -51,6 +151,9 @@
    org-fold-catch-invisible-edits 'show-and-error
 
    org-imenu-depth 4)
+
+  ;; Keep first-run capture and agenda commands from failing when directories are absent.
+  (make-directory (car org-agenda-files) t)
 
   ;; Better Org Latex Preview
   (setq org-preview-latex-default-process 'dvisvgm
@@ -133,12 +236,12 @@
   :straight t
   :after org
   :hook ((org-mode . org-modern-mode)
-         (org-agenda-finalize . org-modern-agenda-mode)))
+         (org-agenda-finalize . org-modern-agenda)))
 
-(use-package org-modern-indent
-  :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
-  :config
-  (add-hook! org-mode-hook :depth 90 #'org-modern-indent-mode))
+;; (use-package org-modern-indent
+;;   :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
+;;   :config
+;;   (add-hook! org-mode-hook :depth 90 #'org-modern-indent-mode))
 
 
 ;; [ox]
