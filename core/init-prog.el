@@ -446,29 +446,3 @@
   (logview-additional-submodes
    '(("Pipeline" . ((format . "[TIMESTAMP] [LEVEL] [NAME] MESSAGE")
                     (levels . "Pipeline levels"))))))
-
-
-;; [minuet-ai] AI-powered inline code completion
-(use-package minuet
-  :straight (:host github :repo "milanglacier/minuet-ai.el")
-  :bind (("M-i" . #'minuet-show-suggestion)
-         :map minuet-active-mode-map
-         ("M-p" . #'minuet-previous-suggestion)
-         ("M-n" . #'minuet-next-suggestion)
-         ("C-e" . #'minuet-accept-suggestion)
-         ("C-g" . #'minuet-dismiss-suggestion))
-  :custom-face
-  (minuet-suggestion-face ((t (:inherit font-lock-comment-face :slant italic :weight normal :underline nil))))
-  :config
-  (setq minuet-provider 'openai-fim-compatible)
-
-  (plist-put minuet-openai-fim-compatible-options :end-point "https://api.deepseek.com/beta/completions")
-  (plist-put minuet-openai-fim-compatible-options :model "deepseek-v4-flash")
-  (plist-put minuet-openai-fim-compatible-options :name "Deepseek")
-  (plist-put minuet-openai-fim-compatible-options :api-key
-             (lambda ()
-               (require 'gptel)
-               (gptel-api-key-from-auth-source "api.deepseek.com" "apikey")))
-
-  (minuet-set-optional-options minuet-openai-fim-compatible-options :max_tokens 56)
-  (minuet-set-optional-options minuet-openai-fim-compatible-options :top_p 0.9))

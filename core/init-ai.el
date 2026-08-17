@@ -3,18 +3,19 @@
 (use-package gptel
   :straight t
   :init
-  (setq gptel-model 'deepseek-v4-flash
+  (setq gptel-model 'gpt-5.3-codex-spark
         gptel-default-mode 'org-mode
         gptel-confirm-tool-calls nil)
   :config
   (setq-default gptel-backend
-                (gptel-make-deepseek "DeepSeek-thinking"
+                (gptel-make-openai-responses "CLIProxyAPI"
+                  :host "127.0.0.1:8317"
+                  :protocol "http"
                   :stream t
-                  :request-params '(:thinking (:type "enabled"))
-                  :key #'gptel-api-key-from-auth-source))
+                  :models '((gpt-5.3-codex-spark :capabilities (tool-use json responses-api)))
+                  :key (lambda () (gptel-api-key-from-auth-source "cliproxyapi" "apikey"))))
   (add-hook! gptel-post-stream-hook #'gptel-auto-scroll)
-  (add-hook! gptel-post-response-functions #'gptel-end-of-response)
-  )
+  (add-hook! gptel-post-response-functions #'gptel-end-of-response))
 
 (use-package gptel-rewrite
   :straight nil
@@ -158,3 +159,28 @@ When OVERLAYS is nil, export all pending rewrites in the current buffer."
               ("C-c C-r" . codex-ide-status))
   :config
   (require 'codex-ide))
+
+
+;; [minuet-ai] AI-powered inline code completion
+(use-package minuet
+  :straight (:host github :repo "milanglacier/minuet-ai.el")
+  :bind (("M-i" . #'minuet-show-suggestion)
+         :map minuet-active-mode-map
+         ("M-p" . #'minuet-previous-suggestion)
+         ("M-n" . #'minuet-next-suggestion)
+         ("C-e" . #'minuet-accept-suggestion)
+         ("C-g" . #'minuet-dismiss-suggestion))
+  :custom-face
+  (minuet-suggestion-face ((t (:inherit font-lock-comment-face :slant italic :weight normal :underline nil))))
+  :config
+  (setq minuet-provider 'openai-compatible)
+
+  (plist-put minuet-openai-compatible-options :end-point "http://127.0.0.1:8317/v1/chat/completions")
+  (plist-put minuet-openai-compatible-options :model "gpt-5.3-codex-spark")
+  (plist-put minuet-openai-compatible-options :api-key
+             (lambda ()
+               (require 'gptel)
+               (gptel-api-key-from-auth-source "cliproxyapi" "apikey")))
+
+  (minuet-set-optional-options minuet-openai-compatible-options :max_tokens 128)
+  (minuet-set-optional-options minuet-openai-compatible-options :reasoning_effort "none"))
