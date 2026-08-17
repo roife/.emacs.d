@@ -121,10 +121,11 @@
       " "
       ,(or +mode-line-project-crumb
            '(:propertize "%b" face +mode-line-meta-face))
-      (:propertize ":%l " face font-lock-comment-face)
-      (:eval (breadcrumb-imenu-crumbs))
+      (:propertize ":%l" face font-lock-comment-face)
       (:propertize +mode-line-remote-host-name
                    face +mode-line-host-name-active-face)
+      " "
+      (:eval (breadcrumb-imenu-crumbs))
       (:eval +mode-line-encoding))
     ))
 

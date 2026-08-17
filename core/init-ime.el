@@ -15,6 +15,7 @@
 
 (use-package liberime
   :straight (liberime :type git :host github :repo "emacs-rime/liberime")
+  :defer 1
   :init
   (setq liberime-load-on-require nil
         liberime-auto-build t
