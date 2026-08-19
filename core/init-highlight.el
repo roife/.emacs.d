@@ -75,8 +75,9 @@
   :straight t
   :custom-face
   (hl-todo ((t (:inherit default :height 0.9 :width condensed :weight bold :inverse-video t))))
-  :hook ((prog-mode conf-mode yaml-mode) . hl-todo-mode)
+  :hook (((prog-mode conf-mode yaml-mode) . hl-todo-mode))
   :config
+  (add-hook! flymake-diagnostic-functions #'hl-todo-flymake)
   (setq hl-todo-require-punctuation t
         hl-todo-highlight-punctuation ":")
 

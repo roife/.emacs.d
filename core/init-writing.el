@@ -78,3 +78,9 @@
 ;; [reftex]
 (use-package reftex
   :straight (:type built-in))
+
+
+(use-package mermaid-mode
+  :straight t
+  :config
+  (setq mermaid-output-format ".svg"))

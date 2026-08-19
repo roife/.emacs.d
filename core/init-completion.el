@@ -14,8 +14,6 @@
   (setq vertico-cycle t
         vertico-count 15)
 
-  (vertico-mouse-mode)
-
   ;; WORKAROUND: https://github.com/minad/vertico#problematic-completion-commands
   (setq org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil))
@@ -184,10 +182,10 @@
           :state    #'consult--file-preview
           :async (lambda (sink)
                    (let* ((consult-fd-args '("fd" "--full-path" "--color=never" "--hidden" "--follow"
-                                            "--exclude=.git" "--max-results=100"))
-                         (builder (consult--fd-make-builder
-                                   (list (or (consult--project-root)
-                                             (expand-file-name default-directory))))))
+                                             "--exclude=.git" "--max-results=100"))
+                          (builder (consult--fd-make-builder
+                                    (list (or (consult--project-root)
+                                              (expand-file-name default-directory))))))
                      (funcall
                       (consult--process-collection builder
                         :transform (consult--async-map #'abbreviate-file-name)
