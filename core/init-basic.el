@@ -406,8 +406,6 @@
 ;; [posframe]
 (use-package posframe :straight t)
 
-(use-package cl-lib :straight t)
-
 ;; [project] Project manager
 (use-package project
   :straight (:type built-in)
