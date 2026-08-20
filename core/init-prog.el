@@ -125,6 +125,9 @@
   ;; we call eldoc manually
   (add-hook! eglot-managed-mode-hook
     (defun +eglot-disable-eldoc-mode ()
+      (remove-hook 'xref-backend-functions #'eglot-xref-backend t)
+      (add-hook 'xref-backend-functions #'eglot-xref-backend -50 t)
+
       (setq-local eldoc-documentation-strategy
                   'eldoc-documentation-compose-eagerly)
       (when (eglot-managed-p)
@@ -186,7 +189,7 @@
 (use-package dumb-jump
   :straight t
   :init
-  (add-hook! xref-backend-functions #'dumb-jump-xref-activate)
+  (add-hook! xref-backend-functions :depth 80 #'dumb-jump-xref-activate)
   :config
   (setq dumb-jump-prefer-searcher 'rg
         dumb-jump-selector 'completing-read
@@ -200,58 +203,31 @@
   :straight t
   :commands (citre-update-this-tags-file)
   :preface
-  (defun +citre-auto-enable ()
-    (when (and buffer-file-name (derived-mode-p 'prog-mode))
-      (require 'citre)
-      (citre-auto-enable-citre-mode)))
+  (defun +citre-manage-xref-backend ()
+    "Register Citre's xref backend at the configured priority."
+    (remove-hook 'xref-backend-functions #'citre-xref-backend t)
+    (add-hook 'xref-backend-functions #'citre-xref-backend -25 t))
   :bind (:map prog-mode-map
-              ("C-c c j" . +citre-jump)
-              ("C-c c k" . +citre-jump-back)
-              ("C-c c p" . citre-peek)
-              ("C-c c a" . citre-ace-peek)
-              ("C-c c u" . citre-update-this-tags-file))
-  :hook (find-file . +citre-auto-enable)
+              ("C-c r c" . citre-update-this-tags-file))
+  :hook ((find-file . citre-auto-enable-citre-mode)
+         (citre-mode . +citre-manage-xref-backend))
   :config
   (setq citre-default-create-tags-file-location 'global-cache
         citre-edit-ctags-options-manually t
-        citre-enable-capf-integration t)
+        citre-auto-enable-citre-mode-modes '(prog-mode))
+  (setq-default citre-enable-xref-integration nil
+                citre-enable-capf-integration t)
 
   (with-eval-after-load 'cc-mode (require 'citre-lang-c))
   (with-eval-after-load 'dired (require 'citre-lang-fileref))
   (with-eval-after-load 'verilog-mode (require 'citre-lang-verilog))
-
-  (defun +citre-jump ()
-    "Jump to the definition of the symbol at point. Fallback to `xref-find-definitions'."
-    (interactive)
-    (condition-case _
-        (citre-jump)
-      (error (call-interactively #'xref-find-definitions))))
-
-  (defun +citre-jump-back ()
-    "Go back to the position before last `citre-jump'. Fallback to `xref-go-back'."
-    (interactive)
-    (condition-case _
-        (citre-jump-back)
-      (error (call-interactively #'xref-go-back))))
-
-  ;; Use Citre xref backend as a [fallback]
-  (defadvice! +citre--xref-fallback-a (fn &rest args)
-    :around #'xref--create-fetcher
-    (let ((fetcher (apply fn args))
-          (citre-fetcher
-           (let ((xref-backend-functions '(citre-xref-backend t)))
-             (ignore xref-backend-functions)
-             (apply fn args))))
-      (lambda ()
-        (or (with-demoted-errors "%s, fallback to citre"
-              (funcall fetcher))
-            (funcall citre-fetcher)))))
   )
 
 
 ;; [quickrun] Run commands quickly
 (use-package quickrun
   :straight t
+  :bind (("C-c r r" . quickrun))
   :config
   (setq quickrun-focus-p nil))
 

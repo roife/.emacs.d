@@ -108,8 +108,8 @@
   :hook (((prog-mode conf-mode yaml-mode) . hs-minor-mode)
          ((ruby-mode nxml-mode latex-mode LaTeX-mode) . +hideshow-setup)
          ((yaml-mode) . hs-indentation-mode))
-  :bind (("C-c h TAB" . hs-cycle)
-         ("C-c h `" . hs-toggle-all))
+  :bind (("C-c TAB" . hs-cycle)
+         ("C-c `" . hs-toggle-all))
   :config
   (setq hs-indicator-type nil
         hs-display-lines-hidden t))
