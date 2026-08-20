@@ -19,7 +19,7 @@
 ## Credentials
 
 - `~/.authinfo`
-  + Deepseek API (for `gptel`)
+  + GPT API (for `gptel`)
 - `~/.authinfo.gpg`
   + Gmail app password (for Gnus, mbsync, and SMTP, note: use imap.googlemail.com with TLS 1.2 for Gmail)
   + GitHub token (for `forge`)
