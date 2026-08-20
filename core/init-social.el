@@ -40,6 +40,17 @@
   :hook ((telega-chat-mode . corfu-mode)
          (telega-chat-mode . telega-completions-setup-capf))
   :config
+  (setq telega-root-fill-column 79
+        telega-chat-fill-column 79)
+
+  (add-hook! telega-chat-mode-hook
+    (defun +telega-disable-visual-fill-column-h ()
+      "Disable visual fill column in Telega chat buffers."
+      (visual-fill-column-mode -1)))
+
+  (telega-root-auto-fill-mode -1)
+  (remove-hook 'telega-chat-mode-hook #'telega-chat-auto-fill-mode)
+
   (setq telega-chat-show-avatars nil
         telega-user-show-avatars nil
         telega-root-show-avatars nil

@@ -170,10 +170,14 @@
 ;; [ligature] ligature support for Emacs
 (use-package ligature
   :straight t
-  :hook ((prog-mode markdown-ts-mode org-mode) . ligature-mode)
+  ;; Org hides emphasis delimiters with text properties.  Font ligatures can
+  ;; still shape those invisible delimiters together with visible content
+  ;; (for example, the final `*=' in `=path/**='), leaking part of the hidden
+  ;; delimiter into the rendered glyph.  Keep ligatures out of Org buffers.
+  :hook (prog-mode . ligature-mode)
   :config
   ;; Enable Sarasa/Iosevka ligatures in programming modes
-  (ligature-set-ligatures '(prog-mode markdown-ts-mode org-mode)
+  (ligature-set-ligatures '(prog-mode)
                           '(;; Arrows
                             "<-" "<--" "<---" "<<-" "<-<" "->" "->>" "-->"
                             "--->" ">->" "<->" "<-->" "<--->" "<---->"

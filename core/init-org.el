@@ -27,7 +27,8 @@
   :straight (:type built-in)
   :init
   ;; Load optional Org modules only when explicitly enabled.
-  (setq org-modules nil)
+  (setq org-modules nil
+        org-hide-emphasis-markers t)
   :bind (("C-c a" . org-agenda)
          ("C-c n c" . org-capture))
   :custom-face
@@ -256,7 +257,7 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
 
   ;; Block delimiter faces inherit from `org-meta-line'.
   (dolist (face '(org-meta-line org-block-begin-line org-block-end-line))
-    (set-face-attribute face nil :height 0.9))
+    (set-face-attribute face nil :height 0.85))
 
   ;; Cycle the visible parent heading when point is in or just past folded text.
   (add-hook! org-cycle-tab-first-hook
@@ -280,15 +281,17 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
         org-highlight-latex-and-related '(latex))
   (plist-put org-format-latex-options :scale 1.7)
 
-  ;; HACK: inline highlight for CJK
-  ;; (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:][:alpha:]"
-  ;;                                        "-[:space:].,:!?;'\")}\\[[:nonascii:][:alpha:]"
-  ;;                                        "[:space:]"
-  ;;                                        "."
-  ;;                                        1))
-  ;; (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
-  ;; (org-element-update-syntax)
-  ;; (org-element--set-regexps)
+  ;; Allow CJK characters and full-width punctuation next to
+  ;; emphasis markers.  Keep ASCII letters excluded to avoid
+  ;; treating paths and identifiers as emphasis.
+  (setq org-emphasis-regexp-components '("-[:space:]('\"{[:nonascii:]"
+                                         "-[:space:].,:!?;'\")}\\[[:nonascii:]"
+                                         "[:space:]"
+                                         "."
+                                         1))
+  (org-set-emph-re 'org-emphasis-regexp-components
+                   org-emphasis-regexp-components)
+
   )
 
 
@@ -324,8 +327,6 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
   :hook ((org-mode . org-appear-mode))
   :config
   (setq
-   org-hide-emphasis-markers t
-
    org-appear-autosubmarkers t
    org-appear-autoentities t
    org-appear-autokeywords t
@@ -346,12 +347,6 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
   :after org
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda)))
-
-;; (use-package org-modern-indent
-;;   :straight (org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent")
-;;   :config
-;;   (add-hook! org-mode-hook :depth 90 #'org-modern-indent-mode))
-
 
 ;; [ox]
 (use-package ox
