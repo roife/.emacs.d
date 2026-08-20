@@ -98,15 +98,11 @@
       (apply fn args)))
 
   (defun +sis-context-switching-other (back-detect fore-detect)
-    (when (and meow-insert-mode
-               (or (and (derived-mode-p 'org-mode 'markdown-ts-mode 'text-mode)
-                        (sis--context-other-p back-detect fore-detect))
-                   (and (derived-mode-p 'telega-chat-mode)
-                        (or (and (= (point) telega-chatbuf--input-marker) ; beginning of input
-                                 (eolp))
-                            (sis--context-other-p back-detect fore-detect)))))
-      'other))
-
+    (and meow-insert-mode
+         (or (and (derived-mode-p 'telega-chat-mode)
+                  (or (and (= (point) telega-chatbuf--input-marker) ; beginning of input
+                           (eolp)))))
+         'other))
   (add-to-list 'sis-context-detectors #'+sis-context-switching-other)
 
   ;; Inline-mode
