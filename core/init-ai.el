@@ -17,73 +17,6 @@
   (add-hook! gptel-post-stream-hook #'gptel-auto-scroll)
   (add-hook! gptel-post-response-functions #'gptel-end-of-response))
 
-(use-package gptel-rewrite
-  :straight nil
-  :bind (("C-c r t" . +gptel-rewrite-translate-to-chinese)
-         ("C-c r s" . +gptel-rewrite-summarize)
-         :map gptel-rewrite-actions-map
-         ("C-c C-x" . +gptel-rewrite-export))
-  :preface
-  (defun +gptel-rewrite-export (&optional overlays)
-    "Export OVERLAYS to a new buffer without changing their source.
-When OVERLAYS is nil, export all pending rewrites in the current buffer."
-    (interactive)
-    (require 'gptel-rewrite)
-    (setq overlays (or overlays gptel--rewrite-overlays))
-    (unless overlays
-      (user-error "No pending rewrites to export"))
-    (let* ((source-buffer (current-buffer))
-           (source-name (buffer-name source-buffer))
-           (prepared-buffer
-            (gptel--rewrite-prepare-buffer overlays))
-           (prepared-point
-            (with-current-buffer prepared-buffer
-              (- (point) (point-min))))
-           (contents
-            (with-current-buffer prepared-buffer
-              (buffer-substring-no-properties (point-min) (point-max))))
-           (export-buffer
-            (generate-new-buffer
-             (format "*gptel rewrite export: %s*" source-name))))
-      (with-current-buffer export-buffer
-        (markdown-ts-mode)
-        (insert contents)
-        (goto-char (+ (point-min)
-                      (min prepared-point (- (point-max) (point-min)))))
-        (setq-local header-line-format
-                    (format " Exported rewrite from %s" source-name))
-        (visual-line-mode 1)
-        (set-buffer-modified-p nil))
-      (pop-to-buffer export-buffer)))
-
-  (defun +gptel-rewrite-region-or-buffer (prompt)
-    "Rewrite the active region, or the whole buffer, according to PROMPT."
-    (require 'gptel-rewrite)
-    (if (use-region-p)
-        (gptel--suffix-rewrite prompt)
-      (when (= (point-min) (point-max))
-        (user-error "Buffer is empty"))
-      (save-mark-and-excursion
-        (set-mark (point-max))
-        (goto-char (point-min))
-        (activate-mark)
-        (gptel--suffix-rewrite prompt))))
-
-  (defun +gptel-rewrite-translate-to-chinese ()
-    "Translate the active region, or the whole buffer, to Chinese."
-    (interactive)
-    (+gptel-rewrite-region-or-buffer
-     "Translate into fluent Chinese."))
-
-  (defun +gptel-rewrite-summarize ()
-    "Summarize the active region, or the whole buffer when no region is active."
-    (interactive)
-    (+gptel-rewrite-region-or-buffer
-     "Summarize in Chinese while preserving details and key information."))
-
-  (with-eval-after-load 'embark
-    (keymap-set embark-region-map "T" #'+gptel-rewrite-translate-to-chinese)
-    (keymap-set embark-region-map "S" #'+gptel-rewrite-summarize)))
 
 (use-package gptel-agent
   :straight t
@@ -100,17 +33,105 @@ When OVERLAYS is nil, export all pending rewrites in the current buffer."
 
 (use-package gptel-quick
   :straight (gptel-quick :type git :host github :repo "karthink/gptel-quick")
-  :after (gptel embark)
+  :bind (("C-c g e" . +gptel-quick-explain)
+         ("C-c g t" . +gptel-quick-translate-to-chinese)
+         ("C-c g s" . +gptel-quick-summarize))
+  :preface
+  (defadvice! +gptel-quick-apply-options-a
+    (gptel-quick-fn query-text &optional count)
+    :around #'gptel-quick
+    "Run GPTEL-QUICK-FN with the options stored on QUERY-TEXT."
+    (let* ((options
+            (and (stringp query-text)
+                 (get-text-property 0 '+gptel-quick-options query-text)))
+           (system-message (car-safe options))
+           (gptel-quick-system-message
+            (if system-message
+                (lambda (&rest _) system-message)
+              gptel-quick-system-message)))
+      (funcall gptel-quick-fn query-text count)))
+
+  (defadvice! +gptel-request-apply-quick-limit-a
+    (gptel-request-fn prompt &rest args)
+    :around #'gptel-request
+    "Remove gptel-quick's token limit when PROMPT requests it."
+    (let* ((options
+            (and (stringp prompt)
+                 (get-text-property 0 '+gptel-quick-options prompt)))
+           (gptel-max-tokens
+            (if (and options (not (cdr options)))
+                nil
+              gptel-max-tokens)))
+      (apply gptel-request-fn prompt args)))
+
+  (defadvice! +set-transient-map-keep-gptel-quick-a
+    (set-transient-map-fn map keep-pred &rest args)
+    :around #'set-transient-map
+    "Keep gptel-quick's map active during unrelated commands."
+    (when (equal (buffer-name) " *gptel-quick*")
+      (setq keep-pred
+            (lambda ()
+              (or (null this-command)
+                  (not (where-is-internal this-command (list map) t))))))
+    (apply set-transient-map-fn map keep-pred args))
+
+  (defadvice! +posframe-show-focus-gptel-quick-a
+    (posframe-show-fn buffer-or-name &rest args)
+    :around #'posframe-show
+    "Show the gptel-quick posframe with input focus."
+    (let ((gptel-quick-p (equal buffer-or-name " *gptel-quick*")))
+      (when gptel-quick-p
+        (setq args (plist-put args :accept-focus t)))
+      (let ((frame (apply posframe-show-fn buffer-or-name args)))
+        (when (and gptel-quick-p (frame-live-p frame))
+          (set-window-point (frame-selected-window frame) 1)
+          (select-frame-set-input-focus frame))
+        frame)))
+
+  (defun +gptel-quick-region-or-buffer (system-message &optional limit-response)
+    "Run `gptel-quick' on the active region or buffer using SYSTEM-MESSAGE.
+Preserve SYSTEM-MESSAGE when requesting another response with `+'.  When
+LIMIT-RESPONSE is non-nil, apply gptel-quick's count-derived token limit."
+    (require 'gptel-quick)
+    (let ((query-text
+           (if (use-region-p)
+               (buffer-substring-no-properties (region-beginning) (region-end))
+             (buffer-substring-no-properties (point-min) (point-max)))))
+      (when (string-empty-p query-text)
+        (user-error "Buffer is empty"))
+      (setq query-text
+            (propertize query-text '+gptel-quick-options
+                        (cons system-message limit-response)))
+      (gptel-quick query-text)))
+
+  (defun +gptel-quick-explain ()
+    "Explain the active region, or the whole buffer, in Chinese."
+    (interactive)
+    (+gptel-quick-region-or-buffer
+     "Explain in clear Chinese, preserving necessary context and details."
+     t))
+
+  (defun +gptel-quick-translate-to-chinese ()
+    "Translate the active region, or the whole buffer, to Chinese."
+    (interactive)
+    (+gptel-quick-region-or-buffer "Translate into fluent Chinese."))
+
+  (defun +gptel-quick-summarize ()
+    "Summarize the active region, or the whole buffer, in Chinese."
+    (interactive)
+    (+gptel-quick-region-or-buffer
+     "Summarize in Chinese while preserving details and key information."
+     t))
+
+  (with-eval-after-load 'embark
+    (keymap-set embark-general-map "?" #'gptel-quick)
+    (keymap-set embark-region-map "E" #'+gptel-quick-explain)
+    (keymap-set embark-region-map "T" #'+gptel-quick-translate-to-chinese)
+    (keymap-set embark-region-map "S" #'+gptel-quick-summarize))
+
   :config
-  (setq gptel-quick-backend (gptel-make-deepseek "DeepSeek-quick"
-                              :stream t
-                              :request-params '(:thinking (:type "disabled"))
-                              :key #'gptel-api-key-from-auth-source)
-        gptel-quick-model 'deepseek-v4-flash
-        gptel-quick-word-count 500
-        gptel-quick-system-message (lambda (&rest _) "一句话解释："))
-  (keymap-set embark-general-map "?" #'gptel-quick)
-  )
+  (setq gptel-quick-word-count 50
+        gptel-quick-timeout nil))
 
 (use-package codex-ide
   :straight (:type git :host github :repo "dgillis/emacs-codex-ide")

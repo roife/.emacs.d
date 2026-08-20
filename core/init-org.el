@@ -29,8 +29,8 @@
   ;; Load optional Org modules only when explicitly enabled.
   (setq org-modules nil
         org-hide-emphasis-markers t)
-  :bind (("C-c a" . org-agenda)
-         ("C-c n c" . org-capture))
+  :bind (("C-c o a" . org-agenda)
+         ("C-c o c" . org-capture))
   :custom-face
   (org-quote ((t (:inherit org-block-begin-line))))
   :hook ((org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]")))  ;; Skipping leading char, so corfu can complete with dabbrev for formatted text
@@ -299,7 +299,7 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
 (use-package ob-mermaid
   :straight t
   :after org
-  :config
+  :init
   (setf (alist-get 'mermaid org-babel-load-languages) t))
 
 
@@ -336,10 +336,12 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
 
    org-appear-trigger 'manual)
 
-  (add-hook! org-mode-hook :call-immediately
-    (defun +org-add-appear-hook ()
+  (add-hook! org-mode-hook
+    (defun +org-appear-meow-integration ()
       (add-hook! meow-insert-enter-hook :local #'org-appear-manual-start)
-      (add-hook! meow-insert-exit-hook :local #'org-appear-manual-stop))))
+      (add-hook! meow-insert-exit-hook :local #'org-appear-manual-stop)))
+  (when (derived-mode-p 'org-mode) (+org-appear-meow-integration))
+  )
 
 
 (use-package org-modern

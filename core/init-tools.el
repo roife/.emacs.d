@@ -138,7 +138,7 @@
 ;; [undo-hl] Highlight undo changes
 (use-package undo-hl
   :straight (:host github :repo "casouri/undo-hl")
-  :hook (after-init . undo-hl-mode)
+  :hook (((prog-mode text-mode conf-mode) . undo-hl-mode))
   :config (setq undo-hl-flash-duration 0.1))
 
 

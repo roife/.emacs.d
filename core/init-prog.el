@@ -37,6 +37,11 @@
 
 ;; [xref] Cross reference
 (use-package xref
+  :init
+  (defadvice! +xref--push-marker-stack-a (&rest _)
+    :before '(find-function consult-imenu consult-ripgrep citre-jump)
+    (require 'xref)
+    (xref-push-marker-stack (point-marker)))
   :config
   (setq
    xref-search-program 'ripgrep
@@ -46,9 +51,6 @@
    ;; xref-show-xrefs-function #'xref-show-definitions-completing-read
    xref-history-storage 'xref-window-local-history)
 
-  (defadvice! +xref--push-marker-stack-a (&rest rest)
-    :before '(find-function consult-imenu consult-ripgrep citre-jump)
-    (xref-push-marker-stack (point-marker)))
   )
 
 
@@ -76,8 +78,6 @@
         eglot-documentation-renderer 'markdown-ts-view-mode
         eglot-code-action-indications nil)
 
-  ;; eglot has it's own strategy by default
-  (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   (setq-default eglot-workspace-configuration
                 '((:pyls . (:plugins (:jedi_completion (:fuzzy t))))
                   (:rust-analyzer . (:cargo (:allFeatures t :allTargets t :features "full")
@@ -125,6 +125,8 @@
   ;; we call eldoc manually
   (add-hook! eglot-managed-mode-hook
     (defun +eglot-disable-eldoc-mode ()
+      (setq-local eldoc-documentation-strategy
+                  'eldoc-documentation-compose-eagerly)
       (when (eglot-managed-p)
         (eldoc-mode -1))))
   )
@@ -140,8 +142,10 @@
 (use-package eglot-booster
   :straight (:host github :repo "jdtsmith/eglot-booster")
   :after eglot
-  :config (eglot-booster-mode)
-  (setq eglot-booster-io-only t))
+  :init
+  (setq eglot-booster-io-only t)
+  :config
+  (eglot-booster-mode 1))
 
 
 ;; [Eldoc]
@@ -256,8 +260,6 @@
 (use-package dape
   :straight t
   :commands (dape)
-  :bind (:map prog-mode-map
-              ("C-c D" . dape))
   :preface
   (defun +dape-save-buffers-h ()
     "Save file-visiting buffers before starting a debug session."

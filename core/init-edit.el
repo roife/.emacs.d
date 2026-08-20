@@ -87,7 +87,7 @@
 (use-package apheleia
   :straight t
   :commands (apheleia-format-buffer)
-  :bind (("C-c f f" . apheleia-format-buffer))
+  :bind (("C-c r f" . apheleia-format-buffer))
   :hook (after-init . apheleia-global-mode)
   :config
   (setq apheleia-hide-log-buffers t))
@@ -211,8 +211,7 @@
 ;; [dtdr-indent] Detect indentation size
 (use-package dtrt-indent
   :straight t
-  :config
-  (dtrt-indent-global-mode 1))
+  :hook (prog-mode . dtrt-indent-mode))
 
 ;; [dogears] Jump to the last edit location
 (use-package dogears

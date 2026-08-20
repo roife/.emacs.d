@@ -7,8 +7,7 @@
 ;; [osx-dictionary] macOS native dictionary app
 (use-package osx-dictionary
   :straight t
-  :bind (("C-c d i" . osx-dictionary-search-input)
-         ("C-c d d" . osx-dictionary-search-pointer)))
+  :bind (("C-c d d" . osx-dictionary-search-pointer)))
 
 (use-package emt
   :straight (:host github :repo "roife/emt"

@@ -94,17 +94,12 @@
   :straight t
   :bind (("C-c m b" . emms-smart-browse)
          ("C-c m c" . +emms-extract-embedded-covers)
-         ("C-c m e" . emms-tag-editor-edit)
          ("C-c m i" . emms-show)
          ("C-c m l" . emms-playlist-mode-go)
          ("C-c m p" . emms-previous)
          ("C-c m n" . emms-next)
          ("C-c m P" . emms-pause)
-         ("C-c m r" . emms-toggle-random-playlist)
          ("C-c m s" . emms-stop)
-         ("C-c m y" . emms-lyrics-visit-lyric)
-         ("C-c m +" . emms-volume-mode-plus)
-         ("C-c m -" . emms-volume-mode-minus)
          ("<XF86AudioPlay>" . emms-pause)
          ("<XF86AudioStop>" . emms-stop)
          ("<XF86AudioPrev>" . emms-previous)
@@ -150,9 +145,7 @@
 
 (use-package consult-emms
   :straight (:host github :repo "Hugo-Heagren/consult-emms")
-  :after (consult emms)
-  :bind (("C-c m a" . consult-emms-library)
-         ("C-c m j" . consult-emms-current-playlist))
+  :bind (("C-c d m" . consult-emms-library))
   :config
   (setq consult-emms--sort-album-function #'string<))
 

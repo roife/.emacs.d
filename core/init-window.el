@@ -191,11 +191,7 @@
 ;; [zoom] Managing the window sizes automatically
 (use-package zoom
   :straight t
-  :hook (window-setup . zoom-mode)
-  :config
-  (setq zoom-minibuffer-preserve-layout nil
-        zoom-ignored-major-modes '(ediff-mode vundo-mode minibuffer-mode speedbar-mode))
-
+  :init
   (add-hook! vundo-mode-hook
     (defun +zoom-fix-window-size-h ()
       (setq-local window-size-fixed t)))
@@ -206,7 +202,11 @@
 
   (add-hook! ediff-mode-hook
     (defun +zoom-fix-window-height-h ()
-      (setq-local window-size-fixed 'height))))
+      (setq-local window-size-fixed 'height)))
+  :hook (window-setup . zoom-mode)
+  :config
+  (setq zoom-minibuffer-preserve-layout nil
+        zoom-ignored-major-modes '(ediff-mode vundo-mode minibuffer-mode speedbar-mode)))
 
 ;; [auto-dim-other-buffers] Dim non-active buffers
 (use-package auto-dim-other-buffers
