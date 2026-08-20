@@ -123,10 +123,9 @@
 
 
 ;; Smooth Scroll (less "jumpy" than defaults)
-(when (display-graphic-p)
-  (setq mouse-wheel-scroll-amount '(2 ((shift) . hscroll) ((control) . nil))
-        mouse-wheel-scroll-amount-horizontal 1
-        mouse-wheel-progressive-speed nil))
+(setq mouse-wheel-scroll-amount '(2 ((shift) . hscroll) ((control) . nil))
+      mouse-wheel-scroll-amount-horizontal 1
+      mouse-wheel-progressive-speed nil)
 
 ;; Load theme
 ;; Don't prompt to confirm theme safety. This avoids problems with
