@@ -68,7 +68,6 @@
           (nnatom "emacsredux.com/atom.xml")
           (nnatom "matklad.github.io/feed.xml")
           (nnatom "blog.rust-lang.org/feed.xml")
-          (nnatom ,(no-littering-expand-var-file-name "rss/hackernews.atom"))
           (nndiscourse "emacs-china"
                        (nndiscourse-base-url "https://emacs-china.org")
                        (nndiscourse-auth-type user-api-key)))
@@ -105,51 +104,37 @@
         gnus-permanently-visible-groups ".*")
 
   (defvar +gnus--refresh-process nil
-    "The process updating external sources before a Gnus refresh.")
+    "The mbsync process running before a Gnus refresh.")
+
   (defadvice! +gnus--sync-before-refresh (refresh &rest args)
     :around #'gnus-group-get-new-news
-    "Update external sources before calling the Gnus REFRESH with ARGS.
-Interactive refreshes update the local Hacker News Atom feed in addition to
-synchronizing mail.  Automatic Gnus demon scans only synchronize mail, so they
-do not repeatedly invoke the comparatively expensive Hacker News generator."
+    "Synchronize mail before calling the Gnus REFRESH with ARGS."
     (if (and +gnus--refresh-process
              (process-live-p +gnus--refresh-process))
-        (message "A Gnus source update is already running")
+        (message "Mail synchronization is already running")
       (let ((group-buffer (current-buffer))
-            (interactive-refresh (called-interactively-p 'interactive))
-            (output-buffer (get-buffer-create "*gnus-source-update*"))
-            (command
-             (list
-              (expand-file-name "scripts/update-gnus-sources"
-                                user-emacs-directory))))
-        (when interactive-refresh
-          (setq command (append command '("--hacker-news"))))
+            (output-buffer (get-buffer-create "*gnus-source-update*")))
         (with-current-buffer output-buffer
           (erase-buffer))
         (setq +gnus--refresh-process
               (make-process
-               :name "gnus-source-update"
+               :name "gnus-mbsync"
                :buffer output-buffer
-               :command command
+               :command '("mbsync" "--all")
                :noquery t
                :sentinel
                (lambda (process _event)
                  (when (memq (process-status process) '(exit signal))
                    (setq +gnus--refresh-process nil)
-                   (if (zerop (process-exit-status process))
-                       (message "Gnus sources updated")
-                     (message
-                      "Some Gnus sources failed to update; see %s"
-                      (buffer-name (process-buffer process))))
-                   ;; Refresh even after an update failure: mbsync or the HN
-                   ;; generator may have completed partially, and the existing
-                   ;; local data remains usable.
+                   (if (and (eq (process-status process) 'exit)
+                            (zerop (process-exit-status process)))
+                       (message "Mail synchronized")
+                     (message "Mail synchronization failed; see %s"
+                              (buffer-name (process-buffer process))))
                    (when (buffer-live-p group-buffer)
                      (with-current-buffer group-buffer
                        (apply refresh args)))))))
-        (message (if interactive-refresh
-                     "Updating Hacker News and synchronizing mail..."
-                   "Synchronizing mail..."))))))
+        (message "Synchronizing mail...")))))
 
 (use-package gnus-topic
   :after gnus-group
