@@ -159,6 +159,29 @@
 ;; [smerge] Highlight all the conflicted regions for git
 (use-package smerge-mode
   :preface
+  (defun +smerge-flymake-backend (report-fn &rest _args)
+    "Report unresolved merge conflicts in the current buffer."
+    (let (diagnostics)
+      (save-excursion
+        (goto-char (point-min))
+        (while (smerge-find-conflict)
+          (let ((beg (match-beginning 0)))
+            (push (flymake-make-diagnostic
+                   (current-buffer) beg
+                   (save-excursion (goto-char beg) (line-end-position))
+                   'flymake-error "Unresolved merge conflict")
+                  diagnostics))))
+      (funcall report-fn (nreverse diagnostics))))
+
+  (defun +smerge-flymake-setup-h ()
+    "Add the Smerge Flymake backend to a conflicted buffer."
+    (when smerge-mode
+      (add-hook 'flymake-diagnostic-functions
+                #'+smerge-flymake-backend nil t)
+      (if (bound-and-true-p flymake-mode)
+          (flymake-start)
+        (flymake-mode 1))))
+
   (defun +smerge-try-smerge ()
     (when (and buffer-file-name
                (save-excursion
@@ -167,7 +190,8 @@
                (vc-backend buffer-file-name))
       (require 'smerge-mode)
       (smerge-mode 1)))
-  :hook (find-file . +smerge-try-smerge))
+  :hook ((find-file . +smerge-try-smerge)
+         (smerge-mode . +smerge-flymake-setup-h)))
 
 
 ;; [browse-at-remote] Open github/gitlab/bitbucket page

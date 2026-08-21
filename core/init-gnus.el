@@ -81,6 +81,12 @@
 (use-package nnextension
   :straight (:host github :repo "roife/nnextension"))
 
+(use-package nnhackernews-gptel
+  :straight nil
+  :after nnhackernews
+  :demand t
+  :custom (nnhackernews-gptel-auto-summarize t))
+
 ;; [gnus-group] group mode
 (use-package gnus-group
   :config

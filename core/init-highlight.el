@@ -167,16 +167,16 @@
 
 
 ;; [highlight]
-;; (use-package hilit-chg
-;;   :preface
-;;   (defun +highlight-changes-mode-turn-on ()
-;;     (highlight-changes-mode 1)
-;;     (highlight-changes-visible-mode -1))
-;;   (defun +highlight-changes-mode-turn-off ()
-;;     (and highlight-changes-mode (highlight-changes-mode -1)))
-;;   (defun +highlight-changes-auto ()
-;;     (when (buffer-file-name)
-;;       (+highlight-changes-mode-turn-on)
-;;       (add-hook! after-save-hook :local #'+highlight-changes-mode-turn-on)
-;;       (add-hook! before-save-hook :local #'+highlight-changes-mode-turn-off)))
-;;   :hook ((prog-mode conf-mode text-mode) . +highlight-changes-auto))
+(use-package hilit-chg
+  :preface
+  (defun +highlight-changes-mode-turn-on ()
+    (highlight-changes-mode 1)
+    (highlight-changes-visible-mode -1))
+  (defun +highlight-changes-mode-turn-off ()
+    (and highlight-changes-mode (highlight-changes-mode -1)))
+  (defun +highlight-changes-auto ()
+    (when (buffer-file-name)
+      (+highlight-changes-mode-turn-on)
+      (add-hook! after-save-hook :local #'+highlight-changes-mode-turn-on)
+      (add-hook! before-save-hook :local #'+highlight-changes-mode-turn-off)))
+  :hook ((prog-mode conf-mode text-mode) . +highlight-changes-auto))
