@@ -20,18 +20,19 @@
 ;;; Indicators
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display whether it is in overwrite mode or read-only buffer."
-  (let ((mo (pcase (buffer-modified-p)
-              ('t (and (buffer-file-name) " *"))
-              ('autosaved " ~")
-              (_ "")))
-        (ro (and buffer-read-only " %%"))
-        (ov (and overwrite-mode " #")))
-    (concat mo ro ov)))
+  (when-let* ((mo (pcase (buffer-modified-p)
+                    ('t (and (buffer-file-name) " *"))
+                    ('autosaved " ~")
+                    (_ "")))
+              (ro (and buffer-read-only " %%"))
+              (ov (and overwrite-mode " #"))
+              (ans (concat mo ro ov)))
+    (concat " | " ans)))
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."
-  (cond (defining-kbd-macro " MacroDef")
-        (executing-kbd-macro " MacroExc")))
+  (cond (defining-kbd-macro " | MacroDef")
+        (executing-kbd-macro " | MacroExc")))
 
 (defsubst +mode-line-symbol-overlay-indicator ()
   "Display the number of matches for symbol overlay."
@@ -41,7 +42,7 @@
               (symbol (car keyword))
               (before (length (symbol-overlay-get-list -1 symbol)))
               (after (length (symbol-overlay-get-list 1 symbol))))
-    (format " %d/%d sym%s" (1+ before) (+ before after) (if (cadr keyword) " in scope" ""))))
+    (format " | %d/%d sym%s" (1+ before) (+ before after) (if (cadr keyword) " in scope" ""))))
 
 
 ;;; Cache remote host name
@@ -93,8 +94,8 @@
       (setq +mode-line-envrc
             (pcase (and (bound-and-true-p envrc-mode)
                         envrc--status)
-              ('on " ⎇")
-              ('error " ⎇[error]")
+              ('on " | ⎇")
+              ('error " | ⎇[error]")
               (_ nil)))))
   (force-mode-line-update t))
 (defadvice! +mode-line-envrc-after-apply (buffer _result)
@@ -112,12 +113,12 @@
                    face ,panel-face)
       (:propertize ,(+mode-line-overwrite-readonly-indicator) face ,panel-face)
       (:propertize +mode-line-envrc face ,panel-face)
-      (:propertize mode-line-process face ,panel-face)
       (,active-p (:propertize
                   ,(concat (+mode-line-macro-indicator)
                            (+mode-line-symbol-overlay-indicator))
                   face ,panel-face))
       (:propertize " " face ,panel-face)
+      (mode-line-process (list " [" mode-line-process "]"))
       " "
       ,(or +mode-line-project-crumb
            '(:propertize "%b" face +mode-line-meta-face))
