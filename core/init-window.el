@@ -177,9 +177,11 @@
     )
 
   (defun +popper-smart-popup (buffer &optional alist)
-    (let ((window (display-buffer-in-direction buffer
-                                               (append alist '((direction . below)
-                                                               (window-height . 0.5))))))
+    (let ((window (or (display-buffer-reuse-window buffer alist)
+                      (display-buffer-in-direction
+                       buffer
+                       (append alist '((direction . below)
+                                       (window-height . 0.5)))))))
       (unless (cl-progv +popper-unpacked-vars
                   (mapcar #'symbol-value +popper-unpacked-vars-no-select)
                 (popper-popup-p buffer))

@@ -173,9 +173,7 @@
 (use-package browse-url
   :defines dired-mode-map
   :bind (("C-, o" . browse-url-at-point)
-         ("C-, e" . browse-url-emacs))
-  :config
-  (setq browse-url-browser-function #'eww-browse-url))
+         ("C-, e" . browse-url-emacs)))
 
 ;; [eww] Builtin browser
 (use-package eww

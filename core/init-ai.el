@@ -7,13 +7,7 @@
         gptel-default-mode 'org-mode
         gptel-confirm-tool-calls nil)
   :config
-  (setq-default gptel-backend
-                (gptel-make-openai-responses "CLIProxyAPI"
-                  :host "127.0.0.1:8317"
-                  :protocol "http"
-                  :stream t
-                  :models '((gpt-5.3-codex-spark :capabilities (tool-use json responses-api)))
-                  :key (lambda () (gptel-api-key-from-auth-source "cliproxyapi" "apikey"))))
+  (setq-default gptel-backend (gptel-make-openai-oauth "OpenAI OAuth"))
   (add-hook! gptel-post-stream-hook #'gptel-auto-scroll)
   (add-hook! gptel-post-response-functions #'gptel-end-of-response))
 
@@ -182,26 +176,31 @@ LIMIT-RESPONSE is non-nil, apply gptel-quick's count-derived token limit."
   (require 'codex-ide))
 
 
-;; [minuet-ai] AI-powered inline code completion
-(use-package minuet
-  :straight (:host github :repo "milanglacier/minuet-ai.el")
-  :bind (("M-i" . #'minuet-show-suggestion)
-         :map minuet-active-mode-map
-         ("M-p" . #'minuet-previous-suggestion)
-         ("M-n" . #'minuet-next-suggestion)
-         ("C-e" . #'minuet-accept-suggestion)
-         ("C-g" . #'minuet-dismiss-suggestion))
-  :custom-face
-  (minuet-suggestion-face ((t (:inherit font-lock-comment-face :slant italic :weight normal :underline nil))))
+;; [gptel-copilot] gptel-powered inline code completion
+(use-package gptel-copilot
+  :straight (:type git :host github :repo "roife/gptel-copilot")
+  :commands gptel-copilot-mode
+  :preface
+  (defun +gptel-copilot-complete ()
+    "Accept the completion, or move to the end of code or line."
+    (interactive)
+    (or (gptel-copilot-accept-completion)
+        (mwim-end-of-code-or-line)))
+
+  (defun +gptel-copilot-complete-word ()
+    "Accept one completion word, or move forward one word."
+    (interactive)
+    (or (gptel-copilot-accept-completion-by-word 1)
+        (forward-word)))
+
+  :hook (prog-mode . gptel-copilot-mode)
+  :bind (:map gptel-copilot-mode-map
+              ("C-e" . +gptel-copilot-complete)
+              ("M-f" . +gptel-copilot-complete-word))
   :config
-  (setq minuet-provider 'openai-compatible)
+  (require 'gptel-openai-oauth)
 
-  (plist-put minuet-openai-compatible-options :end-point "http://127.0.0.1:8317/v1/chat/completions")
-  (plist-put minuet-openai-compatible-options :model "gpt-5.3-codex-spark")
-  (plist-put minuet-openai-compatible-options :api-key
-             (lambda ()
-               (require 'gptel)
-               (gptel-api-key-from-auth-source "cliproxyapi" "apikey")))
-
-  (minuet-set-optional-options minuet-openai-compatible-options :max_tokens 128)
-  (minuet-set-optional-options minuet-openai-compatible-options :reasoning_effort "none"))
+  (setq gptel-copilot-model 'gpt-5.4-mini
+        gptel-copilot-backend
+        (gptel-make-openai-oauth "OpenAI OAuth Inline"
+          :request-params '(:reasoning (:effort "low")))))
