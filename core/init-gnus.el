@@ -70,15 +70,16 @@
           (nnatom "blog.rust-lang.org/feed.xml")
           (nndiscourse "emacs-china"
                        (nndiscourse-base-url "https://emacs-china.org")
-                       (nndiscourse-auth-type user-api-key)))
+                       (nndiscourse-auth-type user-api-key))
+          (nnhackernews ""))
 
         ;; Gmail already keeps a server-side Sent folder, so do not create an
         ;; additional local monthly archive.
         gnus-message-archive-group nil))
 
-;; Read and participate in Emacs China through its Discourse API.
-(use-package nndiscourse
-  :straight (:host github :repo "roife/nnext"))
+;; Read web communities through Gnus-native backends.
+(use-package nnextension
+  :straight (:host github :repo "roife/nnextension"))
 
 ;; [gnus-group] group mode
 (use-package gnus-group
