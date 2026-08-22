@@ -446,7 +446,11 @@ separate argument, although the command accepts only one."
   :straight t
   :init
   (setq rust-mode-treesitter-derive t
-        rust-format-goto-problem nil))
+        rust-format-goto-problem nil)
+  :config
+  (with-eval-after-load 'dtrt-indent
+    (setf (alist-get 'rust-mode dtrt-indent-hook-mapping-list)
+          '(c/c++/java rust-ts-indent-offset))))
 
 
 (use-package fish-mode
