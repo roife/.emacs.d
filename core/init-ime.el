@@ -17,8 +17,7 @@
   :straight (liberime :type git :host github :repo "emacs-rime/liberime")
   :defer 1
   :init
-  (setq liberime-load-on-require nil
-        liberime-auto-build t
+  (setq liberime-auto-build t
         liberime-user-data-dir (if (eq system-type 'darwin)
                                    "~/Library/Rime/"
                                  "~/.local/share/fcitx5/rime")))
