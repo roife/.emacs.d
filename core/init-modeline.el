@@ -118,7 +118,7 @@
                            (+mode-line-symbol-overlay-indicator))
                   face ,panel-face))
       (:propertize " " face ,panel-face)
-      (mode-line-process ("[" mode-line-process "]"))
+      mode-line-process
       " "
       ,(or +mode-line-project-crumb
            '(:propertize "%b" face +mode-line-meta-face))
