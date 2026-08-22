@@ -180,8 +180,6 @@ Diagnostics for all files are published separately for project listings."
    xref-search-program 'ripgrep
    ;; TODO: https://github.com/oantolin/embark/issues/162#issuecomment-785039305
    ;; Maybe a bug?
-   ;; xref-show-definitions-function #'xref-show-definitions-completing-read
-   ;; xref-show-xrefs-function #'xref-show-definitions-completing-read
    xref-history-storage 'xref-window-local-history))
 
 
@@ -203,12 +201,15 @@ Diagnostics for all files are published separately for project listings."
               ("M-/" . eglot-find-typeDefinition)
               ("M-?" . xref-find-references))
   :config
+  (add-to-list 'eglot-stay-out-of 'flymake-diagnostic-functions)
+  (add-hook 'flymake-diagnostic-functions #'eglot-flymake-backend)
+
   (setq eglot-events-buffer-config '(:size 0 :format full)
         eglot-autoshutdown t
-        ;; eglot-report-progress 'messages
         eglot-documentation-renderer 'markdown-ts-view-mode
         eglot-code-action-indications nil)
 
+  ;; LSP server settings
   (setq-default eglot-workspace-configuration
                 '((:pyls . (:plugins (:jedi_completion (:fuzzy t))))
                   (:rust-analyzer . (:cargo (:allFeatures t :allTargets t :features "full")
@@ -242,7 +243,8 @@ Diagnostics for all files are published separately for project listings."
                             :autobuild (:enabled :json-false)
                             :extendedClientCapabilities (:classFileContentsSupport t)))))
 
-  (defun jdtls-command-contact (&optional interactive)
+  ;; Java integration
+  (defun +jdtls-command-contact (&optional interactive)
     (let* ((jdtls-java-home (getenv "JDTLS_JAVA_HOME"))
            (project-root (project-root (project-current t)))
            (data-dir
@@ -251,14 +253,15 @@ Diagnostics for all files are published separately for project listings."
              (md5 (expand-file-name project-root)))))
       `("env" ,(concat "JAVA_HOME=" jdtls-java-home)
         "jdtls" "--jvm-arg=-Xmx16G" "-data" ,data-dir)))
-  (push '(java-mode . jdtls-command-contact) eglot-server-programs)
+  (push '(java-mode . +jdtls-command-contact) eglot-server-programs)
 
-  ;; we call eldoc manually
   (add-hook! eglot-managed-mode-hook
     (defun +eglot-disable-eldoc-mode ()
-      (remove-hook 'xref-backend-functions #'eglot-xref-backend t)
-      (add-hook 'xref-backend-functions #'eglot-xref-backend -50 t)
+      ;; Remove local Flymake backends so Eglot can manage diagnostics.
+      (dolist (backend '(rust-ts-flymake flymake-cc python-flymake))
+        (remove-hook 'flymake-diagnostic-functions backend t))
 
+      ;; We call eldoc manually
       (setq-local eldoc-documentation-strategy
                   'eldoc-documentation-compose-eagerly)
       (when (eglot-managed-p)
@@ -320,39 +323,40 @@ Diagnostics for all files are published separately for project listings."
 (use-package dumb-jump
   :straight t
   :init
-  (add-hook! xref-backend-functions :depth 80 #'dumb-jump-xref-activate)
+  (add-hook! xref-backend-functions #'dumb-jump-xref-activate)
   :config
   (setq dumb-jump-prefer-searcher 'rg
         dumb-jump-selector 'completing-read
         dumb-jump-aggressive t
-        dumb-jump-default-project user-emacs-directory)
+        dumb-jump-default-project nil)
   )
 
 
 ;; [citre] Ctags-infra
-;; (use-package citre
-;;   :straight t
-;;   :commands (citre-update-this-tags-file)
-;;   :preface
-;;   (defun +citre-manage-xref-backend ()
-;;     "Register Citre's xref backend at the configured priority."
-;;     (remove-hook 'xref-backend-functions #'citre-xref-backend t)
-;;     (add-hook 'xref-backend-functions #'citre-xref-backend -25 t))
-;;   :bind (:map prog-mode-map
-;;               ("C-c r c" . citre-update-this-tags-file))
-;;   :hook ((find-file . citre-auto-enable-citre-mode)
-;;          (citre-mode . +citre-manage-xref-backend))
-;;   :config
-;;   (setq citre-default-create-tags-file-location 'global-cache
-;;         citre-edit-ctags-options-manually t
-;;         citre-auto-enable-citre-mode-modes '(prog-mode))
-;;   (setq-default citre-enable-xref-integration nil
-;;                 citre-enable-capf-integration t)
-;;
-;;   (with-eval-after-load 'cc-mode (require 'citre-lang-c))
-;;   (with-eval-after-load 'dired (require 'citre-lang-fileref))
-;;   (with-eval-after-load 'verilog-mode (require 'citre-lang-verilog))
-;;   )
+(use-package citre
+  :straight t
+  :commands (citre-update-this-tags-file)
+  :preface
+  :bind (:map prog-mode-map
+              ("C-c r c" . citre-update-this-tags-file))
+  :hook ((prog-mode . citre-auto-enable-citre-mode))
+  :config
+  (citre-register-backend 'dumb-jump
+                          (citre-xref-backend-to-citre-backend
+                           'dumb-jump #'dumb-jump-xref-activate))
+
+  (setq citre-default-create-tags-file-location 'global-cache
+        citre-edit-ctags-options-manually t
+        citre-auto-enable-citre-mode-modes '(prog-mode)
+        citre-find-definition-backends '(eglot tags global dumb-jump)
+        citre-find-reference-backends '(eglot global dumb-jump))
+  (setq-default citre-enable-xref-integration nil
+                citre-enable-capf-integration t)
+
+  (with-eval-after-load 'cc-mode (require 'citre-lang-c))
+  (with-eval-after-load 'dired (require 'citre-lang-fileref))
+  (with-eval-after-load 'verilog-mode (require 'citre-lang-verilog))
+  )
 
 
 ;; [quickrun] Run commands quickly
@@ -387,7 +391,12 @@ Emacs 31's interactive form returns every diagnostic at point as a
 separate argument, although the command accepts only one."
     (if (cdr args) (list (car args)) args))
 
-  :hook ((prog-mode . flymake-mode))
+  (defun +flymake-mode-h ()
+    "Enable Flymake with local shared backends."
+    (dolist (backend '(hl-todo-flymake +compilation-flymake-backend))
+      (add-hook 'flymake-diagnostic-functions backend nil t))
+    (flymake-mode 1))
+  :hook ((prog-mode . +flymake-mode-h))
   :bind (("C-c f ]" . flymake-goto-next-error)
          ("C-c f [" . flymake-goto-prev-error)
          ("C-c f b" . flymake-show-buffer-diagnostics)
@@ -398,8 +407,6 @@ separate argument, although the command accepts only one."
   :config
   (advice-add 'flymake-show-buffer-diagnostics :filter-args
               #'+flymake-show-buffer-diagnostics-single-a)
-  (add-hook 'flymake-diagnostic-functions
-            #'+compilation-flymake-backend)
   (setq flymake-show-diagnostics-at-end-of-line 'short))
 
 ;; Langs
