@@ -47,7 +47,7 @@
                                         (window-height . 0.5)))
   (defadvice! +vertico-buffer-disbale-mode-line ()
     :before #'vertico-buffer--setup
-    (setq-local mode-line-format nil)))
+    (mode-line-invisible-mode)))
 
 
 ;;; Matching styles
