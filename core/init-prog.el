@@ -201,9 +201,6 @@ Diagnostics for all files are published separately for project listings."
               ("M-/" . eglot-find-typeDefinition)
               ("M-?" . xref-find-references))
   :config
-  (add-to-list 'eglot-stay-out-of 'flymake-diagnostic-functions)
-  (add-hook 'flymake-diagnostic-functions #'eglot-flymake-backend)
-
   (setq eglot-events-buffer-config '(:size 0 :format full)
         eglot-autoshutdown t
         eglot-documentation-renderer 'markdown-ts-view-mode
@@ -255,11 +252,10 @@ Diagnostics for all files are published separately for project listings."
         "jdtls" "--jvm-arg=-Xmx16G" "-data" ,data-dir)))
   (push '(java-mode . +jdtls-command-contact) eglot-server-programs)
 
+  (add-to-list 'eglot-stay-out-of 'flymake-diagnostic-functions)
   (add-hook! eglot-managed-mode-hook
     (defun +eglot-disable-eldoc-mode ()
-      ;; Remove local Flymake backends so Eglot can manage diagnostics.
-      (dolist (backend '(rust-ts-flymake flymake-cc python-flymake))
-        (remove-hook 'flymake-diagnostic-functions backend t))
+      (add-hook! flymake-diagnostic-functions :local #'eglot-flymake-backend)
 
       ;; We call eldoc manually
       (setq-local eldoc-documentation-strategy
@@ -393,6 +389,12 @@ separate argument, although the command accepts only one."
 
   (defun +flymake-mode-h ()
     "Enable Flymake with local shared backends."
+    ;; Eglot will supply diagnostics for these modes.  Remove their native
+    ;; backends before enabling Flymake so an asynchronous checker cannot
+    ;; report after Eglot has taken over (notably `rust-ts-flymake').
+    (when (memq major-mode +eglot-auto-start-modes)
+      (dolist (backend '(rust-ts-flymake flymake-cc python-flymake))
+        (remove-hook 'flymake-diagnostic-functions backend t)))
     (dolist (backend '(hl-todo-flymake +compilation-flymake-backend))
       (add-hook 'flymake-diagnostic-functions backend nil t))
     (flymake-mode 1))
