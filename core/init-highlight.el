@@ -111,8 +111,8 @@
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
   :init
-  (setq pulse-delay 0.1
-        pulse-iterations 2)
+  (setq pulse-delay 0.2
+        pulse-iterations 1)
 
   (defadvice! +pulse-momentary-line (&rest _)
     :after '(recenter-top-bottom
@@ -140,6 +140,14 @@
     "Recenter and pulse the current line."
     (recenter)
     (+pulse-momentary-line))
+
+  ;; Pulse only in current window
+  (defadvice! +pulse-window-local-a (fn &rest args)
+    :around #'pulse-momentary-highlight-region
+    (let ((window (selected-window)))
+      (prog1 (apply fn args)
+        (when (overlayp pulse-momentary-overlay)
+          (overlay-put pulse-momentary-overlay 'window window)))))
   )
 
 
