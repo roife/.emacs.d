@@ -120,8 +120,8 @@
              aw-select
              windmove-do-window-select
              pager-page-up
-             treemacs-select-window
-             tab-bar-select-tab)
+             tab-bar-select-tab
+             +tab-bar-echo)
     "Pulse the current line."
     (pulse-momentary-highlight-one-line (point)))
 
