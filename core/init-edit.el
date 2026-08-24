@@ -93,19 +93,58 @@
   (setq apheleia-hide-log-buffers t))
 
 
-;; [jinx] Spell checker
-(use-package jinx
-  :straight t
-  :hook ((text-mode . jinx-mode)
-         (prog-mode . jinx-mode))
-  :bind (:map jinx-mode-map
-              ("C-c f >" . jinx-next)
-              ("C-c f <" . jinx-previous)
-              ("C-c f ." . jinx-correct)
-              ("C-c f /" . jinx-correct-all))
+;; [flyspell] Spell-checking overlays
+(defun +flyspell-org-skip-regions-h ()
+  "Exclude Org blocks and inline markup from spell checking."
+  (make-local-variable 'ispell-skip-region-alist)
+  (dolist (pair '((org-property-drawer-re)
+                  ("~" "~") ("=" "=")
+                  ("^#\\+BEGIN_SRC" "^#\\+END_SRC")
+                  ("\\\\(" "\\\\)") ("\\[" "\\]")
+                  ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
+    (add-to-list 'ispell-skip-region-alist pair)))
+
+(defun +flyspell-markdown-skip-regions-h ()
+  "Exclude Markdown code and inline markup from spell checking."
+  (make-local-variable 'ispell-skip-region-alist)
+  (dolist (pair '(("`" "`")
+                  ("^```" "^```")
+                  ("{{" "}}")
+                  ("\\\\(" "\\\\)") ("\\[" "\\]")
+                  ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
+    (add-to-list 'ispell-skip-region-alist pair)))
+
+(use-package flyspell
+  :hook ((text-mode . flyspell-mode)
+         (prog-mode . flyspell-prog-mode)
+         (org-mode . +flyspell-org-skip-regions-h)
+         ((markdown-mode markdown-ts-mode) . +flyspell-markdown-skip-regions-h))
+  :bind (:map flyspell-mode-map
+              ("C-c s ]" . flyspell-goto-next-error)
+              ("C-c s [" . +flyspell-goto-previous-error)
+              ("C-c s s" . flyspell-auto-correct-word)
+              ("C-;" . nil)
+              ("C-," . nil)
+              ("C-." . nil))
+  :init
+  (let ((personal-dictionary
+         (expand-file-name "ispell/.pws" user-emacs-directory)))
+    (make-directory (file-name-directory personal-dictionary) t)
+    (setq ispell-program-name (or (executable-find "enchant-2") "enchant-2")
+          ispell-extra-args nil
+          ;; AppleSpell advertises generic English through Enchant as `en'.
+          ;; On this system `en_US' is instead provided by Aspell.
+          ispell-dictionary "en"
+          ispell-personal-dictionary personal-dictionary))
   :config
-  (setq jinx-delay 0.5)
-  (add-to-list 'jinx-exclude-regexps '(t "\\cc")))
+  (defun +flyspell-goto-previous-error ()
+    "Go to the previous Flyspell error."
+    (interactive)
+    (flyspell-goto-next-error t))
+
+  (setq flyspell-issue-message-flag nil
+        flyspell-issue-welcome-flag nil
+        flyspell-use-meta-tab nil))
 
 
 ;; [ediff] Diff & patch

@@ -1,14 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-;; (setq mac-option-modifier 'meta
-;;       mac-command-modifier 'super
-;;       mac-right-command-modifier 'left)
-
-;; [osx-dictionary] macOS native dictionary app
-(use-package osx-dictionary
-  :straight t
-  :bind (("C-c d d" . osx-dictionary-search-pointer)))
-
 (use-package emt
   :straight (:host github :repo "roife/emt"
                    :files ("*.el" "module/*" "module"))

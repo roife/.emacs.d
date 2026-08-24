@@ -294,7 +294,7 @@
                   highlight-parentheses-mode
                   hl-line-mode
                   indent-bars-mode
-                  jinx-mode
+                  flyspell-mode
                   ligature-mode
                   prettify-symbols-mode
                   rainbow-delimiters-mode

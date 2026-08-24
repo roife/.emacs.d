@@ -12,6 +12,7 @@
                      'init-basic
                      'init-ui
                      'init-xterm
+                     (when (eq system-type 'gnu/linux) 'init-linux)
                      (when (eq system-type 'darwin) 'init-mac)
                      'init-completion
                      'init-tools

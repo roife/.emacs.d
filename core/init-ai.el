@@ -29,15 +29,28 @@
   :straight (gptel-quick :type git :host github :repo "karthink/gptel-quick")
   :bind (("C-c g e" . +gptel-quick-explain)
          ("C-c g t" . +gptel-quick-translate-to-chinese)
-         ("C-c g s" . +gptel-quick-summarize))
+         ("C-c g s" . +gptel-quick-summarize)
+         ("C-c g d" . +gptel-quick-dict))
   :preface
+  (defsubst +gptel-quick--buffered-callback (callback)
+    "Adapt streaming responses for non-streaming CALLBACK."
+    (let (chunks)
+      (lambda (response info)
+        (cond
+         ((stringp response) (push response chunks))
+         ((eq response t)
+          (funcall callback (apply #'concat (nreverse chunks)) info))
+         (t
+          (when-let ((error (plist-get info :error)))
+            (setf (plist-get info :status) error))
+          (funcall callback response info))))))
+
   (defadvice! +gptel-quick-apply-options-a
     (gptel-quick-fn query-text &optional count)
     :around #'gptel-quick
     "Run GPTEL-QUICK-FN with the options stored on QUERY-TEXT."
-    (let* ((options
-            (and (stringp query-text)
-                 (get-text-property 0 '+gptel-quick-options query-text)))
+    (let* ((options (and (stringp query-text)
+                         (get-text-property 0 '+gptel-quick-options query-text)))
            (system-message (car-safe options))
            (gptel-quick-system-message
             (if system-message
@@ -48,14 +61,19 @@
   (defadvice! +gptel-request-apply-quick-limit-a
     (gptel-request-fn prompt &rest args)
     :around #'gptel-request
-    "Remove gptel-quick's token limit when PROMPT requests it."
-    (let* ((options
-            (and (stringp prompt)
-                 (get-text-property 0 '+gptel-quick-options prompt)))
+    "Apply gptel-quick request options and support streaming-only backends."
+    (let* ((options (and (stringp prompt)
+                         (get-text-property 0 '+gptel-quick-options prompt)))
+           (callback (plist-get args :callback))
            (gptel-max-tokens
             (if (and options (not (cdr options)))
                 nil
               gptel-max-tokens)))
+      (when (and (gptel-openai-oauth-p gptel-backend)
+                 (eq callback #'gptel-quick--callback-posframe))
+        (setf (plist-get args :stream) t
+              (plist-get args :callback)
+              (+gptel-quick--buffered-callback callback)))
       (apply gptel-request-fn prompt args)))
 
   (defadvice! +set-transient-map-keep-gptel-quick-a
@@ -82,46 +100,69 @@
           (select-frame-set-input-focus frame))
         frame)))
 
-  (defun +gptel-quick-region-or-buffer (system-message &optional limit-response)
-    "Run `gptel-quick' on the active region or buffer using SYSTEM-MESSAGE.
+  (defun +gptel-quick-region-or-buffer (system-message &optional limit-response thing)
+    "Run `gptel-quick' on THING, the active region, or the buffer.
 Preserve SYSTEM-MESSAGE when requesting another response with `+'.  When
 LIMIT-RESPONSE is non-nil, apply gptel-quick's count-derived token limit."
     (require 'gptel-quick)
     (let ((query-text
-           (if (use-region-p)
-               (buffer-substring-no-properties (region-beginning) (region-end))
-             (buffer-substring-no-properties (point-min) (point-max)))))
+           (if thing
+               (or (thing-at-point thing t)
+                   (user-error "No %s at point" thing))
+             (if (use-region-p)
+                 (buffer-substring-no-properties (region-beginning) (region-end))
+               (buffer-substring-no-properties (point-min) (point-max))))))
       (when (string-empty-p query-text)
         (user-error "Buffer is empty"))
-      (setq query-text
-            (propertize query-text '+gptel-quick-options
-                        (cons system-message limit-response)))
-      (gptel-quick query-text)))
+      (gptel-quick
+       (propertize query-text '+gptel-quick-options
+                   (cons system-message limit-response)))))
 
-  (defun +gptel-quick-explain ()
-    "Explain the active region, or the whole buffer, in Chinese."
-    (interactive)
-    (+gptel-quick-region-or-buffer
-     "Explain in clear Chinese, preserving necessary context and details."
-     t))
+  (defmacro +gptel-quick-define-command (name doc prompt &optional limit thing)
+    "Define NAME as a gptel-quick action over the region or buffer."
+    `(defun ,name ()
+       ,doc (interactive)
+       (+gptel-quick-region-or-buffer ,prompt ,limit ,thing)))
 
-  (defun +gptel-quick-translate-to-chinese ()
-    "Translate the active region, or the whole buffer, to Chinese."
-    (interactive)
-    (+gptel-quick-region-or-buffer "Translate into fluent Chinese."))
+  (+gptel-quick-define-command +gptel-quick-explain
+                               "Explain the active region, or the whole buffer, in Chinese."
+                               "Explain in clear Chinese, preserving necessary context and details." t)
 
-  (defun +gptel-quick-summarize ()
-    "Summarize the active region, or the whole buffer, in Chinese."
-    (interactive)
-    (+gptel-quick-region-or-buffer
-     "Summarize in Chinese while preserving details and key information."
-     t))
+  (+gptel-quick-define-command +gptel-quick-translate-to-chinese
+                               "Translate the active region, or the whole buffer, to Chinese."
+                               "Translate into fluent Chinese.")
+
+  (+gptel-quick-define-command +gptel-quick-summarize
+                               "Summarize the active region, or the whole buffer, in Chinese."
+                               "Summarize in Chinese while preserving details and key information." t)
+
+  (+gptel-quick-define-command +gptel-quick-dict
+                               "Explain the word at point in dictionary style."
+                               "Given a word, explain it in the style of a concise English dictionary entry,
+and add accurate Chinese translations for each sense. Preserve the compact dictionary
+format in plain text rather than giving a long explanatory article or markdown document.
+No need for chinese in sentences.
+
+Use this format:
+*word* syllable division | pronunciation | part of speech (inflections)
+
+1. English definition 中文
+     > example sentence.
+• sub-sense or extended meaning 中文
+     > example sentence.
+• ...
+2. English definition 中文
+     > example sentence.
+
+ORIGIN brief etymology and word history (in Chinese)."
+                               nil 'word)
 
   (with-eval-after-load 'embark
     (keymap-set embark-general-map "?" #'gptel-quick)
     (keymap-set embark-region-map "E" #'+gptel-quick-explain)
     (keymap-set embark-region-map "T" #'+gptel-quick-translate-to-chinese)
-    (keymap-set embark-region-map "S" #'+gptel-quick-summarize))
+    (keymap-set embark-region-map "S" #'+gptel-quick-summarize)
+    (keymap-set embark-region-map "D" #'+gptel-quick-dict))
 
   :config
   (setq gptel-quick-word-count 50

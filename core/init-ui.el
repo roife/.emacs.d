@@ -205,8 +205,7 @@
   :straight (:type git :host github :repo "roife/scrollview.el" :branch "main")
   :hook ((after-init . global-scrollview-mode))
   :config
-  (setq scrollview-refresh-delay 0.1
-        scrollview-spell-checker 'jinx))
+  (setq scrollview-refresh-delay 0.1))
 
 (setq frame-title-format
       '((:eval (or buffer-file-truename "%b"))))
