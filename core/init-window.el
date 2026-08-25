@@ -209,28 +209,3 @@
   :config
   (setq zoom-minibuffer-preserve-layout nil
         zoom-ignored-major-modes '(ediff-mode vundo-mode minibuffer-mode speedbar-mode)))
-
-;; [auto-dim-other-buffers] Dim non-active buffers
-(use-package auto-dim-other-buffers
-  :straight t
-  :hook ((after-init . auto-dim-other-buffers-mode))
-  :config
-  (setq auto-dim-other-buffers-dim-on-focus-out nil
-        auto-dim-other-buffers-dim-on-switch-to-minibuffer nil)
-
-  ;; `adob--rescan-windows' does not honor this option.
-  (defadvice! +auto-dim-other-buffers-respect-minibuffer-option-a (fn)
-    :around #'adob--rescan-windows
-    (when (or auto-dim-other-buffers-dim-on-switch-to-minibuffer
-              (not (window-minibuffer-p)))
-      (funcall fn)))
-
-  (add-hook! (auto-dim-other-buffers-mode-hook enable-theme-functions server-after-make-frame-hook) :unless-daemonp-call-immediately
-    (defun +auto-dim-other-buffers-auto-set-face (&rest _)
-      (let ((dim (or (face-background 'mode-line)
-                     'unspecified)))
-        (set-face-background 'auto-dim-other-buffers-face dim)
-        (set-face-attribute 'auto-dim-other-buffers-hide nil
-                            :foreground dim
-                            :background dim))))
-  )

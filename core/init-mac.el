@@ -1,14 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(use-package emt
-  :straight (:host github :repo "roife/emt"
-                   :files ("*.el" "module/*" "module"))
-  :init
-  (setq emt-lib-path
-        (concat (no-littering-expand-var-file-name "modules/libEMT")
-                module-file-suffix))
-  :hook (after-init . emt-mode))
-
 (add-hook! ns-system-appearance-change-functions
   (defun +mac-auto-change-theme-with-system (&rest _)
     (+load-theme)))

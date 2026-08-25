@@ -24,7 +24,8 @@
 
 (use-package liberime-regexp
   :straight (:host github :repo "roife/liberime-regexp")
-  :hook (liberime-after-start . liberime-regexp-enable)
+  :hook ((liberime-after-start . liberime-regexp-enable)
+         (liberime-after-start . liberime-regexp-segment-mode))
   :config
   (setq liberime-regexp-candidate-limit 40))
 

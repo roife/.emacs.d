@@ -93,32 +93,50 @@
   (setq apheleia-hide-log-buffers t))
 
 
+;; [ispell] Spell-checker backend
+(use-package ispell
+  :hook ((org-mode . +ispell-org-skip-regions-h)
+         ((markdown-mode markdown-ts-mode) . +ispell-markdown-skip-regions-h))
+  :config
+  (defun +ispell-org-skip-regions-h ()
+    "Exclude Org blocks and inline markup from spell checking."
+    (make-local-variable 'ispell-skip-region-alist)
+    (dolist (pair '((org-property-drawer-re)
+                    ("~" "~") ("=" "=")
+                    ("^#\\+BEGIN_SRC" "^#\\+END_SRC")
+                    ("\\\\(" "\\\\)") ("\\[" "\\]")
+                    ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
+      (add-to-list 'ispell-skip-region-alist pair)))
+
+  (defun +ispell-markdown-skip-regions-h ()
+    "Exclude Markdown code and inline markup from spell checking."
+    (make-local-variable 'ispell-skip-region-alist)
+    (dolist (pair '(("`" "`")
+                    ("^```" "^```")
+                    ("{{" "}}")
+                    ("\\\\(" "\\\\)") ("\\[" "\\]")
+                    ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
+      (add-to-list 'ispell-skip-region-alist pair)))
+
+  (setq ispell-program-name (or (executable-find "enchant-2") "enchant-2")
+        ispell-extra-args nil
+        ;; AppleSpell advertises generic English through Enchant as `en'.
+        ;; On this system `en_US' is instead provided by Aspell.
+        ispell-dictionary "en"
+        ispell-personal-dictionary (no-littering-expand-var-file-name "ispell/.pws"))
+
+  ;; Avoid querying every installed Enchant dictionary on first use.
+  (setq ispell-enchant-dictionary-alist
+        `((,ispell-dictionary
+           "[[:alpha:]]" "[^[:alpha:]]"
+           ,(ispell--get-extra-word-characters ispell-dictionary)
+           t nil nil utf-8))))
+
+
 ;; [flyspell] Spell-checking overlays
-(defun +flyspell-org-skip-regions-h ()
-  "Exclude Org blocks and inline markup from spell checking."
-  (make-local-variable 'ispell-skip-region-alist)
-  (dolist (pair '((org-property-drawer-re)
-                  ("~" "~") ("=" "=")
-                  ("^#\\+BEGIN_SRC" "^#\\+END_SRC")
-                  ("\\\\(" "\\\\)") ("\\[" "\\]")
-                  ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
-    (add-to-list 'ispell-skip-region-alist pair)))
-
-(defun +flyspell-markdown-skip-regions-h ()
-  "Exclude Markdown code and inline markup from spell checking."
-  (make-local-variable 'ispell-skip-region-alist)
-  (dolist (pair '(("`" "`")
-                  ("^```" "^```")
-                  ("{{" "}}")
-                  ("\\\\(" "\\\\)") ("\\[" "\\]")
-                  ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
-    (add-to-list 'ispell-skip-region-alist pair)))
-
 (use-package flyspell
   :hook ((text-mode . flyspell-mode)
-         (prog-mode . flyspell-prog-mode)
-         (org-mode . +flyspell-org-skip-regions-h)
-         ((markdown-mode markdown-ts-mode) . +flyspell-markdown-skip-regions-h))
+         (prog-mode . flyspell-prog-mode))
   :bind (:map flyspell-mode-map
               ("C-c s ]" . flyspell-goto-next-error)
               ("C-c s [" . +flyspell-goto-previous-error)
@@ -126,16 +144,6 @@
               ("C-;" . nil)
               ("C-," . nil)
               ("C-." . nil))
-  :init
-  (let ((personal-dictionary
-         (expand-file-name "ispell/.pws" user-emacs-directory)))
-    (make-directory (file-name-directory personal-dictionary) t)
-    (setq ispell-program-name (or (executable-find "enchant-2") "enchant-2")
-          ispell-extra-args nil
-          ;; AppleSpell advertises generic English through Enchant as `en'.
-          ;; On this system `en_US' is instead provided by Aspell.
-          ispell-dictionary "en"
-          ispell-personal-dictionary personal-dictionary))
   :config
   (defun +flyspell-goto-previous-error ()
     "Go to the previous Flyspell error."

@@ -41,7 +41,7 @@
          ((eq response t)
           (funcall callback (apply #'concat (nreverse chunks)) info))
          (t
-          (when-let ((error (plist-get info :error)))
+          (when-let* ((error (plist-get info :error)))
             (setf (plist-get info :status) error))
           (funcall callback response info))))))
 
@@ -79,8 +79,15 @@
   (defadvice! +set-transient-map-keep-gptel-quick-a
     (set-transient-map-fn map keep-pred &rest args)
     :around #'set-transient-map
-    "Keep gptel-quick's map active during unrelated commands."
+    "Add `q' to quit gptel-quick and keep its map active otherwise."
     (when (equal (buffer-name) " *gptel-quick*")
+      (when-let* ((quit-command (lookup-key map [remap keyboard-quit]))
+                  ((commandp quit-command)))
+        (define-key map (kbd "q")
+                    (lambda ()
+                      (interactive)
+                      (funcall-interactively quit-command)
+                      (message nil))))
       (setq keep-pred
             (lambda ()
               (or (null this-command)
@@ -152,9 +159,7 @@ Use this format:
      > example sentence.
 • ...
 2. English definition 中文
-     > example sentence.
-
-ORIGIN brief etymology and word history (in Chinese)."
+     > example sentence."
                                nil 'word)
 
   (with-eval-after-load 'embark
