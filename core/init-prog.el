@@ -552,7 +552,9 @@ separate argument, although the command accepts only one."
         indent-bars-color '(highlight :face-bg t :blend 0.2)
         indent-bars-zigzag nil
         indent-bars-highlight-current-depth nil
-        indent-bars-pattern "."))
+        indent-bars-pattern ".")
+
+  (add-hook! enable-theme-functions #'indent-bars-reset))
 
 
 ;; [direnv] Buffer-local project environments

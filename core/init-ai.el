@@ -26,87 +26,12 @@
         gptel-magit-commit-prompt (cdr (assoc "Conventional Commits" gptel-magit-commit-styles-alist))))
 
 (use-package gptel-quick
-  :straight (gptel-quick :type git :host github :repo "karthink/gptel-quick")
+  :straight (gptel-quick :type git :host github :repo "roife/gptel-quick")
   :bind (("C-c g e" . +gptel-quick-explain)
          ("C-c g t" . +gptel-quick-translate-to-chinese)
          ("C-c g s" . +gptel-quick-summarize)
          ("C-c g d" . +gptel-quick-dict))
   :preface
-  (defsubst +gptel-quick--buffered-callback (callback)
-    "Adapt streaming responses for non-streaming CALLBACK."
-    (let (chunks)
-      (lambda (response info)
-        (cond
-         ((stringp response) (push response chunks))
-         ((eq response t)
-          (funcall callback (apply #'concat (nreverse chunks)) info))
-         (t
-          (when-let* ((error (plist-get info :error)))
-            (setf (plist-get info :status) error))
-          (funcall callback response info))))))
-
-  (defadvice! +gptel-quick-apply-options-a
-    (gptel-quick-fn query-text &optional count)
-    :around #'gptel-quick
-    "Run GPTEL-QUICK-FN with the options stored on QUERY-TEXT."
-    (let* ((options (and (stringp query-text)
-                         (get-text-property 0 '+gptel-quick-options query-text)))
-           (system-message (car-safe options))
-           (gptel-quick-system-message
-            (if system-message
-                (lambda (&rest _) system-message)
-              gptel-quick-system-message)))
-      (funcall gptel-quick-fn query-text count)))
-
-  (defadvice! +gptel-request-apply-quick-limit-a
-    (gptel-request-fn prompt &rest args)
-    :around #'gptel-request
-    "Apply gptel-quick request options and support streaming-only backends."
-    (let* ((options (and (stringp prompt)
-                         (get-text-property 0 '+gptel-quick-options prompt)))
-           (callback (plist-get args :callback))
-           (gptel-max-tokens
-            (if (and options (not (cdr options)))
-                nil
-              gptel-max-tokens)))
-      (when (and (gptel-openai-oauth-p gptel-backend)
-                 (eq callback #'gptel-quick--callback-posframe))
-        (setf (plist-get args :stream) t
-              (plist-get args :callback)
-              (+gptel-quick--buffered-callback callback)))
-      (apply gptel-request-fn prompt args)))
-
-  (defadvice! +set-transient-map-keep-gptel-quick-a
-    (set-transient-map-fn map keep-pred &rest args)
-    :around #'set-transient-map
-    "Add `q' to quit gptel-quick and keep its map active otherwise."
-    (when (equal (buffer-name) " *gptel-quick*")
-      (when-let* ((quit-command (lookup-key map [remap keyboard-quit]))
-                  ((commandp quit-command)))
-        (define-key map (kbd "q")
-                    (lambda ()
-                      (interactive)
-                      (funcall-interactively quit-command)
-                      (message nil))))
-      (setq keep-pred
-            (lambda ()
-              (or (null this-command)
-                  (not (where-is-internal this-command (list map) t))))))
-    (apply set-transient-map-fn map keep-pred args))
-
-  (defadvice! +posframe-show-focus-gptel-quick-a
-    (posframe-show-fn buffer-or-name &rest args)
-    :around #'posframe-show
-    "Show the gptel-quick posframe with input focus."
-    (let ((gptel-quick-p (equal buffer-or-name " *gptel-quick*")))
-      (when gptel-quick-p
-        (setq args (plist-put args :accept-focus t)))
-      (let ((frame (apply posframe-show-fn buffer-or-name args)))
-        (when (and gptel-quick-p (frame-live-p frame))
-          (set-window-point (frame-selected-window frame) 1)
-          (select-frame-set-input-focus frame))
-        frame)))
-
   (defun +gptel-quick-region-or-buffer (system-message &optional limit-response thing)
     "Run `gptel-quick' on THING, the active region, or the buffer.
 Preserve SYSTEM-MESSAGE when requesting another response with `+'.  When
@@ -121,9 +46,10 @@ LIMIT-RESPONSE is non-nil, apply gptel-quick's count-derived token limit."
                (buffer-substring-no-properties (point-min) (point-max))))))
       (when (string-empty-p query-text)
         (user-error "Buffer is empty"))
-      (gptel-quick
-       (propertize query-text '+gptel-quick-options
-                   (cons system-message limit-response)))))
+      (gptel-quick query-text nil
+                   (append (list :system system-message)
+                           (unless limit-response
+                             (list :max-tokens nil))))))
 
   (defmacro +gptel-quick-define-command (name doc prompt &optional limit thing)
     "Define NAME as a gptel-quick action over the region or buffer."
