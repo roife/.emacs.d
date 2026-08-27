@@ -5,7 +5,9 @@
 # Emacs runtime files
 /.cache/
 /auto-save-list/
-/etc/
+/etc/*
+!/etc/tempel/
+!/etc/mermaid/
 /var/
 
 # Package and native build artifacts

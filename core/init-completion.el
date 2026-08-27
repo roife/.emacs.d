@@ -313,9 +313,7 @@
       (setq +tempel-trigger-capf (cape-capf-trigger #'tempel-complete ?/)))
     (unless (memq +tempel-trigger-capf completion-at-point-functions)
       (setq-local completion-at-point-functions
-                  (cons +tempel-trigger-capf completion-at-point-functions))))
-  :config
-  (setq tempel-path (expand-file-name "tempel-templates" user-emacs-directory)))
+                  (cons +tempel-trigger-capf completion-at-point-functions)))))
 
 
 (use-package tempel-collection

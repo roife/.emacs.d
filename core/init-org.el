@@ -300,7 +300,10 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
   :straight t
   :after org
   :init
-  (setf (alist-get 'mermaid org-babel-load-languages) t))
+  (setf (alist-get 'mermaid org-babel-load-languages) t)
+  :config
+  (setq ob-mermaid-default-config-file
+        (no-littering-expand-etc-file-name "mermaid/config.json")))
 
 
 ;; [org-entities]
