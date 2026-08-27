@@ -208,7 +208,7 @@ Diagnostics for all files are published separately for project listings."
 
   ;; LSP server settings
   (setq-default eglot-workspace-configuration
-                '((:pyls . (:plugins (:jedi_completion (:fuzzy t))))
+                `((:pyls . (:plugins (:jedi_completion (:fuzzy t))))
                   (:rust-analyzer . (:cargo (:allFeatures t :allTargets t :features "full")
                                             :checkOnSave :json-false
                                             :completion (:termSearch (:enable t)
@@ -230,18 +230,15 @@ Diagnostics for all files are published separately for project listings."
                                             :diagnostics (:enable :json-false)))
                   (:typescript . (:preferences (:importModuleSpecifierPreference "non-relative")))
                   (:java . (:configuration
-                            (:runtimes [(:name "JavaSE-17"
-                                               :path "/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/")
-                                        (:name "JavaSE-21"
-                                               :path "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home/"
-                                               :default t)])
+                            (:runtimes [(:name "JavaSE-21" :path ,(getenv "JAVA21_HOME") :default t)
+                                        (:name "JavaSE-26" :path ,(getenv "JAVA26_HOME"))])
                             :import (:gradle (:enabled t
                                                        :wrapper (:enabled t)))
                             :autobuild (:enabled :json-false)
                             :extendedClientCapabilities (:classFileContentsSupport t)))))
 
   ;; Java integration
-  (defun +jdtls-command-contact (&optional interactive)
+  (defun +jdtls-command-contact (&optional _interactive)
     (let* ((jdtls-java-home (getenv "JDTLS_JAVA_HOME"))
            (project-root (project-root (project-current t)))
            (data-dir
