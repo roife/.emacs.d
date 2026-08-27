@@ -102,7 +102,12 @@
                                             telega-capf-botcmd))
 
   (when (eq system-type 'gnu/linux)
-    (setq telega-proxies '((:server "127.0.0.1" :port 7891 :enable t :type (:@type "proxyTypeSocks5")))))
+    (add-hook! telega-before-auth-hook
+      (defun +telega-enable-linux-proxy-h ()
+        "Add and enable the local SOCKS5 proxy before Telega authorizes."
+        (telega--addProxy '(:server "127.0.0.1" :port 7891 :type (:@type "proxyTypeSocks5"))
+                          :enable-p t
+                          :comment "Local SOCKS5 proxy"))))
 
   ;; HACK: Work around upstream bot command completion returning nested lists.
   ;; Each mapped candidate list is freshly allocated, so `mapcan' is safe here.

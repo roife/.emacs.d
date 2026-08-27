@@ -4,11 +4,8 @@
   :straight (:host github :repo "emacscollective/no-littering")
   :demand t
   :config
-  ;; `no-littering' intentionally leaves `custom-file' to the user.
-  (setq custom-file (no-littering-expand-etc-file-name "custom.el")
-
-        ;; Package-specific paths not covered by no-littering.
-        tramp-rpc-deploy-local-cache-directory (no-littering-expand-var-file-name "tramp-rpc/")
+  ;; Package-specific paths not covered by no-littering.
+  (setq tramp-rpc-deploy-local-cache-directory (no-littering-expand-var-file-name "tramp-rpc/")
         forge-post-fallback-directory (no-littering-expand-var-file-name "forge/drafts/")
         rust-playground-basedir (no-littering-expand-var-file-name "rust-playground/")
         typst-ts-lsp-download-path (no-littering-expand-var-file-name "lsp/tinymist/tinymist")

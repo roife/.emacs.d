@@ -19,7 +19,7 @@
   :straight (:type git :host github :repo "cashmeredev/kitty-graphics.el")
   :hook (tty-setup . kitty-graphics-setup)
   :init
-  (setq kitty-gfx-enable-video t))
+  (setq kitty-graphics-enable-video t))
 
 
 ;; [Kitty Keyboard Protocol] Implements support for Kitty's "keyboard protocol",

@@ -165,8 +165,8 @@
 
 ;; [emacs-reader] read docs in emacs
 (use-package reader
-  :straight '(reader :type git :host codeberg :repo "MonadicSheep/emacs-reader"
-                     :files ("*.el" "render-core.dylib")
+  :straight `(reader :type git :host codeberg :repo "MonadicSheep/emacs-reader"
+                     :files (:defaults ,(concat "render-core" module-file-suffix))
                      :pre-build ("make" "all")))
 
 ;; [browse-url] Pass a URL to browser

@@ -213,7 +213,7 @@
       '(warning org-link)))
   (org-link-set-parameters "file" :face #'+org-file-link-face)
 
-  (add-to-list 'org-src-lang-modes '("md" . markdown))
+  (add-to-list 'org-src-lang-modes '("md" . markdown-ts-mode))
   (define-key org-src-mode-map (kbd "C-c C-c") #'org-edit-src-exit)
 
   (add-hook! meow-insert-exit-hook

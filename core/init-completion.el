@@ -7,8 +7,7 @@
   :bind (:map vertico-map
               ("TAB" . minibuffer-complete)
               ("<tab>" . minibuffer-complete)
-              ("C-<return>" . vertico-exit-input)
-              ("C-, ." . vertico-quick-jump))
+              ("C-<return>" . vertico-exit-input))
   :hook ((after-init . vertico-mode))
   :config
   (setq vertico-cycle t
