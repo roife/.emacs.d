@@ -79,13 +79,13 @@ No need for chinese in sentences.
 Use this format:
 *word* syllable division | pronunciation | part of speech (inflections)
 
-1. English definition 中文
-     > example sentence.
-• sub-sense or extended meaning 中文
-     > example sentence.
+1. English definition **中文**
+     *Example sentence.*
+ | Sub-sense or extended meaning **中文**
+     *Example sentence.*
 • ...
-2. English definition 中文
-     > example sentence."
+2. English definition **中文**
+     *Example sentence.*"
                                nil 'word)
 
   (with-eval-after-load 'embark
