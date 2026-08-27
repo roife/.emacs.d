@@ -254,14 +254,17 @@ Diagnostics for all files are published separately for project listings."
 
   (add-to-list 'eglot-stay-out-of 'flymake-diagnostic-functions)
   (add-hook! eglot-managed-mode-hook
-    (defun +eglot-disable-eldoc-mode ()
-      (add-hook! flymake-diagnostic-functions :local #'eglot-flymake-backend)
-
-      ;; We call eldoc manually
-      (setq-local eldoc-documentation-strategy
-                  'eldoc-documentation-compose-eagerly)
-      (when (eglot-managed-p)
-        (eldoc-mode -1))))
+    (defun +eglot-managed-mode-h ()
+      "Install or remove integrations as Eglot starts or stops managing."
+      (if (eglot-managed-p)
+          (progn
+            (add-hook! flymake-diagnostic-functions :local #'eglot-flymake-backend)
+            ;; We call Eldoc manually while Eglot is active.
+            (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+            (eldoc-mode -1))
+        (remove-hook 'flymake-diagnostic-functions #'eglot-flymake-backend t)
+        (when flymake-mode
+          (flymake-start)))))
   )
 
 
