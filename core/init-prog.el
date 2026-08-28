@@ -272,15 +272,6 @@ Diagnostics for all files are published separately for project listings."
   (eglot-tempel-mode 1))
 
 
-(use-package eglot-booster
-  :straight (:host github :repo "jdtsmith/eglot-booster")
-  :after eglot
-  :init
-  (setq eglot-booster-io-only t)
-  :config
-  (eglot-booster-mode 1))
-
-
 ;; [Eldoc]
 (use-package eldoc
   :bind (("C-h h" . eldoc))

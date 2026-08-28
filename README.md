@@ -7,10 +7,10 @@
   + `Sarasa Gothic`
 - `rg`
 - `fd`
-- `enchant` (AppleSpell provider)
+- `aspell`
 - `librime`
 - `isync`
-- `mpv`
+- `ffplay`
 - `ffmpeg`
 - `exiftool`
 - `universal-ctags`

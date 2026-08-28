@@ -118,19 +118,10 @@
                     ("^\\\\begin{[^}]+}" "^\\\\end{[^}]+}")))
       (add-to-list 'ispell-skip-region-alist pair)))
 
-  (setq ispell-program-name (or (executable-find "enchant-2") "enchant-2")
+  (setq ispell-program-name "aspell"
         ispell-extra-args nil
-        ;; AppleSpell advertises generic English through Enchant as `en'.
-        ;; On this system `en_US' is instead provided by Aspell.
-        ispell-dictionary "en"
-        ispell-personal-dictionary (no-littering-expand-var-file-name "ispell/.pws"))
-
-  ;; Avoid querying every installed Enchant dictionary on first use.
-  (setq ispell-enchant-dictionary-alist
-        `((,ispell-dictionary
-           "[[:alpha:]]" "[^[:alpha:]]"
-           ,(ispell--get-extra-word-characters ispell-dictionary)
-           t nil nil utf-8))))
+        ispell-dictionary "en_US"
+        ispell-personal-dictionary (no-littering-expand-var-file-name "ispell/.pws")))
 
 
 ;; [flyspell] Spell-checking overlays

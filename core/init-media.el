@@ -109,13 +109,18 @@
         emms-cache-file (no-littering-expand-var-file-name "emms/cache")
         emms-history-file (no-littering-expand-var-file-name "emms/history")
         emms-source-file-default-directory "~/Music/"
-        emms-player-list '(emms-player-mpv)
-        emms-player-mpv-parameters '("--quiet" "--no-video" "--force-window=no"))
+        emms-player-list '(emms-player-ffplay))
   (make-directory emms-directory t)
   :config
-  (require 'emms-player-mpv)
+  (require 'emms-player-simple)
   (require 'emms-cache)
   (require 'emms-history)
+
+  (define-emms-simple-player ffplay '(file url)
+    (concat "\\`http[s]?://\\|"
+            (apply #'emms-player-simple-regexp
+                   emms-player-base-format-list))
+    "ffplay" "-nodisp" "-autoexit" "-loglevel" "quiet")
 
   (add-to-list 'emms-track-initialize-functions
                #'emms-info-initialize-track)
@@ -136,12 +141,9 @@
         emms-playlist-mode-center-when-go t
         emms-info-asynchronously t
         emms-info-auto-update t
-        emms-volume-change-amount 5
-        emms-volume-change-function #'emms-volume-mpv-change
         emms-show-format "♪ %s")
 
-  (emms-cache 1)
-  (setopt emms-player-mpv-update-metadata t))
+  (emms-cache 1))
 
 (use-package consult-emms
   :straight (:host github :repo "Hugo-Heagren/consult-emms")
