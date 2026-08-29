@@ -4,28 +4,9 @@
   :straight (:host github :repo "emacscollective/no-littering")
   :demand t
   :config
-  ;; Package-specific paths not covered by no-littering.
-  (setq tramp-rpc-deploy-local-cache-directory (no-littering-expand-var-file-name "tramp-rpc/")
-        forge-post-fallback-directory (no-littering-expand-var-file-name "forge/drafts/")
-        rust-playground-basedir (no-littering-expand-var-file-name "rust-playground/")
-        typst-ts-lsp-download-path (no-littering-expand-var-file-name "lsp/tinymist/tinymist")
-        chirp-cache-directory (no-littering-expand-var-file-name "chirp/")
-        chirp-compose-temporary-directory (no-littering-expand-var-file-name "chirp/compose/")
-        ghostel-module-directory (no-littering-expand-var-file-name "ghostel/"))
-
   ;; The existing configuration enables backups and auto-save.  This moves
   ;; them under `var/' as well.
-  (no-littering-theme-backups)
-
-  (dolist (directory
-           (list tramp-rpc-deploy-local-cache-directory
-                 forge-post-fallback-directory
-                 rust-playground-basedir
-                 chirp-cache-directory
-                 chirp-compose-temporary-directory
-                 ghostel-module-directory
-                 (file-name-directory typst-ts-lsp-download-path)))
-    (make-directory directory t)))
+  (no-littering-theme-backups))
 
 (setq-default
  ;; no client startup messages
@@ -358,6 +339,10 @@
                    :host github
                    :repo "ArthurHeymans/emacs-tramp-rpc")
   :after tramp
+  :init
+  (setq tramp-rpc-deploy-local-cache-directory
+        (no-littering-expand-var-file-name "tramp-rpc/"))
+  (make-directory tramp-rpc-deploy-local-cache-directory t)
   :config
   (setq tramp-rpc-deploy-auto-deploy t
         tramp-rpc-deploy-git-build-policy 'release))

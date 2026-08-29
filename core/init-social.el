@@ -205,6 +205,12 @@
              chirp-profile
              chirp-profile-followers
              chirp-profile-following-users)
+  :init
+  (setq chirp-cache-directory (no-littering-expand-var-file-name "chirp/")
+        chirp-compose-temporary-directory
+        (no-littering-expand-var-file-name "chirp/compose/"))
+  (make-directory chirp-cache-directory t)
+  (make-directory chirp-compose-temporary-directory t)
   :config
   (setq chirp-show-avatars nil
         chirp-show-tweet-media nil

@@ -133,6 +133,10 @@
 (use-package forge
   :straight t
   :after magit
+  :init
+  (setq forge-post-fallback-directory
+        (no-littering-expand-var-file-name "forge/drafts/"))
+  (make-directory forge-post-fallback-directory t)
   :custom-face
   (forge-topic-label ((t (:inherit variable-pitch :height 0.9 :width condensed :weight regular :underline unspecified))))
   :config

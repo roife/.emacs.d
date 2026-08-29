@@ -451,7 +451,11 @@ separate argument, although the command accepts only one."
 
 
 (use-package rust-playground
-  :straight t)
+  :straight t
+  :init
+  (setq rust-playground-basedir
+        (no-littering-expand-var-file-name "rust-playground/"))
+  (make-directory rust-playground-basedir t))
 
 
 (use-package verilog-mode
