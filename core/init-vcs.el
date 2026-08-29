@@ -156,6 +156,12 @@
   )
 
 
+;; [remoto] Browse GitHub repositories without cloning
+(use-package remoto
+  :straight (:host github :repo "agzam/remoto.el")
+  :demand t)
+
+
 ;; [smerge] Highlight all the conflicted regions for git
 (use-package smerge-mode
   :preface
