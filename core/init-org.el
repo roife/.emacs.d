@@ -25,6 +25,8 @@
 ;; [org]
 (use-package org
   :straight (:type built-in)
+  ;; Calendar and reminder timers must be active from Emacs startup.
+  :defer 2
   :init
   ;; Load optional Org modules only when explicitly enabled.
   (setq org-modules nil

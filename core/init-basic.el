@@ -374,12 +374,14 @@
 (use-package exec-path-from-shell
   :straight t
   :unless (or noninteractive (daemonp) (not (display-graphic-p)))
-  :hook (after-init . exec-path-from-shell-initialize)
   :init
   (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-variables '("PATH" "HOMEBREW"
                                          "JAVA_HOME" "JAVA21_HOME" "JAVA26_HOME"
-                                         "JDTLS_JAVA_HOME" "MANPATH")))
+                                         "JDTLS_JAVA_HOME" "MANPATH"))
+  ;; External programs can be needed by mode hooks during startup, so import
+  ;; the login-shell environment before the rest of the configuration loads.
+  (exec-path-from-shell-initialize))
 
 
 ;; [backup walker] A utility to view Emacs backup files.
