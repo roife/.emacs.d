@@ -9,6 +9,7 @@
 !/etc/tempel/
 !/etc/mermaid/
 /var/
+/rime/
 
 # Package and native build artifacts
 /straight/
