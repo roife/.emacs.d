@@ -150,6 +150,7 @@ Use this format:
 
 ;; [gptel-copilot] gptel-powered inline code completion
 (use-package gptel-copilot
+  :disabled t
   :straight (:type git :host github :repo "roife/gptel-copilot")
   :commands gptel-copilot-mode
   :preface

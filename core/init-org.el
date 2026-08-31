@@ -412,12 +412,23 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
   )
 
 
+(defface +calendar-org-agenda-date
+  '((t (:inherit warning :weight bold :underline t)))
+  "Face used for dates containing entries from `org-agenda-files'.")
+
 (use-package calendar
   :straight nil
-  :bind ("C-c o C" . calendar)
-  :custom-face (+calendar-org-agenda-date ((t (:inherit warning :weight bold :underline t))))
+  :bind (("C-c o C" . calendar)
+         :map calendar-mode-map
+         ("H" . calendar-cursor-holidays))
+  :hook (calendar-today-visible . calendar-mark-today)
   :config
-  (setq calendar-mark-diary-entries-flag t
+  ;; `diary-file' contains "%%(org-diary)", which exposes Agenda entries
+  ;; to Calendar while preserving Org's scheduling and repeater semantics.
+  (setq calendar-chinese-all-holidays-flag t
+        calendar-mark-holidays-flag t
+        calendar-holidays holiday-oriental-holidays
+        calendar-mark-diary-entries-flag t
         diary-entry-marker '+calendar-org-agenda-date))
 
 
@@ -563,13 +574,3 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
   (setq org-typst-preview-scale 1.5
         org-typst-preview-image-directory
         (no-littering-expand-var-file-name "org/typst/")))
-
-(use-package calendar
-  :straight nil
-  :hook (calendar-today-visible . calendar-mark-today)
-  :bind (:map calendar-mode-map
-              ("H" . calendar-cursor-holidays))
-  :init
-  (setq calendar-chinese-all-holidays-flag t
-        calendar-mark-holidays-flag t
-        calendar-holidays holiday-oriental-holidays))
