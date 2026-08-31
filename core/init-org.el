@@ -28,8 +28,8 @@
   ;; Calendar and reminder timers must be active from Emacs startup.
   :defer 2
   :init
-  ;; Load optional Org modules only when explicitly enabled.
-  (setq org-modules nil
+  ;; Habits complement repeating reminders in the daily agenda.
+  (setq org-modules '(org-habit)
         org-hide-emphasis-markers t)
   :bind (("C-c o a" . org-agenda)
          ("C-c o c" . org-capture))
@@ -46,20 +46,63 @@
                        (push '("\\ " . ?‿) prettify-symbols-alist)
                        (prettify-symbols-mode))))
   :config
+  (defconst +org-agenda-urgent-states '("IMMEDIATE" "URGENT")
+    "TODO states treated as urgent in the Eisenhower dashboard.")
+
+  (defun +org-agenda-entry-quadrant ()
+    "Return the Eisenhower quadrant of the Org entry at point.
+Explicit priorities A and B are important, C is not important, and a
+missing priority cookie is unclassified.  `IMMEDIATE' tasks and `URGENT'
+projects are urgent; every other unfinished state is not urgent."
+    (let ((priority (org-element-property :priority (org-element-at-point)))
+          (urgent (member (org-get-todo-state) +org-agenda-urgent-states)))
+      (cond ((memq priority '(?A ?B)) (if urgent 'q1 'q2))
+            ((eq priority ?C) (if urgent 'q3 'q4))
+            (t 'unclassified))))
+
+  (defun +org-agenda-skip-unless-quadrant (quadrant)
+    "Skip the current entry unless it belongs to QUADRANT."
+    (unless (eq (+org-agenda-entry-quadrant) quadrant)
+      (org-entry-end-position)))
+
+  (defun +org-agenda-toggle-dashboard ()
+    "Toggle between the regular dashboard and the Eisenhower view."
+    (interactive)
+    (unless (derived-mode-p 'org-agenda-mode)
+      (user-error "This command is only available in an Org Agenda buffer"))
+    (org-agenda
+     nil
+     (if (and (eq (car-safe org-agenda-redo-command)
+                  'org-agenda-run-series)
+              (equal (nth 1 org-agenda-redo-command)
+                     "Eisenhower quadrants"))
+         "d"
+       "e")))
+
+  (with-eval-after-load 'org-agenda
+    (define-key org-agenda-mode-map (kbd "V") #'+org-agenda-toggle-dashboard))
+
   (setq
    org-directory (file-truename "~/org/")
    +org-agenda-directory (expand-file-name "agenda/" org-directory)
    +org-refile-files (mapcar (lambda (file) (expand-file-name file +org-agenda-directory))
-                             '("actions.org" "projects.org" "someday.org"))
+                             '("actions.org" "projects.org" "routines.org" "someday.org"))
    org-default-notes-file (expand-file-name "inbox.org" +org-agenda-directory)
    ;; Keep generated LaTeX previews out of note directories.
    org-preview-latex-image-directory (no-littering-expand-var-file-name "org/latex/")
    ;; Recognize a), A), a., and A. as list markers.
    org-list-allow-alphabetical t
 
-   ;; Task workflow
-   org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "SOMEDAY(s)" "|" "DONE(d!)" "CANCELED(c@)"))
+   ;; Task and project state machines.  Tasks describe executable work;
+   ;; project states describe the lifecycle of a multi-step outcome.
+   org-todo-keywords '((sequence
+                        "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "SOMEDAY(s)" "IMMEDIATE(i!)"
+                        "|" "DONE(d!)" "CANCELED(c@)")
+                       (sequence
+                        "PLANNED(p)" "ACTIVE(a)" "BLOCKED(b@)" "URGENT(u!)"
+                        "|" "COMPLETED(f!)" "ABANDONED(x@)"))
    org-log-done 'time
+   org-log-repeat 'time
    org-log-into-drawer t
    org-log-reschedule 'time
    org-log-redeadline 'time
@@ -67,7 +110,6 @@
                    ("@home" . ?h)
                    ("@work" . ?w)
                    (:endgroup)
-                   ("project" . ?p)
                    ("note" . ?n))
 
    ;; Refile clarified inbox items into an action list or a project.
@@ -81,6 +123,7 @@
    org-agenda-files (list +org-agenda-directory)
    org-agenda-span 7
    org-agenda-start-on-weekday 1
+   org-deadline-warning-days 7
    org-agenda-window-setup 'current-window
    org-agenda-restore-windows-after-quit t
    org-agenda-skip-unavailable-files t
@@ -90,6 +133,7 @@
                                (1.0 . org-warning)
                                (0.5 . org-upcoming-deadline)
                                (0.0 . org-upcoming-distant-deadline))
+   org-agenda-show-inherited-tags nil
    org-agenda-tags-column 0
    org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
                               (todo . " %i %-12:c")
@@ -98,17 +142,67 @@
    org-agenda-custom-commands '(("d" "Dashboard"
                                  ((agenda ""
                                           ((org-agenda-overriding-header "This week")
-                                           (org-agenda-span 7)))
+                                           (org-agenda-span 7)
+                                           (org-agenda-start-on-weekday nil)
+                                           (org-agenda-start-day "+0d")))
                                   (todo "NEXT"
                                         ((org-agenda-overriding-header "Next actions")))
                                   (todo "WAIT"
                                         ((org-agenda-overriding-header "Waiting")))
-                                  (todo "TODO"
-                                        ((org-agenda-overriding-header "Unscheduled tasks")
-                                         (org-agenda-skip-function
-                                          '(org-agenda-skip-entry-if 'scheduled 'deadline))))))
+                                  (todo "ACTIVE"
+                                        ((org-agenda-overriding-header "Active projects")))
+                                  (todo "BLOCKED"
+                                        ((org-agenda-overriding-header "Blocked projects")))
+                                  (todo "PLANNED"
+                                        ((org-agenda-overriding-header "Planned projects")))))
+                                ("e" "Eisenhower quadrants"
+                                 ((alltodo ""
+                                           ((org-agenda-overriding-header
+                                             "Q1 · Important and urgent (A/B)")
+                                            (org-agenda-skip-function
+                                             '(+org-agenda-skip-unless-quadrant 'q1))
+                                            (org-agenda-sorting-strategy
+                                             '(priority-down category-keep))))
+                                  (alltodo ""
+                                           ((org-agenda-overriding-header
+                                             "Q2 · Important, not urgent (A/B)")
+                                            (org-agenda-skip-function
+                                             '(+org-agenda-skip-unless-quadrant 'q2))
+                                            (org-agenda-sorting-strategy
+                                             '(priority-down category-keep))))
+                                  (alltodo ""
+                                           ((org-agenda-overriding-header
+                                             "Q3 · Not important and urgent (C)")
+                                            (org-agenda-skip-function
+                                             '(+org-agenda-skip-unless-quadrant 'q3))
+                                            (org-agenda-sorting-strategy
+                                             '(priority-down category-keep))))
+                                  (alltodo ""
+                                           ((org-agenda-overriding-header
+                                             "Q4 · Not important, not urgent (C)")
+                                            (org-agenda-skip-function
+                                             '(+org-agenda-skip-unless-quadrant 'q4))
+                                            (org-agenda-sorting-strategy
+                                             '(priority-down category-keep))))
+                                  (alltodo ""
+                                           ((org-agenda-overriding-header
+                                             "Unclassified · choose A, B, or C")
+                                            (org-agenda-skip-function
+                                             '(+org-agenda-skip-unless-quadrant
+                                               'unclassified))))))
+                                ("i" "Immediate actions" todo "IMMEDIATE")
+                                ("u" "Urgent projects" todo "URGENT")
                                 ("n" "Next actions" todo "NEXT")
                                 ("w" "Waiting" todo "WAIT")
+                                ("p" "Projects"
+                                 ((todo "URGENT"
+                                        ((org-agenda-overriding-header "Urgent projects")))
+                                  (todo "ACTIVE"
+                                        ((org-agenda-overriding-header "Active projects")))
+                                  (todo "BLOCKED"
+                                        ((org-agenda-overriding-header "Blocked projects")))
+                                  (todo "PLANNED"
+                                        ((org-agenda-overriding-header "Planned projects")))))
                                 ("s" "Someday / maybe" todo "SOMEDAY"))
 
    ;; Capture quickly; clarify and organize during inbox processing.
@@ -129,7 +223,17 @@
                            ("p" "Project" entry
                             (file (lambda ()
                                     (expand-file-name "projects.org" +org-agenda-directory)))
-                            "* %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
+                            "* PLANNED %^{Project name}\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
+                            :empty-lines 1)
+                           ("r" "Reminder" entry
+                            (file org-default-notes-file)
+                            "* TODO %?\nSCHEDULED: %^{When}T\n:PROPERTIES:\n:CREATED: %U\n:APPT_WARNTIME: %^{Warn before (minutes)|15}\n:END:\n"
+                            :empty-lines 1)
+                           ("R" "Repeating reminder" entry
+                            (file+headline (lambda ()
+                                             (expand-file-name "routines.org" +org-agenda-directory))
+                                           "Recurring")
+                            "* TODO %?\nSCHEDULED: %(+org-capture-repeating-schedule)\n:PROPERTIES:\n:CREATED: %U\n:APPT_WARNTIME: %^{Warn before (minutes)|15}\n:END:\n"
                             :empty-lines 1)
                            ("s" "Someday / maybe" entry
                             (file+headline (lambda ()
@@ -140,7 +244,7 @@
                            ("e" "Calendar event" entry
                             (file (lambda ()
                                     (expand-file-name "calendar.org" +org-agenda-directory)))
-                            "* %?\nSCHEDULED: %^T\n:PROPERTIES:\n:CREATED: %U\n:END:\n"
+                            "* %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:APPT_WARNTIME: %^{Warn before (minutes)|15}\n:END:\n%^{When}T\n%?\n"
                             :empty-lines 1))
 
    ;; subscription: Use {} for sub- or super- scripts
@@ -192,6 +296,17 @@
    org-fold-catch-invisible-edits 'show-and-error
 
    org-imenu-depth 4)
+
+  (defun +org-capture-repeating-schedule ()
+    "Prompt for the first occurrence and repeater of a recurring reminder."
+    (let* ((time (org-read-date t t nil "First occurrence: "))
+           (repeater (completing-read
+                      "Repeat interval: "
+                      '(".+1d" ".+1w" ".+1m" "++1w" "++1m" "++1y")
+                      nil nil nil nil ".+1w")))
+      (format "<%s %s>"
+              (format-time-string "%Y-%m-%d %a %H:%M" time)
+              repeater)))
 
   ;; Common web and local-note link abbreviations.
   (dolist (abbrev '(("github" . "https://github.com/%s")
@@ -297,6 +412,72 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
   )
 
 
+;; [org-clock] Portable desktop notification backend, loaded on first use.
+(use-package org-clock
+  :straight nil
+  :commands (org-show-notification))
+
+
+;; [appt] Convert today's timed Org entries into desktop notifications.
+(use-package appt
+  :straight nil
+  :after org
+  :defer 3
+  :hook ((org-mode . +org-enable-appt-refresh)
+         (org-capture-after-finalize . +org-refresh-appt)
+         (org-after-todo-state-change . +org-refresh-appt))
+  :config
+  (setq appt-message-warning-time 15
+        appt-display-interval 5
+        appt-display-mode-line t
+        appt-display-format 'window
+        appt-audible nil
+        appt-delete-window-function #'ignore)
+
+  (defun +org-appt-text (value)
+    "Convert appointment VALUE to display text."
+    (if (listp value)
+        (mapconcat #'identity value "\n")
+      value))
+
+  (defun +org-appt-notify (minutes _current-time message)
+    "Show a portable desktop notification for an Org appointment."
+    (org-show-notification
+     (format "%s min · %s"
+             (+org-appt-text minutes)
+             (+org-appt-text message))))
+
+  (setq appt-disp-window-function #'+org-appt-notify)
+
+  (defun +org-refresh-appt ()
+    "Rebuild today's reminders from Org agenda files."
+    (interactive)
+    (org-agenda-to-appt t))
+
+  (defun +org-enable-appt-refresh ()
+    "Refresh reminders whenever the current Org buffer is saved."
+    (add-hook 'after-save-hook #'+org-refresh-appt nil t))
+
+  (appt-activate 1)
+  (+org-refresh-appt)
+
+  (defvar +org-appt-midnight-timer nil)
+  (when (timerp +org-appt-midnight-timer)
+    (cancel-timer +org-appt-midnight-timer))
+  (setq +org-appt-midnight-timer
+        (run-at-time "00:01" 86400 #'+org-refresh-appt)))
+
+
+;; [org-pomodoro] Clock focused work sessions on the Org task at point.
+(use-package org-pomodoro
+  :straight t
+  :after org
+  :bind ("C-c o p" . org-pomodoro)
+  :config
+  (setq org-pomodoro-length 30
+        org-pomodoro-long-break-length 15))
+
+
 ;; [ob-mermaid] Generate Mermaid diagrams through Org Babel
 (use-package ob-mermaid
   :straight t
@@ -362,3 +543,24 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
         org-html-validation-link nil
         org-latex-prefer-user-labels t
         org-export-with-latex t))
+
+
+;; [org-typst-preview] Render native Typst formulae asynchronously.
+(use-package org-typst-preview
+  :straight (:host github :repo "roife/org-typst-preview")
+  :after org
+  :hook (org-mode . org-typst-preview-mode)
+  :config
+  (setq org-typst-preview-scale 1.5
+        org-typst-preview-image-directory
+        (no-littering-expand-var-file-name "org/typst/")))
+
+(use-package calendar
+  :straight nil
+  :hook (calendar-today-visible . calendar-mark-today)
+  :bind (:map calendar-mode-map
+              ("H" . calendar-cursor-holidays))
+  :init
+  (setq calendar-chinese-all-holidays-flag t
+        calendar-mark-holidays-flag t
+        calendar-holidays holiday-oriental-holidays))
