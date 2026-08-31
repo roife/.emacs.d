@@ -149,11 +149,7 @@
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
-  :bind* (("M-t" . tab-new)
-          ("M-q" . tab-close)
-          ("M-<tab>" . tab-next)
-          ("M-S-<tab>" . tab-previous)
-          ("M-SPC" . +tab-bar-echo))
+  ;; Turn on tab-bar in early-init to speedup
   :config
   (setq tab-bar-separator ""
         tab-bar-new-tab-choice "*scratch*"
@@ -163,7 +159,6 @@
         tab-bar-tab-hints t)
 
   (customize-set-variable 'tab-bar-select-tab-modifiers '(meta))
-  (customize-set-variable 'tab-bar-show nil)
 
   ;; truncate for [tab name] and add count
   (setq tab-bar-tab-name-format-functions
@@ -172,30 +167,56 @@
           (lambda (name &rest _) (concat " " name " "))
           tab-bar-tab-name-format-face))
 
-  (defadvice! +tab-bar-echo (&rest _)
-    :after '(tab-bar-select-tab tab-bar-new-tab tab-bar-close-tab)
-    "Display the current tab bar in the echo area."
-    (interactive)
-    (message
-     "%s%s%s%s"
-     (or +tab-bar-telega-indicator-cache "")
-     (or +tab-bar-emms-indicator-cache "")
-     (or +tab-bar-gnus-indicator-cache "")
-     (cl-loop for tab in (funcall tab-bar-tabs-function)
-              for i from 1
-              for current = (eq (car tab) 'current-tab)
-              for face = (if current
-                             '(:inherit tab-bar-tab :inverse-video t)
-                           'tab-bar-tab)
-              concat (propertize
-                      (format " %d %s " i
-                              (tab-bar-tab-name-format-truncated
-                               (alist-get 'name tab) tab i))
-                      'face face))))
-
   (defvar +tab-bar-gnus-indicator-cache nil)
   (defvar +tab-bar-telega-indicator-cache nil)
   (defvar +tab-bar-emms-indicator-cache nil)
+  (defvar +tab-bar-org-agenda-indicator-cache nil)
+  (defvar +tab-bar-org-agenda-count-cache 0)
+
+  (setq tab-bar-format '((lambda () +tab-bar-org-agenda-indicator-cache)
+                         (lambda () +tab-bar-telega-indicator-cache)
+                         (lambda () +tab-bar-emms-indicator-cache)
+                         (lambda () +tab-bar-gnus-indicator-cache)
+                         tab-bar-format-tabs))
+
+  (with-eval-after-load 'appt
+    (defadvice! +tab-bar-org-agenda-indicator-update (&rest _)
+      :after #'appt-check
+      (let* ((notification (and (bound-and-true-p appt-mode-string)
+                                (cadar appt-time-msg-list)))
+             (preview (and notification
+                           (truncate-string-to-width
+                            notification 24 nil nil "…")))
+             (text (propertize (format " A %d%s " +tab-bar-org-agenda-count-cache
+                                       (if preview (concat " " preview) ""))
+                               'face 'font-lock-keyword-face)))
+        (setq +tab-bar-org-agenda-indicator-cache
+              (when (or (> +tab-bar-org-agenda-count-cache 0)
+                        preview)
+                `((tab-bar-org-agenda menu-item ,text
+                                      (lambda ()
+                                        (interactive)
+                                        (org-agenda-list nil nil 'day)))))))
+      (force-mode-line-update t))
+    (when (fboundp '+tab-bar-org-agenda-count-update)
+      (+tab-bar-org-agenda-count-update)))
+
+  (with-eval-after-load 'org-agenda
+    (defadvice! +tab-bar-org-agenda-count-update (&rest _)
+      :after #'org-agenda-to-appt
+      (let ((date (calendar-current-date))
+            (org-agenda-buffer nil)
+            (org-agenda-restrict nil))
+        (setq +tab-bar-org-agenda-count-cache
+              (cl-loop for file in (org-agenda-files t)
+                       sum (length (org-agenda-get-day-entries
+                                    file date :deadline :scheduled
+                                    :timestamp :sexp)))))
+      (when (fboundp '+tab-bar-org-agenda-indicator-update)
+        (+tab-bar-org-agenda-indicator-update)))
+    (add-hook! org-agenda-finalize-hook #'+tab-bar-org-agenda-count-update)
+    (when (fboundp '+tab-bar-org-agenda-indicator-update)
+      (+tab-bar-org-agenda-count-update)))
 
   (with-eval-after-load 'gnus
     (add-hook! (gnus-started-hook gnus-after-getting-new-news-hook

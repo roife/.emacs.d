@@ -24,6 +24,7 @@
                      'init-prog
                      'init-writing
                      'init-org
+                     'init-agenda
                      'init-vcs
                      'init-ibuffer
                      'init-ime

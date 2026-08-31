@@ -120,8 +120,7 @@
              aw-select
              windmove-do-window-select
              pager-page-up
-             tab-bar-select-tab
-             +tab-bar-echo)
+             tab-bar-select-tab)
     "Pulse the current line."
     (pulse-momentary-highlight-one-line (point)))
 
