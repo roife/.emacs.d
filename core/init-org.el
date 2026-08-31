@@ -412,6 +412,15 @@ Temporarily prepend `save-buffer' to `org-after-refile-insert-hook' only while
   )
 
 
+(use-package calendar
+  :straight nil
+  :bind ("C-c o C" . calendar)
+  :custom-face (+calendar-org-agenda-date ((t (:inherit warning :weight bold :underline t))))
+  :config
+  (setq calendar-mark-diary-entries-flag t
+        diary-entry-marker '+calendar-org-agenda-date))
+
+
 ;; [org-clock] Portable desktop notification backend, loaded on first use.
 (use-package org-clock
   :straight nil
