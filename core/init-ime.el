@@ -33,6 +33,7 @@
 (use-package rimel
   :straight (rimel :type git :host github :repo "emacs-rime/rimel")
   :defer 1
+  :bind (("M-SPC" . toggle-input-method))
   :custom-face
   (rimel-candidate-label-face ((t (:inherit font-lock-comment-face :height 0.85))))
   (rimel-page-indicator-face ((t (:inherit font-lock-comment-face :height 0.85))))

@@ -38,7 +38,7 @@
               :map telega-root-mode-map
               ("A" . +telega-toggle-archive))
   :hook ((telega-chat-mode . corfu-mode)
-         (telega-chat-mode . telega-completions-setup-capf))
+         (telega-chat-mode . +telega-completions-setup-capf))
   :config
   (setq telega-root-fill-column 79
         telega-chat-fill-column 79)
@@ -100,6 +100,21 @@
                                             telega-capf-hashtag
                                             telega-capf-markdown-precode
                                             telega-capf-botcmd))
+
+  (defun +telega-capf-in-input (capf)
+    "Call CAPF only while point is in Telega's writable input area."
+    (when (and (markerp telega-chatbuf--input-marker)
+               (>= (point) telega-chatbuf--input-marker)
+               (not (get-text-property (point) 'read-only)))
+      (funcall capf)))
+
+  (defun +telega-completions-setup-capf ()
+    "Set up Telega CAPFs without completing read-only message text."
+    (telega-completions-setup-capf)
+    (setq-local completion-at-point-functions
+                (mapcar (lambda (capf)
+                          (apply-partially #'+telega-capf-in-input capf))
+                        telega-completions-capf-functions)))
 
   (when (eq system-type 'gnu/linux)
     (add-hook! telega-before-auth-hook

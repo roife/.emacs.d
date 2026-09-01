@@ -149,7 +149,10 @@
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
-  ;; Turn on tab-bar in early-init to speedup
+  :bind* (("M-t" . tab-new)
+          ("M-q" . tab-close)
+          ("M-<tab>" . tab-next)
+          ("M-S-<tab>" . tab-previous))
   :config
   (setq tab-bar-separator ""
         tab-bar-new-tab-choice "*scratch*"
@@ -206,12 +209,15 @@
       :after #'org-agenda-to-appt
       (let ((date (calendar-current-date))
             (org-agenda-buffer nil)
+            (org-agenda-new-buffers nil)
             (org-agenda-restrict nil))
-        (setq +tab-bar-org-agenda-count-cache
-              (cl-loop for file in (org-agenda-files t)
-                       sum (length (org-agenda-get-day-entries
-                                    file date :deadline :scheduled
-                                    :timestamp :sexp)))))
+        (unwind-protect
+            (setq +tab-bar-org-agenda-count-cache
+                  (cl-loop for file in (org-agenda-files t)
+                           sum (length (org-agenda-get-day-entries
+                                        file date :deadline :scheduled
+                                        :timestamp :sexp))))
+          (org-release-buffers org-agenda-new-buffers)))
       (when (fboundp '+tab-bar-org-agenda-indicator-update)
         (+tab-bar-org-agenda-indicator-update)))
     (add-hook! org-agenda-finalize-hook #'+tab-bar-org-agenda-count-update)

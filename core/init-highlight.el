@@ -110,6 +110,7 @@
   (pulse-highlight-face ((t (:inherit region :background unspecified :extend t))))
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
+  :bind (("C-\\" . +pulse-momentary-line-command))
   :init
   (setq pulse-delay 0.2
         pulse-iterations 1)
@@ -123,6 +124,11 @@
              tab-bar-select-tab)
     "Pulse the current line."
     (pulse-momentary-highlight-one-line (point)))
+
+  (defun +pulse-momentary-line-command ()
+    "Pulse the current line interactively."
+    (interactive)
+    (+pulse-momentary-line))
 
   (defun +pulse-momentary (&rest _)
     "Pulse the region or the current line."
