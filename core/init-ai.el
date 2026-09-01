@@ -23,7 +23,41 @@
   :hook ((magit-mode . gptel-magit-install))
   :config
   (setq gptel-magit-body-length 72
-        gptel-magit-commit-prompt (cdr (assoc "Conventional Commits" gptel-magit-commit-styles-alist))))
+        gptel-magit-commit-prompt (cdr (assoc "Conventional Commits" gptel-magit-commit-styles-alist)))
+
+  (defun +gptel-magit-fish (fifo insertp)
+    "Generate a message, optionally insert it, and report through FIFO."
+    (let ((commit-buffer (magit-commit-message-buffer))
+          record fsm)
+      (cond
+       ((and insertp (not commit-buffer))
+        (user-error "No commit in progress"))
+       ((and (not insertp) commit-buffer)
+        (user-error "Commit already in progress")))
+      (setq fsm
+            (gptel-magit--generate
+             (lambda (message)
+               (setq record (concat "0" message)))
+             nil commit-buffer "Generating commit message..."))
+      (let ((info (gptel-fsm-info fsm)))
+        (plist-put
+         info :post
+         (append
+          (plist-get info :post)
+          (list
+           (lambda (request-info)
+             (with-temp-buffer
+               (insert
+                (or record
+                    (if (eq (gptel-fsm-state fsm) 'DONE)
+                        "0"
+                      (concat "1" (format "%s"
+                                          (or (plist-get request-info :status)
+                                              (plist-get request-info :error)
+                                              "generation failed"))))))
+               (write-region (point-min) (point-max)
+                             fifo nil 'silent)))))))
+      fsm)))
 
 (use-package gptel-quick
   :straight (gptel-quick :type git :host github :repo "roife/gptel-quick")
