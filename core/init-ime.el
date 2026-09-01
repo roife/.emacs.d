@@ -18,9 +18,10 @@
   :defer 1
   :init
   (setq liberime-load-on-require nil
-        liberime-user-data-dir (if (eq system-type 'darwin)
-                                   "~/Library/Rime/"
-                                 "~/.local/share/fcitx5/rime")))
+        liberime-shared-data-dir (if (eq system-type 'darwin)
+                                     "~/Library/Rime/"
+                                   "~/.local/share/fcitx5/rime")
+        liberime-user-data-dir (no-littering-expand-var-file-name "rime/")))
 
 (use-package liberime-regexp
   :straight (:host github :repo "roife/liberime-regexp")
