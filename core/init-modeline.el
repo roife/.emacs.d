@@ -182,6 +182,9 @@
                          (lambda () +tab-bar-gnus-indicator-cache)
                          tab-bar-format-tabs))
 
+  (with-eval-after-load 'agent-shell-attention
+    (add-to-list 'tab-bar-format 'agent-shell-attention-tab-bar-format))
+
   (with-eval-after-load 'appt
     (defadvice! +tab-bar-org-agenda-indicator-update (&rest _)
       :after #'appt-check

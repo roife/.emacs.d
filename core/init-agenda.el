@@ -9,9 +9,9 @@
    ;; of a multi-step outcome.
    org-todo-keywords '((sequence
                         "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "SOMEDAY(s)" "IMMEDIATE(i!)"
-                        "|" "DONE(d!)" "CANCELED(c@)")
+                       "|" "DONE(d!)" "CANCELED(c@)")
                        (sequence
-                        "PLANNED(p)" "ACTIVE(a)" "BLOCKED(b@)" "URGENT(u!)"
+                        "PROPOSED(o)" "PLANNED(p)" "ACTIVE(a)" "BLOCKED(b@)" "URGENT(u!)"
                         "|" "COMPLETED(f!)" "ABANDONED(x@)"))
    org-log-done 'time
    org-log-into-drawer t
@@ -23,7 +23,21 @@
                    (:endgroup)
                    ("note" . ?n))
    org-archive-location "%s_archive::* Archived"
-   org-archive-subtree-save-file-p t))
+   org-archive-subtree-save-file-p t)
+
+  (add-hook! org-mode-hook
+    (defun +org-set-project-archive-location ()
+      "Archive active projects by domain and completion year.
+Work and personal project files use separate yearly archives.  Other Org
+files keep the default value of `org-archive-location'."
+      (when-let* ((file buffer-file-name)
+                  (domain (pcase (file-name-base file)
+                            ("projects-work" "work")
+                            ("projects-personal" "personal"))))
+        (setq-local org-archive-location
+                    (format "archives/projects-%s-%s.org::* Archived"
+                            domain
+                            (format-time-string "%Y")))))))
 
 
 ;; [org-refile]
@@ -35,7 +49,8 @@
   (setq org-refile-targets
         `((,(mapcar (lambda (file)
                       (expand-file-name (concat "agenda/" file) org-directory))
-                    '("actions.org" "projects.org" "routines.org" "someday.org"))
+                    '("actions.org" "projects-work.org" "projects-personal.org"
+                      "routines.org" "someday.org"))
            :maxlevel . 3))
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil
@@ -62,9 +77,14 @@
                             (file+headline "agenda/actions.org" "Actions")
                             "* NEXT %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%a\n"
                             :empty-lines 1)
-                           ("p" "Project" entry
-                            (file "agenda/projects.org")
-                            "* PLANNED %^{Project name}\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
+                           ("p" "Project")
+                           ("pw" "Work project" entry
+                            (file "agenda/projects-work.org")
+                            "* PLANNED %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
+                            :empty-lines 1)
+                           ("pp" "Personal project" entry
+                            (file "agenda/projects-personal.org")
+                            "* PLANNED %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
                             :empty-lines 1)
                            ("r" "Reminder" entry
                             (file org-default-notes-file)
@@ -137,7 +157,9 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
                                   (todo "BLOCKED"
                                         ((org-agenda-overriding-header "Blocked projects")))
                                   (todo "PLANNED"
-                                        ((org-agenda-overriding-header "Planned projects")))))
+                                        ((org-agenda-overriding-header "Planned projects")))
+                                  (todo "PROPOSED"
+                                        ((org-agenda-overriding-header "Proposed projects")))))
                                 ("e" "Eisenhower quadrants"
                                  ((tags-todo "PRIORITY={A\\|B}/!IMMEDIATE|URGENT"
                                              ((org-agenda-overriding-header
@@ -175,6 +197,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
                                 ("u" "Urgent projects" todo "URGENT")
                                 ("n" "Next actions" todo "NEXT")
                                 ("w" "Waiting" todo "WAIT")
+                                ("o" "Proposed projects" todo "PROPOSED")
                                 ("p" "Projects"
                                  ((todo "URGENT"
                                         ((org-agenda-overriding-header "Urgent projects")))
@@ -183,7 +206,9 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
                                   (todo "BLOCKED"
                                         ((org-agenda-overriding-header "Blocked projects")))
                                   (todo "PLANNED"
-                                        ((org-agenda-overriding-header "Planned projects")))))
+                                        ((org-agenda-overriding-header "Planned projects")))
+                                  (todo "PROPOSED"
+                                        ((org-agenda-overriding-header "Proposed projects")))))
                                 ("s" "Someday / maybe" todo "SOMEDAY"))))
 
 

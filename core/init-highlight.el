@@ -110,7 +110,7 @@
   (pulse-highlight-face ((t (:inherit region :background unspecified :extend t))))
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
-  :bind (("C-\\" . +pulse-momentary-line-command))
+  :bind (("M-SPC" . +pulse-momentary-line-command))
   :init
   (setq pulse-delay 0.2
         pulse-iterations 1)

@@ -133,53 +133,106 @@ Use this format:
   (setq gptel-quick-word-count 50
         gptel-quick-timeout nil))
 
-(use-package codex-ide
-  :straight (:type git :host github :repo "dgillis/emacs-codex-ide")
+(use-package agent-shell
+  :straight (:type git :host github :repo "xenodium/agent-shell")
+  :bind (("C-c g a" . agent-shell)
+         ("C-c g p" . agent-shell-prompt-compose)
+         ("C-c g w" . agent-shell-send-dwim)
+         :map agent-shell-mode-map
+         ("M-<return>" . agent-shell-newline)
+         ("C-c C-h" . agent-shell-help-menu)
+         ("C-c C-q" . agent-shell-prompt-queue)
+         ("C-c C-e" . agent-shell-prompt-steer))
   :custom-face
-  (codex-ide-item-summary-face ((t (:inherit font-lock-function-name-face :height 0.9))))
-  (codex-ide-item-detail-face ((t (:inherit shadow :height 0.8))))
-  :init
-  (setq codex-ide-diff-inline-fold-threshold 20
-        codex-ide-image-detail "auto"
-        codex-ide-prompt-placeholder-text ""
-        codex-ide-placeholder-ellipsis-animation-interval nil
-        codex-ide-status-mode-auto-refresh-delay 0.3
-        codex-ide-want-mcp-bridge nil
-        codex-ide-emacs-context-policy nil
-        codex-ide-session-transcript-default-detail-level 'compact
-        codex-ide-buffer-name-function (lambda (dir)
-                                         (format "%s: %s"
-                                                 codex-ide-buffer-name-prefix
-                                                 (file-name-nondirectory (directory-file-name dir)))))
-  )
-
-(use-package codex-ide-session
-  :straight nil
+  (agent-shell-section-heading ((t (:inherit font-lock-function-name-face :height 0.9))))
+  (agent-shell-section-annotation ((t (:inherit shadow :height 0.8))))
   :preface
-  (defun +codex-ide-submit-or-newline ()
-    "Submit one-line Codex prompts, otherwise insert a newline."
-    (interactive)
-    (let* ((session (codex-ide--get-default-session-for-current-buffer))
-           (start (and session
-                       (codex-ide-session-input-start-marker session)))
-           (end (and session
-                     (codex-ide--input-end-position session))))
-      (if (and (markerp start)
-               end
-               (not (save-excursion
-                      (goto-char (marker-position start))
-                      (search-forward "\n" end t))))
-          (codex-ide-submit)
-        (newline))))
-  :bind (:map codex-ide-session-prompt-minor-mode-map
-              ("RET" . +codex-ide-submit-or-newline)
-              ("<return>" . +codex-ide-submit-or-newline)
-              ("S-<return>" . newline)
-              :map codex-ide-session-mode-map
-              ("C-c C-;" . codex-ide-agent-config-menu)
-              ("C-c C-r" . codex-ide-status))
+  (defun +agent-shell-dot-subdir (subdir)
+    "Return the centralized Agent Shell data directory for SUBDIR."
+    (let* ((cwd (directory-file-name (agent-shell-cwd)))
+           (name (file-name-nondirectory cwd))
+           (slug (replace-regexp-in-string
+                  "[^[:alnum:]._-]+" "-" (if (string-empty-p name) "root" name)))
+           (project-key
+            (format "%s-%s" slug (substring (secure-hash 'sha1 cwd) 0 10))))
+      (expand-file-name
+       (file-name-concat project-key ".agent-shell" subdir)
+       (locate-user-emacs-file "var/agent-shell/"))))
+  :init
+  (setq agent-shell-agent-configs '(agent-shell-openai-make-codex-config)
+        agent-shell-preferred-agent-config 'codex
+        agent-shell-openai-codex-acp-command '("mise" "exec" "--" "codex-acp")
+        agent-shell-context-sources nil
+        agent-shell-mcp-servers nil
+        agent-shell-session-strategy 'prompt
+        agent-shell-session-restore-verbosity 'full
+        agent-shell-show-welcome-message nil
+        agent-shell-header-style 'text
+        agent-shell-activity-group-expand-by-default 'latest
+        agent-shell-tool-use-expand-by-default nil
+        agent-shell-thought-process-expand-by-default nil
+        agent-shell-dot-subdir-function #'+agent-shell-dot-subdir
+        agent-shell-show-context-usage-indicator 'detailed
+        agent-shell-file-display-action '((display-buffer-reuse-window display-buffer-pop-up-window)))
   :config
-  (require 'codex-ide))
+  (advice-add #'agent-shell--update-bootstrapping-fragment :override #'ignore))
+
+(use-package agent-shell-tramp
+  :straight (:type git :host github :repo "junyi-hou/agent-shell-tramp")
+  :after agent-shell
+  :init
+  (setq agent-shell-tramp-transcript-directory
+        (expand-file-name
+         (locate-user-emacs-file "var/agent-shell/remote-transcripts/")))
+  :config
+  (agent-shell-tramp-mode 1))
+
+(use-package agent-shell-attention
+  :straight (:type git :host github :repo "ultronozm/agent-shell-attention.el")
+  :commands agent-shell-attention-mode
+  :hook (agent-shell-mode . +agent-shell-attention-enable)
+  :bind (("C-c g j" . agent-shell-attention-jump)
+         ("C-c g l" . agent-shell-attention-dashboard))
+  :preface
+  (defun +agent-shell-attention-enable ()
+    "Enable global Agent Shell attention tracking on first use."
+    (unless (bound-and-true-p agent-shell-attention-mode)
+      (agent-shell-attention-mode 1)))
+  :init
+  (setq agent-shell-attention-render-function 'agent-shell-attention-render-active
+        agent-shell-attention-show-zeros nil
+        agent-shell-attention-notify-function nil))
+
+(use-package agent-recall
+  :straight (:type git :host github :repo "mrx-xo/agent-recall")
+  :hook (agent-shell-mode . agent-recall-track-sessions)
+  :bind (("C-c g h" . agent-recall-browse)
+         ("C-c g u" . agent-recall-resume))
+  :init
+  (setq agent-recall-search-paths
+        (mapcar #'expand-file-name
+                '("~/.emacs.d" "~/code" "~/.config" "~/.emacs.d/var/agent-shell"))
+        agent-recall-max-depth 3
+        agent-recall-search-function 'consult-ripgrep
+        agent-recall-browse-sort 'modified-desc
+        agent-recall-resume-continue-transcript t))
+
+(use-package agent-recall-consult
+  :straight nil
+  :bind ("C-c g /" . agent-recall-consult-search)
+  :init
+  (setq agent-recall-consult-resumable-only nil))
+
+(use-package agent-review
+  :straight (:type git :host github :repo "nineluj/agent-review")
+  :commands agent-review
+  :bind ("C-c g r" . +agent-review-codex)
+  :preface
+  (defun +agent-review-codex ()
+    "Review staged and unstaged Git changes with Codex."
+    (interactive)
+    (require 'agent-review)
+    (agent-review (agent-shell-openai-make-codex-config))))
 
 
 ;; [gptel-copilot] gptel-powered inline code completion

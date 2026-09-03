@@ -219,7 +219,8 @@
 
 (use-package corfu
   :straight (:files (:defaults "extensions/*.el"))
-  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode text-mode codex-ide-session-mode) . corfu-mode)
+  :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode text-mode
+                      agent-shell-mode agent-shell-viewport-edit-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . +corfu-enable-in-minibuffer))
   :bind (:map corfu-map
