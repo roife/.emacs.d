@@ -257,10 +257,11 @@
                                                        (telega-filter-chats chats '(and is-known mention)))))
                      (reaction-count (apply #'+ (mapcar (telega--tl-prop :unread_reaction_count)
                                                         (telega-filter-chats chats '(and is-known unread-reactions)))))
-                     (count (+ unread-count mention-count reaction-count)))
-                (propertize
-                 (concat " T" (unless (zerop count) (number-to-string count)) " ")
-                 'face `(:inherit font-lock-keyword-face :inverse-video ,online-p))))))
+                     (count (+ unread-count mention-count reaction-count))
+                     (text (propertize (concat " T" (unless (zerop count) (number-to-string count)) " ")
+                                       'face `(:inherit font-lock-keyword-face :inverse-video ,online-p))))
+                `((tab-bar-telega menu-item ,text telega
+                                  :help "Open Telega"))))))
 
     (add-hook! (telega-ready-hook
                 telega-chats-fetched-hook
@@ -273,8 +274,11 @@
       "Update the cached EMMS track indicator in the tab bar."
       (setq +tab-bar-emms-indicator-cache
             (when (and (bound-and-true-p emms-player-playing-p))
-              (propertize (concat " " (if emms-player-paused-p "Ⅱ" "♫") " ")
-                          'face 'font-lock-keyword-face))))
+              (let ((text
+                     (propertize (concat " " (if emms-player-paused-p "Ⅱ" "♫") " ")
+                                 'face 'font-lock-keyword-face)))
+                `((tab-bar-emms menu-item ,text emms-ui-now-playing
+                                :help "Open EMMS Now Playing"))))))
 
     (add-hook! (emms-player-started-hook
                 emms-player-paused-hook
