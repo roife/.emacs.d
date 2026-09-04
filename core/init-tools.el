@@ -183,3 +183,13 @@
 (use-package xwidget
   :config
   (setq xwidget-webkit-buffer-name-format "*XWidget: %T*"))
+
+
+;; [bitwarden.el] Manage the Bitwarden vault through `bw'
+(use-package magit-section
+  :straight t)
+
+(use-package bitwarden
+  :straight nil
+  :load-path "/Users/roifewu/code/bitwarden.el"
+  :commands bitwarden)
