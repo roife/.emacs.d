@@ -21,7 +21,7 @@
 ;; [diff-hl] Highlight uncommitted changes using VC
 (use-package diff-hl
   :straight t
-  :hook ((find-file . global-diff-hl-mode)
+  :hook ((after-init . global-diff-hl-mode)
          (vc-dir-mode  . diff-hl-dir-mode)
          (dired-mode   . diff-hl-dired-mode))
   :bind (:map diff-hl-mode-map

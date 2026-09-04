@@ -80,7 +80,7 @@
 
 ;; [editorconfig] Respect project-local formatting rules
 (use-package editorconfig
-  :hook (find-file . editorconfig-mode))
+  :hook (after-init . editorconfig-mode))
 
 
 ;; [apheleia] Format buffers asynchronously without moving point
@@ -124,10 +124,10 @@
         ispell-personal-dictionary (no-littering-expand-var-file-name "ispell/.pws")))
 
 
-;; [flyspell] Spell-checking overlays
+;; [flyspell] Spell-checking overlays for writing modes
 (use-package flyspell
-  :hook ((text-mode . flyspell-mode)
-         (prog-mode . flyspell-prog-mode))
+  :hook ((org-mode markdown-mode markdown-ts-mode typst-ts-mode
+                  tex-mode TeX-mode) . flyspell-mode)
   :bind (:map flyspell-mode-map
               ("C-c s ]" . flyspell-goto-next-error)
               ("C-c s [" . +flyspell-goto-previous-error)
