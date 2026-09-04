@@ -186,10 +186,6 @@
 
 
 ;; [bitwarden.el] Manage the Bitwarden vault through `bw'
-(use-package magit-section
-  :straight t)
-
 (use-package bitwarden
-  :straight nil
-  :load-path "/Users/roifewu/code/bitwarden.el"
+  :straight (:host github :repo "roife/bitwarden.el")
   :commands bitwarden)
