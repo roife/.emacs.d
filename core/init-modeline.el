@@ -23,12 +23,11 @@
   (let* ((mo (pcase (buffer-modified-p)
                ('t (and (buffer-file-name) " *"))
                ('autosaved " ~")
-               (_ "")))
+               (_ nil)))
          (ro (and buffer-read-only " %%"))
          (ov (and overwrite-mode " #"))
          (ans (concat mo ro ov)))
-    (unless (string-empty-p ans)
-      (concat " | " ans))))
+    ans))
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."

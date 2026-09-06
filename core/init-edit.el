@@ -127,7 +127,7 @@
 ;; [flyspell] Spell-checking overlays for writing modes
 (use-package flyspell
   :hook ((org-mode markdown-mode markdown-ts-mode typst-ts-mode
-                  tex-mode TeX-mode) . flyspell-mode)
+                   tex-mode TeX-mode) . flyspell-mode)
   :bind (:map flyspell-mode-map
               ("C-c s ]" . flyspell-goto-next-error)
               ("C-c s [" . +flyspell-goto-previous-error)
@@ -143,7 +143,8 @@
 
   (setq flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil
-        flyspell-use-meta-tab nil))
+        flyspell-use-meta-tab nil
+        flyspell-delay-use-timer t))
 
 
 ;; [ediff] Diff & patch

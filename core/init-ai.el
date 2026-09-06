@@ -260,6 +260,6 @@ Use this format:
   (require 'gptel-openai-oauth)
 
   (setq gptel-copilot-model 'gpt-5.4-mini
-        gptel-copilot-backend
-        (gptel-make-openai-oauth "OpenAI OAuth Inline"
-          :request-params '(:reasoning (:effort "low")))))
+        gptel-copilot-idle-delay 0.2
+        gptel-copilot-backend (gptel-make-openai-oauth "OpenAI OAuth Inline"
+                                :request-params '(:reasoning (:effort "low")))))
