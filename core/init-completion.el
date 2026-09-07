@@ -220,7 +220,7 @@
 (use-package corfu
   :straight (:files (:defaults "extensions/*.el"))
   :hook (((prog-mode conf-mode yaml-mode shell-mode eshell-mode text-mode
-                      agent-shell-mode agent-shell-viewport-edit-mode) . corfu-mode)
+                     agent-shell-mode agent-shell-viewport-edit-mode) . corfu-mode)
          ((eshell-mode shell-mode) . (lambda () (setq-local corfu-auto nil)))
          (minibuffer-setup . +corfu-enable-in-minibuffer))
   :bind (:map corfu-map
@@ -235,7 +235,7 @@
         corfu-auto-prefix 2
         corfu-preselect 'first
         corfu-preview-current nil
-        corfu-auto-delay 0.1)
+        corfu-auto-delay 0.2)
 
   (defun +corfu-move-to-minibuffer ()
     "Use Consult's minibuffer UI for the current completion-in-region table."

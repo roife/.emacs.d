@@ -237,7 +237,7 @@
   :config
   (defun +puni-hungry-delete ()
     (interactive)
-    (if (looking-back "^[[:blank:]]+")
+    (if (looking-back "^[[:blank:]]+" (line-beginning-position))
         (let* ((puni-mode nil)
                (original-func (key-binding (kbd "DEL"))))
           ;; original-func is what `DEL' would be if puni-mode were disabled

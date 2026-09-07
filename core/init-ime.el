@@ -120,7 +120,9 @@
       (add-hook! post-self-insert-hook :local
         (defun +sis-inline-remove-redundant-space ()
           (when (and (eq +sis-inline-english-last-space-pos (1- (point)))
-                     (looking-back (concat " [" +sis-chinese-puncs "]")))
+                     (> (point) (1+ (point-min)))
+                     (eq (char-before (1- (point))) ?\s)
+                     (memq (char-before) +sis-chinese-punc-chars))
             (save-excursion
               (backward-char 2)
               (delete-char 1)
