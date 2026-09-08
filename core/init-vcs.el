@@ -77,6 +77,11 @@
 ;; [magit] Version control interface
 (use-package magit
   :straight t
+  :require-incrementally
+  (compat with-editor eieio transient
+          magit-section magit-base magit-git magit-mode magit-process
+          git-commit magit-transient magit-margin magit-autorevert magit-core
+          magit-diff magit-log magit-wip magit-apply magit-repos t)
   :bind (("C-x g" . magit))
   :hook ((magit-process-mode . goto-address-mode))
   :config
@@ -122,6 +127,7 @@
 
 (use-package magit-difftastic
   :straight (:host github :repo "rschmukler/magit-difftastic")
+  :require-incrementally t
   :after magit
   :config
   (setq magit-difftastic-display "inline"
@@ -132,6 +138,7 @@
 
 (use-package forge
   :straight t
+  :require-incrementally t
   :after magit
   :init
   (setq forge-post-fallback-directory
@@ -151,6 +158,7 @@
 ;; Show TODOs in magit
 (use-package magit-todos
   :straight t
+  :require-incrementally t
   :after magit
   :hook (magit-mode . magit-todos-mode)
   :config

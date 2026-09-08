@@ -28,6 +28,21 @@
       use-package-expand-minimally t
       use-package-enable-imenu-support t)
 
+;; [once] Incremental loading
+(use-package once
+  :straight (:host github :repo "emacs-magus/once"
+                   :files (:defaults "once-use-package/*.el"))
+  :demand t
+  :init
+  (setq once-idle-timer 2.0
+        once-incremental-run-interval 0.5
+        once-use-package-keyword-aliases
+        '(:once-require-incrementally :require-incrementally))
+  :config
+  (require 'once-use-package)
+  (unless (daemonp)
+    (once-enable-incremental-loading)))
+
 
 ;; [straight-overview]
 (use-package straight-overview

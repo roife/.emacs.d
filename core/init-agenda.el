@@ -60,6 +60,7 @@ files keep the default value of `org-archive-location'."
 ;; [org-capture]
 (use-package org-capture
   :straight nil
+  :require-incrementally (org-agenda t)
   :bind ("C-c o c" . org-capture)
   :config
   (setq
@@ -119,6 +120,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 ;; [org-agenda]
 (use-package org-agenda
   :straight nil
+  :require-incrementally t
   :preface
   (defun +org-agenda-show-eisenhower-quadrants (&rest _)
     (interactive)
@@ -228,7 +230,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
         calendar-mark-diary-entries-flag t))
 
 
-;; [org-clock] Portable desktop notification backend, loaded on first use.
+;; [org-clock] Portable desktop notification backend.
 (use-package org-clock
   :straight nil
   :commands (org-show-notification))
@@ -237,8 +239,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 ;; [appt] Convert today's timed Org entries into desktop notifications.
 (use-package appt
   :straight nil
-  :after org
-  :defer 3
+  :require-incrementally (org-agenda t)
   :preface
   (defun +appt-refresh ()
     (org-agenda-to-appt t))

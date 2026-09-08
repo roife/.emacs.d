@@ -2,6 +2,8 @@
 
 (use-package nnnrss
   :straight (:host github :repo "jjbarr/nnnrss")
+  :after gnus-group
+  :require-incrementally (nnfeed mm-url t)
   :config
   ;; nnnrss 0.4.1 references an unbound `id' when an item has no GUID.
   (defun nnnrss--read-id (article)
@@ -17,6 +19,11 @@
 ;; [gnus] a newsreader, mail reader, and news server client
 (use-package gnus
   :commands gnus
+  :require-incrementally
+  (range gnus-util mm-util nnheader wid-edit t
+         gnus-range gnus-spec gnus-win gnus-undo
+         mail-parse mm-bodies mm-decode mml message gnus-int mail-source nnmail
+         gnus-start gnus-group shr url nnoo gnus-sum mm-view mm-uu gnus-art)
   :config
   (setq
    gnus-use-cache t
@@ -79,7 +86,9 @@
 
 ;; Read web communities through Gnus-native backends.
 (use-package nnextension
-  :straight (:host github :repo "roife/nnextension"))
+  :straight (:host github :repo "roife/nnextension")
+  :after gnus-group
+  :require-incrementally (nnextension-core nndiscourse nnhackernews t))
 
 ;; [gnus-group] group mode
 (use-package gnus-group
@@ -139,6 +148,7 @@
 
 (use-package gnus-topic
   :after gnus-group
+  :require-incrementally t
   :hook (gnus-group-mode . gnus-topic-mode)
   :bind (:map gnus-topic-mode-map
               ("TAB" . gnus-topic-fold)
@@ -152,6 +162,7 @@
 
 (use-package gnus-demon
   :after gnus
+  :require-incrementally t
   :config
   (gnus-demon-add-handler #'gnus-demon-scan-news 30 nil)
   (add-hook! gnus-started-hook #'gnus-demon-init))

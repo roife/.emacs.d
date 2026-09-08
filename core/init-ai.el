@@ -20,6 +20,7 @@
 
 (use-package gptel-magit
   :straight (gptel-magit :type git :host github :repo "roife/gptel-magit")
+  :require-incrementally (magit t)
   :hook ((magit-mode . gptel-magit-install))
   :config
   (setq gptel-magit-body-length 72
@@ -135,6 +136,12 @@ Use this format:
 
 (use-package agent-shell
   :straight (:type git :host github :repo "xenodium/agent-shell")
+  :require-incrementally
+  (acp-traffic acp comint shell shell-maker transient
+   agent-shell-faces agent-shell-work-buffer agent-shell-project
+   agent-shell-config agent-shell-markdown agent-shell-diff
+   agent-shell-styles agent-shell-usage agent-shell-list-edit
+   agent-shell-viewport agent-shell-ui t)
   :bind (("C-c g a" . agent-shell)
          ("C-c g p" . agent-shell-prompt-compose)
          ("C-c g w" . agent-shell-send-dwim)
@@ -180,6 +187,7 @@ Use this format:
 (use-package agent-shell-tramp
   :straight (:type git :host github :repo "junyi-hou/agent-shell-tramp")
   :after agent-shell
+  :require-incrementally t
   :init
   (setq agent-shell-tramp-transcript-directory
         (expand-file-name

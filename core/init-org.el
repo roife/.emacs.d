@@ -15,7 +15,10 @@
 ;; [org]
 (use-package org
   :straight (:type built-in)
-  :defer 2
+  :require-incrementally
+  (calendar find-func format-spec org-macs org-compat org-faces
+   org-entities org-fold-core org-fold oc org-keys ol org-table
+   org-footnote org-list org-pcomplete org-src org-macro ob t)
   :init
   (setq org-modules '(org-habit)
         org-directory (file-truename "~/org/"))
@@ -151,9 +154,16 @@
   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components))
 
 
+;; `org-element' and its `org-persist' dependency need Org loaded first.
+(use-package org-element
+  :straight nil
+  :require-incrementally (org t))
+
+
 ;; [ob-mermaid] Generate Mermaid diagrams through Org Babel
 (use-package ob-mermaid
   :straight t
+  :require-incrementally t
   :after org
   :init
   (setf (alist-get 'mermaid org-babel-load-languages) t)
@@ -165,6 +175,7 @@
 ;; [org-appear] Make invisible parts of Org elements appear visible.
 (use-package org-appear
   :straight t
+  :require-incrementally t
   :hook ((org-mode . org-appear-mode))
   :config
   (setq org-appear-autosubmarkers t
@@ -184,6 +195,7 @@
 
 (use-package org-modern
   :straight t
+  :require-incrementally t
   :after org
   :hook ((org-mode . org-modern-mode)
          (org-agenda-finalize . org-modern-agenda)))
@@ -200,6 +212,7 @@
 ;; [org-typst-preview] Render native Typst formulae asynchronously.
 (use-package org-typst-preview
   :straight (:host github :repo "roife/org-typst-preview")
+  :require-incrementally t
   :after org
   :hook (org-mode . org-typst-preview-mode)
   :config
