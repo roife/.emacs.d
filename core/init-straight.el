@@ -34,10 +34,9 @@
                    :files (:defaults "once-use-package/*.el"))
   :demand t
   :init
-  (setq once-idle-timer 2.0
+  (setq once-idle-timer 5.0
         once-incremental-run-interval 0.5
-        once-use-package-keyword-aliases
-        '(:once-require-incrementally :require-incrementally))
+        once-use-package-keyword-aliases '(:once-require-incrementally :require-incrementally))
   :config
   (require 'once-use-package)
   (unless (daemonp)
