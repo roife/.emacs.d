@@ -160,9 +160,9 @@
   :straight t
   :require-incrementally t
   :after magit
-  :hook (magit-mode . magit-todos-mode)
   :config
-  (setq magit-todos-update nil))
+  (setq magit-todos-update nil)
+  (magit-todos-mode 1))
 
 
 ;; [remoto] Browse GitHub repositories without cloning
