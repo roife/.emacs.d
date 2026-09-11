@@ -15,16 +15,16 @@
 
 (use-package liberime
   :straight (liberime :type git :host github :repo "emacs-rime/liberime")
-  :defer 1
+  :require-incrementally (t)
   :init
-  (setq liberime-load-on-require nil
-        liberime-shared-data-dir (if (eq system-type 'darwin)
+  (setq liberime-shared-data-dir (if (eq system-type 'darwin)
                                      "~/Library/Rime/"
                                    "~/.local/share/fcitx5/rime")
         liberime-user-data-dir (no-littering-expand-var-file-name "rime/")))
 
 (use-package liberime-regexp
   :straight (:host github :repo "roife/liberime-regexp")
+  :require-incrementally (liberime t)
   :hook ((liberime-after-start . liberime-regexp-enable)
          (liberime-after-start . liberime-regexp-segment-mode))
   :config
@@ -32,7 +32,7 @@
 
 (use-package rimel
   :straight (rimel :type git :host github :repo "emacs-rime/rimel")
-  :defer 1
+  :require-incrementally (liberime liberime-regexp t)
   :custom-face
   (rimel-candidate-label-face ((t (:inherit font-lock-comment-face :height 0.85))))
   (rimel-page-indicator-face ((t (:inherit font-lock-comment-face :height 0.85))))
@@ -146,6 +146,3 @@
                  (memq (char-after) +sis-chinese-punc-chars))
         (backward-delete-char 1))))
   (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc))
-
-(when (daemonp)
-  (liberime-load))

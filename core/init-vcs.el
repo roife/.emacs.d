@@ -160,7 +160,7 @@
   :straight t
   :require-incrementally t
   :after magit
-  :config
+  :init
   (setq magit-todos-update nil)
   (magit-todos-mode 1))
 
