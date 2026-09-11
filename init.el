@@ -8,7 +8,6 @@
 
 (defvar +init-files (list
                      'init-util
-                     'init-load
                      'init-straight
                      'init-basic
                      'init-ui
