@@ -138,10 +138,10 @@ Use this format:
   :straight (:type git :host github :repo "xenodium/agent-shell")
   :require-incrementally
   (acp-traffic acp comint shell shell-maker transient
-   agent-shell-faces agent-shell-work-buffer agent-shell-project
-   agent-shell-config agent-shell-markdown agent-shell-diff
-   agent-shell-styles agent-shell-usage agent-shell-list-edit
-   agent-shell-viewport agent-shell-ui t)
+               agent-shell-faces agent-shell-work-buffer agent-shell-project
+               agent-shell-config agent-shell-markdown agent-shell-diff
+               agent-shell-styles agent-shell-usage agent-shell-list-edit
+               agent-shell-viewport agent-shell-ui t)
   :bind (("C-c g a" . agent-shell)
          ("C-c g p" . agent-shell-prompt-compose)
          ("C-c g w" . agent-shell-send-dwim)
@@ -171,13 +171,11 @@ Use this format:
         agent-shell-openai-codex-acp-command '("mise" "exec" "--" "codex-acp")
         agent-shell-context-sources nil
         agent-shell-mcp-servers nil
-        agent-shell-session-strategy 'prompt
         agent-shell-session-restore-verbosity 'full
         agent-shell-show-welcome-message nil
         agent-shell-header-style 'text
         agent-shell-activity-group-expand-by-default 'latest
-        agent-shell-tool-use-expand-by-default nil
-        agent-shell-thought-process-expand-by-default nil
+        agent-shell-markdown-table-zebra-stripe nil
         agent-shell-dot-subdir-function #'+agent-shell-dot-subdir
         agent-shell-show-context-usage-indicator 'detailed
         agent-shell-file-display-action '((display-buffer-reuse-window display-buffer-pop-up-window)))

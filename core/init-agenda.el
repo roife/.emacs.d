@@ -9,7 +9,7 @@
    ;; of a multi-step outcome.
    org-todo-keywords '((sequence
                         "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "SOMEDAY(s)" "IMMEDIATE(i!)"
-                       "|" "DONE(d!)" "CANCELED(c@)")
+                        "|" "DONE(d!)" "CANCELED(c@)")
                        (sequence
                         "PROPOSED(o)" "PLANNED(p)" "ACTIVE(a)" "BLOCKED(b@)" "URGENT(u!)"
                         "|" "COMPLETED(f!)" "ABANDONED(x@)"))
@@ -23,7 +23,8 @@
                    (:endgroup)
                    ("note" . ?n))
    org-archive-location "%s_archive::* Archived"
-   org-archive-subtree-save-file-p t)
+   org-archive-subtree-save-file-p t
+   org-deadline-warning-days 3)
 
   (add-hook! org-mode-hook
     (defun +org-set-project-archive-location ()
