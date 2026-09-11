@@ -173,6 +173,7 @@ Use this format:
         agent-shell-mcp-servers nil
         agent-shell-session-restore-verbosity 'full
         agent-shell-show-welcome-message nil
+        agent-shell-chat-mode-enabled nil
         agent-shell-header-style 'text
         agent-shell-activity-group-expand-by-default 'latest
         agent-shell-markdown-table-zebra-stripe nil
