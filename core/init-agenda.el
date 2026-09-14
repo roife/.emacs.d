@@ -5,14 +5,10 @@
   :straight (:type built-in)
   :config
   (setq
-   ;; Tasks describe executable work; project states describe the lifecycle
-   ;; of a multi-step outcome.
+   ;; A single workflow keeps tasks and project headings consistent.
    org-todo-keywords '((sequence
-                        "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "SOMEDAY(s)" "IMMEDIATE(i!)"
-                        "|" "DONE(d!)" "CANCELED(c@)")
-                       (sequence
-                        "PROPOSED(o)" "PLANNED(p)" "ACTIVE(a)" "BLOCKED(b@)" "URGENT(u!)"
-                        "|" "COMPLETED(f!)" "ABANDONED(x@)"))
+                        "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "SOMEDAY(s)" "URGENT(i!)"
+                        "|" "DONE(d!)" "CANCELED(c@)"))
    org-log-done 'time
    org-log-into-drawer t
    org-log-reschedule 'time
@@ -82,11 +78,11 @@ files keep the default value of `org-archive-location'."
                            ("p" "Project")
                            ("pw" "Work project" entry
                             (file "agenda/projects-work.org")
-                            "* PLANNED %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
+                            "* TODO %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
                             :empty-lines 1)
                            ("pp" "Personal project" entry
                             (file "agenda/projects-personal.org")
-                            "* PLANNED %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
+                            "* TODO %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
                             :empty-lines 1)
                            ("r" "Reminder" entry
                             (file org-default-notes-file)
@@ -122,17 +118,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 (use-package org-agenda
   :straight nil
   :require-incrementally t
-  :preface
-  (defun +org-agenda-show-eisenhower-quadrants (&rest _)
-    (interactive)
-    (org-agenda
-     nil
-     (if (equal (cadr org-agenda-redo-command) "Eisenhower quadrants")
-         "d"
-       "e")))
-  :bind (("C-c o a" . org-agenda)
-         :map org-agenda-mode-map
-         ("V" . +org-agenda-show-eisenhower-quadrants))
+  :bind (("C-c o a" . org-agenda))
   :config
   (setq
    ;; All Org files directly under ~/org/agenda/ are included.
@@ -147,72 +133,23 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
                                (0.5 . org-upcoming-deadline)
                                (0.0 . org-upcoming-distant-deadline))
    org-agenda-custom-commands '(("d" "Dashboard"
-                                 ((agenda ""
-                                          ((org-agenda-overriding-header "This week")
-                                           (org-agenda-span 7)
-                                           (org-agenda-start-on-weekday nil)
-                                           (org-agenda-start-day "+0d")))
+                                 ((agenda "")
+                                  (todo "URGENT"
+                                        ((org-agenda-overriding-header "Urgent actions")))
                                   (todo "NEXT"
                                         ((org-agenda-overriding-header "Next actions")))
+                                  (tags-todo "+project/TODO"
+                                             ((org-agenda-overriding-header "Projects")))
                                   (todo "WAIT"
                                         ((org-agenda-overriding-header "Waiting")))
-                                  (todo "ACTIVE"
-                                        ((org-agenda-overriding-header "Active projects")))
-                                  (todo "BLOCKED"
-                                        ((org-agenda-overriding-header "Blocked projects")))
-                                  (todo "PLANNED"
-                                        ((org-agenda-overriding-header "Planned projects")))
-                                  (todo "PROPOSED"
-                                        ((org-agenda-overriding-header "Proposed projects")))))
-                                ("e" "Eisenhower quadrants"
-                                 ((tags-todo "PRIORITY={A\\|B}/!IMMEDIATE|URGENT"
-                                             ((org-agenda-overriding-header
-                                               "Q1 · Important and urgent (A/B)")
-                                              (org-agenda-skip-function
-                                               '(org-agenda-skip-entry-if
-                                                 'notregexp org-priority-regexp))))
-                                  (tags-todo "PRIORITY={A\\|B}/!-IMMEDIATE-URGENT"
-                                             ((org-agenda-overriding-header
-                                               "Q2 · Important, not urgent (A/B)")
-                                              (org-agenda-skip-function
-                                               '(org-agenda-skip-entry-if
-                                                 'notregexp org-priority-regexp))))
-                                  (tags-todo "PRIORITY=\"C\"/!IMMEDIATE|URGENT"
-                                             ((org-agenda-overriding-header
-                                               "Q3 · Not important and urgent (C)")
-                                              (org-agenda-skip-function
-                                               '(org-agenda-skip-entry-if
-                                                 'notregexp org-priority-regexp))))
-                                  (tags-todo "PRIORITY=\"C\"/!-IMMEDIATE-URGENT"
-                                             ((org-agenda-overriding-header
-                                               "Q4 · Not important, not urgent (C)")
-                                              (org-agenda-skip-function
-                                               '(org-agenda-skip-entry-if
-                                                 'notregexp org-priority-regexp))))
-                                  (alltodo ""
-                                           ((org-agenda-overriding-header
-                                             "Unclassified · choose A, B, or C")
-                                            (org-agenda-skip-function
-                                             '(org-agenda-skip-entry-if
-                                               'regexp org-priority-regexp)))))
-                                 ((org-agenda-sorting-strategy
-                                   '(priority-down category-keep))))
-                                ("i" "Immediate actions" todo "IMMEDIATE")
-                                ("u" "Urgent projects" todo "URGENT")
+                                  (todo "SOMEDAY"
+                                        ((org-agenda-overriding-header "Someday / maybe")))))
+                                ("i" "Urgent actions" todo "URGENT")
                                 ("n" "Next actions" todo "NEXT")
                                 ("w" "Waiting" todo "WAIT")
-                                ("o" "Proposed projects" todo "PROPOSED")
                                 ("p" "Projects"
-                                 ((todo "URGENT"
-                                        ((org-agenda-overriding-header "Urgent projects")))
-                                  (todo "ACTIVE"
-                                        ((org-agenda-overriding-header "Active projects")))
-                                  (todo "BLOCKED"
-                                        ((org-agenda-overriding-header "Blocked projects")))
-                                  (todo "PLANNED"
-                                        ((org-agenda-overriding-header "Planned projects")))
-                                  (todo "PROPOSED"
-                                        ((org-agenda-overriding-header "Proposed projects")))))
+                                 ((tags-todo "+project/TODO"
+                                             ((org-agenda-overriding-header "Projects")))))
                                 ("s" "Someday / maybe" todo "SOMEDAY"))))
 
 
