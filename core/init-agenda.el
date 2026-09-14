@@ -137,6 +137,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
   (setq
    ;; All Org files directly under ~/org/agenda/ are included.
    org-agenda-files (list (expand-file-name "agenda/" org-directory))
+   org-agenda-sticky t
    org-agenda-window-setup 'current-window
    org-agenda-restore-windows-after-quit t
    org-agenda-skip-scheduled-if-done t

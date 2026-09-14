@@ -46,6 +46,9 @@
    org-pretty-entities t
    org-ellipsis "…"
    org-hide-emphasis-markers t
+   ;; Sparse trees should filter visibility without making every match look
+   ;; like an active region.
+   org-highlight-sparse-tree-matches nil
    ;; Highlight quote and verse blocks
    org-fontify-quote-and-verse-blocks t
    ;; Highlight the whole line for headings
