@@ -3,7 +3,7 @@
 (use-package gptel
   :straight t
   :init
-  (setq gptel-model 'gpt-5.3-codex-spark
+  (setq gptel-model 'gpt-5.6-luna
         gptel-default-mode 'org-mode
         gptel-confirm-tool-calls nil)
   :config

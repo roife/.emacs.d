@@ -32,8 +32,6 @@
                             (format-time-string "%Y")))))))
 
 
-
-
 ;; [org-refile]
 (use-package org-refile
   :straight nil

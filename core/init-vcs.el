@@ -136,6 +136,31 @@
   )
 
 
+;; Use the GitHub CLI credential directly.  Keep the token in memory only
+;; and fetch it lazily.
+(use-package ghub
+  :straight t
+  :preface
+  (defvar +ghub-gh-token-cache nil)
+
+  (defun +ghub--token-from-gh-cli ()
+    "Return the GitHub CLI token, caching it for this Emacs session."
+    (or +ghub-gh-token-cache
+        (let ((gh (or (executable-find "gh")
+                      (user-error "GitHub CLI executable not found"))))
+          (with-temp-buffer
+            (call-process gh nil t nil "auth" "token" "--hostname" "github.com")
+            (setq +ghub-gh-token-cache (string-trim (buffer-string)))))))
+  :config
+  (defadvice! +ghub-token-from-gh-cli-a (fn host username package
+                                            &optional nocreate forge)
+    :around #'ghub--token
+    "Use `gh auth token' directly for GitHub; otherwise call FN."
+    (if (memq forge '(nil github))
+        (+ghub--token-from-gh-cli)
+      (funcall fn host username package nocreate forge))))
+
+
 (use-package forge
   :straight t
   :require-incrementally t
@@ -167,7 +192,10 @@
 
 ;; [remoto] Browse GitHub repositories without cloning
 (use-package remoto
-  :straight (:host github :repo "agzam/remoto.el"))
+  :straight (:host github :repo "agzam/remoto.el")
+  :config
+  (advice-add #'remoto--warm-auth :override #'ignore)
+  (advice-add #'remoto--find-github-token :override #'+ghub--token-from-gh-cli))
 
 
 ;; [smerge] Highlight all the conflicted regions for git
