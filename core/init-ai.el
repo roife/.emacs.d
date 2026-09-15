@@ -183,6 +183,18 @@ Use this format:
   :config
   (advice-add #'agent-shell--update-bootstrapping-fragment :override #'ignore))
 
+(use-package agent-shell-links
+  :straight (:type git :host github :repo "ultronozm/agent-shell-links.el")
+  :after agent-shell
+  :require-incrementally (ol t)
+  :config
+  (agent-shell-links-bookmark-setup)
+  (with-eval-after-load 'ol
+    (org-link-set-parameters
+     "agent-shell"
+     :follow #'agent-shell-links-org-follow
+     :store #'agent-shell-links-org-store)))
+
 (use-package agent-shell-tramp
   :straight (:type git :host github :repo "junyi-hou/agent-shell-tramp")
   :after agent-shell

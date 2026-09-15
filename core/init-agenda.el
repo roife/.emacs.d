@@ -24,17 +24,14 @@
 
   (add-hook! org-mode-hook
     (defun +org-set-project-archive-location ()
-      "Archive active projects by domain and completion year.
-Work and personal project files use separate yearly archives.  Other Org
-files keep the default value of `org-archive-location'."
-      (when-let* ((file buffer-file-name)
-                  (domain (pcase (file-name-base file)
-                            ("projects-work" "work")
-                            ("projects-personal" "personal"))))
+      "Archive entries by source filename and year."
+      (when buffer-file-name
         (setq-local org-archive-location
-                    (format "archives/projects-%s-%s.org::* Archived"
-                            domain
+                    (format "archives/%s-%s.org::* Archived"
+                            (file-name-base buffer-file-name)
                             (format-time-string "%Y")))))))
+
+
 
 
 ;; [org-refile]
@@ -46,7 +43,7 @@ files keep the default value of `org-archive-location'."
   (setq org-refile-targets
         `((,(mapcar (lambda (file)
                       (expand-file-name (concat "agenda/" file) org-directory))
-                    '("actions.org" "projects-work.org" "projects-personal.org"
+                    '("actions.org" "work.org" "personal.org"
                       "routines.org" "someday.org"))
            :maxlevel . 3))
         org-refile-use-outline-path 'file
@@ -77,11 +74,11 @@ files keep the default value of `org-archive-location'."
                             :empty-lines 1)
                            ("p" "Project")
                            ("pw" "Work project" entry
-                            (file "agenda/projects-work.org")
+                            (file "agenda/work.org")
                             "* TODO %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
                             :empty-lines 1)
                            ("pp" "Personal project" entry
-                            (file "agenda/projects-personal.org")
+                            (file "agenda/personal.org")
                             "* TODO %^{Project name} :project:\n:PROPERTIES:\n:CREATED: %U\n:END:\n** NEXT %?\n"
                             :empty-lines 1)
                            ("r" "Reminder" entry
@@ -120,37 +117,57 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
   :require-incrementally t
   :bind (("C-c o a" . org-agenda))
   :config
-  (setq
-   ;; All Org files directly under ~/org/agenda/ are included.
-   org-agenda-files (list (expand-file-name "agenda/" org-directory))
-   org-agenda-sticky t
-   org-agenda-window-setup 'current-window
-   org-agenda-restore-windows-after-quit t
-   org-agenda-skip-scheduled-if-done t
-   org-agenda-skip-deadline-if-done t
-   org-agenda-deadline-faces '((1.001 . error)
-                               (1.0 . org-warning)
-                               (0.5 . org-upcoming-deadline)
-                               (0.0 . org-upcoming-distant-deadline))
-   org-agenda-custom-commands '(("d" "Dashboard"
-                                 ((agenda "")
-                                  (todo "URGENT"
-                                        ((org-agenda-overriding-header "Urgent actions")))
-                                  (todo "NEXT"
-                                        ((org-agenda-overriding-header "Next actions")))
-                                  (tags-todo "+project/TODO"
-                                             ((org-agenda-overriding-header "Projects")))
-                                  (todo "WAIT"
-                                        ((org-agenda-overriding-header "Waiting")))
-                                  (todo "SOMEDAY"
-                                        ((org-agenda-overriding-header "Someday / maybe")))))
-                                ("i" "Urgent actions" todo "URGENT")
-                                ("n" "Next actions" todo "NEXT")
-                                ("w" "Waiting" todo "WAIT")
-                                ("p" "Projects"
-                                 ((tags-todo "+project/TODO"
-                                             ((org-agenda-overriding-header "Projects")))))
-                                ("s" "Someday / maybe" todo "SOMEDAY"))))
+  (cl-flet ((files (&rest names)
+              (mapcar (lambda (name)
+                        (expand-file-name (concat "agenda/" name ".org") org-directory))
+                      names)))
+    (let* ((agenda-files (files "actions" "calendar" "inbox" "personal"
+                                "routines" "someday" "work"))
+           (dated-files (remove (car (files "someday")) agenda-files))
+           (action-files (remove (car (files "calendar")) dated-files))
+           (project-files (files "personal" "work"))
+           (someday-files (files "personal" "someday" "work")))
+      (setq
+       org-agenda-files agenda-files
+       org-agenda-sticky t
+       org-agenda-window-setup 'current-window
+       org-agenda-restore-windows-after-quit t
+       org-agenda-inhibit-startup t
+       org-agenda-dim-blocked-tasks nil
+       org-agenda-use-tag-inheritance nil
+       org-agenda-ignore-properties '(stats)
+       org-agenda-skip-scheduled-if-done t
+       org-agenda-skip-deadline-if-done t
+       org-agenda-deadline-faces '((1.001 . error)
+                                   (1.0 . org-warning)
+                                   (0.5 . org-upcoming-deadline)
+                                   (0.0 . org-upcoming-distant-deadline))
+       org-agenda-custom-commands
+       `(("d" "Dashboard"
+          ((agenda "" ((org-agenda-files ',dated-files)))
+           (todo "URGENT" ((org-agenda-files ',action-files)
+                           (org-agenda-overriding-header "Urgent actions")))
+           (todo "NEXT" ((org-agenda-files ',action-files)
+                         (org-agenda-overriding-header "Next actions")))
+           (tags-todo "+project/TODO"
+                      ((org-agenda-files ',project-files)
+                       (org-agenda-overriding-header "Projects")))
+           (todo "WAIT" ((org-agenda-files ',action-files)
+                         (org-agenda-overriding-header "Waiting")))
+           (todo "SOMEDAY" ((org-agenda-files ',someday-files)
+                            (org-agenda-overriding-header "Someday / maybe")))))
+         ("i" "Urgent actions" todo "URGENT"
+          ((org-agenda-files ',action-files)))
+         ("n" "Next actions" todo "NEXT"
+          ((org-agenda-files ',action-files)))
+         ("w" "Waiting" todo "WAIT"
+          ((org-agenda-files ',action-files)))
+         ("p" "Projects"
+          ((tags-todo "+project/TODO"
+                      ((org-agenda-files ',project-files)
+                       (org-agenda-overriding-header "Projects")))))
+         ("s" "Someday / maybe" todo "SOMEDAY"
+          ((org-agenda-files ',someday-files))))))))
 
 
 ;; [calendar]
@@ -180,10 +197,15 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
   :straight nil
   :require-incrementally (org-agenda t)
   :preface
+  (defvar +appt-refresh-timer nil
+    "Timer for deferred appointment refreshes.")
   (defun +appt-refresh ()
-    (org-agenda-to-appt t))
-  :hook ((org-mode . +org-appt-refresh-after-save)
-         ((org-capture-after-finalize
+    "Schedule one appointment refresh after Emacs becomes idle."
+    (when +appt-refresh-timer
+      (cancel-timer +appt-refresh-timer))
+    (setq +appt-refresh-timer
+          (run-with-idle-timer 0.75 nil #'org-agenda-to-appt t)))
+  :hook (((org-capture-after-finalize
            org-after-todo-state-change) . +appt-refresh))
   :config
   (setq appt-message-warning-time 15
@@ -198,9 +220,11 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
                    (string-join (ensure-list minutes) "\n")
                    (string-join (ensure-list message) "\n")))))
 
-  (add-hook! org-mode-hook
-    (defun +org-appt-refresh-after-save (&rest _)
-      (add-hook 'after-save-hook #'+appt-refresh nil t)))
+  (add-hook 'after-save-hook
+            (lambda ()
+              (when (and (derived-mode-p 'org-mode)
+                         (member buffer-file-name org-agenda-files))
+                (+appt-refresh))))
 
   (appt-activate 1)
   (+appt-refresh)
