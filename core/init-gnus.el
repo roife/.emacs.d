@@ -84,12 +84,6 @@
         ;; additional local monthly archive.
         gnus-message-archive-group nil))
 
-;; Read web communities through Gnus-native backends.
-(use-package nnextension
-  :straight (:host github :repo "roife/nnextension")
-  :after gnus-group
-  :require-incrementally (nnextension-core nndiscourse nnhackernews t))
-
 ;; [gnus-group] group mode
 (use-package gnus-group
   :config
