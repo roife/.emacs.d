@@ -121,3 +121,11 @@ This command does the inverse of `fill-region'."
 (defun +temp-buffer-p (buffer)
   "Return t if BUFFER is temporary."
   (string-match-p "^ " (buffer-name buffer)))
+
+(defun +enable-conservative-scrolling ()
+  "Use conservative scrolling in the current buffer."
+  (setq-local scroll-margin 0
+              scroll-conservatively 101
+              scroll-up-aggressively nil
+              scroll-down-aggressively nil
+              auto-window-vscroll t))

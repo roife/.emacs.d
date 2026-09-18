@@ -207,7 +207,8 @@ included; for the final argument the leading separator is included."
            (term-mode . insert)
            (ghostel-mode . insert)
            (help-mode . normal)
-           (vundo-mode . motion)))
+           (vundo-mode . motion)
+           (calfw-calendar-mode . motion)))
       (add-to-list 'meow-mode-state-list state))
     ))
 

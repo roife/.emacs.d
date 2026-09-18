@@ -17,8 +17,8 @@
   :straight (:type built-in)
   :require-incrementally
   (calendar find-func format-spec org-macs org-compat org-faces
-   org-entities org-fold-core org-fold oc org-keys ol org-table
-   org-footnote org-list org-pcomplete org-src org-macro ob t)
+            org-entities org-fold-core org-fold oc org-keys ol org-table
+            org-footnote org-list org-pcomplete org-src org-macro ob t)
   :init
   (setq org-modules '(org-habit)
         org-directory (file-truename "~/org/"))
@@ -123,8 +123,8 @@
           (org-table-align)
           (goto-char point)))))
 
-  ;; Block delimiter faces inherit from `org-meta-line'.
-  (dolist (face '(org-meta-line org-block-begin-line org-block-end-line))
+  ;; Keep drawer and block delimiter faces compact after theme loading.
+  (dolist (face '(org-drawer org-meta-line org-block-begin-line org-block-end-line))
     (set-face-attribute face nil :height 0.85))
 
   ;; Cycle the visible parent heading when point is in or just past folded text.

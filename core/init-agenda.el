@@ -53,7 +53,7 @@
 (use-package org-capture
   :straight nil
   :require-incrementally (org-agenda t)
-  :bind ("C-c o c" . org-capture)
+  :bind ("C-t c" . org-capture)
   :config
   (setq
    org-default-notes-file (expand-file-name "agenda/inbox.org" org-directory)
@@ -113,7 +113,9 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 (use-package org-agenda
   :straight nil
   :require-incrementally t
-  :bind (("C-c o a" . org-agenda))
+  :bind (("C-t a" . org-agenda)
+         :map org-agenda-mode-map
+         ([remap org-agenda-goto-calendar] . +agenda-calendar-blocks))
   :config
   (cl-flet ((files (&rest names)
               (mapcar (lambda (name)
@@ -184,6 +186,91 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
         calendar-mark-diary-entries-flag t))
 
 
+;; [calfw] One calendar view for Org entries and subscribed days off/workdays.
+(use-package calfw
+  :straight (:host github :repo "haji-ali/emacs-calfw")
+  :preface
+  (defun +agenda-calendar (&optional view)
+    "Open Org and China holidays, keeping the date selected in Agenda."
+    (interactive)
+    (require 'calfw-org)
+    (require 'calfw-ical)
+    (let ((day (when (derived-mode-p 'org-agenda-mode)
+                 (get-text-property (point) 'day))))
+      (calfw-open-calendar-buffer
+       :date (if day (calendar-gregorian-from-absolute day)
+               (calendar-current-date))
+       :view view
+       :custom-map calfw-org-schedule-map
+       :contents-sources
+       (list (calfw-org-create-source nil "Org" "SeaGreen")
+             (calfw-ical-create-source "https://cdn.jsdelivr.net/npm/chinese-days/dist/holidays.ics" "中国放假" "IndianRed")))))
+  :config
+  (setq calfw-calendar-buffer-name "*Org Calendar*"
+        calfw-display-calendar-holidays t)
+  (add-hook! calfw-calendar-mode-hook #'+enable-conservative-scrolling)
+  (advice-add 'calfw--render-footer :override (lambda (&rest _) (string))
+              '((name . hide-calendar-sources))))
+
+(use-package calfw-org
+  :straight (:host github :repo "haji-ali/emacs-calfw"
+                   :files ("calfw-org.el"))
+  :after calfw)
+
+(use-package calfw-ical
+  :straight (:host github :repo "haji-ali/emacs-calfw"
+                   :files ("calfw-ical.el"))
+  :after calfw)
+
+(use-package calfw-blocks
+  :straight (:host github :repo "haji-ali/calfw-blocks")
+  :after calfw-org
+  :demand t
+  :preface
+  (defun +calfw-event (item start &optional end)
+    "Return ITEM as an event, preserving Agenda properties and timing."
+    (if (not (stringp item)) item
+      (let* ((time (get-text-property 0 'time-of-day item))
+             (minutes (when time (+ (* (/ time 100) 60) (% time 100))))
+             (finish (when minutes
+                       (+ minutes (round (or (get-text-property 0 'duration item)
+                                             (* 60 calfw-blocks-default-event-length)))))))
+        (make-calfw-event
+         :title item :source (get-text-property 0 'cfw:source item)
+         :start-date start
+         :end-date (if finish
+                       (calendar-gregorian-from-absolute
+                        (+ (calendar-absolute-from-gregorian (or end start))
+                           (/ finish 1440)))
+                     end)
+         :start-time (when minutes (list (/ minutes 60) (% minutes 60)))
+         :end-time (when finish (list (% (/ finish 60) 24) (% finish 60)))))))
+  (defun +calfw-block-contents (contents)
+    "Convert text entries and place untimed events in the all-day area."
+    (let (periods days)
+      (cl-loop for (date . items) in contents
+               do (if (eq date 'periods)
+                      (pcase-dolist (`(,start ,end ,item) items)
+                        (push (list start end (+calfw-event item start end)) periods))
+                    (let ((timed
+                           (cl-loop for item in items
+                                    for event = (+calfw-event item date)
+                                    if (calfw-event-start-time event) collect event
+                                    else do (push (list date (or (calfw-event-end-date event) date)
+                                                        event) periods))))
+                      (when timed (push (cons date timed) days)))))
+      (cons (cons 'periods (nreverse periods)) (nreverse days))))
+  (defun +agenda-calendar-blocks ()
+    "Open Org and subscribed holidays in a weekly time-block view."
+    (interactive)
+    (+agenda-calendar 'block-week))
+  :config
+  ;; Normal calfw views pass two arguments; the block toolbar needs four.
+  ;; Block views call their own toolbar directly, so keep the normal one.
+  (advice-remove 'calfw--render-toolbar #'calfw-blocks-render-toolbar)
+  (advice-add 'calfw--contents-put-source :filter-return #'+calfw-block-contents))
+
+
 ;; [org-clock] Portable desktop notification backend.
 (use-package org-clock
   :straight nil
@@ -233,7 +320,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 (use-package org-pomodoro
   :straight t
   :after org
-  :bind ("C-c o p" . org-pomodoro)
+  :bind ("C-t p" . org-pomodoro)
   :config
   (setq org-pomodoro-length 30
         org-pomodoro-long-break-length 15))
