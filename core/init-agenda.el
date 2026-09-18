@@ -53,7 +53,7 @@
 (use-package org-capture
   :straight nil
   :require-incrementally (org-agenda t)
-  :bind ("C-t c" . org-capture)
+  :bind ("C-c o c" . org-capture)
   :config
   (setq
    org-default-notes-file (expand-file-name "agenda/inbox.org" org-directory)
@@ -113,7 +113,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 (use-package org-agenda
   :straight nil
   :require-incrementally t
-  :bind (("C-t a" . org-agenda)
+  :bind (("C-c o a" . org-agenda)
          :map org-agenda-mode-map
          ([remap org-agenda-goto-calendar] . +agenda-calendar-blocks))
   :config
@@ -320,7 +320,7 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 (use-package org-pomodoro
   :straight t
   :after org
-  :bind ("C-t p" . org-pomodoro)
+  :bind ("C-c o p" . org-pomodoro)
   :config
   (setq org-pomodoro-length 30
         org-pomodoro-long-break-length 15))
