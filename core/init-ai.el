@@ -183,6 +183,33 @@ Use this format:
   :config
   (advice-add #'agent-shell--update-bootstrapping-fragment :override #'ignore))
 
+(use-package agent-shell-fork-tree
+  :straight (:type git :host github :repo "roife/agent-shell-fork-tree")
+  :after agent-shell
+  :demand t
+  :hook (agent-shell-mode . agent-shell-fork-tree-mode)
+  :custom
+  (agent-shell-fork-tree-auto-rebuild nil)
+  :bind (("C-c g f" . agent-shell-fork-tree)
+         :map agent-shell-mode-map
+         ("C-c g t" . agent-shell-fork-tree)
+         :map agent-shell-viewport-edit-mode-map
+         ("C-c g t" . agent-shell-fork-tree)
+         :map agent-shell-viewport-view-mode-map
+         ("C-c g t" . agent-shell-fork-tree)))
+
+(use-package agent-shell-btw
+  :straight (:type git :host github :repo "roife/agent-shell-btw")
+  :after agent-shell
+  :demand t
+  :bind (("C-c g b" . agent-shell-btw)
+         :map agent-shell-mode-map
+         ("C-c b" . agent-shell-btw)
+         :map agent-shell-viewport-edit-mode-map
+         ("C-c b" . agent-shell-btw)
+         :map agent-shell-viewport-view-mode-map
+         ("C-c b" . agent-shell-btw)))
+
 (use-package agent-shell-links
   :straight (:type git :host github :repo "ultronozm/agent-shell-links.el")
   :after agent-shell
