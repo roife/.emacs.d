@@ -169,7 +169,6 @@
           (lambda (name &rest _) (concat " " name " "))
           tab-bar-tab-name-format-face))
 
-  (defvar +tab-bar-gnus-indicator-cache nil)
   (defvar +tab-bar-telega-indicator-cache nil)
   (defvar +tab-bar-emms-indicator-cache nil)
   (defvar +tab-bar-org-agenda-indicator-cache nil)
@@ -177,7 +176,6 @@
   (setq tab-bar-format '((lambda () +tab-bar-org-agenda-indicator-cache)
                          (lambda () +tab-bar-telega-indicator-cache)
                          (lambda () +tab-bar-emms-indicator-cache)
-                         (lambda () +tab-bar-gnus-indicator-cache)
                          tab-bar-format-tabs))
 
   (with-eval-after-load 'agent-shell-attention
@@ -200,20 +198,6 @@
                                       (org-agenda-list nil nil 'day))))))
       (force-mode-line-update t))
     (+tab-bar-org-agenda-indicator-update))
-
-  (with-eval-after-load 'gnus
-    (add-hook! (gnus-started-hook gnus-after-getting-new-news-hook
-                                  gnus-group-catchup-group-hook gnus-summary-exit-hook)
-      (defun +tab-bar-gnus-indicator-update (&rest _)
-        "Update the cached Gnus unread count in the tab bar."
-        (setq +tab-bar-gnus-indicator-cache
-              (when-let* ((count (cl-loop for entry being the hash-values
-                                          of gnus-newsrc-hashtb
-                                          for unread = (car entry)
-                                          when (numberp unread)
-                                          sum unread))
-                          ((> count 0)))
-                (propertize (format " M %d " count) 'face 'font-lock-keyword-face))))))
 
   (with-eval-after-load 'telega
     (defadvice! +tab-bar-telega-indicator-update (&rest _)

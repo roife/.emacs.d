@@ -32,7 +32,6 @@
                      'init-modeline
                      'init-ai
                      'init-social
-                     'init-gnus
                      'init-media
                      'init-test
                      ))

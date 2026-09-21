@@ -278,7 +278,9 @@
                             xref-go-back
                             xref-find-definitions
                             xref-find-references))
-  (add-to-list 'dogears-ignore-modes 'gnus-article-mode)
+  (dolist (mode '(himalaya-read-message-mode
+                  himalaya-read-message-raw-mode))
+    (add-to-list 'dogears-ignore-modes mode))
 
   (defadvice! +dogears--keep-record-style-only-a (fn &rest args)
     :around #'dogears--place
