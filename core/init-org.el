@@ -196,13 +196,6 @@
   )
 
 
-(use-package org-modern
-  :straight t
-  :require-incrementally t
-  :after org
-  :hook ((org-mode . org-modern-mode)
-         (org-agenda-finalize . org-modern-agenda)))
-
 ;; [ox]
 (use-package ox
   :config
