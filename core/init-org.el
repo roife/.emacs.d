@@ -125,6 +125,7 @@
 
   ;; Keep drawer and block delimiter faces compact after theme loading.
   (dolist (face '(org-drawer org-meta-line org-block-begin-line org-block-end-line))
+    (set-face-attribute face nil :inherit 'font-lock-comment-face)
     (set-face-attribute face nil :height 0.85))
 
   ;; Cycle the visible parent heading when point is in or just past folded text.
