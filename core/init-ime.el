@@ -107,32 +107,49 @@
   (add-to-list 'sis-context-detectors #'+sis-context-switching-other)
 
   ;; Inline-mode
-  (defvar-local +sis-inline-english-last-space-pos nil
-    "The last space position in inline mode.")
-
-  (add-hook! sis-inline-english-deactivated-hook
-    (defun +sis-line-set-last-space-pos ()
-      (when (eq (char-before) ?\s)
-        (setq +sis-inline-english-last-space-pos (point)))))
-
-  (add-hook! sis-inline-mode-hook
-    (defun +sis-inline-add-post-self-insert-hook ()
-      (add-hook! post-self-insert-hook :local
-        (defun +sis-inline-remove-redundant-space ()
-          (when (and (eq +sis-inline-english-last-space-pos (1- (point)))
-                     (> (point) (1+ (point-min)))
-                     (eq (char-before (1- (point))) ?\s)
-                     (memq (char-before) +sis-chinese-punc-chars))
-            (save-excursion
-              (backward-char 2)
-              (delete-char 1)
-              (setq-local +sis-inline-english-last-space-pos nil)))))))
-
-  ;; Chinese punc adjustment for inline mode
   (defconst +sis-chinese-puncs "，。？！；：（【「“")
-
   (defconst +sis-chinese-punc-chars (string-to-list +sis-chinese-puncs))
 
+  (defvar-local +sis-inline-pending-space-pos nil
+    "Position after the space to remove before the next Chinese punctuation.")
+
+  (defun +sis-inline-clear-space ()
+    (setq-local +sis-inline-pending-space-pos nil)
+    (add-hook! pre-command-hook :local :remove #'+sis-inline-check-next-command)
+    (add-hook! post-self-insert-hook :local :remove #'+sis-inline-remove-redundant-space))
+
+  (defadvice! +sis-inline-record-space (fn &rest args)
+    :around #'sis--inline-deactivate
+    (let ((english-tail-p (and (eq sis--inline-lang 'english)
+                               (overlayp sis--inline-overlay)
+                               (= (point) (overlay-end sis--inline-overlay)))))
+      (prog1 (apply fn args)
+        (+sis-inline-clear-space)
+        (when (and sis-inline-mode english-tail-p
+                   (eq this-command 'self-insert-command)
+                   (eq (char-before) ?\s))
+          (setq-local +sis-inline-pending-space-pos (point))
+          (add-hook! pre-command-hook :local #'+sis-inline-check-next-command)
+          (add-hook! post-self-insert-hook :local #'+sis-inline-remove-redundant-space)))))
+
+  (defun +sis-inline-check-next-command ()
+    (unless (and sis-inline-mode
+                 (eq this-command 'self-insert-command)
+                 (eql (point) +sis-inline-pending-space-pos))
+      (+sis-inline-clear-space)))
+
+  (add-hook! sis-inline-mode-hook
+    (defun +sis-inline-remove-redundant-space ()
+      (when-let ((pos +sis-inline-pending-space-pos))
+        ;; A composing input method may not have inserted anything yet.
+        (unless (= (point) pos)
+          (+sis-inline-clear-space)
+          (when (and (> (point) pos)
+                     (eq (char-before pos) ?\s)
+                     (memq (char-after pos) +sis-chinese-punc-chars))
+            (delete-region (1- pos) pos))))))
+
+  ;; Chinese punc adjustment for inline mode
   (defun +sis-remove-head-space-after-cc-punc (_)
     (when (or (memq (char-before) +sis-chinese-punc-chars)
               (bolp))
