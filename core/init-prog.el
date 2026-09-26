@@ -458,6 +458,14 @@ separate argument, although the command accepts only one."
   (make-directory rust-playground-basedir t))
 
 
+(use-package jupyter-notebook
+  :straight (:type git :host github :repo "roife/jupyter.el")
+  :mode ("\\.ipynb\\'" . jupyter-notebook-mode)
+  :commands jupyter-notebook-new
+  :custom
+  (jupyter-notebook-formula-scale 2.0))
+
+
 (use-package verilog-mode
   :straight (:type built-in)
   :config
