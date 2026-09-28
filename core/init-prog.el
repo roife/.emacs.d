@@ -498,6 +498,12 @@ separate argument, although the command accepts only one."
   :straight t)
 
 
+;; [nix]
+(use-package nix-mode
+  :straight t
+  :mode "\\.nix\\'")
+
+
 ;; [graphviz-dot]
 (use-package graphviz-dot-mode
   :straight t
