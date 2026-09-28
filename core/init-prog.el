@@ -230,8 +230,7 @@ Diagnostics for all files are published separately for project listings."
                                             :diagnostics (:enable :json-false)))
                   (:typescript . (:preferences (:importModuleSpecifierPreference "non-relative")))
                   (:java . (:configuration
-                            (:runtimes [(:name "JavaSE-21" :path ,(getenv "JAVA21_HOME") :default t)
-                                        (:name "JavaSE-26" :path ,(getenv "JAVA26_HOME"))])
+                            (:runtimes [(:name "JavaSE-21" :path ,(getenv "JAVA21_HOME") :default t)])
                             :import (:gradle (:enabled t
                                                        :wrapper (:enabled t)))
                             :autobuild (:enabled :json-false)
