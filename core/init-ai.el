@@ -165,6 +165,34 @@ Use this format:
       (expand-file-name
        (file-name-concat project-key ".agent-shell" subdir)
        (locate-user-emacs-file "var/agent-shell/"))))
+
+  (cl-defun +agent-shell-resume-codex-fork
+      (original &rest args &key state client request buffer on-success on-failure
+                &allow-other-keys)
+    "Resume Codex forks before completing their initialization.
+This restores the event subscription without replaying history."
+    (when (and (equal (map-elt request :method) "session/fork")
+               (eq (map-nested-elt state '(:agent-config :identifier)) 'codex)
+               (map-elt state :supports-session-resume))
+      (setf (plist-get args :on-success)
+            (lambda (fork-response)
+              (let ((id (map-elt fork-response 'sessionId))
+                    (params (map-elt request :params)))
+                (unless (and (stringp id) (not (string-empty-p id))
+                             (not (equal id (map-elt params 'sessionId))))
+                  (error "Invalid fork session ID"))
+                (agent-shell--send-request
+                 :state state :client client :buffer (or buffer (map-elt state :buffer))
+                 :request (acp-make-session-resume-request
+                           :session-id id :cwd (map-elt params 'cwd)
+                           :mcp-servers (map-elt params 'mcpServers)
+                           :meta (map-elt params '_meta))
+                 :on-success (lambda (resume-response)
+                               (funcall on-success
+                                        (map-merge 'alist fork-response resume-response
+                                                   `((sessionId . ,id)))))
+                 :on-failure on-failure)))))
+    (apply original args))
   :init
   (setq agent-shell-agent-configs '(agent-shell-openai-make-codex-config)
         agent-shell-preferred-agent-config 'codex
@@ -181,7 +209,11 @@ Use this format:
         agent-shell-show-context-usage-indicator 'detailed
         agent-shell-file-display-action '((display-buffer-reuse-window display-buffer-pop-up-window)))
   :config
-  (advice-add #'agent-shell--update-bootstrapping-fragment :override #'ignore))
+  (advice-add #'agent-shell--update-bootstrapping-fragment :override #'ignore)
+  ;; Run outside agent-shell-btw's request advice: it records the fork ID
+  ;; before resume, allowing its normal close hook to clean up after failures.
+  (advice-add #'agent-shell--send-request :around
+              #'+agent-shell-resume-codex-fork '((depth . -50))))
 
 (use-package agent-shell-fork-tree
   :straight (:type git :host github :repo "roife/agent-shell-fork-tree")
