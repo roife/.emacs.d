@@ -10,8 +10,11 @@
                   path))))))
 
 (when (eq system-type 'darwin)
-  (+liberime-prepend-env-path "CPATH" "/opt/homebrew/include")
-  (+liberime-prepend-env-path "LIBRARY_PATH" "/opt/homebrew/lib"))
+  (let ((profile (expand-file-name "~/.nix-profile")))
+    (+liberime-prepend-env-path "CPATH" (expand-file-name "include" profile))
+    (+liberime-prepend-env-path "LIBRARY_PATH" (expand-file-name "lib" profile))
+    (+liberime-prepend-env-path "PKG_CONFIG_PATH"
+                                (expand-file-name "lib/pkgconfig" profile))))
 
 (use-package liberime
   :straight (liberime :type git :host github :repo "emacs-rime/liberime")
