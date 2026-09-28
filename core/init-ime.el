@@ -9,21 +9,21 @@
                     (concat path path-separator value)
                   path))))))
 
-(when (eq system-type 'darwin)
-  (let ((profile (expand-file-name "~/.nix-profile")))
-    (+liberime-prepend-env-path "CPATH" (expand-file-name "include" profile))
-    (+liberime-prepend-env-path "LIBRARY_PATH" (expand-file-name "lib" profile))
-    (+liberime-prepend-env-path "PKG_CONFIG_PATH"
-                                (expand-file-name "lib/pkgconfig" profile))))
+(let ((profile (expand-file-name "~/.nix-profile")))
+  (+liberime-prepend-env-path "CPATH" (expand-file-name "include" profile))
+  (+liberime-prepend-env-path "LIBRARY_PATH" (expand-file-name "lib" profile))
+  (+liberime-prepend-env-path "PKG_CONFIG_PATH"
+                              (expand-file-name "lib/pkgconfig" profile)))
 
 (use-package liberime
   :straight (liberime :type git :host github :repo "emacs-rime/liberime")
   :require-incrementally (t)
   :init
+  (require 'xdg)
   (setq liberime-shared-data-dir (if (eq system-type 'darwin)
-                                     "~/Library/Rime/"
-                                   "~/.local/share/fcitx5/rime")
-        liberime-user-data-dir (no-littering-expand-var-file-name "rime/")))
+                                     (expand-file-name "~/Library/Rime/")
+                                   (expand-file-name "rime/" (xdg-data-home)))
+        liberime-user-data-dir liberime-shared-data-dir))
 
 (use-package liberime-regexp
   :straight (:host github :repo "roife/liberime-regexp")

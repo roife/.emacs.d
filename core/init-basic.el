@@ -372,7 +372,7 @@
 ;; [environment variables]
 (use-package exec-path-from-shell
   :straight t
-  :unless (or noninteractive (daemonp) (not (display-graphic-p)))
+  :unless noninteractive
   :init
   (setq exec-path-from-shell-arguments '("-l")
         exec-path-from-shell-variables '("PATH" "HOMEBREW"
