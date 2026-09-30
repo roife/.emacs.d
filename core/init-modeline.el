@@ -158,7 +158,8 @@
         tab-bar-tab-name-truncated-max 20
         tab-bar-auto-width nil
         tab-bar-close-button-show nil
-        tab-bar-tab-hints t)
+        tab-bar-tab-hints t
+        tab-bar-show 1)
 
   (customize-set-variable 'tab-bar-select-tab-modifiers '(meta))
 
