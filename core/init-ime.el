@@ -16,7 +16,8 @@
                               (expand-file-name "lib/pkgconfig" profile)))
 
 (use-package liberime
-  :straight (liberime :type git :host github :repo "emacs-rime/liberime")
+  :straight (liberime :type git :host github :repo "emacs-rime/liberime"
+                      :pre-build ("make"))
   :require-incrementally (t)
   :init
   (require 'xdg)

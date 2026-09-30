@@ -143,16 +143,31 @@
 
 (defvar +light-theme 'doom-gruvbox-light)
 (defvar +dark-theme 'doom-gruvbox)
+(defvar +system-appearance nil
+  "Last reported system appearance, either `light' or `dark'.")
+
+(defun +system-appearance-changed (appearance)
+  "Remember APPEARANCE and update the theme using a graphical frame."
+  (setq +system-appearance appearance)
+  ;; Notifications may arrive while a terminal frame is selected.
+  (when-let* ((frame (seq-find #'display-graphic-p (frame-list))))
+    (with-selected-frame frame
+      (+load-theme))))
+
 (add-hook! (tty-setup-hook server-after-make-frame-hook) :unless-daemonp-call-immediately
   (defun +load-theme (&optional theme)
-    (setq theme (if (if (display-graphic-p)
-                        (cond ((eq system-type 'darwin) (eq ns-system-appearance 'dark))
-                              (t t))
-                      (eq (or (terminal-parameter nil 'background-mode)
-                              (frame-parameter nil 'background-mode))
-                          'dark))
-                    +dark-theme
-                  +light-theme))
+    "Load THEME, or choose a theme matching the system or terminal."
+    (setq theme
+          (or theme
+              (if (eq (if (display-graphic-p)
+                          (or +system-appearance
+                              (and (boundp 'ns-system-appearance) ns-system-appearance)
+                              'dark)
+                        (or (terminal-parameter nil 'background-mode)
+                            (frame-parameter nil 'background-mode)))
+                      'dark)
+                  +dark-theme
+                +light-theme)))
     (unless (member theme custom-enabled-themes)
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme theme t))))

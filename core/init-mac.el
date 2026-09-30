@@ -1,8 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 
 (add-hook! ns-system-appearance-change-functions
-  (defun +mac-auto-change-theme-with-system (&rest _)
-    (+load-theme)))
+  (defun +mac-auto-change-theme-with-system (appearance)
+    (+system-appearance-changed appearance)))
 
 ;; Prevent accidental touch
 (unbind-key "C-<wheel-down>")
