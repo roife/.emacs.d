@@ -141,8 +141,8 @@
 
   (doom-themes-org-config))
 
-(defvar +light-theme 'doom-gruvbox-light)
-(defvar +dark-theme 'doom-gruvbox)
+(defvar +light-theme 'doom-oksolar-light)
+(defvar +dark-theme 'doom-oksolar-dark)
 (defvar +system-appearance nil
   "Last reported system appearance, either `light' or `dark'.")
 
