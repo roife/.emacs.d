@@ -194,7 +194,8 @@ This restores the event subscription without replaying history."
                  :on-failure on-failure)))))
     (apply original args))
   :init
-  (setq agent-shell-agent-configs '(agent-shell-openai-make-codex-config)
+  (setq agent-shell-agent-configs '(agent-shell-openai-make-codex-config
+                                    agent-shell-codebuddy-make-agent-config)
         agent-shell-preferred-agent-config 'codex
         agent-shell-context-sources nil
         agent-shell-mcp-servers nil
