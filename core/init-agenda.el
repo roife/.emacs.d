@@ -117,6 +117,13 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
          :map org-agenda-mode-map
          ([remap org-agenda-goto-calendar] . +agenda-calendar-blocks))
   :config
+  ;; Defer indentation until an agenda entry is displayed.
+  (add-hook! org-agenda-after-show-hook
+    (when (and (derived-mode-p 'org-mode)
+               org-startup-indented
+               (not (bound-and-true-p org-indent-mode)))
+      (org-indent-mode 1)))
+
   (cl-flet ((files (&rest names)
               (mapcar (lambda (name)
                         (expand-file-name (concat "agenda/" name ".org") org-directory))
