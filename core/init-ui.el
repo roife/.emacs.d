@@ -141,8 +141,8 @@
 
   (doom-themes-org-config))
 
-(defvar +light-theme 'doom-oksolar-light)
-(defvar +dark-theme 'doom-oksolar-dark)
+(defvar +light-theme 'doom-solarized-light)
+(defvar +dark-theme 'doom-solarized-dark)
 (defvar +system-appearance nil
   "Last reported system appearance, either `light' or `dark'.")
 
