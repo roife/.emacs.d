@@ -1,5 +1,14 @@
 ;;; -*- lexical-binding: t; -*-
 
+;; `y-or-n-p' and `read-char-choice' use `read-key' in this config.
+;; Read their literal keys without changing the buffer's input-method state.
+(defadvice! +ime-read-key-without-input-method (fn &rest args)
+  :around #'read-key
+  (let ((input-method-function nil))
+    ;; Restore the buffer before unwinding the buffer-local binding.
+    (save-current-buffer
+      (apply fn args))))
+
 (defun +liberime-prepend-env-path (name path)
   (when (file-directory-p path)
     (let ((value (getenv name)))
