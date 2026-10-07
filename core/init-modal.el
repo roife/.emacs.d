@@ -83,8 +83,7 @@ included; for the final argument the leading separator is included."
   (defun +meow-enable-global-mode-once ()
     "Enable Meow after a usable frame exists."
     (+meow-bind-keys)
-    (meow-global-mode 1)
-    (meow-esc-mode -1))
+    (meow-global-mode 1))
 
   (defun +meow-bind-keys ()
     (add-to-list 'meow-char-thing-table '(?a . arg))
