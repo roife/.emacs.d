@@ -9,65 +9,6 @@
     (save-current-buffer
       (apply fn args))))
 
-(defun +liberime-prepend-env-path (name path)
-  (when (file-directory-p path)
-    (let ((value (getenv name)))
-      (unless (member path (and value (split-string value path-separator t)))
-        (setenv name
-                (if (and value (not (string= value "")))
-                    (concat path path-separator value)
-                  path))))))
-
-(let ((profile (expand-file-name "~/.nix-profile")))
-  (+liberime-prepend-env-path "CPATH" (expand-file-name "include" profile))
-  (+liberime-prepend-env-path "LIBRARY_PATH" (expand-file-name "lib" profile))
-  (+liberime-prepend-env-path "PKG_CONFIG_PATH"
-                              (expand-file-name "lib/pkgconfig" profile)))
-
-(use-package liberime
-  :straight (liberime :type git :host github :repo "emacs-rime/liberime"
-                      :pre-build ("make"))
-  :require-incrementally (t)
-  :init
-  (require 'xdg)
-  (setq liberime-shared-data-dir (if (eq system-type 'darwin)
-                                     (expand-file-name "~/Library/Rime/")
-                                   (expand-file-name "rime/" (xdg-data-home)))
-        liberime-user-data-dir liberime-shared-data-dir))
-
-(use-package liberime-regexp
-  :straight (:host github :repo "roife/liberime-regexp")
-  :require-incrementally (liberime t)
-  :hook ((liberime-after-start . liberime-regexp-enable)
-         (liberime-after-start . liberime-regexp-segment-mode))
-  :config
-  (setq liberime-regexp-candidate-limit 40))
-
-(use-package rimel
-  :straight (rimel :type git :host github :repo "emacs-rime/rimel")
-  :require-incrementally (liberime liberime-regexp t)
-  :custom-face
-  (rimel-candidate-label-face ((t (:inherit font-lock-comment-face :height 0.85))))
-  (rimel-page-indicator-face ((t (:inherit font-lock-comment-face :height 0.85))))
-  (rimel-highlight-face ((t (:inherit hl-line))))
-  :init
-  (setq default-input-method "rimel"
-        rimel-show-candidate 'posframe
-        rimel-inline-preedit t
-        rimel-candidate-show-preedit nil
-        rimel-posframe-style 'horizontal
-        rimel-posframe-properties nil
-        rimel-candidate-label-format "%d "
-        rimel-page-indicator-format "%d%s"
-        rimel-disable-predicates '(rimel-predicate-prog-in-code-p
-                                   rimel-predicate-after-alphabet-char-p
-                                   rimel-predicate-current-uppercase-letter-p
-                                   rimel-predicate-org-in-src-block-p
-                                   rimel-predicate-org-latex-mode-p
-                                   rimel-predicate-tex-math-or-command-p)))
-
-(register-input-method "rimel" "Chinese" #'rimel-activate "中" "Rimel")
-
 ;; [sis] automatically switch input source
 (use-package sis
   :straight t
@@ -176,3 +117,62 @@
                  (memq (char-after) +sis-chinese-punc-chars))
         (backward-delete-char 1))))
   (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc))
+
+(defun +liberime-prepend-env-path (name path)
+  (when (file-directory-p path)
+    (let ((value (getenv name)))
+      (unless (member path (and value (split-string value path-separator t)))
+        (setenv name
+                (if (and value (not (string= value "")))
+                    (concat path path-separator value)
+                  path))))))
+
+(let ((profile (expand-file-name "~/.nix-profile")))
+  (+liberime-prepend-env-path "CPATH" (expand-file-name "include" profile))
+  (+liberime-prepend-env-path "LIBRARY_PATH" (expand-file-name "lib" profile))
+  (+liberime-prepend-env-path "PKG_CONFIG_PATH"
+                              (expand-file-name "lib/pkgconfig" profile)))
+
+(use-package liberime
+  :straight (liberime :type git :host github :repo "emacs-rime/liberime"
+                      :pre-build ("make"))
+  :require-incrementally (t)
+  :init
+  (require 'xdg)
+  (setq liberime-shared-data-dir (if (eq system-type 'darwin)
+                                     (expand-file-name "~/Library/Rime/")
+                                   (expand-file-name "rime/" (xdg-data-home)))
+        liberime-user-data-dir liberime-shared-data-dir))
+
+(use-package liberime-regexp
+  :straight (:host github :repo "roife/liberime-regexp")
+  :require-incrementally (liberime t)
+  :hook ((liberime-after-start . liberime-regexp-enable)
+         (liberime-after-start . liberime-regexp-segment-mode))
+  :config
+  (setq liberime-regexp-candidate-limit 40))
+
+(use-package rimel
+  :straight (rimel :type git :host github :repo "emacs-rime/rimel")
+  :require-incrementally (liberime liberime-regexp t)
+  :custom-face
+  (rimel-candidate-label-face ((t (:inherit font-lock-comment-face :height 0.85))))
+  (rimel-page-indicator-face ((t (:inherit font-lock-comment-face :height 0.85))))
+  (rimel-highlight-face ((t (:inherit hl-line))))
+  :init
+  (setq default-input-method "rimel"
+        rimel-show-candidate 'posframe
+        rimel-inline-preedit t
+        rimel-candidate-show-preedit nil
+        rimel-posframe-style 'horizontal
+        rimel-posframe-properties nil
+        rimel-candidate-label-format "%d "
+        rimel-page-indicator-format "%d%s"
+        rimel-disable-predicates '(rimel-predicate-prog-in-code-p
+                                   rimel-predicate-after-alphabet-char-p
+                                   rimel-predicate-current-uppercase-letter-p
+                                   rimel-predicate-org-in-src-block-p
+                                   rimel-predicate-org-latex-mode-p
+                                   rimel-predicate-tex-math-or-command-p)))
+
+(register-input-method "rimel" "Chinese" #'rimel-activate "中" "Rimel")
