@@ -46,8 +46,7 @@ If the popup is focused, kill it.
 If no project is found, create a temporary Eshell instance in the current directory."
     (interactive "P")
     (require 'eshell)
-    (require 'project)  ;; Ensure we load project.el
-    (let* ((project (project-current)) ;; Get the current project
+    (let* ((project (project-current))
            (dir-name (directory-file-name default-directory))
            (root-name (if project
                           (file-name-nondirectory (directory-file-name (project-root project))) ;; Use project name
@@ -94,7 +93,6 @@ If no project is found, create a temporary Eshell instance in the current direct
                      '(("l" . "ls -lah $*")
                        ("ll" . "ls -laG $*")
                        ("rg" . "rg --color=always $*")
-                       ("git" . "git $*")
                        ("gst" . "git status $*")
                        ("ga" . "git add $*")
                        ("gc" . "git commit $*")
