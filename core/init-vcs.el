@@ -70,8 +70,7 @@
            (diff-hl-dired-update))
           (t t)))
   (add-function :after after-focus-change-function
-                #'+diff-hl-update-after-focus-change)
-  )
+                #'+diff-hl-update-after-focus-change))
 
 
 ;; [magit] Version control interface
@@ -121,8 +120,7 @@
     (magit-difftastic-mode
      (if magit-difftastic-mode -1 1)))
   (transient-append-suffix 'magit-diff '(-1 -1)
-    [("D" "Difftastic Diff" +toggle-magit-difftastic)])
-  )
+    [("D" "Difftastic Diff" +toggle-magit-difftastic)]))
 
 
 (use-package magit-difftastic
@@ -132,8 +130,7 @@
   :config
   (setq magit-difftastic-display "inline"
         magit-difftastic-line-numbers nil
-        magit-difftastic-syntax-highlight nil)
-  )
+        magit-difftastic-syntax-highlight nil))
 
 
 ;; Use the GitHub CLI credential directly.  Keep the token in memory only
@@ -176,8 +173,7 @@
         '(("#" 5 forge-topic-list-sort-by-number (:right-align t) number nil)
           ("Title" 60 t nil title  nil)
           ("State" 6 t nil state nil)
-          ("Updated" 10 t nil updated nil)))
-  )
+          ("Updated" 10 t nil updated nil))))
 
 
 ;; Show TODOs in magit
@@ -240,8 +236,7 @@
 (use-package browse-at-remote
   :straight t
   :bind (:map vc-prefix-map
-              ("B" . browse-at-remote))
-  )
+              ("B" . browse-at-remote)))
 
 
 ;; [git-modes] Git configuration major modes

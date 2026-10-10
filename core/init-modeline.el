@@ -126,8 +126,7 @@
                    face +mode-line-host-name-active-face)
       "  "
       (:eval (breadcrumb-imenu-crumbs))
-      (:eval +mode-line-encoding))
-    ))
+      (:eval +mode-line-encoding))))
 
 (setq-default mode-line-format '((:eval (+mode-line-normal))))
 (setq-default header-line-format nil)
@@ -143,8 +142,7 @@
   :config
   (setq breadcrumb-imenu-crumb-separator " ⋅ "
         breadcrumb-project-max-length 0.55
-        breadcrumb-idle-time 5)
-  )
+        breadcrumb-idle-time 5))
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
@@ -250,5 +248,4 @@
   (add-hook! (server-after-make-frame-hook window-setup-hook) :call-immediately
     (defun +refresh-tab-bar (&rest _)
       (tab-bar--update-tab-bar-lines)
-      (force-mode-line-update)))
-  )
+      (force-mode-line-update))))

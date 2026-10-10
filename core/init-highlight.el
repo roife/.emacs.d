@@ -18,8 +18,7 @@
         show-paren-when-point-in-periphery t
         show-paren-context-when-offscreen t
         blink-matching-paren-highlight-offscreen t
-        show-paren-delay 0.2)
-  )
+        show-paren-delay 0.2))
 
 
 ;; [whitespace] Show visualize TAB, (HARD) SPC, newline
@@ -53,8 +52,7 @@
   :config
   (setq highlight-parentheses-colors '("green3" "firebrick1" "orange1")
         highlight-parentheses-attributes '((:underline t) (:underline t) (:underline t))
-        highlight-parentheses-delay 0.25)
-  )
+        highlight-parentheses-delay 0.25))
 
 
 ;; [rainbow-mode] Colorize color names in buffers
@@ -90,8 +88,7 @@
   (add-hook! enable-theme-functions :unless-daemonp-call-immediately
     (defun +hl-update-keyword-faces (&rest _)
       (+hl-todo-add-keywords '("BUG" "DEFECT" "ISSUE") (face-foreground 'error))
-      (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning))))
-  )
+      (+hl-todo-add-keywords '("WORKAROUND" "HACK" "TRICK") (face-foreground 'warning)))))
 
 
 ;; [goggles] Highlight modified region
@@ -99,8 +96,7 @@
   :straight t
   :hook ((prog-mode text-mode) . goggles-mode)
   :config
-  (setq-default goggles-pulse nil)
-  )
+  (setq-default goggles-pulse nil))
 
 
 ;; [pulse] Highlight line at cursor after switching window
@@ -152,8 +148,7 @@
     (let ((window (selected-window)))
       (prog1 (apply fn args)
         (when (overlayp pulse-momentary-overlay)
-          (overlay-put pulse-momentary-overlay 'window window)))))
-  )
+          (overlay-put pulse-momentary-overlay 'window window))))))
 
 
 ;; [symbol-overlay] Highlight symbols
@@ -174,8 +169,7 @@
          ("C" . symbol-overlay-remove-all))
   :hook (((prog-mode yaml-mode) . symbol-overlay-mode))
   :config
-  (setq symbol-overlay-temp-highlight-on-region t)
-  )
+  (setq symbol-overlay-temp-highlight-on-region t))
 
 
 ;; [highlight]

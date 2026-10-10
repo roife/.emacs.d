@@ -1,13 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
-;; [org-fragtog] Preview and edit latex in md/org elegantly
-;; (use-package org-fragtog
-;;   :straight t
-;;   :hook ((org-mode . org-fragtog-mode)))
-
 ;; [org-persist]
 (use-package org-persist
-  :straight nil
   :init
   (setq org-persist-directory (no-littering-expand-var-file-name "org/persist/")))
 
@@ -160,7 +154,6 @@
 
 ;; `org-element' and its `org-persist' dependency need Org loaded first.
 (use-package org-element
-  :straight nil
   :require-incrementally (org t))
 
 

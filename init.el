@@ -6,37 +6,10 @@
                      (float-time (time-subtract nil before-init-time))
                      (float-time (time-subtract after-init-time before-init-time)))))
 
-(defvar +init-files (list
-                     'init-util
-                     'init-straight
-                     'init-basic
-                     'init-ui
-                     'init-xterm
-                     (when (eq system-type 'gnu/linux) 'init-linux)
-                     (when (eq system-type 'darwin) 'init-mac)
-                     'init-completion
-                     'init-tools
-                     'init-highlight
-                     'init-edit
-                     'init-window
-                     'init-dired
-                     'init-shell
-                     'init-prog
-                     'init-writing
-                     'init-org
-                     'init-agenda
-                     'init-vcs
-                     'init-ibuffer
-                     'init-ime
-                     'init-modal
-                     'init-modeline
-                     'init-ai
-                     'init-social
-                     'init-media
-                     'init-test
-                     ))
-
-(let ((init-directory (expand-file-name "core/" user-emacs-directory)))
-  (dolist (file +init-files)
-    (when file
-      (load-file (concat init-directory (symbol-name file) ".el")))))
+(dolist (file `(util straight basic ui xterm
+                     ,(pcase system-type ('gnu/linux 'linux) ('darwin 'mac))
+                     completion tools highlight edit window dired shell prog
+                     writing org agenda vcs ibuffer ime modal modeline
+                     ai social media test))
+  (load (expand-file-name (format "core/init-%s.el" file) user-emacs-directory)
+        nil 'nomessage 'nosuffix))

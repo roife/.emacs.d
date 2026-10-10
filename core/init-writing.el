@@ -1,6 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-
 ;; [visual-fill-column] Center text in markdown and org
 (use-package visual-fill-column
   :straight t

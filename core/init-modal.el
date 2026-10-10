@@ -1,7 +1,5 @@
 ;;; -*- lexical-binding: t; -*-
 
-(require 'subr-x)
-
 (defun +thing--arg-parent-bounds-near-point ()
   "Return surrounding list-like bounds around point or nearby whitespace."
   (or (+thing--arg-parent-bounds)
@@ -102,34 +100,19 @@ included; for the final argument the leading separator is included."
      '("l" . meow-right)
      '("<escape>" . ignore))
 
+    ;; Digits: SPC 0-9 for digit arguments, 0-9 to expand in normal state.
+    (dotimes (i 10)
+      (let ((key (number-to-string i)))
+        (meow-leader-define-key (cons key #'meow-digit-argument))
+        (meow-normal-define-key (cons key (intern (format "meow-expand-%d" i))))))
+
     ;; [leader]
     (meow-leader-define-key
-     ;; Use SPC (0-9) for digit arguments.
-     '("1" . meow-digit-argument)
-     '("2" . meow-digit-argument)
-     '("3" . meow-digit-argument)
-     '("4" . meow-digit-argument)
-     '("5" . meow-digit-argument)
-     '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument)
-     '("8" . meow-digit-argument)
-     '("9" . meow-digit-argument)
-     '("0" . meow-digit-argument)
      '("/" . meow-keypad-describe-key)
      '("?" . meow-cheatsheet))
 
     ;; [normal]
     (meow-normal-define-key
-     '("0" . meow-expand-0)
-     '("9" . meow-expand-9)
-     '("8" . meow-expand-8)
-     '("7" . meow-expand-7)
-     '("6" . meow-expand-6)
-     '("5" . meow-expand-5)
-     '("4" . meow-expand-4)
-     '("3" . meow-expand-3)
-     '("2" . meow-expand-2)
-     '("1" . meow-expand-1)
      '("-" . negative-argument)
      '(";" . meow-reverse)
      '("," . meow-inner-of-thing)
@@ -196,7 +179,6 @@ included; for the final argument the leading separator is included."
            (emms-ui-list-mode . motion)
            (emms-ui-now-playing-mode . motion)
            (View-mode . normal)
-           ;; (compilation-mode . normal)
            (blink-search-mode . insert)
            (rcirc-mode . normal)
            (comint-mode . normal)         ; IELM
@@ -210,8 +192,7 @@ included; for the final argument the leading separator is included."
            (help-mode . normal)
            (vundo-mode . motion)
            (calfw-calendar-mode . motion)))
-      (add-to-list 'meow-mode-state-list state))
-    ))
+      (add-to-list 'meow-mode-state-list state))))
 
 ;; These optional interfaces are not needed to make Meow usable.  Load each
 ;; from its own library only when its command is invoked.

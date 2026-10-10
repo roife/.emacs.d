@@ -18,8 +18,7 @@
    ;; symlink
    dired-hide-details-hide-symlink-targets nil
    ;; free disk
-   dired-free-space nil
-   )
+   dired-free-space nil)
 
   (when (eq system-type 'darwin)
     (if (executable-find "gls")
@@ -30,8 +29,7 @@
   (when (or (not (eq system-type 'darwin)) (executable-find "gls"))
     (setq ls-lisp-use-insert-directory-program t ; Using `insert-directory-program'
           ;; Show directory first
-          dired-listing-switches "-alh --group-directories-first"))
-  )
+          dired-listing-switches "-alh --group-directories-first")))
 
 ;; [dired-git-info] Show git info in dired
 (use-package dired-git-info
@@ -41,8 +39,7 @@
               ("G" . dired-git-info-mode))
   :config
   (setq dgi-commit-message-format "%h %cs %s"
-        dgi-auto-hide-details-p nil)
-  )
+        dgi-auto-hide-details-p nil))
 
 ;; [dired-aux] Extra Dired functionality
 (use-package dired-aux
@@ -63,8 +60,7 @@
         dired-omit-files "^\\..*\\'")
 
   ;; Disable the prompt about killing the Dired buffer for a deleted directory.
-  (setq dired-clean-confirm-killing-deleted-buffers nil)
-  )
+  (setq dired-clean-confirm-killing-deleted-buffers nil))
 
 
 ;; [fd-dired] Using `fd' with `find-dired'
@@ -94,8 +90,7 @@
 
   (use-package dired-narrow
     :bind (:map dired-mode-map
-                (";" . dired-narrow-fuzzy)))
-  )
+                (";" . dired-narrow-fuzzy))))
 
 
 ;; [ffx] `dired-collapse'-style folding for file-name completion.

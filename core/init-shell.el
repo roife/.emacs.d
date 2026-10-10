@@ -37,9 +37,7 @@
 
    ;; Completion like bash
    eshell-cmpl-ignore-case t
-   eshell-cmpl-cycle-completions nil
-   )
-
+   eshell-cmpl-cycle-completions nil)
 
   (defun +eshell-toggle (&optional arg)
     "Toggle a persistent Eshell popup window for the current project or directory.
@@ -196,8 +194,7 @@ If no project is found, create a temporary Eshell instance in the current direct
       (when (and (equal major-mode 'eshell-mode)
                  ;; avoid renaming buffer name like Eshell-popup: ...
                  (not (string-match-p "^Eshell-popup: " (buffer-name))))
-        (rename-buffer (concat "Esh: " (abbreviate-file-name default-directory)) t))))
-  )
+        (rename-buffer (concat "Esh: " (abbreviate-file-name default-directory)) t)))))
 
 
 ;; [esh-syntax-highlighting] Fish-like syntax highlighting
@@ -314,5 +311,4 @@ Like normal Emacs `C-k'.  Kill to end of line and put content in kill-ring."
 
 
 (use-package ghostel-eshell
-  :straight nil
   :hook (eshell-load . ghostel-eshell-visual-command-mode))

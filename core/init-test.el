@@ -9,8 +9,7 @@
           (message "Running cargo xtask install --server")
           (compile "cargo xtask install --server --mimalloc")
           (message "Running cargo xtask install --server done"))
-      (message "Not in rust-analyzer project")))
-  )
+      (message "Not in rust-analyzer project"))))
 ;; set C-c C-x C-i in rust-mode to run cargo xtask install --server
 (with-eval-after-load 'rust-mode
   (define-key rust-mode-map (kbd "C-c C-x C-i") 'cargo-xtask-install-server))

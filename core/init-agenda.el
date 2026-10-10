@@ -34,7 +34,6 @@
 
 ;; [org-refile]
 (use-package org-refile
-  :straight nil
   :hook (org-after-refile-insert . save-buffer)
   :init
   ;; Refile clarified inbox items into an action list or a project.
@@ -51,7 +50,6 @@
 
 ;; [org-capture]
 (use-package org-capture
-  :straight nil
   :require-incrementally (org-agenda t)
   :bind ("C-c o c" . org-capture)
   :config
@@ -111,7 +109,6 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 
 ;; [org-agenda]
 (use-package org-agenda
-  :straight nil
   :require-incrementally t
   :bind (("C-c o a" . org-agenda)
          :map org-agenda-mode-map
@@ -188,7 +185,6 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 
 ;; [calendar]
 (use-package calendar
-  :straight nil
   :bind (("C-c o C" . calendar)
          :map calendar-mode-map
          ("H" . calendar-cursor-holidays))
@@ -289,13 +285,11 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
 
 ;; [org-clock] Portable desktop notification backend.
 (use-package org-clock
-  :straight nil
   :commands (org-show-notification))
 
 
 ;; [appt] Convert today's timed Org entries into desktop notifications.
 (use-package appt
-  :straight nil
   :require-incrementally (org-agenda t)
   :preface
   (defvar +appt-refresh-timer nil

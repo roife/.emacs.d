@@ -16,7 +16,6 @@
 
 ;; [autorevert]
 (use-package autorevert
-  :straight nil
   :hook (find-file . +auto-revert-mode)
   :config
   (setq auto-revert-verbose t
@@ -169,8 +168,7 @@
         ediff-merge-split-window-function 'split-window-horizontally
         ediff-highlight-all-diffs t
         ;; turn off whitespace checking
-        ediff-diff-options "-w")
-  )
+        ediff-diff-options "-w"))
 
 
 ;; [elec-pair] Automatic parenthesis pairing
@@ -244,8 +242,7 @@
           (if (eq original-func 'delete-backward-char)
               (backward-delete-char-untabify 1)
             (call-interactively original-func)))
-      (puni-backward-delete-char)))
-  )
+      (puni-backward-delete-char))))
 
 ;; [dtdr-indent] Detect indentation size
 (use-package dtrt-indent

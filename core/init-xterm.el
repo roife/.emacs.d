@@ -31,7 +31,6 @@
 
 ;; [xterm]
 (use-package term/xterm
-  :straight nil
   :hook (tty-setup . xterm-mouse-mode)
   :init
   (setq xterm-extra-capabilities '(modifyOtherKeys reportBackground

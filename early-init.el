@@ -71,7 +71,7 @@
 ;; (push '(undecorated-round . t) default-frame-alist)
 (when (featurep 'ns)
   (push '(ns-transparent-titlebar . t) default-frame-alist))
-                                        ; Set these to nil so users don't have to toggle the modes twice to reactivate.
+;; Set these to nil so users don't have to toggle the modes twice to reactivate.
 (setq menu-bar-mode nil
       tool-bar-mode nil
       scroll-bar-mode nil

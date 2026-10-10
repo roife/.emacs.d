@@ -210,7 +210,6 @@
 
 
 (use-package telega-dired-dwim
-  :straight nil
   :after telega
   :demand t)
 

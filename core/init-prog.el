@@ -159,12 +159,10 @@ Diagnostics for all files are published separately for project listings."
       (let ((inhibit-read-only t))
         (ansi-color-apply-on-region compilation-filter-start (point)))))
 
-  (add-hook 'compilation-finish-functions #'+compilation-flymake-finish-h)
-  )
+  (add-hook 'compilation-finish-functions #'+compilation-flymake-finish-h))
 
 
-;; [comment]
-;; comment over empty lines
+;; [comment] comment over empty lines
 (setq comment-empty-lines t)
 
 
@@ -260,8 +258,7 @@ Diagnostics for all files are published separately for project listings."
             (eldoc-mode -1))
         (remove-hook 'flymake-diagnostic-functions #'eglot-flymake-backend t)
         (when flymake-mode
-          (flymake-start)))))
-  )
+          (flymake-start))))))
 
 
 (use-package eglot-tempel
@@ -314,8 +311,7 @@ Diagnostics for all files are published separately for project listings."
   (setq dumb-jump-prefer-searcher 'rg
         dumb-jump-selector 'completing-read
         dumb-jump-aggressive t
-        dumb-jump-default-project nil)
-  )
+        dumb-jump-default-project nil))
 
 
 ;; [citre] Ctags-infra
@@ -341,8 +337,7 @@ Diagnostics for all files are published separately for project listings."
 
   (with-eval-after-load 'cc-mode (require 'citre-lang-c))
   (with-eval-after-load 'dired (require 'citre-lang-fileref))
-  (with-eval-after-load 'verilog-mode (require 'citre-lang-verilog))
-  )
+  (with-eval-after-load 'verilog-mode (require 'citre-lang-verilog)))
 
 
 ;; [quickrun] Run commands quickly
@@ -410,16 +405,10 @@ separate argument, although the command accepts only one."
 
 (use-package csv-mode
   :straight t)
-
-
 (use-package rainbow-csv
   :straight (:host github :repo "emacs-vs/rainbow-csv"))
-
-
 (use-package rmsbolt
   :straight t)
-
-
 (use-package llvm-mode
   :straight (:host github :repo "nverno/llvm-mode" :files ("*.el")))
 
@@ -472,7 +461,7 @@ separate argument, although the command accepts only one."
         verilog-auto-delete-trailing-whitespace t
         verilog-auto-inst-param-value t
         verilog-auto-inst-vector nil
-        verilog-auto-lineup (quote all)
+        verilog-auto-lineup 'all
         verilog-auto-newline nil
         verilog-auto-save-policy nil
         verilog-auto-template-warn-unused t

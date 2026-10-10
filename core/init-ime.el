@@ -94,7 +94,7 @@
 
   (add-hook! sis-inline-mode-hook
     (defun +sis-inline-remove-redundant-space ()
-      (when-let ((pos +sis-inline-pending-space-pos))
+      (when-let* ((pos +sis-inline-pending-space-pos))
         ;; A composing input method may not have inserted anything yet.
         (unless (= (point) pos)
           (+sis-inline-clear-space)

@@ -1,22 +1,16 @@
 ;;; -*- lexical-binding: t -*-
 
-(add-hook! ns-system-appearance-change-functions
-  (defun +mac-auto-change-theme-with-system (appearance)
-    (+system-appearance-changed appearance)))
+(add-hook 'ns-system-appearance-change-functions #'+system-appearance-changed)
 
-;; Prevent accidental touch
-(unbind-key "C-<wheel-down>")
-(unbind-key "C-<wheel-up>")
-
-(global-set-key (kbd "s-a") #'mark-whole-buffer)
-(global-set-key (kbd "s-x") #'kill-region)
-(global-set-key (kbd "s-s") #'save-buffer)
-(global-set-key (kbd "s-v") #'yank)
-(global-set-key (kbd "s-c") #'copy-region-as-kill)
-(global-set-key (kbd "s-z") #'undo)
-(global-set-key (kbd "s-Z") #'undo-redo)
-(global-set-key (kbd "s-f") #'isearch-forward)
-(global-set-key (kbd "s-w") #'tab-close)
-(global-set-key (kbd "s-t") #'tab-new)
-(global-set-key (kbd "s-o") #'other-window)
-(global-set-key (kbd "s-,") nil)
+(unbind-key "s-,")
+(bind-keys ("s-a" . mark-whole-buffer)
+           ("s-x" . kill-region)
+           ("s-s" . save-buffer)
+           ("s-v" . yank)
+           ("s-c" . copy-region-as-kill)
+           ("s-z" . undo)
+           ("s-Z" . undo-redo)
+           ("s-f" . isearch-forward)
+           ("s-w" . tab-close)
+           ("s-t" . tab-new)
+           ("s-o" . other-window))

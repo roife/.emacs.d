@@ -19,7 +19,6 @@
 
 
 (use-package vertico-directory
-  :straight nil
   :after vertico
   :bind (:map vertico-map
               ("RET" . vertico-directory-enter)
@@ -30,14 +29,12 @@
 
 
 (use-package vertico-quick
-  :straight nil
   :after vertico
   :bind (:map vertico-map
               ("C-," . vertico-quick-jump)))
 
 
 (use-package vertico-buffer
-  :straight nil
   :after vertico
   :hook (vertico-mode . vertico-buffer-mode)
   :config
@@ -253,7 +250,6 @@
       (corfu-mode 1))))
 
 (use-package corfu-history
-  :straight nil
   :after corfu
   :config
   (corfu-history-mode 1)
@@ -261,14 +257,12 @@
     (cl-pushnew 'corfu-history savehist-additional-variables)))
 
 (use-package corfu-popupinfo
-  :straight nil
   :after corfu
   :config
   (corfu-popupinfo-mode 1)
   (setq corfu-popupinfo-delay '(1.0 . 1.0)))
 
 (use-package corfu-quick
-  :straight nil
   :after corfu
   :bind (:map corfu-map
               ("C-, ," . corfu-quick-complete)))

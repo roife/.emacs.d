@@ -16,30 +16,20 @@
   :custom-face
   (aw-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
   (aw-minibuffer-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 1.0))))
-  ;; (aw-mode-line-face ((t (:inherit mode-line-emphasis :bold t))))
   :hook ((window-configuration-change . aw-update)) ;; For modeline
-  ;; (add-hook 'after-make-frame-functions #'aw--after-make-frame t)
   :config
   (setq aw-scope 'global
         aw-background nil
         aw-ignore-current t)
 
   (defun +aw--select-window (number)
-    "Select the specified window."
-    (let* ((window-list (aw-window-list))
-           (target-window nil))
-      (cl-loop for win in window-list
-               when (and (window-live-p win)
-                         (eq number
-                             (string-to-number
-                              (window-parameter win 'ace-window-path))))
-               do (setq target-window win)
-               finally return target-window)
-
-      ;; Select the target window if found
-      (if target-window
-          (aw-switch-to-window target-window)
-        (message "No specified window: %d" number))))
+    "Select the window labeled NUMBER."
+    (if-let* ((win (seq-find (lambda (win)
+                               (equal (window-parameter win 'ace-window-path)
+                                      (number-to-string number)))
+                             (aw-window-list))))
+        (aw-switch-to-window win)
+      (message "No specified window: %d" number)))
 
   (dotimes (n 9)
     (bind-key (format "C-%d" (1+ n))
@@ -58,8 +48,7 @@
   (setq winner-boring-buffers
         '("*Completions*" "*Compile-Log*" "*inferior-lisp*" "*Fuzzy Completions*"
           "*Apropos*" "*Help*" "*cvs*" "*Buffer List*" "*Ibuffer*"
-          "*esh command on file*"))
-  )
+          "*esh command on file*")))
 
 
 ;; [popper] Enforce rules for popup windows like *Help*
@@ -186,8 +175,7 @@
                   (mapcar #'symbol-value +popper-unpacked-vars-no-select)
                 (popper-popup-p buffer))
         (select-window window))))
-  (setq popper-display-function #'+popper-smart-popup)
-  )
+  (setq popper-display-function #'+popper-smart-popup))
 
 
 ;; [zoom] Managing the window sizes automatically
