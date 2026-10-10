@@ -40,14 +40,13 @@
    ;; Use margins in terminal frames where fringes don't exist.
    diff-hl-fallback-to-margin t)
 
-  (defun +diff-hl--vc-face (type)
+  (defun +diff-hl--vc-face (type _pos)
     (pcase type
       ('insert 'diff-refine-added)
       ('delete 'diff-refine-removed)
       ('change 'diff-refine-changed)))
-
-  (setq diff-hl-fringe-face-function #'(lambda (type _pos) (+diff-hl--vc-face type))
-        diff-hl-fringe-reference-face-function #'(lambda (type _pos) (+diff-hl--vc-face type)))
+  (setq diff-hl-fringe-face-function #'+diff-hl--vc-face
+        diff-hl-fringe-reference-face-function #'+diff-hl--vc-face)
 
   ;; Integration with magit
   (with-eval-after-load 'magit
@@ -67,8 +66,7 @@
           ((bound-and-true-p diff-hl-dir-mode)
            (diff-hl-dir-update))
           ((bound-and-true-p diff-hl-dired-mode)
-           (diff-hl-dired-update))
-          (t t)))
+           (diff-hl-dired-update))))
   (add-function :after after-focus-change-function
                 #'+diff-hl-update-after-focus-change))
 

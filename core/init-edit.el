@@ -24,14 +24,6 @@
         ;; Only prompts for confirmation when buffer is unsaved.
         revert-without-query (list "."))
 
-  (defun +visible-buffers ()
-    "Return visible buffers across all frames."
-    (let (buffers)
-      (walk-windows (lambda (window)
-                      (push (window-buffer window) buffers))
-                    'no-minibuf t)
-      (delete-dups buffers)))
-
   (defun +auto-revert-buffer-h (&rest _)
     "Auto revert current buffer when it is stale."
     (unless (or (active-minibuffer-window)
@@ -54,7 +46,7 @@
 
   (defun +auto-revert-visible-buffers-h (&rest _)
     "Auto revert visible stale buffers."
-    (dolist (buffer (+visible-buffers))
+    (dolist (buffer (delete-dups (mapcar #'window-buffer (window-list-1 nil 'no-minibuf t))))
       (with-current-buffer buffer
         (+auto-revert-buffer-h))))
 
@@ -250,17 +242,16 @@
 (use-package dogears
   :straight t
   :hook (after-init . dogears-mode)
-  :bind (:map global-map
-              ("M-g d" . dogears-go)
-              ("M-g M-b" . dogears-back)
-              ("M-g M-f" . dogears-forward)
-              ("M-g M-d" . dogears-list)
-              ("M-g M-D" . dogears-sidebar))
+  :bind (("M-g d" . dogears-go)
+         ("M-g M-b" . dogears-back)
+         ("M-g M-f" . dogears-forward)
+         ("M-g M-d" . dogears-list)
+         ("M-g M-D" . dogears-sidebar))
   :config
   (setq dogears-idle 1
         dogears-limit 200
-        dogears-position-delta 20)
-  (setq dogears-functions '(find-file
+        dogears-position-delta 20
+        dogears-functions '(find-file
                             recenter-top-bottom
                             other-window switch-to-buffer
                             aw-select

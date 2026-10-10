@@ -17,29 +17,21 @@
 (blink-cursor-mode -1)
 
 
-;; [Fringes] Reduce the clutter in the fringes
+;; [Fringes] Reduce the clutter in the fringes, but indicate eob lines
 (setq indicate-buffer-boundaries nil
-      indicate-empty-lines nil)
+      indicate-empty-lines t)
 
 ;; Better fringe symbol
-(define-fringe-bitmap 'right-curly-arrow
-  [#b00110000
-   #b00110000
-   #b00000000
-   #b00110000
-   #b00110000
-   #b00000000
-   #b00110000
-   #b00110000])
-(define-fringe-bitmap 'left-curly-arrow
-  [#b00110000
-   #b00110000
-   #b00000000
-   #b00110000
-   #b00110000
-   #b00000000
-   #b00110000
-   #b00110000])
+(let ((dots [#b00110000
+             #b00110000
+             #b00000000
+             #b00110000
+             #b00110000
+             #b00000000
+             #b00110000
+             #b00110000]))
+  (define-fringe-bitmap 'right-curly-arrow dots)
+  (define-fringe-bitmap 'left-curly-arrow dots))
 (define-fringe-bitmap 'right-arrow
   [#b00000000
    #b00000000
@@ -67,10 +59,6 @@
 ;; Suppress GUI features for consistency
 (setq use-file-dialog nil
       use-dialog-box nil)
-
-
-;; Indicate eob lines
-(setq indicate-empty-lines t)
 
 
 ;; Disable menu/tool/scroll bars in daemon/client frames

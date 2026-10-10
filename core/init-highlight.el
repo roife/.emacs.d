@@ -100,10 +100,15 @@
   (pulse-highlight-face ((t (:inherit region :background unspecified :extend t))))
   :hook (((dumb-jump-after-jump imenu-after-jump) . +recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . +recenter-and-pulse-line))
-  :bind (("M-SPC" . +pulse-momentary-line-command))
+  :bind (("M-SPC" . +pulse-line))
   :init
   (setq pulse-delay 0.2
         pulse-iterations 1)
+
+  (defun +pulse-line ()
+    "Pulse the current line."
+    (interactive)
+    (pulse-momentary-highlight-one-line (point)))
 
   (defadvice! +pulse-momentary-line (&rest _)
     :after '(recenter-top-bottom
@@ -112,23 +117,13 @@
              windmove-do-window-select
              pager-page-up
              tab-bar-select-tab)
-    "Pulse the current line."
-    (pulse-momentary-highlight-one-line (point)))
-
-  (defun +pulse-momentary-line-command ()
-    "Pulse the current line interactively."
-    (interactive)
-    (+pulse-momentary-line))
-
-  (defun +pulse-momentary (&rest _)
-    "Pulse the region or the current line."
-    (xref-pulse-momentarily))
+    (+pulse-line))
 
   (defadvice! +recenter-and-pulse (&rest _)
     :after '(pop-to-mark-command pop-global-mark)
     "Recenter and pulse the region or the current line."
     (recenter)
-    (+pulse-momentary))
+    (xref-pulse-momentarily))
 
   (defadvice! +recenter-and-pulse-line (&rest _)
     :after '(symbol-overlay-basic-jump compile-goto-error)

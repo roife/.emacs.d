@@ -199,6 +199,7 @@ Diagnostics for all files are published separately for project listings."
               ("M-?" . xref-find-references))
   :config
   (setq eglot-events-buffer-config '(:size 0 :format full)
+        eglot-extend-to-xref t
         eglot-autoshutdown t
         eglot-documentation-renderer 'markdown-ts-view-mode
         eglot-code-action-indications nil)
@@ -274,7 +275,6 @@ Diagnostics for all files are published separately for project listings."
   (setq eldoc-echo-area-display-truncation-message t
         eldoc-echo-area-prefer-doc-buffer t
         eldoc-echo-area-use-multiline-p nil
-        eglot-extend-to-xref t
         eldoc-help-at-pt t))
 
 
@@ -347,14 +347,11 @@ Diagnostics for all files are published separately for project listings."
 ;; [dape] Debug Adapter Protocol client
 (use-package dape
   :straight t
-  :preface
-  (defun +dape-save-buffers-h ()
-    "Save file-visiting buffers before starting a debug session."
-    (save-some-buffers t t))
   :init
   (setq dape-buffer-window-arrangement 'right)
   :config
-  (add-hook! dape-start-hook #'+dape-save-buffers-h))
+  ;; Save file-visiting buffers before starting a debug session.
+  (add-hook! dape-start-hook (save-some-buffers t t)))
 
 
 ;; [flymake] On-the-fly syntax checker
@@ -406,6 +403,12 @@ separate argument, although the command accepts only one."
   :straight t)
 (use-package llvm-mode
   :straight (:host github :repo "nverno/llvm-mode" :files ("*.el")))
+(use-package fish-mode
+  :straight t)
+(use-package yaml-mode
+  :straight t)
+(use-package toml-mode
+  :straight t)
 
 
 (use-package js
@@ -427,10 +430,6 @@ separate argument, although the command accepts only one."
   (with-eval-after-load 'dtrt-indent
     (setf (alist-get 'rust-mode dtrt-indent-hook-mapping-list)
           '(c/c++/java rust-ts-indent-offset))))
-
-
-(use-package fish-mode
-  :straight t)
 
 
 (use-package rust-playground
@@ -471,16 +470,6 @@ separate argument, although the command accepts only one."
         verilog-tab-to-comment t))
 
 
-;; [yaml]
-(use-package yaml-mode
-  :straight t)
-
-
-;; [toml]
-(use-package toml-mode
-  :straight t)
-
-
 ;; [nix]
 (use-package nix-mode
   :straight t
@@ -497,21 +486,21 @@ separate argument, although the command accepts only one."
 ;; Major mode for editing web templates
 (use-package web-mode
   :straight t
-  :mode "\\.[px]?html?\\'"
-  :mode "\\.\\(?:tpl\\|blade\\)\\(?:\\.php\\)?\\'"
-  :mode "\\.erb\\'"
-  :mode "\\.[lh]?eex\\'"
-  :mode "\\.jsp\\'"
-  :mode "\\.as[cp]x\\'"
-  :mode "\\.ejs\\'"
-  :mode "\\.hbs\\'"
-  :mode "\\.mustache\\'"
-  :mode "\\.svelte\\'"
-  :mode "\\.twig\\'"
-  :mode "\\.jinja2?\\'"
-  :mode "\\.eco\\'"
-  :mode "wp-content/themes/.+/.+\\.php\\'"
-  :mode "templates/.+\\.php\\'"
+  :mode ("\\.[px]?html?\\'"
+         "\\.\\(?:tpl\\|blade\\)\\(?:\\.php\\)?\\'"
+         "\\.erb\\'"
+         "\\.[lh]?eex\\'"
+         "\\.jsp\\'"
+         "\\.as[cp]x\\'"
+         "\\.ejs\\'"
+         "\\.hbs\\'"
+         "\\.mustache\\'"
+         "\\.svelte\\'"
+         "\\.twig\\'"
+         "\\.jinja2?\\'"
+         "\\.eco\\'"
+         "wp-content/themes/.+/.+\\.php\\'"
+         "templates/.+\\.php\\'")
   :config
   (setq
    web-mode-markup-indent-offset 2

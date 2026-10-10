@@ -18,14 +18,11 @@
 ;;; Indicators
 (defsubst +mode-line-overwrite-readonly-indicator ()
   "Display modified, read-only, and overwrite indicators independently."
-  (let* ((mo (pcase (buffer-modified-p)
-               ('t (and (buffer-file-name) " *"))
-               ('autosaved " ~")
-               (_ nil)))
-         (ro (and buffer-read-only " %%"))
-         (ov (and overwrite-mode " #"))
-         (ans (concat mo ro ov)))
-    ans))
+  (concat (pcase (buffer-modified-p)
+            ('t (and (buffer-file-name) " *"))
+            ('autosaved " ~"))
+          (and buffer-read-only " %%")
+          (and overwrite-mode " #")))
 
 (defsubst +mode-line-macro-indicator ()
   "Display current Emacs macro being recorded."

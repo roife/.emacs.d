@@ -75,21 +75,6 @@ DOCSTRING and BODY are as in `defun'.
          (dolist (target (cdr targets))
            (advice-add target (car targets) #',symbol))))))
 
-(defmacro +advice-pp-to-prin1! (&rest body)
-  "Define an advice called SYMBOL that map `pp' to `prin1' when called.
-PLACE is the function to which to add the advice, like in `advice-add'.
-
-\(fn SYMBOL &rest [PLACES...]\)"
-  `(progn
-     (dolist (target (list ,@body))
-       (advice-add target :around #'+call-fn-with-pp-to-prin1))))
-
-(defun +call-fn-with-pp-to-prin1 (fn &rest args)
-  "Call FN with ARGS, map `pp' to `prin1' when called."
-  (cl-letf (((symbol-function #'pp) #'prin1)
-            ((symbol-function #'pp-to-string) #'prin1-to-string))
-    (apply fn args)))
-
 (defun +unfill-region (start end)
   "Replace newline chars in region from START to END by single spaces.
 This command does the inverse of `fill-region'."

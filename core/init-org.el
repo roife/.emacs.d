@@ -173,21 +173,20 @@
 (use-package org-appear
   :straight t
   :require-incrementally t
-  :hook ((org-mode . org-appear-mode))
+  :preface
+  (defun +org-appear-setup ()
+    "Enable `org-appear-mode', revealing markup only in Meow insert state."
+    (org-appear-mode 1)
+    (add-hook 'meow-insert-enter-hook #'org-appear-manual-start nil t)
+    (add-hook 'meow-insert-exit-hook #'org-appear-manual-stop nil t))
+  :hook (org-mode . +org-appear-setup)
   :config
   (setq org-appear-autosubmarkers t
         org-appear-autoentities t
         org-appear-autokeywords t
         org-appear-inside-latex t
         org-appear-delay 0.1
-        org-appear-trigger 'manual)
-
-  (add-hook! org-mode-hook
-    (defun +org-appear-meow-integration ()
-      (add-hook! meow-insert-enter-hook :local #'org-appear-manual-start)
-      (add-hook! meow-insert-exit-hook :local #'org-appear-manual-stop)))
-  (when (derived-mode-p 'org-mode) (+org-appear-meow-integration))
-  )
+        org-appear-trigger 'manual))
 
 
 ;; [ox]
