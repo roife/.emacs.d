@@ -68,7 +68,6 @@
           "\\*Apropos\\*"
           "\\*Backtrace\\*"
           "\\*Calendar\\*"
-          ;; "\\*Embark Actions\\*"
           "\\*Finder\\*"
           ;; `ibuffer' displays the buffer before enabling `ibuffer-mode',
           ;; so the first display has to match by name.
@@ -84,7 +83,6 @@
           Buffer-menu-mode
           flymake-diagnostics-buffer-mode
 
-          ;; grep-mode occur-mode rg-mode
           osx-dictionary-mode
 
           "^\\*Process List\\*" process-menu-mode

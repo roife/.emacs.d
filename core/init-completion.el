@@ -11,11 +11,7 @@
   :hook ((after-init . vertico-mode))
   :config
   (setq vertico-cycle t
-        vertico-count 15)
-
-  ;; WORKAROUND: https://github.com/minad/vertico#problematic-completion-commands
-  (setq org-refile-use-outline-path 'file
-        org-outline-path-complete-in-steps nil))
+        vertico-count 15))
 
 
 (use-package vertico-directory
@@ -77,8 +73,6 @@
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-ignore-case t
-        read-buffer-completion-ignore-case t
-        read-file-name-completion-ignore-case t
         completion-category-overrides '((file (styles basic partial-completion))
                                         (eglot (styles orderless))
                                         (eglot-capf (styles orderless)))

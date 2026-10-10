@@ -24,7 +24,6 @@
 ;; [whitespace] Show visualize TAB, (HARD) SPC, newline
 (use-package whitespace
   :hook ((prog-mode conf-mode yaml-mode) . whitespace-mode)
-  :init
   :config
   ;; only show bad whitespace
   (setq whitespace-style
@@ -58,14 +57,9 @@
 ;; [rainbow-mode] Colorize color names in buffers
 (use-package rainbow-mode
   :straight t
-  :functions (rainbow-turn-off rainbow-colorize-match rainbow-x-color-luminance)
   :bind (:map help-mode-map
               ("r" . rainbow-mode))
-  :hook ((html-mode css-mode) . rainbow-mode)
-  :config
-  ;; removed HACK: Use overlay instead of text properties to override `hl-line' faces.
-  ;; @see https://emacs.stackexchange.com/questions/36420
-  )
+  :hook ((html-mode css-mode) . rainbow-mode))
 
 
 ;; [hl-todo] Highlight TODO and similar keywords in comments and strings

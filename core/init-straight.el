@@ -2,6 +2,7 @@
 
 ;; [straight] Package manager config (should put setq before installation for `straight`)
 (setq straight-check-for-modifications nil                   ; skip modification
+      straight-use-package-by-default nil
       straight-vc-git-default-clone-depth '(1 single-branch) ; shadow clone
       warning-suppress-log-types '((comp))                   ; Don't display comp warnings
       straight-disable-native-compile (not (native-comp-available-p)))

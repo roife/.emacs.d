@@ -43,14 +43,6 @@
          (prog-mode . goto-address-prog-mode)))
 
 
-;; [arxiv.el] Search, browse, and save arXiv papers
-;; (use-package arxiv
-;;   :straight (:type git :host github :repo "roife/arxiv.el")
-;;   :config
-;;   (setq arxiv-browser-function #'arxiv-eww-browse-url)
-;;   (arxiv-url-handler-mode 1))
-
-
 ;; [avy] Jump with several key strock
 (use-package avy
   :straight t
@@ -143,8 +135,6 @@
 
 ;; [re-builder]
 (use-package re-builder
-  :ensure nil
-  :commands re-builder
   :bind (:map reb-mode-map
               ("C-c C-k" . reb-quit)
               ("C-c C-p" . reb-prev-match)
@@ -170,7 +160,6 @@
 
 ;; [browse-url] Pass a URL to browser
 (use-package browse-url
-  :defines dired-mode-map
   :bind (("C-, o" . browse-url-at-point)
          ("C-, e" . browse-url-emacs)))
 

@@ -173,10 +173,7 @@
 
 ;; [elec-pair] Automatic parenthesis pairing
 (use-package elec-pair
-  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-ts-mode minibuffer-mode) . electric-pair-mode)
-  :config
-  (setq electric-pair-inhibit-predicate 'electric-pair-default-inhibit)
-  )
+  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-ts-mode minibuffer-mode) . electric-pair-mode))
 
 
 ;; [mwim] Better C-a C-e for programming

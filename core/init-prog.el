@@ -184,7 +184,6 @@ Diagnostics for all files are published separately for project listings."
 ;; [Eglot] LSP support
 (use-package eglot
   :straight (:type built-in)
-  :commands (eglot eglot-ensure)
   :preface
   (defconst +eglot-auto-start-modes
     '(c-mode c++-mode rust-mode python-mode java-mode
@@ -295,7 +294,6 @@ Diagnostics for all files are published separately for project listings."
 ;; [webpaste] Web Pastebin
 (use-package webpaste
   :straight t
-  :commands webpaste-paste-buffer-or-region
   :config
   (setq webpaste-paste-confirmation t
         webpaste-add-to-killring t
@@ -317,8 +315,6 @@ Diagnostics for all files are published separately for project listings."
 ;; [citre] Ctags-infra
 (use-package citre
   :straight t
-  :commands (citre-update-this-tags-file)
-  :preface
   :bind (:map prog-mode-map
               ("C-c r c" . citre-update-this-tags-file))
   :hook ((prog-mode . citre-auto-enable-citre-mode))
@@ -351,7 +347,6 @@ Diagnostics for all files are published separately for project listings."
 ;; [dape] Debug Adapter Protocol client
 (use-package dape
   :straight t
-  :commands (dape)
   :preface
   (defun +dape-save-buffers-h ()
     "Save file-visiting buffers before starting a debug session."

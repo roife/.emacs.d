@@ -1,7 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(eval-when-compile (require 'cl-lib))
-
 ;;; face
 (defgroup +mode-line nil
   "Mode-Line faces."

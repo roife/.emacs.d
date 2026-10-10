@@ -36,9 +36,6 @@
  large-hscroll-threshold 1000
  syntax-wholeline-max 1000
 
- ;; Larger process output buffer for LSP module
- read-process-output-max (* 4 1024 1024)
-
  ;; [Wrapping] words at whitespace, but do not wrap by default
  ;; Wrap words at whitespace, rather than in the middle of a word.
  word-wrap t
@@ -155,28 +152,12 @@
         (set-terminal-coding-system 'utf-8-unix frame t)))))
 
 
-;; [gcmh] Run GC when Emacs is idle, not while commands are active.
-;; (use-package gcmh
-;;   :straight t
-;;   :unless (fboundp 'igc-info)
-;;   :hook (emacs-startup . gcmh-mode)
-;;   :config
-;;   (setq gcmh-idle-delay 'auto
-;;         gcmh-auto-idle-delay-factor 10
-;;         gcmh-high-cons-threshold (* 128 1024 1024)
-;;         gcmh-low-cons-threshold +gc-cons-threshold))
-
-
 ;; History
 ;;; [save-place-mode] save place lastly visited
 (use-package saveplace
   :hook (after-init . save-place-mode)
   :config
   (setq save-place-autosave-interval 1000)
-
-  ;; HACK: `save-place-alist-to-file' uses `pp' to prettify the contents of its
-  ;; cache, which is expensive and useless. replace it with `prin1'
-  (+advice-pp-to-prin1! 'save-place-alist-to-file)
 
   ;; recenters the view after the jump
   (defadvice! +save-place-recenter-a (&rest _)
@@ -399,3 +380,8 @@
                                   (project-eshell "Eshell")
                                   (project-search "Search")
                                   (magit-status "Magit"))))
+
+;; keybinding
+;; Prevent accidental touch
+(unbind-key "C-<wheel-down>")
+(unbind-key "C-<wheel-up>")
