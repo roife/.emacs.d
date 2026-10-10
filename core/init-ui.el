@@ -142,7 +142,7 @@
     (with-selected-frame frame
       (+load-theme))))
 
-(add-hook! (tty-setup-hook server-after-make-frame-hook) :unless-daemonp-call-immediately
+(add-hook! tty-setup-hook :unless-daemonp-call-immediately
   (defun +load-theme (&optional theme)
     "Load THEME, or choose a theme matching the system or terminal."
     (setq theme
@@ -159,6 +159,13 @@
     (unless (member theme custom-enabled-themes)
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme theme t))))
+
+(add-hook! after-make-frame-functions
+  (defun +load-theme-for-frame (frame)
+    "Choose the theme for a newly created graphical FRAME."
+    (when (display-graphic-p frame)
+      (with-selected-frame frame
+        (+load-theme)))))
 
 ;; [window-divider] Display window divider
 (setq window-divider-default-places t
