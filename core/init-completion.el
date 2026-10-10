@@ -47,28 +47,29 @@
 (use-package orderless
   :straight t
   :init
-  ;; Component modifiers:
+  ;; Component prefix modifiers:
   ;;   !foo excludes, =foo matches literally, ~foo uses flex,
   ;;   ^foo matches a literal prefix, ,foo uses initialism,
   ;;   %foo enables char-folding, @foo matches annotations.
+  (defconst +orderless-prefix-styles
+    '((?! . orderless-without-literal)
+      (?% . char-fold-to-regexp)
+      (?^ . orderless-literal-prefix)
+      (?, . orderless-initialism)
+      (?= . orderless-literal)
+      (?~ . orderless-flex)
+      (?@ . orderless-annotation)))
+
   (defun +orderless-dispatch (pattern _index _total)
-    (cond
-     ;; Ensure $ works with Consult commands, which add disambiguation suffixes
-     ((string-suffix-p "$" pattern) `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x200000-\x300000]*$")))
-     ((string= "!" pattern) `(orderless-literal . ""))
-     ((string-prefix-p "!" pattern) `(orderless-without-literal . ,(substring pattern 1)))
-     ((string-prefix-p "%" pattern) `(char-fold-to-regexp . ,(substring pattern 1)))
-     ((string-suffix-p "%" pattern) `(char-fold-to-regexp . ,(substring pattern 0 -1)))
-     ((string-prefix-p "^" pattern) `(orderless-literal-prefix . ,(substring pattern 1)))
-     ((string-suffix-p "^" pattern) `(orderless-literal-prefix . ,(substring pattern 0 -1)))
-     ((string-prefix-p "," pattern) `(orderless-initialism . ,(substring pattern 1)))
-     ((string-suffix-p "," pattern) `(orderless-initialism . ,(substring pattern 0 -1)))
-     ((string-prefix-p "=" pattern) `(orderless-literal . ,(substring pattern 1)))
-     ((string-suffix-p "=" pattern) `(orderless-literal . ,(substring pattern 0 -1)))
-     ((string-prefix-p "~" pattern) `(orderless-flex . ,(substring pattern 1)))
-     ((string-suffix-p "~" pattern) `(orderless-flex . ,(substring pattern 0 -1)))
-     ((string-prefix-p "@" pattern) `(orderless-annotation . ,(substring pattern 1)))
-     ((string-suffix-p "@" pattern) `(orderless-annotation . ,(substring pattern 0 -1)))))
+    "Dispatch PATTERN's prefix modifier or trailing regexp end anchor."
+    (unless (string-empty-p pattern)
+      (let* ((first (aref pattern 0))
+             (style (alist-get first +orderless-prefix-styles)))
+        (cond
+         ;; Ensure $ works with Consult commands, which add disambiguation suffixes
+         ((string-suffix-p "$" pattern) `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x200000-\x300000]*$")))
+         ((string= "!" pattern) '(orderless-literal . ""))
+         (style (cons style (substring pattern 1)))))))
 
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
