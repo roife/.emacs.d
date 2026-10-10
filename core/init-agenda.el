@@ -116,7 +116,29 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
   :bind (("C-c o a" . org-agenda)
          :map org-agenda-mode-map
          ([remap org-agenda-goto-calendar] . +agenda-calendar-blocks))
+  :preface
+  (defun +agenda-skip-habit ()
+    "Keep repeating tasks out of ordinary agenda blocks."
+    (when (org-get-repeat)
+      (save-excursion (outline-next-heading) (point))))
+
+  (defun +agenda-skip-unless-habit-due-this-week ()
+    "Keep repeating tasks due from today through Sunday, inclusive."
+    (let* ((today (org-today))
+           (repeat (org-get-repeat))
+           (deadline (org-get-deadline-time (point)))
+           (due (cond ((not repeat) nil)
+                      (deadline (time-to-days deadline))
+                      (t (+ (org-time-string-to-absolute (org-entry-get nil "SCHEDULED"))
+                            ;; Use the latest due date of ranges like .+2d/4d.
+                            (if (string-match "/" repeat)
+                                (- (org-habit-duration-to-days (substring repeat (match-end 0)))
+                                   (org-habit-duration-to-days repeat))
+                              0))))))
+      (unless (and due (<= today due (calendar-dayname-on-or-before 0 (+ today 6))))
+        (save-excursion (outline-next-heading) (point)))))
   :config
+  (require 'org-habit)
   ;; Defer indentation until an agenda entry is displayed.
   (add-hook! org-agenda-after-show-hook
     (when (and (derived-mode-p 'org-mode)
@@ -124,57 +146,44 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
                (not (bound-and-true-p org-indent-mode)))
       (org-indent-mode 1)))
 
-  (cl-flet ((files (&rest names)
-              (mapcar (lambda (name)
-                        (expand-file-name (concat "agenda/" name ".org") org-directory))
-                      names)))
-    (let* ((agenda-files (files "actions" "calendar" "inbox" "personal"
-                                "routines" "someday" "work"))
-           (dated-files (remove (car (files "someday")) agenda-files))
-           (action-files (remove (car (files "calendar")) dated-files))
-           (project-files (files "personal" "work"))
-           (someday-files (files "personal" "someday" "work")))
-      (setq
-       org-agenda-files agenda-files
-       org-agenda-sticky t
-       org-agenda-window-setup 'current-window
-       org-agenda-restore-windows-after-quit t
-       org-agenda-inhibit-startup t
-       org-agenda-dim-blocked-tasks nil
-       org-agenda-use-tag-inheritance nil
-       org-agenda-ignore-properties '(stats)
-       org-agenda-skip-scheduled-if-done t
-       org-agenda-skip-deadline-if-done t
-       org-agenda-deadline-faces '((1.001 . error)
-                                   (1.0 . org-warning)
-                                   (0.5 . org-upcoming-deadline)
-                                   (0.0 . org-upcoming-distant-deadline))
-       org-agenda-custom-commands
-       `(("d" "Dashboard"
-          ((agenda "" ((org-agenda-files ',dated-files)))
-           (todo "URGENT" ((org-agenda-files ',action-files)
-                           (org-agenda-overriding-header "Urgent actions")))
-           (todo "NEXT" ((org-agenda-files ',action-files)
-                         (org-agenda-overriding-header "Next actions")))
-           (tags-todo "+project/TODO"
-                      ((org-agenda-files ',project-files)
-                       (org-agenda-overriding-header "Projects")))
-           (todo "WAIT" ((org-agenda-files ',action-files)
-                         (org-agenda-overriding-header "Waiting")))
-           (todo "SOMEDAY" ((org-agenda-files ',someday-files)
-                            (org-agenda-overriding-header "Someday / maybe")))))
-         ("i" "Urgent actions" todo "URGENT"
-          ((org-agenda-files ',action-files)))
-         ("n" "Next actions" todo "NEXT"
-          ((org-agenda-files ',action-files)))
-         ("w" "Waiting" todo "WAIT"
-          ((org-agenda-files ',action-files)))
-         ("p" "Projects"
-          ((tags-todo "+project/TODO"
-                      ((org-agenda-files ',project-files)
-                       (org-agenda-overriding-header "Projects")))))
-         ("s" "Someday / maybe" todo "SOMEDAY"
-          ((org-agenda-files ',someday-files))))))))
+  (setq org-agenda-files
+        (mapcar (lambda (name)
+                  (expand-file-name (concat "agenda/" name ".org") org-directory))
+                '("actions" "calendar" "inbox" "personal" "routines" "someday" "work"))
+        org-agenda-sticky t
+        org-agenda-window-setup 'current-window
+        org-agenda-restore-windows-after-quit t
+        org-agenda-inhibit-startup t
+        org-agenda-dim-blocked-tasks nil
+        org-agenda-use-tag-inheritance nil
+        org-agenda-ignore-properties '(stats)
+        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-deadline-faces '((1.001 . error)
+                                    (1.0 . org-warning)
+                                    (0.5 . org-upcoming-deadline)
+                                    (0.0 . org-upcoming-distant-deadline))
+        org-agenda-custom-commands
+        '(("d" "Dashboard"
+           ((agenda "")
+            (alltodo "" ((org-agenda-overriding-header "Habits due this week")
+                         (org-agenda-skip-function #'+agenda-skip-unless-habit-due-this-week)))
+            (todo "URGENT" ((org-agenda-overriding-header "Urgent actions")))
+            (todo "NEXT" ((org-agenda-overriding-header "Next actions")))
+            (todo "TODO" ((org-agenda-overriding-header "TODO")))
+            (todo "WAIT" ((org-agenda-overriding-header "Waiting")))
+            (todo "SOMEDAY" ((org-agenda-overriding-header "Someday / maybe"))))
+           ((org-agenda-skip-function #'+agenda-skip-habit)))
+          ("i" "Urgent actions" todo "URGENT"
+           ((org-agenda-skip-function #'+agenda-skip-habit)))
+          ("n" "Next actions" todo "NEXT"
+           ((org-agenda-skip-function #'+agenda-skip-habit)))
+          ("w" "Waiting" todo "WAIT"
+           ((org-agenda-skip-function #'+agenda-skip-habit)))
+          ("p" "TODO" todo "TODO"
+           ((org-agenda-skip-function #'+agenda-skip-habit)))
+          ("s" "Someday / maybe" todo "SOMEDAY"
+           ((org-agenda-skip-function #'+agenda-skip-habit))))))
 
 
 ;; [calendar]
