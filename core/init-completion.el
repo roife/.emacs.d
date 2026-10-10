@@ -264,22 +264,14 @@
 
 (use-package cape
   :straight t
-  :hook (((TeX-mode LaTeX-mode org-mode markdown-ts-mode) . +completion-add-tex-capfs))
+  :hook ((TeX-mode LaTeX-mode org-mode markdown-ts-mode) . +cape-tex-setup)
   :init
   (setq cape-dabbrev-buffer-function #'buffer-list)
-
-  (defun +completion-add-capfs (&rest capfs)
-    "Append CAPFS to the buffer-local `completion-at-point-functions'."
-    (dolist (capf capfs)
-      (unless (memq capf completion-at-point-functions)
-        (setq-local completion-at-point-functions
-                    (append completion-at-point-functions (list capf))))))
-
   (setq-default completion-at-point-functions
                 (append completion-at-point-functions (list #'cape-file #'cape-dabbrev)))
 
-  (defun +completion-add-tex-capfs ()
-    (+completion-add-capfs #'cape-tex)))
+  (defun +cape-tex-setup ()
+    (add-hook 'completion-at-point-functions #'cape-tex 90 t)))
 
 
 ;;; Snippets
@@ -297,11 +289,10 @@
   (defvar +tempel-trigger-capf nil)
 
   (defun +tempel-setup-capf ()
-    (unless +tempel-trigger-capf
-      (setq +tempel-trigger-capf (cape-capf-trigger #'tempel-complete ?/)))
-    (unless (memq +tempel-trigger-capf completion-at-point-functions)
-      (setq-local completion-at-point-functions
-                  (cons +tempel-trigger-capf completion-at-point-functions)))))
+    (add-hook 'completion-at-point-functions
+              (or +tempel-trigger-capf
+                  (setq +tempel-trigger-capf (cape-capf-trigger #'tempel-complete ?/)))
+              -90 t)))
 
 
 (use-package tempel-collection
