@@ -4,10 +4,13 @@
 ;; Defer GC during startup, then restore sane runtime defaults later.
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 1.0)
+;; Restore when idle, so the first GC doesn't delay the first frame.
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (setq gc-cons-threshold (* 32 1024 1024)
-                  gc-cons-percentage 0.2))
+            (run-with-idle-timer
+             1 nil (lambda ()
+                     (setq gc-cons-threshold (* 32 1024 1024)
+                           gc-cons-percentage 0.2))))
           100)
 
 ;; Keep early startup quiet unless we're debugging init.
