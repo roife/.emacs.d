@@ -352,7 +352,7 @@
   :unless noninteractive
   :init
   (setq exec-path-from-shell-arguments '("-l")
-        exec-path-from-shell-variables '("PATH" "HOMEBREW" "MANPATH"
+        exec-path-from-shell-variables '("PATH" "HOMEBREW" "MANPATH" "PKG_CONFIG_PATH"
                                          "JAVA_HOME" "JAVA21_HOME" "JDTLS_JAVA_HOME"))
   ;; External programs can be needed by mode hooks during startup, so import
   ;; the login-shell environment before the rest of the configuration loads.
