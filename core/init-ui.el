@@ -89,13 +89,11 @@
 
 
 ;; Font: Same width and height for emoji, chinese and english characters
-(defvar +font-size (if (eq system-type 'darwin) 16 26))
-
 (add-hook! server-after-make-frame-hook :unless-daemonp-call-immediately
   (defun +setup-fonts ()
     "Setup fonts."
     (when (display-graphic-p)
-      (set-face-attribute 'default nil :font (font-spec :family "Sarasa Mono SC" :size +font-size))
+      (set-face-attribute 'default nil :font (font-spec :family "Sarasa Mono SC" :size 16))
       (set-face-font 'fixed-pitch "Sarasa Mono SC")
       (set-face-font 'fixed-pitch-serif "Sarasa Mono Slab SC")
       (set-face-font 'variable-pitch "Sarasa UI SC")
