@@ -53,7 +53,8 @@
 (setq package-enable-at-startup nil)
 
 ;; Faster to disable these here (before initialized)
-(push '(tab-bar-lines . 1) default-frame-alist)
+;; init-modeline enables the tab bar later to avoid clipping PGTK's echo area.
+(push '(tab-bar-lines . 0) default-frame-alist)
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
@@ -64,7 +65,7 @@
 (setq menu-bar-mode nil
       tool-bar-mode nil
       scroll-bar-mode nil
-      tab-bar-mode t)
+      tab-bar-mode nil)
 
 ;; Avoid toolbar setup work during startup. It is unnecessary while the toolbar is
 ;; disabled, and can be reconstructed if `tool-bar-mode' is enabled later.

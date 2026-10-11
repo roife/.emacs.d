@@ -141,6 +141,7 @@
 
 ;; [tab-bar] Tab bar
 (use-package tab-bar
+  :hook (after-init . tab-bar-mode)
   :bind* (("M-t" . tab-new)
           ("M-q" . tab-close)
           ("M-<tab>" . tab-next)
