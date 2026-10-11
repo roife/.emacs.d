@@ -27,7 +27,7 @@
 ;; [ezf] Use Emacs completion from terminal shells
 (use-package ezf
   :straight (:type git :host github :repo "roife/ezf")
-  :demand t)
+  :commands ezf-client)
 
 
 ;; [speedbar]
