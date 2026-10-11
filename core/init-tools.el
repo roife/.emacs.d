@@ -154,9 +154,11 @@
 
 ;; [emacs-reader] read docs in emacs
 (use-package reader
-  :straight `(reader :type git :host codeberg :repo "MonadicSheep/emacs-reader"
-                     :files (:defaults ,(concat "render-core" module-file-suffix))
-                     :pre-build ("make" "all")))
+  :straight  `(reader :type git :host codeberg :repo "MonadicSheep/emacs-reader"
+                      :files (:defaults ,(concat "render-core" module-file-suffix))
+                      :pre-build
+                      ("make" "all" "CC=cc" "USE_PKGCONFIG=yes"
+                       ,(concat "PKG_CONFIG_PATH=" (expand-file-name "~/.nix-profile/lib/pkgconfig")))))
 
 ;; [browse-url] Pass a URL to browser
 (use-package browse-url
