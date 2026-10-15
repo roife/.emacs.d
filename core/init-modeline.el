@@ -153,9 +153,8 @@
         tab-bar-auto-width nil
         tab-bar-close-button-show nil
         tab-bar-tab-hints t
-        tab-bar-show 1)
-
-  (customize-set-variable 'tab-bar-select-tab-modifiers '(meta))
+        tab-bar-show 1
+        tab-bar-select-tab-modifiers '(meta))
 
   ;; truncate for [tab name] and add count
   (setq tab-bar-tab-name-format-functions
