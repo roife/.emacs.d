@@ -159,6 +159,17 @@
   :config
   (setq save-place-autosave-interval 1000)
 
+  ;; Avoid autoloading TRAMP when normalizing saved remote paths, while keeping
+  ;; other file name handlers active.
+  (defadvice! +save-place-inhibit-tramp-autoload-a (fn &rest args)
+    :around #'save-place--normalize-alist
+    (let ((file-name-handler-alist
+           (cl-remove-if
+            (lambda (handler)
+              (eq (cdr handler) 'tramp-autoload-file-name-handler))
+            file-name-handler-alist)))
+      (apply fn args)))
+
   ;; recenters the view after the jump
   (defadvice! +save-place-recenter-a (&rest _)
     :after #'save-place-find-file-hook
