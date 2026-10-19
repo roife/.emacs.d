@@ -409,6 +409,8 @@ separate argument, although the command accepts only one."
   :straight t)
 (use-package toml-mode
   :straight t)
+(use-package tuareg
+  :straight t)
 
 
 (use-package js
