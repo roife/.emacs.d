@@ -139,7 +139,7 @@
   (setq org-preview-latex-default-process 'dvisvgm
         org-startup-with-latex-preview nil
         org-highlight-latex-and-related '(latex))
-  (plist-put org-format-latex-options :scale 1.7)
+  (plist-put org-format-latex-options :scale 1.2)
 
   ;; Allow CJK characters and full-width punctuation next to
   ;; emphasis markers.  Keep ASCII letters excluded to avoid
