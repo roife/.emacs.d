@@ -130,10 +130,11 @@
   :require-incrementally (t)
   :init
   (require 'xdg)
+
   (setq liberime-shared-data-dir (if (eq system-type 'darwin)
                                      (expand-file-name "~/Library/Rime/")
                                    (expand-file-name "rime/" (xdg-data-home)))
-        liberime-user-data-dir liberime-shared-data-dir))
+        liberime-user-data-dir (no-littering-expand-var-file-name "rime/")))
 
 (use-package liberime-regexp
   :straight (:host github :repo "roife/liberime-regexp")
