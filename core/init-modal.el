@@ -67,8 +67,8 @@ included; for the final argument the leading separator is included."
                   (cons beg trimmed-end)))))))))))
 
 ;; [meow] Modal editing
-(use-package meow-core
-  :straight meow
+(use-package meow
+  :straight t
   :demand t
   :custom-face
   (meow-normal-indicator ((t (:inherit (font-lock-function-name-face bold :inverse-video t)))))
@@ -193,8 +193,3 @@ included; for the final argument the leading separator is included."
            (vundo-mode . motion)
            (calfw-calendar-mode . motion)))
       (add-to-list 'meow-mode-state-list state))))
-
-;; These optional interfaces are not needed to make Meow usable.  Load each
-;; from its own library only when its command is invoked.
-(autoload 'meow-cheatsheet "meow-cheatsheet" nil t)
-(autoload 'meow-tutor "meow-tutor" nil t)

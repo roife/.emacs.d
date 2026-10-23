@@ -3,21 +3,19 @@
 ;; [sis] automatically switch input source
 (use-package sis
   :straight t
-  :hook (;; When add space after chinese char, automatically switch to english mode
-         (liberime-after-start . sis-global-inline-mode)
-         ;; Enable the context-mode for all buffers
-         (liberime-after-start . sis-global-context-mode)
-         ;; Colored cursor
-         (liberime-after-start . sis-global-cursor-color-mode))
-  :init
+  :after meow
+  :demand t
+  :config
   ;; Use rimel as default
   (sis-ism-lazyman-config nil "rimel" 'native)
-  (sis-get) ; HACK: set sis--ism
-  :config
+  (sis--get)
+
   (add-hook! buffer-list-update-hook
     (defun +sis-refresh-cursor-color ()
-      (sis--get)
-      (sis--update-cursor-color)))
+      (when sis-global-cursor-color-mode
+        (with-current-buffer (window-buffer (selected-window))
+          (sis--get)
+          (sis--update-cursor-color)))))
 
   ;; HACK: Set cursor color automatically
   (add-hook! (enable-theme-functions server-after-make-frame-hook) :unless-daemonp-call-immediately
@@ -27,10 +25,7 @@
       (+sis-refresh-cursor-color)))
 
   ;; Recover the terminal cursor color when leaving Emacs (TUI only).
-  (add-hook! kill-emacs-hook
-    (defun +sis-reset-terminal-cursor-color ()
-      (unless (display-graphic-p)
-        (send-string-to-terminal "\e]112\a"))))
+  (add-hook! kill-emacs-hook #'sis--reset-tty-cursor-color)
 
   ;; Context mode
   (add-hook! meow-insert-exit-hook #'sis-set-english)
@@ -43,16 +38,16 @@
         'english
       (apply fn args)))
 
-  (defun +sis-context-switching-other (back-detect fore-detect)
+  (defun +sis-context-switching-other (_back-detect _fore-detect)
     (and meow-insert-mode
-         (or (and (derived-mode-p 'telega-chat-mode)
-                  (or (and (= (point) telega-chatbuf--input-marker) ; beginning of input
-                           (eolp)))))
+         (derived-mode-p 'telega-chat-mode)
+         (= (point) telega-chatbuf--input-marker)
+         (eolp)
          'other))
   (add-to-list 'sis-context-detectors #'+sis-context-switching-other)
 
   ;; Inline-mode
-  (defconst +sis-chinese-puncs "，。？！；：（【「“")
+  (defconst +sis-chinese-puncs "，。？！；：、（）【】「」『』“”‘’《》〈〉")
   (defconst +sis-chinese-punc-chars (string-to-list +sis-chinese-puncs))
 
   (defvar-local +sis-inline-pending-space-pos nil
@@ -107,7 +102,12 @@
       (when (and (eq (char-before) ? )
                  (memq (char-after) +sis-chinese-punc-chars))
         (backward-delete-char 1))))
-  (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc))
+  (setq sis-inline-tighten-tail-rule #'+sis-remove-tail-space-before-cc-punc)
+
+  ;; Native input methods need no running Liberime session to install hooks.
+  (sis-global-inline-mode 1)
+  (sis-global-context-mode 1)
+  (sis-global-cursor-color-mode 1))
 
 (defun +liberime-prepend-env-path (name path)
   (when (file-directory-p path)
