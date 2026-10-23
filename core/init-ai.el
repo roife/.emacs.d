@@ -209,6 +209,48 @@ This restores the event subscription without replaying history."
         agent-shell-show-context-usage-indicator 'detailed
         agent-shell-file-display-action '((display-buffer-reuse-window display-buffer-pop-up-window)))
   :config
+  (defun +agent-shell-header-option (option shell-buffer)
+    "Render OPTION with a menu that updates SHELL-BUFFER's session."
+    (let* ((id (map-elt option :id))
+           (current (map-elt option :current-value))
+           (name (map-elt option :name))
+           (label (agent-shell--config-option-value-name option current))
+           (menu (make-sparse-keymap name))
+           (map (make-sparse-keymap)))
+      (dolist (choice (reverse (agent-shell--config-option-value-choices option)))
+        (let ((value (map-elt (cdr choice) :value)))
+          (define-key menu (vector (intern (format "value-%s" value)))
+                      `(menu-item ,(car choice)
+                                  (lambda () (interactive)
+                                    (agent-shell-set-config-option-value
+                                     :shell-buffer ,shell-buffer :id ,id :value ,value))
+                                  :button (:toggle . ,(equal value current))))))
+      (define-key map [header-line down-mouse-1] #'ignore)
+      (define-key map [header-line mouse-1] menu)
+      (propertize (if (equal id "fast-mode") (concat "Fast " label) label)
+                  'face (pcase current
+                          ("on" 'success)
+                          ("off" 'shadow)
+                          ("plan" 'warning)
+                          (_ 'font-lock-constant-face))
+                  'help-echo (format "%s: %s" name label)
+                  'mouse-face 'mode-line-highlight
+                  'local-map map)))
+
+  (defadvice! +agent-shell-extend-header-model (original state &rest args)
+    :around #'agent-shell--make-header-model
+    "Append clickable collaboration and Fast mode options to the header."
+    (let* ((model (apply original state args))
+           (parts
+            (cons (map-elt model :context-indicator)
+                  (cl-loop for option in (agent-shell--config-options state)
+                           when (member (map-elt option :id) '("collaboration_mode" "fast-mode"))
+                           collect (+agent-shell-header-option option (current-buffer))))))
+      (setf (map-elt model :context-indicator)
+            (when-let* ((parts (delq nil parts)))
+              (string-join parts " · ")))
+      model))
+
   (advice-add #'agent-shell--update-bootstrapping-fragment :override #'ignore)
   ;; Run outside agent-shell-btw's request advice: it records the fork ID
   ;; before resume, allowing its normal close hook to clean up after failures.
