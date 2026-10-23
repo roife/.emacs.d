@@ -331,8 +331,9 @@
         (no-littering-expand-var-file-name "tramp-rpc/"))
   (make-directory tramp-rpc-deploy-local-cache-directory t)
   :config
+  ;; Pair Git clients with server binaries built from the same sources.
   (setq tramp-rpc-deploy-auto-deploy t
-        tramp-rpc-deploy-git-build-policy 'release))
+        tramp-rpc-deploy-git-build-policy 'build))
 
 
 ;; [minibuffer]

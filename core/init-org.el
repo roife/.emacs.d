@@ -15,7 +15,7 @@
             org-footnote org-list org-pcomplete org-src org-macro ob t)
   :init
   (setq org-modules '(org-habit)
-        org-directory (file-truename "~/org/"))
+        org-directory (file-truename "~/Library/CloudStorage/Nutstore-roifewu@gmail.com/org/"))
   :custom-face
   (org-quote ((t (:inherit org-block-begin-line))))
   :hook ((org-babel-after-execute . org-link-preview-refresh)
@@ -117,6 +117,21 @@
           (org-table-align)
           (goto-char point)))))
 
+  ;; Give custom blocks such as #+begin_question the usual block face.
+  (defun +org-fontify-special-blocks (limit)
+    "Add `org-block' to special block contents found before LIMIT."
+    (let ((case-fold-search t))
+      (while (re-search-forward "^[ \t]*#\\+begin_\\S-+" limit t)
+        (let ((block (save-excursion
+                       (beginning-of-line)
+                       (org-element-at-point))))
+          (when (eq (org-element-type block) 'special-block)
+            (when-let* ((begin (org-element-property :contents-begin block))
+                        (end (org-element-property :contents-end block)))
+              (add-face-text-property begin end 'org-block t))))))
+    nil)
+  (font-lock-add-keywords 'org-mode '((+org-fontify-special-blocks)) 'append)
+
   ;; Keep drawer and block delimiter faces compact after theme loading.
   (dolist (face '(org-drawer org-meta-line org-block-begin-line org-block-end-line))
     (set-face-attribute face nil :inherit 'font-lock-comment-face)
@@ -140,6 +155,8 @@
         org-startup-with-latex-preview nil
         org-highlight-latex-and-related '(latex))
   (plist-put org-format-latex-options :scale 1.2)
+  ;; Let LaTeX and Typst previews show the surrounding face's background.
+  (plist-put org-format-latex-options :background "Transparent")
 
   ;; Allow CJK characters and full-width punctuation next to
   ;; emphasis markers.  Keep ASCII letters excluded to avoid
@@ -187,6 +204,12 @@
         org-appear-inside-latex t
         org-appear-delay 0.1
         org-appear-trigger 'manual))
+
+
+;; [org-fragtog] Toggle LaTeX fragment previews when point enters or leaves.
+(use-package org-fragtog
+  :straight t
+  :hook (org-mode . org-fragtog-mode))
 
 
 ;; [ox]
