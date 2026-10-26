@@ -7,7 +7,7 @@
   (setq
    ;; A single workflow keeps tasks and project headings consistent.
    org-todo-keywords '((sequence
-                        "TODO(t)" "NEXT(n)" "WAIT(w@/!)" "SOMEDAY(s)" "URGENT(i!)"
+                        "TODO(t)" "NEXT(n)" "DOING(g!)" "WAIT(w@/!)" "SOMEDAY(s)"
                         "|" "DONE(d!)" "CANCELED(c@)"))
    org-log-done 'time
    org-log-into-drawer t
@@ -165,21 +165,21 @@ SCHEDULED: %(let ((time (org-read-date t t nil \"First occurrence: \")))
            ((agenda "")
             (alltodo "" ((org-agenda-overriding-header "Habits due this week")
                          (org-agenda-skip-function #'+agenda-skip-unless-habit-due-this-week)))
-            (todo "URGENT" ((org-agenda-overriding-header "Urgent actions")))
-            (todo "NEXT" ((org-agenda-overriding-header "Next actions")))
+            (todo "DOING" ((org-agenda-overriding-header "Doing")))
+            (todo "NEXT" ((org-agenda-overriding-header "Next")))
             (todo "TODO" ((org-agenda-overriding-header "TODO")))
             (todo "WAIT" ((org-agenda-overriding-header "Waiting")))
-            (todo "SOMEDAY" ((org-agenda-overriding-header "Someday / maybe"))))
+            (todo "SOMEDAY" ((org-agenda-overriding-header "Someday"))))
            ((org-agenda-skip-function #'+agenda-skip-habit)))
-          ("i" "Urgent actions" todo "URGENT"
+          ("g" "Doing" todo "DOING"
            ((org-agenda-skip-function #'+agenda-skip-habit)))
-          ("n" "Next actions" todo "NEXT"
+          ("n" "Next" todo "NEXT"
            ((org-agenda-skip-function #'+agenda-skip-habit)))
           ("w" "Waiting" todo "WAIT"
            ((org-agenda-skip-function #'+agenda-skip-habit)))
           ("p" "TODO" todo "TODO"
            ((org-agenda-skip-function #'+agenda-skip-habit)))
-          ("s" "Someday / maybe" todo "SOMEDAY"
+          ("s" "Someday" todo "SOMEDAY"
            ((org-agenda-skip-function #'+agenda-skip-habit))))))
 
 
