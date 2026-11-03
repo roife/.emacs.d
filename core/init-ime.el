@@ -24,6 +24,13 @@
             sis-default-cursor-color (face-background 'cursor nil t))
       (+sis-refresh-cursor-color)))
 
+  ;; Meow's restore hook updates the TTY cursor shape, but not its color.
+  (add-hook! sis-cursor-color-restore-hook
+    (defun +sis-restore-tty-cursor-color ()
+      (unless (display-graphic-p)
+        (send-string-to-terminal
+         (format "\e]12;%s\a" sis-default-cursor-color)))))
+
   ;; Recover the terminal cursor color when leaving Emacs (TUI only).
   (add-hook! kill-emacs-hook #'sis--reset-tty-cursor-color)
 
