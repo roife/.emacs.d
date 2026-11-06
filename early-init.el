@@ -25,7 +25,7 @@
 ;; Larger process output buffer (mainly for LSP).
 (setq read-process-output-max (* 4 1024 1024))
 
-;; In noninteractive sessions, prioritize .el file. It saves IO time
+;; Batch jobs should pick up source files newer than their byte-code.
 (setq load-prefer-newer noninteractive)
 
 ;; Inhibit resizing frame
@@ -70,11 +70,6 @@
       scroll-bar-mode nil
       tab-bar-mode nil)
 
-;; Avoid toolbar setup work during startup. It is unnecessary while the toolbar is
-;; disabled, and can be reconstructed if `tool-bar-mode' is enabled later.
-(when (fboundp 'tool-bar-setup)
-  (advice-add #'tool-bar-setup :override #'ignore))
-
 ;; Case-insensitive pass over `auto-mode-alist' is time wasted.
 (setq auto-mode-case-fold nil)
 
@@ -83,49 +78,3 @@
   (setq command-line-ns-option-alist nil))
 (unless (memq initial-window-system '(x pgtk))
   (setq command-line-x-option-alist nil))
-
-;; `setopt' can load custom dependencies early for type checks. Keep it from
-;; doing so during init; type checks will still happen when variables are defined.
-(when (fboundp 'setopt--set)
-  (define-advice setopt--set (:around (fn &rest args) inhibit-load-symbol -90)
-    (let ((custom-load-recursion t))
-      (apply fn args))))
-
-;; `file-name-handler-alist' is consulted on each call to `require', `load', or various file/io functions
-(unless (or (daemonp) noninteractive init-file-debug)
-  (let ((old-value (default-toplevel-value 'file-name-handler-alist)))
-    (put 'file-name-handler-alist 'initial-value (copy-sequence old-value))
-    (define-advice command-line-1 (:around (fn args-left) restore-file-name-handlers)
-      (let ((file-name-handler-alist
-             (if args-left (copy-sequence old-value) file-name-handler-alist)))
-        (funcall fn args-left)))
-    (add-hook 'emacs-startup-hook
-              (lambda ()
-                "Recover file name handlers."
-                (set-default-toplevel-value
-                 'file-name-handler-alist
-                 (delete-dups
-                  (append (default-toplevel-value 'file-name-handler-alist)
-                          old-value))))
-              101)))
-
-;; optimize `load-suffixes'
-(setq load-suffixes '(".elc" ".el")
-      load-file-rep-suffixes '(""))
-
-(defun +restore-load-suffixes-h ()
-  "Restore dynamic module suffixes before loading the init file."
-  (setq load-suffixes `(".elc" ".el"
-                        ,(cond ((eq system-type 'darwin) ".dylib")
-                               ((eq system-type 'gnu/linux) ".so")
-                               ((eq system-type 'windows-nt) ".dll")
-                               (t nil)))))
-
-(add-hook 'before-init-hook #'+restore-load-suffixes-h 100)
-
-;; Site files will use `load-file', which emit messages and triggers redisplay
-;; Make it silent and undo advice later
-(define-advice load-file (:override (file) silence)
-  (load file nil 'nomessage))
-(define-advice startup--load-user-init-file (:after (&rest _) undo-silence)
-  (advice-remove #'load-file #'load-file@silence))

@@ -61,8 +61,12 @@ If no project is found, create a temporary Eshell instance in the current direct
               (ignore-errors (delete-window win)) ;; Close window if already focused
             (select-window win)) ;; Focus the Eshell window if it exists but not selected
         ;; If no Eshell window, create one
-        (let ((display-comint-buffer-action '(display-buffer-at-bottom
-                                              (inhibit-same-window . nil))))
+        (let ((display-buffer-default-alist
+               (cons `(,(concat "\\`" (regexp-quote popup-buffer-name) "\\'")
+                       (display-buffer-reuse-window display-buffer-at-bottom)
+                       (inhibit-same-window . t)
+                       (window-height . 0.5))
+                     display-buffer-default-alist)))
           (if arg
               (with-current-buffer (ghostel-project)
                 ;; display current buffer
