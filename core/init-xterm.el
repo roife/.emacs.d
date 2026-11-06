@@ -9,10 +9,6 @@
                         'truncation
                         (make-glyph-code ?… 'shadow))
 
-;; Disable auto-composition in terminal.
-(setq-default auto-composition-mode "xterm-256color")
-
-
 ;; [Kitty Graphics Protocol] Implements support for Kitty's "graphics protocol",
 ;; which allows the terminal to display images and videos inline.
 (use-package kitty-graphics
@@ -22,19 +18,12 @@
   (setq kitty-graphics-enable-video t))
 
 
-;; [Kitty Keyboard Protocol] Implements support for Kitty's "keyboard protocol",
-;; which allows the terminal to send key events to Emacs.
-(use-package kkp
-  :straight t
-  :hook (tty-setup . global-kkp-mode))
-
-
 ;; [xterm]
 (use-package term/xterm
   :hook (tty-setup . xterm-mouse-mode)
   :init
-  (setq xterm-extra-capabilities '(modifyOtherKeys reportBackground
-                                                   getSelection setSelection)
+  ;; Probe capabilities so native Kitty keyboard support can be negotiated.
+  (setq xterm-extra-capabilities 'check
         xterm-set-window-title t)
 
   (defun +xterm-report-background ()

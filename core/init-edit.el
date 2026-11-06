@@ -165,7 +165,13 @@
 
 ;; [elec-pair] Automatic parenthesis pairing
 (use-package elec-pair
-  :hook ((prog-mode conf-mode yaml-mode org-mode markdown-ts-mode minibuffer-mode) . electric-pair-mode))
+  :preface
+  (defun +electric-pair-shell-setup ()
+    "Pair delimiters within shell input fields, ignoring process output."
+    (setq-local electric-pair-field-search-size 4096)
+    (electric-pair-mode 1))
+  :hook (((prog-mode conf-mode yaml-mode org-mode markdown-ts-mode minibuffer-mode) . electric-pair-mode)
+         ((comint-mode eshell-mode) . +electric-pair-shell-setup)))
 
 
 ;; [mwim] Better C-a C-e for programming

@@ -24,6 +24,12 @@
    regexp-search-ring-max 200))
 
 
+;; Preview matches and replacements together before accepting an edit.
+(use-package replace
+  :init
+  (setq query-replace-show-preview 'both))
+
+
 ;; [ezf] Use Emacs completion from terminal shells
 (use-package ezf
   :straight (:type git :host github :repo "roife/ezf")

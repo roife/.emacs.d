@@ -181,6 +181,16 @@ Diagnostics for all files are published separately for project listings."
    xref-history-storage 'xref-window-local-history))
 
 
+;; [Refactor] Shared interface for language-server code actions.
+(use-package refactor
+  :straight (:type built-in)
+  :bind (("C-c r a" . refactor)
+         ("C-c r n" . refactor-rename)
+         ("C-c r i" . refactor-organize-imports))
+  :config
+  (setq refactor-indications nil))
+
+
 ;; [Eglot] LSP support
 (use-package eglot
   :straight (:type built-in)
@@ -194,15 +204,14 @@ Diagnostics for all files are published separately for project listings."
     (add-hook (intern (format "%s-hook" mode)) #'eglot-ensure))
   :custom-face (eglot-highlight-symbol-face ((t (:underline t))))
   :bind (:map eglot-mode-map
-              ("M-<return>" . eglot-code-actions)
+              ("M-<return>" . refactor)
               ("M-/" . eglot-find-typeDefinition)
               ("M-?" . xref-find-references))
   :config
   (setq eglot-events-buffer-config '(:size 0 :format full)
         eglot-extend-to-xref t
         eglot-autoshutdown t
-        eglot-documentation-renderer 'markdown-ts-view-mode
-        eglot-code-action-indications nil)
+        eglot-documentation-renderer 'markdown-ts-view-mode)
 
   ;; LSP server settings
   (setq-default eglot-workspace-configuration
@@ -358,12 +367,6 @@ Diagnostics for all files are published separately for project listings."
 (use-package flymake
   :straight (:type built-in)
   :preface
-  (defun +flymake-show-buffer-diagnostics-single-a (args)
-    "Pass at most one diagnostic to `flymake-show-buffer-diagnostics'.
-Emacs 31's interactive form returns every diagnostic at point as a
-separate argument, although the command accepts only one."
-    (if (cdr args) (list (car args)) args))
-
   (defun +flymake-mode-h ()
     "Enable Flymake with local shared backends."
     ;; Eglot will supply diagnostics for these modes.  Remove their native
@@ -384,9 +387,8 @@ separate argument, although the command accepts only one."
          ("<left-fringe> <mouse-1>" . nil)
          ("<right-fringe> <mouse-1>" . nil))
   :config
-  (advice-add 'flymake-show-buffer-diagnostics :filter-args
-              #'+flymake-show-buffer-diagnostics-single-a)
-  (setq flymake-show-diagnostics-at-end-of-line 'short))
+  ;; Expand the diagnostic at point; keep other lines compact.
+  (setq flymake-inline-diagnostics '((current . fancy) (t . short))))
 
 ;; Langs
 (use-package cc-mode
