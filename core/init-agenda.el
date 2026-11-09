@@ -2,7 +2,6 @@
 
 ;; [org] Task, project, and refile workflow shared by Agenda and Capture.
 (use-package org
-  :straight (:type built-in)
   :config
   (setq
    ;; A single workflow keeps tasks and project headings consistent.

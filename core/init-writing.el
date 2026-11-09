@@ -15,20 +15,14 @@
 
 (use-package markdown-ts-mode
   :straight (:type built-in)
-  :mode (("\\.md\\'" . markdown-ts-mode)
-         ("\\.markdown\\'" . markdown-ts-mode))
+  :init
+  ;; Packages such as gptel also load Markdown's file associations.
+  (add-to-list 'major-mode-remap-alist '(markdown-mode . markdown-ts-mode-maybe))
   :config
   (setq-default markdown-ts-hide-markup t
                 markdown-ts-inline-images t)
-  (setq
-   ;; Fold bodies on open, keep all heading levels visible
-   markdown-ts-default-folding 'fold-headings
-   ;; Highlight fenced code blocks with the embedded language's mode
-   markdown-ts-fontify-code-blocks-natively t
-   ;; TAB/newline run in the code block's language when point is inside it
-   markdown-ts-enable-code-block-context-mode t
-   ;; org-table-like editing/auto-align when point is in a pipe table
-   markdown-ts-enable-table-mode t)
+  ;; Fold bodies on open, keeping all heading levels visible.
+  (setq markdown-ts-default-folding 'fold-headings)
 
   ;; markdown-ts-mode gives all 6 heading levels the same face; inherit the
   ;; Org level faces instead so they differ and follow the current theme.

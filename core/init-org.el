@@ -8,7 +8,7 @@
 
 ;; [org]
 (use-package org
-  :straight (:type built-in)
+  :straight t
   :require-incrementally
   (calendar find-func format-spec org-macs org-compat org-faces
             org-entities org-fold-core org-fold oc org-keys ol org-table
@@ -22,8 +22,6 @@
          (org-mode . (lambda () (setq-local dabbrev-abbrev-skip-leading-regexp "[=*]"))))
   :config
   (setq
-   ;; Keep generated LaTeX previews out of note directories.
-   org-preview-latex-image-directory (no-littering-expand-var-file-name "org/latex/")
    ;; Recognize a), A), a., and A. as list markers.
    org-list-allow-alphabetical t
    ;; Always use shift to select
@@ -34,7 +32,7 @@
    org-export-with-sub-superscripts '{}
 
    ;; prettify
-   org-startup-indented t
+   ;; org-startup-indented t
    ;; Respect #+startup visibility, archived trees, drawers, and hidden blocks.
    org-startup-folded nil
    org-pretty-entities t
@@ -118,19 +116,19 @@
           (goto-char point)))))
 
   ;; Give custom blocks such as #+begin_question the usual block face.
-  (defun +org-fontify-special-blocks (limit)
-    "Add `org-block' to special block contents found before LIMIT."
-    (let ((case-fold-search t))
-      (while (re-search-forward "^[ \t]*#\\+begin_\\S-+" limit t)
-        (let ((block (save-excursion
-                       (beginning-of-line)
-                       (org-element-at-point))))
-          (when (eq (org-element-type block) 'special-block)
-            (when-let* ((begin (org-element-property :contents-begin block))
-                        (end (org-element-property :contents-end block)))
-              (add-face-text-property begin end 'org-block t))))))
-    nil)
-  (font-lock-add-keywords 'org-mode '((+org-fontify-special-blocks)) 'append)
+  ;; (defun +org-fontify-special-blocks (limit)
+  ;;   "Add `org-block' to special block contents found before LIMIT."
+  ;;   (let ((case-fold-search t))
+  ;;     (while (re-search-forward "^[ \t]*#\\+begin_\\S-+" limit t)
+  ;;       (let ((block (save-excursion
+  ;;                      (beginning-of-line)
+  ;;                      (org-element-at-point))))
+  ;;         (when (eq (org-element-type block) 'special-block)
+  ;;           (when-let* ((begin (org-element-property :contents-begin block))
+  ;;                       (end (org-element-property :contents-end block)))
+  ;;             (add-face-text-property begin end 'org-block t))))))
+  ;;   nil)
+  ;; (font-lock-add-keywords 'org-mode '((+org-fontify-special-blocks)) 'append)
 
   ;; Keep drawer and block delimiter faces compact after theme loading.
   (dolist (face '(org-drawer org-meta-line org-block-begin-line org-block-end-line))
@@ -150,13 +148,7 @@
         (org-cycle)
         t)))
 
-  ;; Better Org Latex Preview
-  (setq org-preview-latex-default-process 'dvisvgm
-        org-startup-with-latex-preview nil
-        org-highlight-latex-and-related '(latex))
-  (plist-put org-format-latex-options :scale 1.2)
-  ;; Let LaTeX and Typst previews show the surrounding face's background.
-  (plist-put org-format-latex-options :background "Transparent")
+  (setq org-highlight-latex-and-related '(latex))
 
   ;; Allow CJK characters and full-width punctuation next to
   ;; emphasis markers.  Keep ASCII letters excluded to avoid
@@ -206,10 +198,27 @@
         org-appear-trigger 'manual))
 
 
-;; [org-fragtog] Toggle LaTeX fragment previews when point enters or leaves.
-(use-package org-fragtog
-  :straight t
-  :hook (org-mode . org-fragtog-mode))
+;; [org-latex-preview] Toggle previews when point enters or leaves a formula.
+(use-package org-latex-preview
+  :hook (org-mode . org-latex-preview-mode)
+  :config
+  ;; Shrink and center display equations, see
+  ;; https://karthinks.com/software/understanding-org-latex-preview/
+  (defadvice! +org-latex-preview-display-math-a (fn ov path-info)
+    :around #'org-latex-preview--update-overlay
+    (if (save-excursion
+          (goto-char (overlay-start ov))
+          (let ((elem (org-element-context)))
+            (or (org-element-type-p elem 'latex-environment)
+                (string-match-p (rx bos (or "\\[" "$$"))
+                                (org-element-property :value elem)))))
+        (let ((org-latex-preview-appearance-options
+               (plist-put (copy-sequence org-latex-preview-appearance-options) :zoom 0.85)))
+          (funcall fn ov path-info)
+          (when-let* ((img (overlay-get ov 'org-preview-image)))
+            (overlay-put ov 'before-string
+                         (propertize " " 'display `(space :align-to (- center (0.5 . ,img)))))))
+      (funcall fn ov path-info))))
 
 
 ;; [ox]
@@ -231,3 +240,9 @@
   (setq org-typst-preview-scale 1.5
         org-typst-preview-image-directory
         (no-littering-expand-var-file-name "org/typst/")))
+
+
+;; [org-modern]
+(use-package org-modern
+  :straight t
+  :hook (org-mode . org-modern-mode))

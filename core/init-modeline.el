@@ -136,7 +136,8 @@
   (breadcrumb-imenu-leaf-face ((t (:inherit font-lock-function-name-face :foreground unspecified))))
   :config
   (setq breadcrumb-imenu-crumb-separator " ⋅ "
-        breadcrumb-project-max-length 0.55
+        breadcrumb-project-max-length 0.5
+        breadcrumb-imenu-max-length 0.45
         breadcrumb-idle-time 5))
 
 ;; [tab-bar] Tab bar

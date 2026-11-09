@@ -22,9 +22,7 @@
 (use-package term/xterm
   :hook (tty-setup . xterm-mouse-mode)
   :init
-  ;; Probe capabilities so native Kitty keyboard support can be negotiated.
-  (setq xterm-extra-capabilities 'check
-        xterm-set-window-title t)
+  (setq xterm-set-window-title t)
 
   (defun +xterm-report-background ()
     "Query the terminal background color and reload the matching theme."
