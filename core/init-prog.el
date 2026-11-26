@@ -391,6 +391,15 @@ Diagnostics for all files are published separately for project listings."
   (setq flymake-inline-diagnostics '((current . fancy) (t . short))))
 
 ;; Langs
+(use-package lean4-mode
+  :straight (lean4-mode :type git :host github
+                        :repo "bustercopley/lean4-mode"
+                        :branch "eglot"
+                        :local-repo "lean4-mode-eglot"
+                        :files ("*.el" "data"))
+  :mode ("\\.lean\\'" . lean4-mode))
+
+
 (use-package cc-mode
   :config
   (setq c-basic-offset 4)

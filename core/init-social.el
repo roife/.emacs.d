@@ -2,6 +2,7 @@
 (use-package telega
   :straight (:host github :repo "zevlg/telega.el"
                    :files (:defaults "contrib/*.el" "etc"))
+  :commands +telega-toggle-work-mode
   :require-incrementally
   (password-cache cl-lib find-func emacsbug
                   telega-customize telega-server telega-root telega-ins
@@ -43,11 +44,98 @@
   (telega-msg-self-title ((t (:bold t :italic t))))
   :bind (:map telega-chat-button-map
               ("h" . nil)
+              :map telega-chat-mode-map
+              ("C-c C-c" . +telega-toggle-work-mode)
               :map telega-root-mode-map
+              ("C-c C-c" . +telega-toggle-work-mode)
               ("A" . +telega-toggle-archive))
   :hook ((telega-chat-mode . corfu-mode)
          (telega-chat-mode . +telega-completions-setup-capf))
   :config
+  (defvar +telega-work-mode nil
+    "Whether Telega uses the work display settings.")
+
+  (defun +telega-toggle-work-mode ()
+    "Toggle Telega's work display settings across chats."
+    (interactive)
+    (setq +telega-work-mode (not +telega-work-mode))
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when (and (derived-mode-p 'telega-chat-mode) telega-chatbuf--ewoc)
+          (with-telega-buffer-modify
+            (telega-save-cursor
+              (telega-chatbuf--footer-update)
+              (ewoc-refresh telega-chatbuf--ewoc))))))
+    (message "Telega work mode %s" (if +telega-work-mode "enabled" "disabled")))
+
+  (defadvice! +telega-work-sender-title-faces-a (orig &rest args)
+    :around #'telega-msg-sender-title-faces
+    (if +telega-work-mode
+        '(default)
+      (apply orig args)))
+
+  (defadvice! +telega-work-message-trail-a (orig msg)
+    :around #'telega-ins--message-date-and-status
+    (if +telega-work-mode
+        (cl-letf* ((original-symbol (symbol-function 'telega-symbol))
+                   ((symbol-function 'telega-ins--date) #'ignore)
+                   ((symbol-function 'telega-symbol)
+                    (lambda (name &optional image)
+                      (if (memq name '(checkmark heavy-checkmark no-checkmark))
+                          ""
+                        (funcall original-symbol name image)))))
+          (funcall orig msg))
+      (funcall orig msg)))
+
+  (defadvice! +telega-work-message-reactions-a (orig &rest args)
+    :around #'telega-ins--message0
+    (let ((telega-msg-temex-show-reactions
+           (if +telega-work-mode
+               `(and ,telega-msg-temex-show-reactions (chat saved-messages))
+             telega-msg-temex-show-reactions)))
+      (apply orig args)))
+
+  (defadvice! +telega-work-reaction-list-a (orig msg)
+    :around #'telega-ins--msg-reaction-list
+    (unless +telega-work-mode
+      (funcall orig msg)))
+
+  (defadvice! +telega-work-inline-message-face-a (orig &rest args)
+    :around '(telega-ins--msg-reply-to-message-inline
+              telega-ins--msg-reply-to-story-inline
+              telega-ins--msg-fwd-info-inline)
+    (if +telega-work-mode
+        (let ((inhibit-read-only t))
+          (telega-ins--with-props '(face default)
+            (apply orig args)))
+      (apply orig args)))
+
+  (defadvice! +telega-work-message-palette-face-a (orig face &rest args)
+    :around #'telega-face-with-palette
+    (if (and +telega-work-mode
+             (memq face '(telega-msg-heading telega-msg-inline-reply
+                          telega-msg-inline-forward)))
+        'default
+      (apply orig face args)))
+
+  (defadvice! +telega-work-unindent-chat-a (orig &rest args)
+    :around '(telega-chatbuf-msg--pp telega-chatbuf-footer-ins-pending-message)
+    (if +telega-work-mode
+        (let ((start (point)))
+          (prog1 (apply orig args)
+            (let ((end (point))
+                  (inhibit-read-only t))
+              (dolist (prop '(line-prefix wrap-prefix))
+                ;; Trim avatar padding, including NBSPs, while keeping markers.
+                (cl-loop for pos = start then next
+                         while (< pos end)
+                         for next = (next-single-property-change pos prop nil end)
+                         for prefix = (get-text-property pos prop)
+                         when (stringp prefix)
+                         do (put-text-property pos next prop
+                                               (string-trim-left prefix "[[:blank:]\u00a0]+")))))))
+      (apply orig args)))
+
   (setq telega-root-fill-column 79
         telega-chat-fill-column 79)
 
@@ -178,8 +266,14 @@
               telega-ins--sticker-image
               telega-ins--inline-sticker
               telega-chatbuf-sticker-insert)
-    (let ((telega-use-images t))
+    (let ((telega-use-images (not +telega-work-mode)))
       (apply orig-fn args)))
+
+  (defadvice! +telega-work-sticker-set-cover-a (orig &rest args)
+    :around #'telega-stickerset-title
+    (let ((telega-sticker-set-show-cover
+           (and (not +telega-work-mode) telega-sticker-set-show-cover)))
+      (apply orig args)))
 
   ;; HACK: disable sponsored msg
   (defadvice! +telega-hide-sponsored-messages-a (&rest _)

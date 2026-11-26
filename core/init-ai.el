@@ -352,33 +352,3 @@ This restores the event subscription without replaying history."
     (interactive)
     (require 'agent-review)
     (agent-review (agent-shell-openai-make-codex-config))))
-
-
-;; [gptel-copilot] gptel-powered inline code completion
-(use-package gptel-copilot
-  :straight (:type git :host github :repo "roife/gptel-copilot")
-  :commands gptel-copilot-mode
-  :preface
-  (defun +gptel-copilot-complete ()
-    "Accept the completion, or move to the end of code or line."
-    (interactive)
-    (or (gptel-copilot-accept-completion)
-        (mwim-end-of-code-or-line)))
-
-  (defun +gptel-copilot-complete-word ()
-    "Accept one completion word, or move forward one word."
-    (interactive)
-    (or (gptel-copilot-accept-completion-by-word 1)
-        (forward-word)))
-
-  :hook (prog-mode . gptel-copilot-mode)
-  :bind (:map gptel-copilot-mode-map
-              ("C-e" . +gptel-copilot-complete)
-              ("M-f" . +gptel-copilot-complete-word))
-  :config
-  (require 'gptel-openai-oauth)
-
-  (setq gptel-copilot-model 'gpt-5.4-mini
-        gptel-copilot-idle-delay 0.2
-        gptel-copilot-backend (gptel-make-openai-oauth "OpenAI OAuth Inline"
-                                :request-params '(:reasoning (:effort "low")))))
